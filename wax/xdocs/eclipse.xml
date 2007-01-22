@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+  <properties>
+    <title>Setup in Eclipse</title>
+    <author email="cathcart at archive dot org">cathcart</author>
+    <revision>$Id$</revision>
+  </properties>
+  <body>
+
+
+<section name="Development setup in Eclipse"> 
+
+<p>Here are vitals on setting up an eclipse development environment for
+nutchwax.
+</p>
+<subsection name="nutch">
+<p>Add the nutch project to eclipse. I had trouble trying to import
+symlinked nutch -- the <code>.classpath</code> and <code>.project</code> weren't written --
+so go against an actual directory.  There also seems to be an
+issue if the directory is named say <code>nutch-trunk</code> when the project name in
+the <code>build.xml</code> (or <code>.project</code> file) is Nutch.  Make them the same.</p>  
+<p>I created the new project by
+doing import using the ant build.xml.  This does not import all plugins nor does
+it add in the necessary conf directory.  Here is a sample .classpath:
+<a href="classpath">.classpath</a>.  I have eclipse build into the <code>target</code> subdir.
+</p>
+</subsection>
+<subsection name="nutchwax">
+<p>Nutchwax has a <code>.classpath</code> and <code>.project</code> already.  These should just work as
+is (They build to the <code>target</code> subdir).  It depends on a project named 'nutch'
+being present in the eclipse environment.
+</p>
+<p>So plugins can be found, I added following full-paths to the plugin
+directories in the nutchwax hadoop-site.xml under nutchwax/conf:
+<pre>
+&lt;property>
+  &lt;name>plugin.folders&lt;/name>
+  &lt;value>/home/stack/workspace/nutchwax/src/plugin,/home/stack/workspace/nutch/src/plugin&lt;/value>
+&lt;/property>
+</pre>
+</p>
+<p>That should do it.</p>
+</subsection>
+</section>
+
+</body>
+</document>
+

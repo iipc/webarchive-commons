@@ -1,0 +1,64 @@
+These are the steps run indexing a small collection, the british national
+election, 2005.  The collection comprises 206 ARCs of about ~20gigs compressed.
+
+$Id$
+
+Heres how I did the count of ARCs after logging into homeserver:
+
+    bash-2.05$ ~webcrawl/crawl-arc-cfg/db-arc-info -like \
+        BRITISH-NATIONAL-ELECTION-2005%  |grep '.arc.gz' | \
+        awk '{print $6}' |sort -u |wc
+
+There are 206 of them.
+
+Heres how I obtained a list of all BE arcs and where they are located:
+
+    bash-2.05$ ~webcrawl/crawl-arc-cfg/db-arc-info -like \
+        BRITISH-NATIONAL-ELECTION-2005% | awk '{print $2$4}' | \
+        sort | grep -e -bu. | uniq
+
+It returned:
+
+    crawldata0025a-bu.archive.org:/0
+    crawldata0027a-bu.archive.org:/3
+    crawldata0029a-bu.archive.org:/1
+    crawldata0029a-bu.archive.org:/2
+    crawldata0029a-bu.archive.org:/3
+    crawldata0030a-bu.archive.org:/0
+    crawldata0031a-bu.archive.org:/0
+    crawldata0032a-bu.archive.org:/0
+
+I put above into a file named /tmp/becollection.txt.
+
+I NFS mounted them all by doing this (after becoming su):
+
+    % mkdir /mnt/becollection
+    % for i in `cat /tmp/bemachines.txt`; \
+        do subpath=`echo $i|sed -n -e 's/://p'`; \
+        mntpoint="/mnt/becollection/$subpath"; \
+        mkdir -p $mntpoint; \
+        mount -t nfs -o ro,rsize=8192,wsize=8192,intr,nfsvers=2 $i $mntpoint; \        done
+
+Next, get nutch software and the archive-access extensions.  Follow
+instructions on this page:
+
+    http://cvs.sourceforge.net/viewcvs.py/*checkout*/archive-access/\
+        archive-access/projects/nutch/README.txt?rev=1
+
+Read requirements and do the ONE-TIME SETUP.
+
+Set configurations in nutch-site.xml.  Make sure right plugins are present.
+Do you want the parse-default to catch all but html instead of the html parse?
+If so, see notes in the README.txt cited above in the INDEXING NOTES section.
+
+Build in home directory rather than on /3 because above disks are mounted
+w/ the nfs option 'noexec' (Bash won't run).
+
+Run below script (206 arcs will take hours).
+
+    % nohup ./bin/indexarcs.sh -n -f \
+        "BRITISH-NATIONAL-ELECTION-2005*arc.gz" \
+        -s /mnt/becollection/ -d /3/british_election_indexing/nutch-data \
+        &> /3/british_election_indexing/indexing`date +%FT%H:%M`.log \
+        < /dev/null &
+

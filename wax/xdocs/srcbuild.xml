@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document>
+  <properties>
+    <title>Building from source</title>
+    <author email="stack at archive dot org">St.Ack</author>
+    <revision>$Id$</revision>
+  </properties>
+  <body>
+
+<section name="Before you start...">
+<p>Before you start, make sure you've satisfied
+<a href="requirements.html">requirements</a>.</p>
+</section>
+
+<section name="Building NutchWAX from src - Pre-mapreduce (i.e. Nutch-0.7 and NutchWAX 0.4.2 or earlier)">
+<p>Do an anonymous svn checkout of the archive-access/projects/nutch project.
+See <a href="http://sourceforge.net/svn/?group_id=118427">Subversion Access</a>
+for instructions that will checkout the archive-access project.  NutchWAX
+is in the archive-access/projects/nutch subdirectory.
+Let ${NUTCHWAX} be this directory everafter.</p>
+
+<p>Obtain the latest Nutch release.  See
+    <a href="http://www.apache.org/dyn/closer.cgi/lucene/nutch/">nutch
+    downloads</a>.
+    The below has been tested working using nutch 0.7.0. Revert to
+    this version of Nutch if problems building (Nutchwax will not
+    work with release 0.6 of Nutch). Unbundle the nutch release  It usually
+    untars as nutch-0.?.?.  The build scripts are looking for 'nutch' in 
+the ${NUTCHWAX} directory so you need to
+either rename nutch directory as Nutch or make a symbolic link from
+nutch-0.?.? to Nutch.
+If building against 0.7.1, you'll need to create the directory
+<literal>${NUTCH_HOME}/src/plugins/nutch-extensionpoints/src/java</literal>
+else the nutch ant build fails (There seem to be other issues running
+nutchwax against nutch 0.7.1 that need looking into).
+You'll may also have to update
+${NUTCHWAX}/project.properties to rename the corenutch jar if building
+against a nutch that is other than that which nutchwax is currently working
+against.
+</p>
+
+<p>Symlink <literal>${NUTCHWAX}/nutch/conf/nutch-site.xml.template</literal> to 
+${NUTCHWAX}/conf/nutch-site.xml. Doing this, there is only one nutch-site.xml
+shared by core Nutch and by NutchWAX extensions.
+<pre>   % cd ${NUTCH_HOME}/nutch/conf
+    % mv  nutch-site.xml nutch-site.xml.original
+    % ln -s ${NUTCHWAX}/conf/nutch-site.xml.template nutch-site.xml</pre>
+The <literal>nutch-site.xml.template</literal> that is in ${NUTCHWAX} has
+NutchWAX
+specific configuration overrides as well as hardcodings of collection names and
+the name of the archive host that holds archived pages. Edit these to suit your
+environment particularly 'wax.host' and 'wax.collection'. The
+NutchWAX search.jsp compounds these values to come up with the WAC URL
+that shows as part of the search results under the 'other versions' link.
+Don't worry if you don't know exact values at this stage. You can always
+come back later to make adjustment.</p>
+
+<p>Build Nutch (Anytime you make edits in base Nutch, redo this step).
+<pre>   % cd ${NUTCHWAX}/nutch
+    % ${ANT_HOME}/bin/ant compile jar war</pre>
+Note: Fedora Core 3 has 1.5.x ant installed.  The Nutch build is 1.6.x ant.  I
+used a local ant 1.6.2 install and passed '--noconfig' so we didn't reference
+the fedora ant 1.5.x install.</p>
+
+<p>Build NutchWAX.
+<pre>   % cd ${ARCHIVE_ACCESS}
+% ${ANT_HOME}/bin/ant compile jar war</pre>
+</p>
+<p>Under ${NUTCHWAX}/build you'll find the war file, classes and jars.</p>
+<p>To produce the binary bundle, we use maven (The ant and maven build need
+to be better unified).  Run 'maven dist'.</p>.
+
+</section>
+</body>
+</document>
+

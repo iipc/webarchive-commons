@@ -1,0 +1,36 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<!--This parser does not do anything with but add metainfo to the index.
+    Assumption is that this parser runs last of all.  Empty pathSuffix is what
+    makes this the default parser.  Include this as a parser to run in the
+    nutch-site.xml and then make sure the html parser does not also
+    have empty pathSuffix.  It is the usual default parser in nutch.
+
+    The contentType is set to 'no-content-type' so we don't accidentally match a
+    content type mistakenly.
+-->
+<plugin version="1.0.0"
+    provider-name="archive.org"
+    id="parse-default"
+    name="Metadata-only parser" >
+  <runtime>
+    <library name="parse-default.jar" >
+      <export name="*" />
+    </library>
+  </runtime>
+   <requires>
+      <import plugin="nutch-extensionpoints"/>
+   </requires>
+  <extension point="org.apache.nutch.parse.Parser"
+        id="org.archive.access.nutch.parse.default"
+        name="MetadataOnlyParser" >
+
+    <implementation
+        class="org.archive.access.nutch.parse.MetadataOnlyParser"
+        id="org.archive.access.nutch.parse.MetadataOnlyParser" >
+        <parameter name="contentType" value="*"/>
+        <parameter name="pathSuffix"  value=""/>
+    </implementation>
+
+
+  </extension>
+</plugin>

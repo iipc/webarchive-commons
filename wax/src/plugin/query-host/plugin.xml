@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin
+   id="query-host"
+   name="Host Query Filter"
+   version="1.0.0"
+   provider-name="nutch.org">
+
+   <runtime>
+      <library name="query-host.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+
+   <requires>
+      <import plugin="nutch-extensionpoints"/>
+   </requires>
+
+   <extension id="org.apache.nutch.searcher.host.HostQueryFilter"
+              name="Nutch Host Query Filter"
+              point="org.apache.nutch.searcher.QueryFilter">
+      <implementation id="HostQueryFilter"
+                      class="org.apache.nutch.searcher.host.HostQueryFilter">
+        <parameter name="fields" value="host"/>
+      </implementation>
+      
+   </extension>
+
+</plugin>

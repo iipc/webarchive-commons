@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+
+<project name="query-title" default="jar-core">
+
+  <import file="../build-plugin.xml"/>
+
+</project>

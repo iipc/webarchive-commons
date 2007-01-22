@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin id="parse-waxext"
+   name="NutchWAX External Command Parser"
+   version="1.0.0"
+   provider-name="archive.org">
+   <runtime>
+      <library name="parse-waxext.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+   <requires>
+      <import plugin="nutch-extensionpoints"/>
+   </requires>
+   <extension id="org.apache.nutch.parse.ext"
+        name="WAX ExtParse"
+        point="org.apache.nutch.parse.Parser">
+    <implementation id="org.apache.nutch.parse.ext.WaxExtParser"
+            class="org.apache.nutch.parse.ext.WaxExtParser">
+        <parameter name="contentType" value="application/pdf"/>
+        <parameter name="pathSuffix"  value=""/>
+        <parameter name="timeout"  value="30"/>
+        <!--Set the /bin/bash prefix because TaskTracker#unJar removes
+        execute permissions.
+        -->
+        <parameter name="command"  value="/bin/bash ./bin/parse-pdf.sh"/>
+      </implementation>
+   </extension>
+
+</plugin>

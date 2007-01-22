@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faqs title="Frequently Asked Questions">
+  <part id="general">
+    <faq id="about">
+      <question>
+            Whats this all about?
+      </question>
+      <answer>
+      <p>This project is a search engine for web collection archives.
+      Used with the (non-distributable) Internet Archive
+      <a href="http://www.archive.org/web/web.php">Wayback Machine</a> or
+      with the freely available 
+      <a href="/projects/wera/">WERA</a> or open source 
+      <a href="../../wayback/">wayback</a>
+      applications, you have a complete access tool for SMALL to MEDIUM
+      web archive collections (Up to 500Million documents or about 150k ARC
+      files).
+      </p>
+        <p>See <a href="iwaw/iwaw-wacsearch.pdf">Full Text Search of
+        Web Archive Collections</a> for a fuller, if now dated, treatment
+        of the problems this project addresses.</p>
+      </answer>
+   </faq>
+   <faq id="wb">
+<question>Can the open source wayback be used to rendor NutchWAX search
+results?</question>
+<answer><p>Yes. See <a href="wayback.html">wayback-NutchWAX</a> for
+instructions on how.
+</p>
+</answer>
+</faq>
+   <faq id="wera">
+<question>Where do I go to learn more about WERA and how it works with
+NutchWAX</question>
+<answer><p>See <a href="/projects/wera/">WERA</a>.
+</p>
+</answer>
+</faq>
+
+   <faq id="src">
+<question>How do I build from source?</question>
+<answer><p>See <a href="apidocs/overview-summary.html#src">Building from source</a> in the javadoc overview.
+</p>
+</answer>
+</faq>
+
+</part>
+
+
+
+  <part id="indexing">
+    <title>Indexing</title>
+
+<faq id="dedup">
+<question>What does the dedup step do (or why do I only see one version of a page when I know
+there are more than one in the repository)?
+</question>
+
+<answer><p>It deduplicates content by an MD5 hash of the content. 
+The dedup step runs after the indexing step and adds a '.del' file, a bit vector of files
+to ignore into, the index just made. Merging, the subsequent step,  will skip over files
+mentioned in the '.del' file.</p>
+<p>Before the move to a mapreduce base -- i.e. NutchWAX 0.6.0 -- dedup would deduplicate by
+MD5 of content AND by URL.  The URL deduplication is now done implicitly by the framework
+since the Nutch mapreduce jobs key use the page's URL as mapreduce key; this means only one
+version of a page will prevail, usually the latest crawled.  NutchWAX has improved this situation
+some by adding the collection name to the key used throughout mapreduce tasks.  This makes it so
+you can have as many versions of a page as you have collections.
+</p>
+</answer>
+</faq>
+
+<faq id="checksum">
+<question>Checksum errors consistently fail my job</question>
+<answer><p>If you can't move to better quality hardware -- ECC memory, etc. -- then
+skip checksum errors by setting the hadoop configuration
+<code>io.skip.checksum.errors</code>.  You will also need to 
+apply the patch that is in the NutchWAX README to your hadoop install.
+</p>
+</answer>
+</faq>
+
+<faq id="sort">
+<title>How do I sort an index in NutchWAX</title>
+<question>How do I sort an index with NutchWAX</question>
+<answer><p>Sorting an index will usually return better
+quality results in less time.  Most of Nutch is built into the NutchWAX jar.
+To run the nutch indexer sorter, do the following:
+<pre>$ hadoop jar nutchwax.jar class org.apache.nutch.indexer.IndexerSorter</pre>
+</p>
+</answer>
+</faq>
+
+<faq id="incremental">
+<question>Is it possible to do incremental updates?</question>
+<answer><p>Here is a sketch of how to do it for now.  Later we'll add better
+documentation as we have more experience running incrementals.  Outstanding issues are
+how new versions of a page play with the old versions.
+If new ARCs are given a collection name on
+import that is the same as that of collection already extant in the index, then likely
+the newer page will replace the older version.  There will be some aggregation of page
+metadata but only one version of the page will persist in the index.  Otherwise,
+if newer ARCs are given a new collection name, both versions will appear
+in the index  but anchor text is distributed only within the confines of the
+collection (pages are keyed by URL+Collection name) so the two versions may score
+very differently.  For example, if you are adding a small collection
+to a big collection, a profusion of inlinks to the page from the big
+collection may cause it to score much higher than that of the page from the small
+collection.  There's work to do here still.  Meantime, here is a receipe for 
+incremental updates.
+</p>
+<p>Choose a collection name with the above in mind.  Run the import
+step to ingest the newly accumulated ARCs.  This will produce a new segment.
+Note its name.</p>
+<p>Next update the crawldb -- the 'update' step -- with the content of the
+new segment.  Here is the usage for the update step:
+<pre>stack@debord:~/workspace$ ./hadoop-0.5.0/bin/hadoop jar nutchwax/build/nutchwax.jar help update
+Usage: hadoop jar nutchwax.jar update &lt;output&gt; [&lt;segments&gt;...]
+Arguments:
+ output    Directory to write crawldb under.
+ Options:
+  segments  List of segments to update crawldb with. If none supplied, updates
+              using latest segment found.</pre>
+Pass the new segment (or segments) and the new ARC content will be added to
+the pre-existing crawldb.  Do the same for the linkdb, the 'invert' step (Be
+sure to read its usage so you pass the options in correct order).
+</p>
+<p>Next up is indexing but lets take pause.  The NutchWAX index step takes
+an <i>output</i> directory and a list of segments outputting a new index at
+<i>output/indexes</i>.  You probably already have an <i>output/indexes</i>
+in place with content of your initial indexing.  You could move it aside
+but its possible to access more indexing options by invoking the NutchwaxIndexer
+class directly rather than going via the Nutchwax driver class:
+<pre>$ ./hadoop/bin/hadoop jar nutchwax/build/nutchwax.jar class org.archive.access.nutch.NutchwaxIndexer
+Usage: &lt;index&gt; &lt;crawldb&gt; &lt;linkdb&gt; &lt;segment&lt; ...
+</pre>
+Now you can pass where you want the index written (at the cost of having
+to explicitly stipulate locations for crawldb, linkdb, etc.).
+</p>
+<p>Run the (optional) dedup and the merge step.  Again you'll need
+access to more options so you can specify the particular index you want
+deduped or merged:
+<pre>$ hadoop jar nutchwax/build/nutchwax.jar class org.apache.nutch.indexer.DeleteDuplicates
+Usage: &lt;indexes&gt;...
+$ hadoop jar nutchwax/build/nutchwax.jar class org.apache.nutch.indexer.IndexMerger
+Usage: IndexMerger [-workingdir &lt;workingdir&gt;] outputIndex indexesDir...</pre>
+</p>
+<p>The new merged index can now be added to the index already deployed.
+You could do this by merging the two indices as one -- see the above cited usage
+for <code>IndexMerger</code> -- or, you could have the
+search application open both the old and new indices.  Here is how you would
+do the latter.  Assuming the currently running index is also the result of a
+merge, then its deployed directory name will be <code>index</code> as oppossed to
+<code>indexes</code>.  To have the search application search against
+both the old and the new index, make a directory <code>indexes</code>
+under the search webapp and move into it the old <code>index</code> 
+directory.  Also move here the new, merged index delta (It should be named
+other than the old index but otherwise names can be anything).  Finally,
+you need to add an empty file named <code>index.done</code> to both indices
+else they won't be used by the search application:
+<pre>$ touch ./indexes/index/index.done
+$ touch .indexes/new-index-delta/index.done.
+</pre>
+Restart and queries should now hit both  (Be sure you've not
+left over the old 'index' -- that its been moved, not copied under
+indexes directory).
+</p>
+
+</answer>
+</faq>
+
+</part>
+
+  <part id="querying">
+    <title>Querying</title>
+<faq id="transform">
+<question>When I try and open the opensearch servlet under tomcat, I get complaint about
+missing TransformerFactoryImpl.</question>
+
+<answer>Restart tomcat w/ 1.4.x JDK.  See this link for more on the issue:
+http://forum.java.sun.com/thread.jspa?tstart=30&amp;forumID=34&amp;threadID=542044&amp;trange=15
+(Note, it speaks of xml-apis.jar. I had success removing xmlParserAPIs.jar).</answer>
+</faq>
+
+
+    <faq id="encoding">
+      <question>Why is encoding of non-ascii characters all messed up?
+      </question>
+      <answer>
+      <p>See <i>useBodyEncodingForURI</i> in the <a 
+      href="http://jakarta.apache.org/tomcat/tomcat-5.5-doc/config/ajp.html">Tomcat Configuration
+      Reference</a>. Edit <code>$TOMCAT_HOME/conf/server.xml</code>
+      and add <i>useBodyEncodingForURI=true</i>.  Here is what it looks like
+      when edit has been added:
+      <pre>&lt;!-- Define a non-SSL HTTP/1.1 Connector on port 8080 -->
+    &lt;Connector port="8080" maxHttpHeaderSize="8192"
+               maxThreads="150" minSpareThreads="25" maxSpareThreads="75"
+               enableLookups="false" redirectPort="8443" acceptCount="100"
+               connectionTimeout="20000" disableUploadTimeout="true"
+               useBodyEncodingForURI="true"
+               /></pre>
+      </p>
+      </answer>
+   </faq>
+
+<faq id="queryfields">
+<question>What fields can I query against?
+</question>
+<answer><p>
+The set of query fields depends on configuration during indexing and
+configuration of the search engine at query time. Generally in NutchWAX,
+you can query against following fields:
+
+<table style="text-align: left; width: 80%;" border="1" cellpadding="2"
+cellspacing="2">
+<tbody>
+<tr>
+<td><b>Name</b>
+</td>
+<td><b>Query Time
+Weight</b>
+</td>
+<td><b>Source</b>
+</td>
+<td><b>Notes</b>
+</td>
+</tr>
+<tr>
+<td>host
+</td>
+<td>2.0
+</td>
+<td>Nutch
+</td>
+<td>Unstored, indexed and tokenized.
+<i>E.g. <code>host:gov</code></i>
+</td>
+</tr>
+<tr>
+<td>site</td>
+<td>1.0
+</td>
+<td>Nutch
+</td>
+<td>Unstored, indexed and
+un-tokenized. Site has zero weight. Means you must pass a term plus
+site: E.g. <code>John Glenn site:atc.nasa.gov</code></td>
+</tr>
+<tr>
+<td>url</td>
+<td>4.0
+</td>
+<td>Nutch
+</td>
+<td>Stored and indexed and
+tokenized. See <span style="font-style: italic;">exacturl</span>also.
+</td>
+</tr>
+<tr>
+<td>date
+</td>
+<td>1.0
+</td>
+<td>NutchWAX
+</td>
+<td>Stored, not indexed, not
+tokenized. Date is 14-digit ARC date: E.g. "date:20060110101010".
+Can query ranges by passing two dates delimited by hyphen: E.g. "date:20060110101010-20060111101010".</td>
+</tr>
+<tr>
+<td>collection
+</td>
+<td>0
+</td>
+<td>NutchWAX
+</td>
+<td>Stored, indexed, not
+tokenized. A zero weight means you must pass a term as well as
+its collection name. Collection alone is not sufficent.
+E.g. "collection:nara john glenn".
+</td>
+</tr>
+<tr>
+<td>arcname
+</td>
+<td>1.0
+</td>
+<td>NutchWAX
+</td>
+<td>Stored, indexed, not tokenized.
+</td>
+</tr>
+<tr>
+<td>type
+</td>
+<td>0.1
+</td>
+<td>NutchWAX
+</td>
+<td>Not stored, indexed, not
+tokenized.
+</td>
+</tr>
+<tr>
+<td>exacturl
+</td>
+<td>1.0
+</td>
+<td>NutchWAX
+</td>
+<td>Because 'url' is tokenized, to
+query for an exact url in the index, use this query field.
+</td>
+</tr>
+</tbody>
+</table>
+</p>
+
+<p>Its possible to search exclusively against
+title, content, and anchors but it requires
+adding the query-time plugins to the nutchwax
+configuration.</p>
+</answer>
+</faq>
+
+<faq id="resultfields">
+<question>What fields can I expect to see in results?
+</question>
+<answer><p>
+The fields available to search results vary with configuration -- check
+out the <i>explain</i> link to see all available in your current install
+-- but in NutchWAX generally you can expect the following fields to be
+present (unless the field was empty for the particular document):
+url, title, date, arcdate, arcname, arcoffset, collection, primarytype,
+and subtype.
+</p></answer>
+</faq>
+
+<faq id="hitspersite">
+<question>I don't seem to be seeing all hits from a site? Why?
+(Or, whats "Hits 1-3 (out of about 6 total matching pages)" mean?). 
+</question>
+<answer><p>
+Default is to show only 1 or 2 hits per site (Google shows maximum of two).
+Append the <b>hitsPerSite</b> to your query to change this config.  E.g. Add
+'&amp;hitsPerSite=3' to the end of your query in the location box to see a
+maximum of three hits from each site (Set it to zero to see all from a site).
+</p></answer>
+</faq>
+
+<faq id="datesort">
+<question>How to sort results by date?
+</question>
+<answer><p>
+<code>http://localhost:8080/archive-access-nutch/search.jsp?query=traditional+irish+music+paddy&amp;hitsPerPage=100&amp;dedupField=date&amp;hitsPerDup=100&amp;sort=date</code>
+... and then in reverse:
+<code>http://localhost:8080/archive-access-nutch/search.jsp?query=traditional+irish+music+paddy&amp;hitsPerPage=100&amp;dedupField=date&amp;hitsPerDup=100&amp;sort=date&amp;reverse=true</code>
+
+The hitsPerPage says how many hits to return per results page.
+The dedupField says what field to dedup the hit results on. Default is 'site'.
+The hitsPerDup says how many of dedupField to return as part of results
+(Default is 2 so we only ever return 2 hits from any one site by default).
+sort is field you want to sort on.
+reverse is self-explainatory.
+</p></answer>
+    </faq>
+    <faq  id="mimetype">
+<question>How to query for mimetypes?
+</question>
+<answer>
+<p>Use <i>type</i> query field name. NutchWAX -- like nutch -- adds the
+mimetype, the primary type and subtype to a <i>type</i> field. This
+means that you can query for the mimetypes 'text/html' by querying
+<code>type:text/html</code>, or for primary type 'text' by
+querying <code>type:text</code>, or for subtype 'html' by querying 
+<code>type:html</code>, etc.</p>
+</answer>
+    </faq>
+    <faq id="scoring">
+        <question>Tell me more about how scoring is done in
+        nutch/NutchWAX (Or 'explain' the <code>explain</code> page)?</question>
+        <answer>
+        <p>See <i>How is scoring done in Nutch? (Or, explain the
+        "explain" page?)</i> and <i>How can I influence Nutch scoring?</i> over on
+        the <a href="http://wiki.apache.org/nutch/FAQ">Nutch FAQ</a> page.</p>
+        </answer>
+    </faq>
+    <faq id="opensearch">
+        <question>What is this RSS symbol in search results all
+        about?</question>
+        <answer>
+            <p>See <a href="http://wiki.apache.org/nutch/FAQ">What is the RSS
+            symbol in search results all about?</a> in the Nutch FAQ.
+            </p>
+        </answer>
+    </faq>
+<faq id="npe_onstart">
+    <question>Why do I get an NPE when I go to access a NutchWAX page
+    in tomcat?</question>
+<answer>
+<p>Does your NPE have a Root Cause that looks like the below?
+<pre>
+java.lang.NullPointerException
+    at org.apache.nutch.searcher.NutchBean.init(NutchBean.java:96)
+    at org.apache.nutch.searcher.NutchBean.(NutchBean.java:82)
+    at org.apache.nutch.searcher.NutchBean.(NutchBean.java:72)
+    at org.apache.nutch.searcher.NutchBean.get(NutchBean.java:64)
+    at org.apache.jsp.search_jsp._jspService(search_jsp.java:79)
+    at org.apache.jasper.runtime.HttpJspBase.service(HttpJspBase.java:137)
+    at javax.servlet.http.HttpServlet.service(HttpServlet.java:853)
+</pre>
+Set the searcher.dir in hadoop-site.xml to point to your index and segments.
+</p>
+</answer>
+</faq>
+
+  <faq id="distributed">
+    <question>How do I run the distributed searcher?
+    </question>
+    <answer><p>See the <i>Distributed Searching</i> section of the
+    <a href="http://wiki.apache.org/nutch/NutchHadoopTutorial">NutchHadoopTutorial</a> for
+    description of how it generally works only running the search servers is done differently
+    in NutchWAX.  See <code>${NUTCHWAX_HOME}/bin/start-slave-searcher.sh</code> for a 
+    sample startup script (Adjacent are shutdown scripts and a script to start up 
+    a cluster of searchers).   Amend these sample scripts to suit your environment.
+    </p>
+    </answer>
+    </faq>
+
+  </part>
+
+  <part id="mapreduce">
+    <title>MapReduce</title>
+  <faq id="overview">
+    <question>Where can I learn about mapreduce?
+    </question>
+    <answer><p>See <a href="http://en.wikipedia.org/wiki/Mapreduce">The
+    Wikipedia MapReduce</a> page.
+    </p>
+    </answer>
+    </faq>
+  <faq id="hadoop_overview">
+    <question>Where can I learn more about setup and operation of
+    <a href="http://lucene.apache.org/hadoop/">hadoop</a>, the mapreduce and distributed filesystem project nutchwax runs atop?
+    </question>
+    <answer><p>
+    See the <a 
+    href="http://lucene.apache.org/hadoop/docs/api/overview-summary.html">hadoop package documentation</a>. Has notes on getting started,
+    standalone and distributed operation, etc.</p>
+    </answer>
+    </faq>
+  </part>
+
+  <part id="oldnutchwax">
+	<title>Old NutchWAX (pre-release 0.6.0, pre-move to mapreduce)</title>
+
+      <faq id="default_parser">
+<question>How do I set the default parser, the one that is called when no
+explicit parser available?
+</question>
+<answer><p>Its already setup for you in the default config.  Here is what
+the 'parse-default' plugin does.  If a resource has a content type for
+which there is no parser,
+e.g. if there is no image or audio parser mentioned in the nutch-site.xml
+plugin.includes, all such resources are passed to the html parser in
+native nutch (For non-html types it will return failed parse).  The way
+nutch ParserFactory figures which parser to use as default is by looking at
+the plugin.xml of each parser and the first that it finds that has an
+empty pathSuffix is the one it uses as default. To change this behavior,
+we've filled in the nutch/src/plugin/parse-html/plugin.xml#pathSuffix
+with 'html' in the html parse plugin that is part of NutchWAX and 
+have added our own default parser, parser-default, to nutch-site.xml in the 
+plugin.includes with an empty pathSuffix in its plugin.xml.
+</p>
+</answer>
+</faq>
+
+<faq id="boost0">
+<question>If boost is zero, nothing shows in the search results?
+</question>
+
+<answer><p>By design. Boost of zero plugins get converted to filters.
+Could make it all in a query are zero boost, that we boost an arbitrary
+field.
+</p></answer>
+</faq>
+
+<faq id="env">
+<question>What are the important environment variables?
+</question>
+
+<answer><p>NUTCH_HEAPSIZE and NUTCH_OPTS influence nutch script operations
+(Memory allocated, etc.).  JAVA_OPTS defaults to '-Xmx400m -server' for
+running of segmenting.
+</p></answer>
+</faq>
+
+<faq id="dist">
+<question>Which steps can be distributed?
+</question>
+<answer><p>
+<pre>Igor Ranitovic wrote:
+
+> If I want to merge indexes from 20 different machines what happens to links
+> db?
+
+The normal order I do things is:
+
+1. create segments, on multiple machines in parallel
+2. update db from segs, on a single machine that can access all segs
+3. update segs from db, on a single machine that can access all segs
+4. index segments, on multiple machines in parallel
+5. dedup segment indexes, on a single machine that can access all segs
+6. merge indexes, on a single machine that can access all segs
+
+In the next few months, as I port stuff to use MapReduce, we'll get rid of the
+single-machine bottlenecks of steps 2, 3, 5 and 6.  MapReduce should also make
+it easy and reliable to script steps 1-6 on a bunch of machines without manual
+intervention.
+
+> These are the steps that I have done so far: create segments, link db, and
+> index on each of individual machines.   Now, I want to run deduping and
+> merging on aggregated segments/indexes from all 20 machines but I am afraid
+> that this approach will drop link db info?  At this point, is it too late to
+> 're-run' updatedb and updatesegs on aggregated segments since the segments
+> have been already updated with link information?
+
+You can always create a new db and update it from a set of segments. Or, if 
+you have a db that's been updated with a subset of the segments then you can
+update it with the rest.  Then you'll want to re-update all of the segments,
+so they know about all of the new links in the db.  You can re-update segments
+repeatedly too, but each time it adds link information you need to reindex the
+segment before that link information is used.
+
+If we need to do this a lot then there's a way to structure Lucene indexes so
+that we can, e.g., re-build the index of incoming anchors without re-indexing
+all of the the content, titles, urls, etc.
+
+http://www.mail-archive.com/java-dev@lucene.apache.org/msg00414.html
+
+Doug 
+</pre>
+</p>
+</answer>
+</faq>
+
+<faq id="incremental">
+<question>How to approach incremental indexing?</question>
+
+<answer><p><pre>
+1. Segment new arcs.
+2. Can update new segmetns into old db
+3. Update from old db against new segments only; otherwise will have reindex
+   old segments.
+4. Index new segments.
+5. Dedup everything because new links may be in old segments.
+6. Merge all segments.
+</pre></p></answer>
+</faq>
+<faq id="files">
+<question>What are these data and index files in nutch segments under data?
+</question>
+
+<answer><p>See <a href="http://wiki.apache.org/nutch/NutchFileFormats">NutchFileFormats</a></p></answer>
+</faq>
+  </part>
+</faqs>

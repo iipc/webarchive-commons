@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<project name="index-wax" default="jar">
+  <import file="../build-plugin.xml"/>
+</project>

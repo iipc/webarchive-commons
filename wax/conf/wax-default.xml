@@ -1,0 +1,248 @@
+<?xml version="1.0"?>
+
+<!--Nutch(WAX) configuration.  Bulk of below are overrides for nutch-default.xml
+plus on the end we add a few new properties with 'wax' prefix. This file is
+read just before we write the job jar and job xml out to DFS for slaves to work
+on.  It overrides nutch-default.xml.  Override the settings
+below by adding overrides to hadoop-site.xml
+-->
+<configuration>
+
+<property>
+  <name>indexer.max.tokens</name>
+  <value>100000</value>
+  <description>
+  The maximum number of tokens that will be indexed for a single field
+  in a document. This limits the amount of memory required for
+  indexing, so that collections with very large files will not crash
+  the indexing process by running out of memory.
+
+  Note that this effectively truncates large documents, excluding
+  from the index tokens that occur further in the document. If you
+  know your source documents are large, be sure to set this value
+  high enough to accomodate the expected size. If you set it to
+  Integer.MAX_VALUE, then the only limit is your memory, but you
+  should anticipate an OutOfMemoryError.
+
+  Make it ten times default.
+  </description>
+</property>
+
+<property>
+  <name>plugin.folders</name>
+  <value>wax-plugins,plugins</value>
+  <description>Directories where nutch plugins are located.  Each
+  element may be a relative or absolute path.  If absolute, it is used
+  as is.  If relative, it is searched for on the classpath.</description>
+</property>
+
+<property>
+  <name>plugin.includes</name>
+  <value>protocol-http|urlfilter-regex|parse-(text|html|rss|default|pdf)|index-(basic|wax)|query-(basic|site|url|host|wax)|summary-basic|scoring-opic|urlnormalizer-(pass|regex|basic)</value>
+  <description>Regular expression naming plugin directory names to
+  include.  Any plugin not matching this expression is excluded.
+  In any case you need at least include the nutch-extensionpoints plugin. By
+  default Nutch includes crawling just HTML and plain text via HTTP,
+  and basic indexing and search plugins.
+
+  See also 'parse.plugin.file'.
+  </description>
+</property>
+
+<property>
+  <name>parse.plugin.file</name>
+  <value>wax-parse-plugins.xml</value>
+  <description>The name of the file that defines the associations between
+  content-types and parsers.
+  </description>
+</property>
+
+<property>
+  <name>io.map.index.skip</name>
+  <value>7</value>
+    <description>Use less RAM.
+
+  This is now a hadoop config.
+  Number of index entries to skip between each entry.
+  Zero by default. Setting this to values larger than zero can
+  facilitate opening large map files using less memory.
+
+  From hadoop-default.xml.
+    </description>
+</property>
+
+<property>
+  <name>indexer.termIndexInterval</name>
+  <value>1024</value>
+  <description>Determines the fraction of terms which Lucene keeps in
+  RAM when searching, to facilitate random-access.  Smaller values use
+  more memory but make searches somewhat faster.  Larger values use
+  less memory but make searches somewhat slower.
+
+  Default is 128.
+  </description>
+</property>
+
+<property>
+  <name>searcher.summary.context</name>
+  <value>20</value>
+  <description>
+  The number of context terms to display preceding and following
+  matching terms in a hit summary.
+ 
+  Make summaries a little longer than the default.
+  </description>
+</property>
+
+<property>
+  <name>searcher.summary.length</name>
+  <value>80</value>
+  <description>
+  The total number of terms to display in a hit summary.
+
+  Make summaries a little longer than the default.
+  </description>
+</property>
+
+<property>
+  <name>searcher.max.hits</name>
+  <value>1000</value>
+  <description>If positive, search stops after this many hits are
+  found.  Setting this to small, positive values (e.g., 1000) can make
+  searches much faster.  With a sorted index, the quality of the hits
+  suffers little.
+
+  Limit to a 1000.
+
+  If this parameter is non-default, must set below search.max.time
+  parameters also else java.lang.NullPointerException in
+    org.apache.nutch.searcher.LuceneQueryOptimizer$LimitedCollector
+    at LuceneQueryOptimizer.java:108
+  </description>
+</property>
+
+<property>
+  <name>searcher.max.time.tick_count</name>
+  <value>10</value>
+  <description>If positive value is defined here, limit search time for
+  every request to this number of elapsed ticks (see the tick_length
+  property below). The total maximum time for any search request will be
+  then limited to tick_count * tick_length milliseconds. When search time
+  is exceeded, partial results will be returned, and the total number of
+  hits will be estimated.
+  </description>
+</property>
+
+<property>
+  <name>searcher.max.time.tick_length</name>
+  <value>1000</value>
+  <description>The number of milliseconds between ticks. Larger values
+  reduce the timer granularity (precision). Smaller values bring more
+  overhead.
+  </description>
+</property>
+
+<property>
+  <name>http.content.limit</name>
+  <value>103424</value>
+  <description>The length limit for downloaded content, in bytes.
+  If this value is nonnegative (>=0), content longer than it will be truncated;
+  otherwise, no truncation at all.
+
+  Default for nutch is 64k.  Set the value for nutchwax to be the old
+  google limit of 101k.
+  </description>
+</property>
+
+<property>
+  <name>fetcher.store.content</name>
+  <value>false</value>
+  <description>If true, fetcher will store content.
+    NutchWAX doesn't store content.  It just does content parse.  Content
+    is elsewhere, in ARCs.
+  </description>
+</property>
+
+<property>
+  <name>wax.index.all</name>
+  <value>true</value>
+    <description>If set to true, all content types are indexed.  Otherwise
+    we only index text/* and application.
+
+	All types are useful if index is going to be used by wayback or
+	WERA.  Otherwise, you probably do not need to index all types
+	(One way to prevent images and stylesheets appearing high
+	in search results, which they are wont to do until we fix
+	problems in page boosting, is to set this property to
+	false).
+    </description>
+</property>
+
+<property>
+  <name>wax.index.timeout</name>
+  <value>120</value>
+    <description>Time to spend indexing an ARC.  If exceeded, indexing
+    thread is destroyed.  Time units are minutes.
+
+    An ARC of all PDFs on a machine with 4 children took more than an hour
+    to process.  Make default be 2 hours.
+    </description>
+</property>
+
+<property>
+    <name>wax.index.redirects</name>
+    <value>false</value>
+    <description>If true, we index redirects (status code 30x).
+    </description>
+</property>
+
+<property>
+  <name>wax.parse.rate.threshold</name>
+    <value>10</value>
+    <description>If kilobytes per second rises above this threshold,
+    we'll log the URL. Default is 10.  -1 says don't log parse rate.
+    </description>
+</property>
+
+<property>
+    <name>wax.pdf.size.multiplicand</name>
+    <value>10</value>
+    <description>Nutch is set to read http.content.limit bytes of content. PDFs
+    are usually larger than text/html and truncated PDFs are usually unparseable.
+    When ingesting and the resource mimetype is application/pdf, we will read
+    http.content.limit * wax.pdf.size.multiplicand bytes instead of just
+    http.content.limit.
+    </description>
+</property>
+
+<property>
+    <name>wax.digest.sha1</name>
+    <value>false</value>
+    <description>Nutch calculates md5 digests and uses these comparing
+    page content in duplicate detection step (at least).  Set this
+    property to true to have ARCReader in the import arcs step
+    calculate a sha1 and write the calculated digest out to the
+    crawldb (Detection of duplicate pages will fail if enabled
+    until the dedup is modified to handle sha1).
+    </description>
+</property>
+
+<property>
+  <name>wax.host</name>
+  <value>localhost:8080</value>
+  <description>
+  Used at search time by the nutchwax webapp.
+ 
+  The name of the server hosting collections.
+  Used by the webapp conjuring URLs that point to page renderor
+  (e.g. wayback).
+
+  URLs are conjured in this fashion:
+
+    ${wax.host}/COLLECTION/DATE/URL
+
+  To override the COLLECTION obtained from the search result,
+  add a path to wax.host: e.g. localhost:8080/web.
+  </description>
+</property>
+</configuration>

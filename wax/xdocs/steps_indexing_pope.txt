@@ -1,0 +1,74 @@
+These are the steps run indexing a medium-sized collection, broad crawl of 
+pope sites around JPII's death and election of Boniface I.
+
+$Id$
+
+Two crawls were run. One for LoC which has a prefix of is POPE-0* and an
+earlier crawl run by IA with prefix POPE-JOHN*
+
+Here is how I found ARCs that make up the collection:
+    
+    (ssh to homeserver)
+    bash-2.05$  ~webcrawl/crawl-arc-cfg/db-arc-info -like POPE%| \
+        grep -v -e 'JOHN-PAUL' | awk '{print $2$4}' | sort | grep -e -bu. | \
+        uniq
+
+    crawldata0020a-bu.archive.org/3
+    crawldata0021a-bu.archive.org/2
+    crawldata0021a-bu.archive.org/3
+    crawldata0022a-bu.archive.org/3
+    crawldata0023a-bu.archive.org/3
+    crawldata0024a-bu.archive.org/0
+    crawldata0024a-bu.archive.org/1
+    crawldata0024a-bu.archive.org/2
+    crawldata0024a-bu.archive.org/3
+    crawldata0025a-bu.archive.org/1
+    crawldata0026a-bu.archive.org/0
+    crawldata0026a-bu.archive.org/1
+    crawldata0026a-bu.archive.org/2
+    crawldata0026a-bu.archive.org/3
+    crawldata0027a-bu.archive.org/0
+    crawldata0027a-bu.archive.org/1
+    crawldata0027a-bu.archive.org/2
+    crawldata0027a-bu.archive.org/3
+    crawldata0029a-bu.archive.org/0
+    crawldata0029a-bu.archive.org/1
+    crawldata0029a-bu.archive.org/2
+
+Doing a count, I see:
+
+    bash-2.05$  ~webcrawl/crawl-arc-cfg/db-arc-info -like POPE%| \
+        grep -v -e 'JOHN-PAUL' | awk '{print $6}'| \
+        grep -e '.arc.gz'|sort|uniq|wc -l
+
+1501
+
+Ran following mkdir and mount:
+
+    wbsearch03:/3/pope-loc-indexing# for i in `cat collection_hosts.txt`; \
+        do subpath=$i; mntpoint="/mnt/pope-loc-collection/$subpath"; \
+        mkdir -p $mntpoint; dev=`echo $i|sed -n -e 's/\//:\//p'`; \
+        mount -t nfs -o ro,rsize=8192,wsize=8192,intr,nfsvers=2 $dev $mntpoint;\
+        done
+
+I split indexing across two machines: wbsearch03 and wbsearch04
+
+stack@wbsearch03:/mnt/pope-loc-collection$ find . \
+        -name 'POPE-0*arc.gz'|sort|uniq|wc
+   1504    1504  141376
+stack@wbsearch03:/mnt/pope-loc-collection$ find . \
+        -name 'POPE-0[0-5]*arc.gz'|sort|uniq|wc
+    663     663   62322
+stack@wbsearch03:/mnt/pope-loc-collection$ find . \
+        -name 'POPE-0[6-9]*arc.gz'|sort|uniq|wc
+    841     841   79054
+
+
+Have wbsearch03 do first pattern above, and 04 the second. Have them only do
+clean, setup, and segment indexing steps.
+
+    $ nohup ./bin/indexarcs.sh -e clean,setup,segment -n -f \
+        'POPE-0[0-5]*arc.gz' -s /mnt/pope-loc-collection/ \
+        -d /3/pope-loc-indexing/nutch-data > \
+        /3/pope-loc-indexing/indexing`date +%FT%H:%M`.log < /dev/null &
+

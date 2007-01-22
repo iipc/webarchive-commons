@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<document>
+  <properties>
+    <title>Home Page</title>
+    <author email="stack at archive dot org">St.Ack</author>
+    <revision>$Id$</revision>
+  </properties>
+
+  <body>
+    <section name="Introduction">
+<p>NutchWAX (<i>"<a href="http://nutch.org">Nutch</a> + Web
+Archive eXtensions"</i>) searches web archive collections.
+The Web Archive eXtensions (WAX) include adaptation of the Nutch fetcher
+step to go against web archives rather than crawl the open net --
+adaptation currently does 
+<a href="http://www.archive.org">Internet Archive</a>
+<a href="http://www.archive.org/web/researcher/ArcFileFormat.php">ARC
+files</a> only -- and plugins to add extra fields to the index that
+return an Archive Records' location in the repository, its collection
+name, etc.
+</p>
+    </section>
+    <section name="Project Sponsors">
+    <table style="width: 100%; text-align: left;" border="0" cellpadding="2"
+    cellspacing="2">
+    <tbody>
+    <tr>
+    <td style="vertical-align: top;"><a
+    href="http://www.netpreserve.org/" class="externalLink"
+    title="External Link"> <img src="images/iipc.gif" alt="IIPC logo"
+    style="border: 0px solid ; width: 115px; height: 35px;" align="middle"/></a></td>
+    <td style="vertical-align: top;">The International Internet
+    Preservation Consortium (IIPC) is a consortium of twelve National
+    Libraries and the Internet Archive. The mission of the IIPC is to
+    acquire, preserve and make accessible knowledge and information from
+    the Internet for future generations everywhere, promoting global
+    exchange and international relations.</td>
+    </tr>
+    <tr>
+    <td style="vertical-align: top;"><a href="http://nwa.nb.no/"
+    class="externalLink" title="External Link"> <img src="images/nwa.jpg"
+    alt="Nordic Web Archive logo"
+    style="border: 0px solid ; width: 142px; height: 19px;" align="left"/></a></td>
+    <td style="vertical-align: top;">The Nordic Web Archive (NWA) is
+    the Nordic National Libraries' forum for co-ordination and exchange of
+    experience in the fields of harvesting and archiving web documents.</td>
+    </tr>
+    <tr>
+    <td style="vertical-align: top;"><a href="http://www.archive.org/"
+    class="externalLink" title="External Link"> <img
+    src="http://www.archive.org/images/logo.jpg"
+    alt="Internet Archive logo"
+    style="border: 0px solid ; width: 84px; height: 70px;" align="left"/></a></td>
+    <td style="vertical-align: top;">The Internet Archive (IA) is a
+    501(c)(3) non-profit organization whose mission is to build a public
+    Internet digital library.</td>
+    </tr>
+    </tbody>
+    </table>
+    </section>
+    <section name="News">
+    <subsection name="Release 0.10.0 - 01/17/2007">
+    <p>
+     Bug fixes and improvements in the quality of search results
+     but the main benefit of NutchWAX 0.10.0 is a move to
+     hadoop 0.9.2 from 0.5.0.  The upgraded hadoop platform 
+     makes indexing much more robust and noticeably faster.
+     See <a href="articles/releasenotes.html#0_10_0">release notes</a>
+     for details and notes on significant changes.
+    </p>
+    </subsection>
+    <subsection name="Release 0.8.0 - 12/12/2006">
+    <p>NutchWAX 0.8.0 is built against Nutch 0.8.1, released 09/24/2006.
+    A version of this software was recently used to make an index of greater
+    than 400 million documents. See 
+    <a href="articles/releasenotes.html">release notes</a> for detail on 
+    new features and fixes.
+    </p>
+    </subsection>
+    <subsection name="Release 0.6.0 - 05/01/2006">
+    <p>With this release, NutchWAX moves on to a mapreduce Nutch base (Nutch 0.8-dev+). Be aware that 0.6.0 bears little resemblance to previous releases both in how it goes bout its work and how its run by the user. Be prepared to leave aside all old NutchWAX assumptions. See 
+      <a href="apidocs/overview-summary.html#getting_started">Getting Started</a>
+      for an introduction. Also see <a href="articles/releasenotes.html">release notes</a>.
+    </p>
+    </subsection>
+    <subsection name="Release 0.4.3 - 03/20/2006">
+    <p>Bug fix release. See <a href="">release notes</a> for detail.
+    This time, for sure, its the last release before move to
+    mapreduce nutch platform.</p>
+    </subsection>
+    <subsection name="Release 0.4.2 - 11/28/2005">
+    <p>Minor fixes. Built for 1.4.x Java and added Google-like paging. Last
+    release against Nutch-0.7 and move to mapreduce.</p>
+    </subsection>
+    <subsection name="Release 0.4.1 - 11/03/2005">
+    <p>Bug fix for double encoding issue in NutchWAX 0.4.0.</p>
+    </subsection>
+    <subsection name="Release 0.4.0 - 10/21/2005">
+    <p>NutchWAX 0.4.0 is built against Nutch-0.7.  Lots of Bug Fixes
+    (See <a href="articles/releasenotes.html">Release Notes</a>).
+    This release has been coordinated with a new release of 
+    <a href="http://archive-access.sourceforge.net/projects/wera/">WERA</a>,
+    a web archive collection viewer application.
+    </p>
+   </subsection>
+    <subsection name="Initial alpha release 0.2.1 07/27/2005">
+      <p>Announcing the initial coordinated alpha release of NutchWAX and 
+      <a href="/projects/wera/">WERA</a>. WERA  is
+      an archive viewer application that gives an Internet Archive
+      <a href="http://www.archive.org/web/web.php">Wayback Machine</a>-like
+      access to web archive collections.
+      </p>
+    </subsection>
+    </section>
+  </body>
+</document>

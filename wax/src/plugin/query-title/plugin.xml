@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin
+   id="query-title"
+   name="Title Query Filter"
+   version="1.0.0"
+   provider-name="nutch.org">
+
+   <runtime>
+      <library name="query-title.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+
+   <requires>
+      <import plugin="nutch-extensionpoints"/>
+   </requires>
+
+   <extension id="org.apache.nutch.searcher.title.TitleQueryFilter"
+              name="Nutch Title Query Filter"
+              point="org.apache.nutch.searcher.QueryFilter">
+      <implementation id="TitleQueryFilter"
+                      class="org.apache.nutch.searcher.title.TitleQueryFilter">
+        <parameter name="fields" value="title"/>
+      </implementation>
+      
+   </extension>
+
+</plugin>

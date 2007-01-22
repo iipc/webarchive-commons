@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<project name="parse-waxext" default="jar-core">
+  <import file="../build-plugin.xml"/>
+</project>

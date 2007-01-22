@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin
+   id="query-wax"
+   name="NutchWAX Query Filter"
+   version="1.0.0"
+   provider-name="nutch.org">
+
+   <runtime>
+      <library name="query-wax.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+
+   <requires>
+      <import plugin="nutch-extensionpoints"/>
+   </requires>
+
+   <extension id="org.archive.access.nutch.searcher"
+          name="Internet Archive Date Query Filter"
+          point="org.apache.nutch.searcher.QueryFilter">
+      <implementation id="WaxDateQueryFilter"
+          class="org.archive.access.nutch.searcher.WaxDateQueryFilter">
+          <parameter name="raw-fields" value="date" />
+      </implementation>
+   </extension>
+
+   <extension id="org.archive.access.nutch.searcher"
+          name="Internet Archive Collection Query Filter"
+          point="org.apache.nutch.searcher.QueryFilter">
+      <implementation id="WaxCollectionQueryFilter"
+          class="org.archive.access.nutch.searcher.WaxCollectionQueryFilter">
+          <parameter name="raw-fields" value="collection" />
+      </implementation>
+   </extension>
+
+   <extension id="org.archive.access.nutch.searcher"
+          name="Internet Archive Type Query Filter"
+          point="org.apache.nutch.searcher.QueryFilter">
+      <implementation id="WaxTypeQueryFilter"
+          class="org.archive.access.nutch.searcher.WaxTypeQueryFilter" >
+          <parameter name="raw-fields" value="type" />
+      </implementation>
+   </extension>
+
+   <extension id="org.archive.access.nutch.searcher"
+          name="Internet Archive Arcname Query Filter"
+          point="org.apache.nutch.searcher.QueryFilter">
+      <implementation id="WaxArcfileFilter"
+          class="org.archive.access.nutch.searcher.WaxArcfileQueryFilter" >
+          <parameter name="raw-fields" value="arcname" />
+      </implementation>
+   </extension>
+
+   <extension id="org.archive.access.nutch.searcher"
+          name="Internet Archive Exacturl Query Filter"
+          point="org.apache.nutch.searcher.QueryFilter">
+      <implementation id="WaxExacturlQueryFilter"
+          class="org.archive.access.nutch.searcher.WaxExacturlQueryFilter" >
+          <parameter name="raw-fields" value="exacturl" />
+      </implementation>
+   </extension>
+</plugin>

@@ -1,0 +1,78 @@
+/**
+ * Prints short report on content of a lucene index.
+ *
+ * Needs to be able to find lucene in CLASSPATH.  To invoke, do something
+ * like the below:
+ *
+ *  $ bsh -classpath $HADOOP_HOME/lib/lucene*.jar index-report.bsh
+ *
+ * or, if you need to allocate more than default memory because index is large:
+ *
+ *  $ java -classpath bsh.jar:$HADOOP_HOME/lib/lucene*.jar bsh.Interpreter index-report.bsh
+ *
+ * $Id$
+ */
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Hits;
+import org.apache.lucene.analysis.standard.ParseException;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.queryParser.QueryParser;
+import java.util.Iterator;
+import java.util.Vector;
+
+
+private Vector getFieldsInfo(IndexReader r, IndexReader.FieldOption o)
+throws IOException {
+    fields = new Vector();
+    // Get the list of all field names
+    for (i = r.getFieldNames(o).iterator(); i.hasNext();) {
+        Object field = i.next();
+        if (field != null && !field.equals("")) {
+            fields.add(field.toString());
+        } 
+    }
+    return fields;
+}
+
+private Hits search(IndexSearcher s, String queryString)
+throws IOException, ParseException {
+    parser = new QueryParser("title", new StandardAnalyzer());
+    return s.search(parser.parse(queryString));
+}
+
+private void queryType(s, type) {
+	print(type + ", " + search(s, "type:" + type).length());
+}
+
+
+if (bsh.args.length != 1) {
+    print("Usage: index-report.bsh INDEX_DIR");
+    System.exit(1);
+}
+index = bsh.args[0];
+IndexReader r = IndexReader.open(index);
+IndexSearcher s = null;
+try {
+    f = getFieldsInfo(r, IndexReader.FieldOption.ALL);
+    print("All Fields, " + f.toString());
+    f = getFieldsInfo(r, IndexReader.FieldOption.INDEXED);
+    print("Indexed Fields, " + f.toString());
+    print("Document Count, " + r.numDocs());
+    s = new IndexSearcher(r);
+	queryType(s, "text");
+	queryType(s, "image");
+	queryType(s, "video");
+	queryType(s, "audio");
+	queryType(s, "application");
+	queryType(s, "text/plain");
+	queryType(s, "text/html");
+	queryType(s, "application/pdf");
+} catch (Exception e) {
+    if (r != null) {
+        r.close();
+    }
+    if (s != null) {
+        s.close();
+    }
+}

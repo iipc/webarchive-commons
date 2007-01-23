@@ -15,7 +15,7 @@
             <arg value="--rsh=ssh" />
             <arg
               value="${maven.build.dir}/docs/"/>
-            <arg value="${maven.username}@archive-access.sf.net:/home/groups/a/ar/archive-access/htdocs/projects/nutch/" />
+            <arg value="${maven.username}@archive-access.sf.net:/home/groups/a/ar/archive-access/htdocs/projects/wax/" />
         </exec>
     </goal>
 

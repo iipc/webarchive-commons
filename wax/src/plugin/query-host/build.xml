@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-
-<project name="query-host" default="jar-core">
-
-  <import file="../build-plugin.xml"/>
-
-</project>

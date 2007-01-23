@@ -4,7 +4,7 @@
   <pomVersion>3</pomVersion>
 
   <!-- a unique name for this project -->
-  <id>nutch</id>
+  <id>wax</id>
 
   <!-- a short but descriptive name for the project -->
   <name>nutchwax</name>

@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<!--
+    POM reference: http://maven.apache.org/pom.html
+
+    List of the better articles on maven:
+
+    http://www.javaworld.com/javaworld/jw-05-2006/jw-0529-maven.html
+    http://www.javaworld.com/javaworld/jw-02-2006/jw-0227-maven_p.html
+
+    URLs on converting from 1.0 to 2.0 maven (not much good generally):
+
+    http://wiki.osafoundation.org/bin/view/Journal/Maven2Upgrade
+    http://maven.apache.org/guides/mini/guide-m1-m2.html
+ -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.archive</groupId>
+  <artifactId>archive-mapred</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>Archive Commons</name>
+  <description>Common code used across all Archive projects.
+  </description>
+  <url>http://archive-access.sourceforge.net/projects/commons/</url>
+  <inceptionYear>2004</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>GNU LESSER GENERAL PUBLIC LICENSE</name>
+            <url>http://www.gnu.org/licenses/lgpl.txt</url>
+            <distribution>repo</distribution>
+       </license>
+    </licenses>
+  <organization>
+    <name>Internet Archive</name>
+    <url>http://www.archive.org/</url>
+  </organization>
+  <issueManagement>
+    <system>SourceForge</system>
+    <url>http://sourceforge.net/tracker/?group_id=118427</url>
+  </issueManagement>
+  <ciManagement>
+    <system>cruisecontrol</system>
+    <url>http://builds.archive.org:8080/cruisecontrol/</url>
+  </ciManagement>
+    <mailingLists>
+        <mailingList>  
+            <name>Archive Access ARC Tools Discussion List</name>
+            <subscribe>
+            http://lists.sourceforge.net/lists/listinfo/archive-access-discuss
+            </subscribe>
+            <unsubscribe>
+            http://lists.sourceforge.net/lists/listinfo/archive-access-discuss
+            </unsubscribe>
+            <post>archive-access-discuss</post>
+            <archive>
+            http://sourceforge.net/mailarchive/forum.php?forum_id=45842
+            </archive>
+        </mailingList>  
+        <mailingList>  
+            <name>Archive Access ARC Tools Commits</name>
+            <subscribe>
+            https://lists.sourceforge.net/lists/listinfo/archive-access-cvs
+            </subscribe>
+            <unsubscribe>
+            https://lists.sourceforge.net/lists/listinfo/archive-access-cvs
+            </unsubscribe>
+            <post>archive-access-cvs</post>
+            <archive>
+            http://sourceforge.net/mailarchive/forum.php?forum=archive-access-cvs
+            </archive>
+        </mailingList>  
+    </mailingLists>
+    <scm>
+       <connection>scm:svn:https://archive-access.svn.sourceforge.net/svnroot/archive-access/</connection>
+       <tag>HEAD</tag>
+        <url>https://archive-access.svn.sourceforge.net/svnroot/archive-access/</url>
+    </scm>
+    <prerequisites>
+        <maven>2.0.4</maven>
+    </prerequisites>
+
+  <build>
+    <plugins />
+  </build>  
+
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+        <checksumPolicy>fail</checksumPolicy>
+      </snapshots>
+      <id>builds.archive.org</id>
+      <name></name>
+      <url>http://builds.archive.org:8080/maven2</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache</groupId>
+            <artifactId>hadoop</artifactId>
+            <version>0.10.1-core</version>
+        </dependency>
+        <dependency>
+            <groupId>org.archive</groupId>
+            <artifactId>archive-commons</artifactId>
+            <version>1.11.0-200702211853</version>
+        </dependency>
+
+  </dependencies>
+
+</project>

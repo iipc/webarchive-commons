@@ -9,4 +9,19 @@
   	<module>access-control</module>
   	<module>oracle</module>
   </modules>
+  
+  <scm>
+    <connection>
+      scm:svn:https://archive-access.svn.sourceforge.net/svnroot/archive-access/trunk/archive-access/projects/access-control
+    </connection>
+    <tag>HEAD</tag>
+    <url>
+      https://archive-access.svn.sourceforge.net/svnroot/archive-access/trunk/archive-access/projects/access-control
+    </url>
+  </scm>
+  
+  <ciManagement>
+    <system>continuum</system>
+    <url>http://builds.archive.org:8081/continuum/</url>
+  </ciManagement>
 </project>

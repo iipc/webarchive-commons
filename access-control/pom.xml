@@ -24,4 +24,19 @@
     <system>continuum</system>
     <url>http://builds.archive.org:8081/continuum/</url>
   </ciManagement>
+  
+  <distributionManagement>
+    <repository>
+      <id>repository</id>
+      <name>Repository</name>
+      <!--Pass as command-line system property to maven-->
+      <url>${repository.url}</url>
+    </repository>
+    <site>
+      <id>website</id>
+      <name>Website</name>
+      <!--Pass as command-line system property to maven-->
+      <url>${website.url}/projects/${artifactId}</url>
+    </site>
+  </distributionManagement>
 </project>

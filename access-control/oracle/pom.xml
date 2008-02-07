@@ -5,6 +5,7 @@
   <packaging>war</packaging>
   <version>0.0.1-SNAPSHOT</version>
   <description></description>
+  <name>Access-Control: Oracle Webapp</name>
   
   <parent>
   	<groupId>org.archive</groupId>

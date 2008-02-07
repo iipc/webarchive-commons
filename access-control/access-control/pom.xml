@@ -5,6 +5,7 @@
   <packaging>jar</packaging>
   <version>0.0.1-SNAPSHOT</version>
   <description></description>
+  <name>Access-Control: core library and client</name>
   
   <parent>
   	<groupId>org.archive</groupId>

@@ -4,6 +4,7 @@
   <artifactId>access-control</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <name>Access-Control</name>
   
   <modules>
   	<module>access-control</module>

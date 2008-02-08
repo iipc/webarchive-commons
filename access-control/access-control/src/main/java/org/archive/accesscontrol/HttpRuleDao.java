@@ -1,9 +1,11 @@
 package org.archive.accesscontrol;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.archive.accesscontrol.model.Rule;
 import org.archive.accesscontrol.model.RuleSet;
@@ -15,13 +17,14 @@ import com.thoughtworks.xstream.XStream;
  * the REST interface an oracle.
  * 
  * For details of the protocol, see:
- *     http://webteam.archive.org/confluence/display/wayback/Exclusions+API
+ * http://webteam.archive.org/confluence/display/wayback/Exclusions+API
  * 
  * @author aosborne
  * 
  */
 public class HttpRuleDao implements RuleDao {
-    protected HttpClient http = new HttpClient();
+    protected HttpClient http = new HttpClient(
+            new MultiThreadedHttpConnectionManager());
     protected XStream xstream = new XStream();
     private String oracleUrl;
 
@@ -30,14 +33,14 @@ public class HttpRuleDao implements RuleDao {
         xstream.alias("rule", Rule.class);
         xstream.alias("ruleSet", RuleSet.class);
     }
-    
+
     /**
      * @see RuleDao#getRuleTree(String)
      */
     public RuleSet getRuleTree(String surt) {
         HttpMethod method = new GetMethod(oracleUrl + "/rules/tree/" + surt);
         RuleSet rules;
-        
+
         try {
             http.executeMethod(method);
             String response = method.getResponseBodyAsString();
@@ -46,7 +49,7 @@ public class HttpRuleDao implements RuleDao {
         } catch (IOException e) {
             e.printStackTrace();
             return null;
-        }       
+        }
         method.releaseConnection();
         return rules;
     }
@@ -59,10 +62,15 @@ public class HttpRuleDao implements RuleDao {
     }
 
     /**
-     * @param oracleUrl the oracleUrl to set
+     * @param oracleUrl
+     *            the oracleUrl to set
      */
     public void setOracleUrl(String oracleUrl) {
         this.oracleUrl = oracleUrl;
     }
-    
+
+    public void prepare(Collection<String> surts) {
+        // no-op
+    }
+
 }

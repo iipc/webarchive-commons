@@ -1,5 +1,6 @@
     package org.archive.accesscontrol.model;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.httpclient.URIException;
@@ -104,5 +105,9 @@ public class HibernateRuleDao extends HibernateDaoSupport implements RuleDao {
     
     public void deleteAllRules() {
         getHibernateTemplate().bulkUpdate("delete from Rule");
+    }
+
+    public void prepare(Collection<String> surts) {
+        // no-op
     }
 }

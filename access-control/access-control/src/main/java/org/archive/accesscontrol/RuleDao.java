@@ -1,11 +1,13 @@
 package org.archive.accesscontrol;
 
+import java.util.Collection;
+
 import org.apache.commons.httpclient.URIException;
 import org.archive.accesscontrol.model.RuleSet;
 
 /**
- * A RuleDao provides methods for retrieving rule information from a local database or
- * remote oracle.
+ * A RuleDao provides methods for retrieving rule information from a local
+ * database or remote oracle.
  * 
  * @author aosborne
  * 
@@ -27,4 +29,12 @@ public interface RuleDao {
      */
     public RuleSet getRuleTree(String surt);
 
+    /**
+     * This method allows a RuleDao to prepare for lookups from a given set of
+     * surts. This can warm up a cache and/or enable a bulk lookup to be done in
+     * parallel.  Many implementations may make it a no-op.
+     * 
+     * @param surts
+     */
+    public void prepare(Collection<String> surts);
 }

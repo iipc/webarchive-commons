@@ -1,10 +1,13 @@
 package org.archive.accesscontrol;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 
 import org.archive.accesscontrol.model.Rule;
 import org.archive.accesscontrol.model.RuleSet;
 import org.archive.net.PublicSuffixes;
+import org.archive.util.ArchiveUtils;
 import org.archive.util.SURT;
 
 /**
@@ -70,6 +73,7 @@ public class AccessControlClient {
      */
     public Rule getRule(String url, Date captureDate, Date retrievalDate,
             String who) {
+        url = ArchiveUtils.addImpliedHttpIfNecessary(url);
         String surt = SURT.fromURI(url);
         String publicSuffix = PublicSuffixes
                 .reduceSurtToTopmostAssigned(getSurtAuthority(surt));
@@ -81,6 +85,24 @@ public class AccessControlClient {
         Rule matchingRule = rules.getMatchingRule(surt, captureDate,
                 retrievalDate, who);
         return matchingRule;
+    }
+    
+    
+    /**
+     * This method allows the client to prepare for lookups from a given set of
+     * urls. This can warm up a cache and/or enable a mass data transfer to be done in
+     * parallel.
+     * 
+     * @param surts
+     */
+    public void prepare(Collection<String> urls) {
+        ArrayList<String> publicSuffixes = new ArrayList<String>(urls.size());
+        for (String url: urls) {
+            String surt = SURT.fromURI(ArchiveUtils.addImpliedHttpIfNecessary(url));
+            publicSuffixes.add(PublicSuffixes
+                    .reduceSurtToTopmostAssigned(getSurtAuthority(surt)));
+        }
+        ruleDao.prepare(publicSuffixes);
     }
 
     protected String getSurtAuthority(String surt) {

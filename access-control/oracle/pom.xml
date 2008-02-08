@@ -112,6 +112,11 @@
       <version>8.2-504.jdbc3</version>
     </dependency>
     <dependency>
+		<groupId>hsqldb</groupId>
+		<artifactId>hsqldb</artifactId>
+		<version>1.8.0.7</version>
+ 	</dependency>
+    <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
       <version>1.2.2</version>

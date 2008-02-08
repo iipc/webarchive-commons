@@ -3,6 +3,7 @@
 import java.util.List;
 
 import org.apache.commons.httpclient.URIException;
+import org.archive.accesscontrol.RuleDao;
 import org.archive.surt.SURTTokenizer2;
 import org.hibernate.Session;
 import org.hibernate.Transaction;

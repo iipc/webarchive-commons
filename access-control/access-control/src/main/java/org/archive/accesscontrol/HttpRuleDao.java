@@ -1,10 +1,12 @@
-package org.archive.accesscontrol.model;
+package org.archive.accesscontrol;
 
 import java.io.IOException;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.archive.accesscontrol.model.Rule;
+import org.archive.accesscontrol.model.RuleSet;
 
 import com.thoughtworks.xstream.XStream;
 

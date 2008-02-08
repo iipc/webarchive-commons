@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="access-control/src/main/java"/>
 	<classpathentry kind="src" path="access-control/src/test/java"/>
 	<classpathentry excluding="**" kind="src" output="access-control/src/main/resources" path="access-control/src/main/resources"/>
-	<classpathentry excluding="**" kind="src" output="access-control/src/test/resources" path="access-control/src/test/resources"/>
 	<classpathentry kind="src" path="oracle/src/main/java"/>
 	<classpathentry kind="src" path="oracle/src/test/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>

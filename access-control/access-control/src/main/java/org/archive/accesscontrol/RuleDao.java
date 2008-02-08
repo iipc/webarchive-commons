@@ -1,6 +1,7 @@
-package org.archive.accesscontrol.model;
+package org.archive.accesscontrol;
 
 import org.apache.commons.httpclient.URIException;
+import org.archive.accesscontrol.model.RuleSet;
 
 /**
  * A RuleDao provides methods for retrieving rule information from a local database or

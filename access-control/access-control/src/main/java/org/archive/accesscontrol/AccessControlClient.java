@@ -2,9 +2,7 @@ package org.archive.accesscontrol;
 
 import java.util.Date;
 
-import org.archive.accesscontrol.model.HttpRuleDao;
 import org.archive.accesscontrol.model.Rule;
-import org.archive.accesscontrol.model.RuleDao;
 import org.archive.accesscontrol.model.RuleSet;
 import org.archive.net.PublicSuffixes;
 import org.archive.util.SURT;
@@ -27,14 +25,14 @@ public class AccessControlClient {
     }
 
     /**
-     * Create a new client to query a remote oracle.
+     * Create a new (caching) client to query a remote oracle.
      * 
      * @param oracleUrl
      *            Base url of the oracle webapp. eg.
      *            "http://localhost:8080/exclusions-oracle/"
      */
     public AccessControlClient(String oracleUrl) {
-        this(new HttpRuleDao(oracleUrl));
+        this(new CachingRuleDao(oracleUrl));
     }
 
     /**
@@ -79,6 +77,7 @@ public class AccessControlClient {
         surt = stripScheme(surt);
 
         RuleSet rules = ruleDao.getRuleTree("(" + publicSuffix);
+
         Rule matchingRule = rules.getMatchingRule(surt, captureDate,
                 retrievalDate, who);
         return matchingRule;

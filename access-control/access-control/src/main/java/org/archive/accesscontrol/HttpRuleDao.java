@@ -35,9 +35,10 @@ public class HttpRuleDao implements RuleDao {
     }
 
     /**
+     * @throws RuleOracleUnavailableException 
      * @see RuleDao#getRuleTree(String)
      */
-    public RuleSet getRuleTree(String surt) {
+    public RuleSet getRuleTree(String surt) throws RuleOracleUnavailableException {
         HttpMethod method = new GetMethod(oracleUrl + "/rules/tree/" + surt);
         RuleSet rules;
 
@@ -47,8 +48,7 @@ public class HttpRuleDao implements RuleDao {
             System.out.println(response);
             rules = (RuleSet) xstream.fromXML(method.getResponseBodyAsStream());
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            throw new RuleOracleUnavailableException(e);
         }
         method.releaseConnection();
         return rules;

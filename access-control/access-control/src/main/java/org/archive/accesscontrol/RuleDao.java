@@ -25,9 +25,10 @@ public interface RuleDao {
      * 
      * @param surt
      * @return
+     * @throws RuleOracleUnavailableException 
      * @throws URIException
      */
-    public RuleSet getRuleTree(String surt);
+    public RuleSet getRuleTree(String surt) throws RuleOracleUnavailableException;
 
     /**
      * This method allows a RuleDao to prepare for lookups from a given set of

@@ -1,11 +1,14 @@
 package org.archive.accesscontrol;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
 import org.archive.accesscontrol.model.Rule;
 import org.archive.accesscontrol.model.RuleSet;
+import org.archive.accesscontrol.robotstxt.CachingRobotClient;
+import org.archive.accesscontrol.robotstxt.RobotClient;
 import org.archive.net.PublicSuffixes;
 import org.archive.util.ArchiveUtils;
 import org.archive.util.SURT;
@@ -21,10 +24,15 @@ import org.archive.util.SURT;
  */
 public class AccessControlClient {
     protected RuleDao ruleDao;
+    protected RobotClient robotClient;
+    private boolean robotLookupsEnabled = true;
+    private boolean robotPreparationEnabled = true;
+    private String robotUserAgent = "wayback-access-control";
 
-    public AccessControlClient(RuleDao ruleDao) {
+    public AccessControlClient(RuleDao ruleDao, RobotClient robotClient) {
         super();
         this.ruleDao = ruleDao;
+        this.robotClient = robotClient;
     }
 
     /**
@@ -35,7 +43,7 @@ public class AccessControlClient {
      *            "http://localhost:8080/exclusions-oracle/"
      */
     public AccessControlClient(String oracleUrl) {
-        this(new CachingRuleDao(oracleUrl));
+        this(new CachingRuleDao(oracleUrl), new CachingRobotClient());
     }
 
     /**
@@ -51,10 +59,24 @@ public class AccessControlClient {
      *            Group name of the user accessing the document.
      * @return Access-control policy that should be enforced. eg "robots",
      *         "block" or "allow".
+     * @throws RobotsUnavailableException 
+     * @throws RuleOracleUnavailableException 
      */
     public String getPolicy(String url, Date captureDate, Date retrievalDate,
-            String who) {
+            String who) throws RobotsUnavailableException, RuleOracleUnavailableException {
         Rule matchingRule = getRule(url, captureDate, retrievalDate, who);
+        
+        if (robotLookupsEnabled && matchingRule != null && "robots".equals(matchingRule.getPolicy())) {
+            try {
+                if (robotClient.isRobotPermitted(url, robotUserAgent)) {
+                    return "allow";
+                } else {
+                    return "block";
+                }
+            } catch (IOException e) {
+                throw new RobotsUnavailableException(e);
+            }
+        }
         return matchingRule.getPolicy();
     }
 
@@ -70,9 +92,10 @@ public class AccessControlClient {
      * @param who
      *            Group name of the user accessing the document.
      * @return
+     * @throws RuleOracleUnavailableException 
      */
     public Rule getRule(String url, Date captureDate, Date retrievalDate,
-            String who) {
+            String who) throws RuleOracleUnavailableException {
         url = ArchiveUtils.addImpliedHttpIfNecessary(url);
         String surt = SURT.fromURI(url);
         String publicSuffix = PublicSuffixes
@@ -103,6 +126,10 @@ public class AccessControlClient {
                     .reduceSurtToTopmostAssigned(getSurtAuthority(surt)));
         }
         ruleDao.prepare(publicSuffixes);
+        
+        if (robotPreparationEnabled) {
+            robotClient.prepare(urls, robotUserAgent);
+        }
     }
 
     protected String getSurtAuthority(String surt) {
@@ -124,4 +151,30 @@ public class AccessControlClient {
             return surt;
         }
     }
+
+
+    public String getRobotUserAgent() {
+        return robotUserAgent;
+    }
+
+    public void setRobotUserAgent(String robotUserAgent) {
+        this.robotUserAgent = robotUserAgent;
+    }
+
+    public boolean isRobotLookupsEnabled() {
+        return robotLookupsEnabled;
+    }
+
+    public void setRobotLookupsEnabled(boolean robotLookupsEnabled) {
+        this.robotLookupsEnabled = robotLookupsEnabled;
+    }
+
+    public boolean isRobotPreparationEnabled() {
+        return robotPreparationEnabled;
+    }
+
+    public void setRobotPreparationEnabled(boolean robotPreparationEnabled) {
+        this.robotPreparationEnabled = robotPreparationEnabled;
+    }
+
 }

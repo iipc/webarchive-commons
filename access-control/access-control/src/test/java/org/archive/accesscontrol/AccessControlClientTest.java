@@ -1,7 +1,5 @@
 package org.archive.accesscontrol;
 
-import java.util.Date;
-
 import org.archive.accesscontrol.AccessControlClient;
 
 import junit.framework.TestCase;
@@ -13,7 +11,7 @@ public class AccessControlClientTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         System.out.println("hello world");
-        client = new AccessControlClient(new HttpRuleDao(ORACLE_URL));
+        client = new AccessControlClient(ORACLE_URL);
     }
 
     protected void tearDown() throws Exception {

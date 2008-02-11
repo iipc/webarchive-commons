@@ -36,7 +36,7 @@ public class CachingRuleDao implements RuleDao {
         this.ruleDao = ruleDao;
     }
 
-    public RuleSet getRuleTree(String surt) {
+    public RuleSet getRuleTree(String surt) throws RuleOracleUnavailableException {
         RuleSet rules;
         synchronized (cache) {
             rules = cache.get(surt);
@@ -65,7 +65,12 @@ public class CachingRuleDao implements RuleDao {
                         break;
                     surt = surts.remove(0);
                 }
-                getRuleTree(surt);
+                try {
+                    getRuleTree(surt);
+                } catch (RuleOracleUnavailableException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         }
     }

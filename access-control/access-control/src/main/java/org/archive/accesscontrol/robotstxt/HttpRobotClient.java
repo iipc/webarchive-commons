@@ -36,4 +36,9 @@ public class HttpRobotClient extends RobotClient {
     public void prepare(Collection<String> urls, String userAgent) {
         // no-op
     }
+
+    @Override
+    public void setRobotProxy(String host, int port) {
+        http.getHostConfiguration().setProxy(host, port);
+    }
 }

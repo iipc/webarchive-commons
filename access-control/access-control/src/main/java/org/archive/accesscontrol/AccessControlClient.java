@@ -176,5 +176,14 @@ public class AccessControlClient {
     public void setRobotPreparationEnabled(boolean robotPreparationEnabled) {
         this.robotPreparationEnabled = robotPreparationEnabled;
     }
+    
+    /**
+     * Use a proxy server when fetching robots.txt data.
+     * @param host
+     * @param port
+     */
+    public void setRobotProxy(String host, int port) {
+        robotClient.setRobotProxy(host, port);
+    }
 
 }

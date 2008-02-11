@@ -102,4 +102,9 @@ public class CachingRobotClient extends RobotClient {
         }
     }
 
+    @Override
+    public void setRobotProxy(String host, int port) {
+        client.setRobotProxy(host, port);
+    }
+
 }

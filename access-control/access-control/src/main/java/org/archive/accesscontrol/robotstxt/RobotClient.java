@@ -55,4 +55,11 @@ public abstract class RobotClient {
      * This may be a no-op.
      */
     public abstract void prepare(Collection<String> urls, String userAgent);
+    
+    /**
+     * Use a proxy server when fetching robots.txt data.
+     * @param host
+     * @param port
+     */
+    public abstract void setRobotProxy(String host, int port);
 }

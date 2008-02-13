@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.commons.httpclient.URIException;
+import org.archive.accesscontrol.RobotsUnavailableException;
 import org.archive.net.LaxURI;
 
 /**
@@ -21,9 +22,10 @@ public abstract class RobotClient {
      * @param userAgent
      * @return
      * @throws IOException
+     * @throws RobotsUnavailableException 
      */
     public boolean isRobotPermitted(String url, String userAgent)
-            throws IOException {
+            throws IOException, RobotsUnavailableException {
         RobotRules rules = getRulesForUrl(url, userAgent);
         return !rules.blocksPathForUA(new LaxURI(url, false).getPath(),
                 userAgent);
@@ -35,10 +37,11 @@ public abstract class RobotClient {
      * @param url
      * @param userAgent
      * @return
-     * @throws IOException
+     * @throws IOException a local problem occurred when attempting to fetch the robots.txt
+     * @throws RobotsUnavailableException a remote problem, we found no robots.txt or the server is down.
      */
     public abstract RobotRules getRulesForUrl(String url, String userAgent)
-            throws IOException;
+            throws IOException, RobotsUnavailableException;
 
     public static String robotsUrlForUrl(String url) throws URIException {
         LaxURI uri = new LaxURI(url, false);

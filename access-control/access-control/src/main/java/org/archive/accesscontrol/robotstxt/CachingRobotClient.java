@@ -4,16 +4,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.archive.accesscontrol.LruCache;
+import org.archive.accesscontrol.RobotsUnavailableException;
 
 /**
- * The CachingRobotClient wraps another RobotClient and caches requests.
+ * The CchingRobotClient wraps another RobotClient and caches requests.
  * 
  * @author aosborne
  *
  */
 public class CachingRobotClient extends RobotClient {
+    private static final Logger LOGGER = Logger.getLogger(
+            CachingRobotClient.class.getName());
     protected LruCache<String, RobotRules> cache = new LruCache<String, RobotRules>();
     protected RobotClient client;
     private static final int PREPARE_THREAD_COUNT = 15;
@@ -36,7 +40,7 @@ public class CachingRobotClient extends RobotClient {
     
     @Override
     public RobotRules getRulesForUrl(String url, String userAgent)
-            throws IOException {
+            throws IOException, RobotsUnavailableException {
         String robotsUrl = robotsUrlForUrl(url);
         RobotRules rules;
         
@@ -77,6 +81,9 @@ public class CachingRobotClient extends RobotClient {
                 try {
                     getRulesForUrl(url, userAgent);
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (RobotsUnavailableException e) {
+                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }

@@ -61,9 +61,12 @@
 
 	<servlet-mapping>
 		<servlet-name>exclusions-oracle</servlet-name>
-		<url-pattern>/</url-pattern>
+		<url-pattern>/rules</url-pattern>
 	</servlet-mapping>
-
+	<servlet-mapping>
+		<servlet-name>exclusions-oracle</servlet-name>
+		<url-pattern>/admin</url-pattern>
+	</servlet-mapping>
 
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>

@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?><project>
+  <parent>
+    <artifactId>access-control</artifactId>
+    <groupId>org.archive</groupId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.archive.access-control</groupId>
   <artifactId>oracle</artifactId>
   <packaging>war</packaging>
+  <name>Access-Control: Oracle Webapp</name>
   <version>0.0.1-SNAPSHOT</version>
   <description></description>
-  <name>Access-Control: Oracle Webapp</name>
-  
-  <parent>
-  	<groupId>org.archive</groupId>
-  	<artifactId>access-control</artifactId>
-  	<version>0.0.1-SNAPSHOT</version>
-  </parent>
-  
   <build>
     <extensions>
       <extension>
@@ -73,14 +71,19 @@
   <dependencies>
     <dependency>
       <groupId>javax.servlet</groupId>
+      <artifactId>jstl</artifactId>
+      <version>1.1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
       <version>2.4</version>
     </dependency>
-  	<dependency>
-  	  <groupId>org.archive.access-control</groupId>
-  	  <artifactId>access-control</artifactId>
-  	  <version>0.0.1-SNAPSHOT</version>
-  	</dependency>
+    <dependency>
+      <groupId>org.archive.access-control</groupId>
+      <artifactId>access-control</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
@@ -112,10 +115,10 @@
       <version>8.2-504.jdbc3</version>
     </dependency>
     <dependency>
-		<groupId>hsqldb</groupId>
-		<artifactId>hsqldb</artifactId>
-		<version>1.8.0.7</version>
- 	</dependency>
+      <groupId>hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>1.8.0.7</version>
+    </dependency>
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
@@ -145,6 +148,16 @@
       <groupId>commons-dbcp</groupId>
       <artifactId>commons-dbcp</artifactId>
       <version>1.2.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.velocity</groupId>
+      <artifactId>velocity</artifactId>
+      <version>1.5</version>
+    </dependency>
+    <dependency>
+      <groupId>taglibs</groupId>
+      <artifactId>standard</artifactId>
+      <version>1.1.2</version>
     </dependency>
   </dependencies>
 </project>

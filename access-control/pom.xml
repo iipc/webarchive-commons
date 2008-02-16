@@ -2,41 +2,30 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.archive</groupId>
   <artifactId>access-control</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Access-Control</name>
-  
-  <modules>
-  	<module>access-control</module>
-  	<module>oracle</module>
-  </modules>
-  
-  <scm>
-    <connection>
-      scm:svn:https://archive-access.svn.sourceforge.net/svnroot/archive-access/trunk/archive-access/projects/access-control
-    </connection>
-    <tag>HEAD</tag>
-    <url>
-      https://archive-access.svn.sourceforge.net/svnroot/archive-access/trunk/archive-access/projects/access-control
-    </url>
-  </scm>
-  
+  <version>0.0.1-SNAPSHOT</version>
   <ciManagement>
     <system>continuum</system>
     <url>http://builds.archive.org:8081/continuum/</url>
   </ciManagement>
-  
+  <scm>
+    <connection>scm:svn:https://archive-access.svn.sourceforge.net/svnroot/archive-access/trunk/archive-access/projects/access-control</connection>
+    <url>https://archive-access.svn.sourceforge.net/svnroot/archive-access/trunk/archive-access/projects/access-control</url>
+  </scm>
+  <modules>
+    <module>access-control</module>
+    <module>oracle</module>
+  </modules>
   <distributionManagement>
     <repository>
       <id>repository</id>
       <name>Repository</name>
-      <!--Pass as command-line system property to maven-->
       <url>${repository.url}</url>
     </repository>
     <site>
       <id>website</id>
       <name>Website</name>
-      <!--Pass as command-line system property to maven-->
       <url>${website.url}/projects/${pom.artifactId}</url>
     </site>
   </distributionManagement>

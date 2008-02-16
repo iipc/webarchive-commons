@@ -12,7 +12,7 @@
 			attribute. This allows AutoFormatView to render the
 			appropriate type of output.
 		</note>
-		<from>^/(.*)\.(\w+)$</from>
+		<from>^/(rules.*)\.(\w+)$</from>
 		<set name="format">$2</set>
 		<to last="false">/$1</to>
 	</rule>
@@ -28,4 +28,11 @@
 		<set name="id">$1</set>
 		<to>/rules</to>
 	</rule>
+	
+	<rule>
+		<from>^/admin/(.*)$</from>
+		<set name="id">$1</set>
+		<to>/admin</to>
+	</rule>
+	
 </urlrewrite>

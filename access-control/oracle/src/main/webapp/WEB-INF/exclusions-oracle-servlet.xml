@@ -16,8 +16,11 @@
 		class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping" />
 
 	<bean name="/rules"
-		class="org.archive.accesscontrol.oracle.RulesController">
-		
+		class="org.archive.accesscontrol.oracle.RulesController">		
+	</bean>
+
+	<bean name="/admin"
+		class="org.archive.accesscontrol.webui.AdminController">		
 	</bean>
 
 	<!-- MultipartResolver for parsing file uploads, implementation for Commons FileUpload -->
@@ -59,6 +62,7 @@
 
 	<bean id="viewResolver"
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
 		<property name="prefix" value="/WEB-INF/views/" />
 		<property name="suffix" value=".jsp" />
 	</bean>

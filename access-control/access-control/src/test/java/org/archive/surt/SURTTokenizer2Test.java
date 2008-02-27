@@ -102,7 +102,7 @@ public class SURTTokenizer2Test extends TestCase {
         /** test */
         public void testLongPathMore() {
                 tok = toSurtT("http://brad.www.archive.org/one/two");
-                assertEquals("(org,archive,www,brad,)/one/two\t",tok.nextSearch());
+                assertEquals("( org, archive, www, brad, )/ one/ two\t",tok.nextSearch());
                 assertEquals("(org,archive,www,brad,)/one/two",tok.nextSearch());
                 assertEquals("(org,archive,www,brad,)/one",tok.nextSearch());
                 assertEquals("(org,archive,www,brad,",tok.nextSearch());

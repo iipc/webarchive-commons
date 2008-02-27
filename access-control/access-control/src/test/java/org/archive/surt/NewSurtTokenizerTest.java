@@ -161,5 +161,28 @@ public class NewSurtTokenizerTest extends TestCase {
         
     }
     
+    public void testListDiffing() {
+        NewSurtTokenizer tok = new NewSurtTokenizer("(org,archive,www,)/fishes/");
+        NewSurtTokenizer tok2 = new NewSurtTokenizer("(org,archive,www,)/fishes/pinky.html");
+        assertEquals("pinky.html", tok2.toList().get(tok.toList().size()));
+    }
+    
+    public void testTrailingTab() {
+        NewSurtTokenizer tok = new NewSurtTokenizer("(org,archive,www,)/fishes/pinky.html?moo=yes&bar=12#423\t");
+        Iterator<String> it = tok.iterator();
+        
+        assertEquals("(", it.next());
+        assertEquals("org,", it.next());
+        assertEquals("archive,", it.next());
+        assertEquals("www,", it.next());
+        assertEquals(")/", it.next());
+        assertEquals("fishes/", it.next());
+        assertEquals("pinky.html", it.next());
+        assertEquals("?moo=yes&bar=12", it.next());
+        assertEquals("#423", it.next());
+        assertEquals("\t", it.next());        
+        assertFalse(it.hasNext());
+        
+    }
 
 }

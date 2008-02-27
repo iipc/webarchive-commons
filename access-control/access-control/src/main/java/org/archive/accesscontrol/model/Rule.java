@@ -33,6 +33,7 @@ public class Rule implements Comparable<Rule> {
     private String privateComment;
     private String publicComment;
     private Boolean enabled;
+    private boolean exactMatch;
 
     public Rule() {
         
@@ -86,6 +87,7 @@ public class Rule implements Comparable<Rule> {
         setSurt(rule.getSurt());
         setWho(rule.getWho());
         setEnabled(rule.getEnabled());
+        setExactMatch(rule.isExactMatch());
     }
     
     /**
@@ -259,17 +261,36 @@ public class Rule implements Comparable<Rule> {
     
     /*
      * Rules are sorted in descending order of "specificity".
-     * So we order first by SURT, then group, then policy.
+     * So we order first by SURT, exact-match,
+     * then group, then policy.
      */
     public int compareTo(Rule o) {
         int i = getSurt().compareTo(o.getSurt());
         if (i == 0) {
-            if (getWho() != null && o.getWho() == null) {
+            // exact matches come before non-exact
+            if (isExactMatch() && !o.isExactMatch()) {
+                i = -1;
+            } else if (!isExactMatch() && o.isExactMatch()) {
+                i = 1;
+                
+            // non-null groups come before null groups
+            } else if (getWho() != null && o.getWho() == null) {
                 i = -1;
             } else if (getWho() == null && o.getWho() != null) {
                 i = 1;
             } else {
                 i = getPolicyId().compareTo(o.getPolicyId());                
+            }
+            
+            
+            // if we're still equal try capture date start
+            if (i == 0 && getCaptureStart() != null) {
+                i = getCaptureStart().compareTo(o.getCaptureStart());
+            }
+            
+            // and retrieval date
+            if (i == 0 && getRetrievalStart() != null) {
+                i = getRetrievalStart().compareTo(o.getRetrievalStart());                
             }
         }
         return i;
@@ -328,5 +349,13 @@ public class Rule implements Comparable<Rule> {
      */
     public boolean matches(String surt, Date captureDate, Date retrievalDate, String who2) {
         return (who == null || who == who2) && matches(surt, captureDate, retrievalDate);
+    }
+
+    public boolean isExactMatch() {
+        return exactMatch;
+    }
+
+    public void setExactMatch(boolean exactMatch) {
+        this.exactMatch = exactMatch;
     }
 }

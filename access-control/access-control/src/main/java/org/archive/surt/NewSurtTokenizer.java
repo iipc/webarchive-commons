@@ -28,11 +28,19 @@ public class NewSurtTokenizer implements Iterable<String> {
     private int endOfAuthority;
     private int endOfPath;
     private int surtLength;
+    private int preTabLength;
 
     public NewSurtTokenizer(String surt) {
         super();
         this.surt = surt;
         surtLength = surt.length();
+        
+        if (surt.charAt(surtLength - 1) == '\t') {
+            preTabLength = surtLength - 1;
+        } else {
+            preTabLength = surtLength;
+        }
+        
         endOfAuthority = surt.indexOf(')');
         if (endOfAuthority == -1) {
             endOfAuthority = surtLength;
@@ -61,6 +69,13 @@ public class NewSurtTokenizer implements Iterable<String> {
         }
 
         private int nextPieceEnd() {
+            // Special case: If the SURT ends with a tab, we treat that as an extra token.
+            // A trailing tab is sometimes used (for better or worse) to make a distinction between
+            // and exact match and prefix match.
+            if (pos >= preTabLength && pos < surtLength) {
+                return surtLength;
+            }
+            
             // ROOT: "(..."
             if (pos == 0) {
                 return 1; // "("
@@ -69,7 +84,7 @@ public class NewSurtTokenizer implements Iterable<String> {
             if (pos < endOfAuthority || endOfAuthority == -1) {
                 int endOfHostComponent = surt.indexOf(',', pos);
                 if (endOfHostComponent == -1) {
-                    return surtLength;
+                    return preTabLength;
                 } else {
                     return endOfHostComponent + 1;
                 }
@@ -88,7 +103,7 @@ public class NewSurtTokenizer implements Iterable<String> {
                 } else if (endOfPath != -1) { // file: "hello.html"
                     return endOfPath;
                 } else {
-                    return surtLength;
+                    return preTabLength;
                 }   
             }
             
@@ -98,12 +113,12 @@ public class NewSurtTokenizer implements Iterable<String> {
                 if (endOfQuery != -1) {
                     return endOfQuery;
                 } else {
-                    return surtLength;
+                    return preTabLength;
                 }
             }
             
             // Anchor "#boo"
-            return surtLength;
+            return preTabLength;
         }
 
         public String next() {

@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +22,7 @@ import org.apache.commons.httpclient.URIException;
 import org.archive.accesscontrol.model.HibernateRuleDao;
 import org.archive.accesscontrol.model.Rule;
 import org.archive.accesscontrol.model.RuleSet;
+import org.archive.surt.NewSurtTokenizer;
 import org.archive.surt.SURTTokenizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
@@ -51,9 +54,11 @@ public class AdminController extends AbstractController {
     
     protected ModelAndView ruleList(String surt, Long editingRuleId, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
+        int surtSegments = new NewSurtTokenizer(surt).toList().size();
         Map<String, Object> model = new HashMap<String, Object>();
         RuleSet rules = ruleDao.getRuleTree(surt);
         ArrayList<DisplayRule> ruleList = new ArrayList<DisplayRule>();
+        ArrayList<String> childSurts = new ArrayList<String>();
         
         for (Rule rule: rules) {
             int comparison = rule.getSurt().compareTo(surt);
@@ -62,13 +67,24 @@ public class AdminController extends AbstractController {
                 displayRule.setEditing(rule.getId().equals(editingRuleId));
                 ruleList.add(displayRule);
             } else {
-                // lowerRules.add(rule);
+                try {
+                String segment = new NewSurtTokenizer(rule.getSurt())
+                            .toList().get(surtSegments);
+                    if (!childSurts.contains(segment)) {
+                        childSurts.add(segment);
+                    }
+                } catch (IndexOutOfBoundsException e) {
+                }
             }
         }
         Collections.sort(ruleList);
         
+        ArrayList<String> childSurtsList = new ArrayList<String>(childSurts);
+        Collections.sort(childSurtsList);
+        
         model.put("rules", ruleList);
         model.put("surt", surt);
+        model.put("childSurts", childSurtsList);
         model.put("encodedSurt", URLEncoder.encode(surt, "utf-8"));
         model.put("breadcrumbs", SurtNode.nodesFromSurt(surt));
         model.put("editingRuleId", request.getParameter("edit"));

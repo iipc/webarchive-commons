@@ -14,6 +14,14 @@
 </ul>
 </div>
 
+<div id="childSurts">
+<ul>
+  <c:forEach var="child" items="${childSurts}">
+    <li><a href="<c:url value="/admin?surt=${surt}${child}" />"><c:out value="${child}" /></a></li>
+  </c:forEach>
+</ul>
+</div>
+
 <table>
 	<thead>
 		<tr>

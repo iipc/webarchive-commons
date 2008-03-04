@@ -68,7 +68,16 @@
 
 						<p><label for="policy">Policy:</label> <input name="policy"
 							id="policy" value="<c:out value="${rule.rule.policy}"/>" /></p>
-						<input type="submit" value="Save" name="saveRule" /></fieldset>
+						
+						<div class="altButtons">
+					    <input type="submit" value="Delete Rule" name="delete" />
+						</div>
+						
+						<div class="priButtons">
+						  <input type="submit" value="Save" name="saveRule" />
+						  <input type="submit" value="Cancel" name="cancel" />
+						</div>
+						</fieldset>
 						</form>
 						<script type="text/javascript">
             setupDateRangeCalendars("captureStart", "captureEnd");

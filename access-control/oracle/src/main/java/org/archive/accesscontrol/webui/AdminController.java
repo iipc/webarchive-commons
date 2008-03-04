@@ -1,5 +1,6 @@
 package org.archive.accesscontrol.webui;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -8,22 +9,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.URIException;
 import org.archive.accesscontrol.model.HibernateRuleDao;
 import org.archive.accesscontrol.model.Rule;
 import org.archive.accesscontrol.model.RuleSet;
 import org.archive.surt.NewSurtTokenizer;
-import org.archive.surt.SURTTokenizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
@@ -31,6 +26,7 @@ import org.springframework.web.servlet.mvc.AbstractController;
 public class AdminController extends AbstractController {
     private HibernateRuleDao ruleDao;
     private static final DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final long NEW_RULE = -1L;
     static {
         dateFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
@@ -44,10 +40,15 @@ public class AdminController extends AbstractController {
             HttpServletResponse response) throws Exception {
         Long editingRuleId = null;
         if (request.getParameter("edit") != null) {
-            try {
-                editingRuleId = Long.decode(request.getParameter("edit"));
-            } catch (NumberFormatException e) {
+            if (request.getParameter("edit").equals("new")) {
+                editingRuleId = NEW_RULE;
+            } else {
+                try {
+                    editingRuleId = Long.decode(request.getParameter("edit"));
+                } catch (NumberFormatException e) {
+                }
             }
+            
         }
         return ruleList(surt, editingRuleId, request, response);
     }
@@ -79,6 +80,16 @@ public class AdminController extends AbstractController {
         }
         Collections.sort(ruleList);
         
+        if (editingRuleId != null && editingRuleId == NEW_RULE) {
+            Rule rule = new Rule();
+            rule.setId(NEW_RULE);
+            rule.setSurt(surt);
+            
+            DisplayRule newRule = new DisplayRule(rule, false);
+            newRule.setEditing(true);
+            ruleList.add(newRule);
+        }
+        
         ArrayList<String> childSurtsList = new ArrayList<String>(childSurts);
         Collections.sort(childSurtsList);
         
@@ -91,17 +102,31 @@ public class AdminController extends AbstractController {
         return new ModelAndView("list_rules", model);
     }
     
+    protected ModelAndView redirectToSurt(HttpServletRequest request, HttpServletResponse response, String surt) throws UnsupportedEncodingException {
+        response.setHeader("Location", request.getContextPath() + "/admin?surt=" + URLEncoder.encode(surt, "UTF-8"));
+        response.setStatus(302);
+        return null;
+    }
+    
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         if (request.getParameter("saveRule") != null) {
             return saveRule(request, response);
         }
-        
+              
         
         String surt = (String) request.getAttribute("id");
         if (surt == null) {
             surt = request.getParameter("surt");
+        }
+        
+        if (request.getParameter("cancel") != null) {
+            return redirectToSurt(request, response, surt);
+        }
+        
+        if (request.getParameter("delete") != null) {
+            return deleteRule(request, response);
         }
         
         if (surt != null) {
@@ -111,11 +136,24 @@ public class AdminController extends AbstractController {
         return new ModelAndView("index");
     }
 
+    private ModelAndView deleteRule(HttpServletRequest request,
+            HttpServletResponse response) throws UnsupportedEncodingException {
+        Long ruleId = Long.decode(request.getParameter("edit"));
+        ruleDao.deleteRule(ruleId);
+        return redirectToSurt(request, response, request.getParameter("surt"));
+    }
+
     private ModelAndView saveRule(HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         String surt = request.getParameter("surt");
+        
+        Rule rule;
         Long ruleId = Long.decode(request.getParameter("edit"));
-        Rule rule = ruleDao.getRule(ruleId);
+        if (ruleId == NEW_RULE) {
+            rule = new Rule();
+        } else {
+            rule = ruleDao.getRule(ruleId);
+        }
         rule.setSurt(surt);
         rule.setPolicy(request.getParameter("policy"));
         rule.setWho(request.getParameter("who"));
@@ -126,9 +164,7 @@ public class AdminController extends AbstractController {
         rule.setSecondsSinceCapture(parseInteger(request.getParameter("secondsSinceCapture")));
         ruleDao.saveRule(rule);
         
-        response.setHeader("Location", request.getContextPath() + "/admin?surt=" + URLEncoder.encode(surt, "UTF-8"));
-        response.setStatus(302);
-        return null;
+        return redirectToSurt(request, response, surt);
     }
     
     private Date parseDate(String s) {

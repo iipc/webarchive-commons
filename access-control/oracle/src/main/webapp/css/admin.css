@@ -63,3 +63,11 @@ ul#breadcrumbs a:hover {
 table {
 	clear: both;
 }
+
+.altButtons {
+  float: left;
+}
+
+.priButtons {
+	float: right;
+}

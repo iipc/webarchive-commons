@@ -1,9 +1,6 @@
 package org.archive.accesscontrol.model;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.SortedSet;
-
 import org.archive.accesscontrol.model.HibernateRuleDao;
 import org.archive.accesscontrol.model.Rule;
 import org.archive.accesscontrol.model.RuleChange;

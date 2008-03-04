@@ -3,9 +3,8 @@
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.httpclient.URIException;
 import org.archive.accesscontrol.RuleDao;
-import org.archive.surt.SURTTokenizer2;
+import org.archive.surt.NewSurtTokenizer;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
@@ -59,17 +58,13 @@ public class HibernateRuleDao extends HibernateDaoSupport implements RuleDao {
         // add the root SURT
         rules.addAll(getRulesWithExactSurt("("));
         
-        // now pull out all of the requested branch and a path to the root
-        SURTTokenizer2 tok = SURTTokenizer2.newFromSURT(surt);        
-        while (true) {
-            String search = tok.nextSearch();
-            if (search == null) break;
-            
-            if (!search.endsWith(SURTTokenizer2.EXACT_SUFFIX)) {
-                rules.addAll(getRulesWithExactSurt(search));
+        boolean first = true;
+        for (String search: new NewSurtTokenizer(surt).getSearchList()) {
+            if (first) {
+                first = false;
+                rules.addAll(getRulesWithSurtPrefix(search));
             } else {
-                rules.addAll(getRulesWithSurtPrefix(search.substring(0, search.length() - 1)));
-                tok.nextSearch(); // skip the duplicate exact-match
+                rules.addAll(getRulesWithExactSurt(search));
             }
         }
         

@@ -14,9 +14,9 @@ public class RuleSetTest extends TestCase {
     public void testSimple() {
         ruleset = new RuleSet();
         ruleset.add(new Rule("robots", "("));
-        ruleset.add(new Rule("allow", "(org,archive"));
-        ruleset.add(new Rule("block", "(org,archive,)/secret"));
-        ruleset.add(new Rule("allow", "(org,archive,)/secret/public"));
+        ruleset.add(new Rule("allow", "(org,archive,"));
+        ruleset.add(new Rule("block", "(org,archive,)/secret/"));
+        ruleset.add(new Rule("allow", "(org,archive,)/secret/public/"));
         
         for (Rule rule: ruleset) {
             System.out.println(rule.getSurt());
@@ -37,9 +37,9 @@ public class RuleSetTest extends TestCase {
         ruleset = new RuleSet();
         ruleset.add(new Rule("robots", "("));
         ruleset.add(new Rule("allow", "("));
-        ruleset.add(new Rule("block", "(org,archive,)/secret"));
-        ruleset.add(new Rule("allow", "(org,archive,)/secret/public"));
-        ruleset.add(new Rule("block", "(org,archive,)/secret/public"));
+        ruleset.add(new Rule("block", "(org,archive,)/secret/"));
+        ruleset.add(new Rule("allow", "(org,archive,)/secret/public/"));
+        ruleset.add(new Rule("block", "(org,archive,)/secret/public/"));
      
         assertEquals("allow", ruleset.getMatchingRule("(org", new Date(), new Date(), null).getPolicy());
         assertEquals("allow", ruleset.getMatchingRule("(org,archive,)/", new Date(), new Date(), null).getPolicy());
@@ -52,7 +52,7 @@ public class RuleSetTest extends TestCase {
     public void testEmbargo() {
         ruleset = new RuleSet();
         ruleset.add(new Rule("robots", "("));
-        ruleset.add(new Rule("allow", "(org,archive"));
+        ruleset.add(new Rule("allow", "(org,archive,"));
         ruleset.add(new Rule("block", "(org,archive,)/classified/"));
         ruleset.add(new Rule("allow", "(org,archive,)/classified/", 60 * 60 * 24 * 90));
         
@@ -70,9 +70,9 @@ public class RuleSetTest extends TestCase {
     public void testGroup() {
         ruleset = new RuleSet();
         ruleset.add(new Rule("robots", "("));
-        ruleset.add(new Rule("allow", "(org,archive", "archivists"));
-        ruleset.add(new Rule("block", "(org,archive,)/classified"));
-        ruleset.add(new Rule("allow", "(org,archive,)/classified", "admins"));
+        ruleset.add(new Rule("allow", "(org,archive,", "archivists"));
+        ruleset.add(new Rule("block", "(org,archive,)/classified/"));
+        ruleset.add(new Rule("allow", "(org,archive,)/classified/", "admins"));
         
         assertEquals("robots", ruleset.getMatchingRule("(org,archive,www,)/index.html", new Date(), new Date(), "dinosaurs").getPolicy());
         assertEquals("allow", ruleset.getMatchingRule("(org,archive,www,)/index.html", new Date(), new Date(), "archivists").getPolicy());

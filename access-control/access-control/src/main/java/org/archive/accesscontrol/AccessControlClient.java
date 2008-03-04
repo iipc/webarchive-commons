@@ -101,9 +101,7 @@ public class AccessControlClient {
         String publicSuffix = PublicSuffixes
                 .reduceSurtToTopmostAssigned(getSurtAuthority(surt));
 
-        surt = stripScheme(surt);
-
-        RuleSet rules = ruleDao.getRuleTree("(" + publicSuffix);
+            RuleSet rules =  ruleDao.getRuleTree(getScheme(surt) + "(" + publicSuffix);
 
         Rule matchingRule = rules.getMatchingRule(surt, captureDate,
                 retrievalDate, who);
@@ -142,13 +140,13 @@ public class AccessControlClient {
         return surt.substring(indexOfOpen + 4, indexOfClose);
     }
 
-    protected static String stripScheme(String surt) {
+    protected static String getScheme(String surt) {
         int i = surt.indexOf("://");
         int j = surt.indexOf(":");
         if (i >= 0 && i == j) {
-            return surt.substring(i + 3);
+            return surt.substring(0, i + 3);
         } else {
-            return surt;
+            return "";
         }
     }
 

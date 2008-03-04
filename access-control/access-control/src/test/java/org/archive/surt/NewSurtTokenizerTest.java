@@ -7,10 +7,10 @@ import junit.framework.TestCase;
 public class NewSurtTokenizerTest extends TestCase {
     
     public void testRoot() {
-        NewSurtTokenizer tok = new NewSurtTokenizer("(");
+        NewSurtTokenizer tok = new NewSurtTokenizer("http://(");
         Iterator<String> it = tok.iterator();
         
-        assertEquals("(", it.next());
+        assertEquals("http://(", it.next());
         assertFalse(it.hasNext());
         
     }
@@ -34,10 +34,10 @@ public class NewSurtTokenizerTest extends TestCase {
     }
 
     public void testFewSegs() {
-        NewSurtTokenizer tok = new NewSurtTokenizer("(org,archive,www");
+        NewSurtTokenizer tok = new NewSurtTokenizer("http://(org,archive,www");
         Iterator<String> it = tok.iterator();
         
-        assertEquals("(", it.next());
+        assertEquals("http://(", it.next());
         assertEquals("org,", it.next());
         assertEquals("archive,", it.next());
         assertEquals("www", it.next());
@@ -68,10 +68,10 @@ public class NewSurtTokenizerTest extends TestCase {
     }
     
     public void testPage() {
-        NewSurtTokenizer tok = new NewSurtTokenizer("(org,archive,www,)/about.html");
+        NewSurtTokenizer tok = new NewSurtTokenizer("http://(org,archive,www,)/about.html");
         Iterator<String> it = tok.iterator();
         
-        assertEquals("(", it.next());
+        assertEquals("http://(", it.next());
         assertEquals("org,", it.next());
         assertEquals("archive,", it.next());
         assertEquals("www,", it.next());
@@ -145,10 +145,10 @@ public class NewSurtTokenizerTest extends TestCase {
     }
     
     public void testQueryAnchor() {
-        NewSurtTokenizer tok = new NewSurtTokenizer("(org,archive,www,)/fishes/pinky.html?moo=yes&bar=12#423");
+        NewSurtTokenizer tok = new NewSurtTokenizer("ftp://(org,archive,www,)/fishes/pinky.html?moo=yes&bar=12#423");
         Iterator<String> it = tok.iterator();
         
-        assertEquals("(", it.next());
+        assertEquals("ftp://(", it.next());
         assertEquals("org,", it.next());
         assertEquals("archive,", it.next());
         assertEquals("www,", it.next());
@@ -185,4 +185,19 @@ public class NewSurtTokenizerTest extends TestCase {
         
     }
 
+    public void testSearchList() {
+        NewSurtTokenizer tok = new NewSurtTokenizer("(org,archive,www,)/fishes/pinky.html?moo=yes&bar=12#423");
+        Iterator<String> it = tok.getSearchList().iterator();
+        
+        assertEquals("(org,archive,www,)/fishes/pinky.html?moo=yes&bar=12#423", it.next());
+        assertEquals("(org,archive,www,)/fishes/pinky.html?moo=yes&bar=12", it.next());
+        assertEquals("(org,archive,www,)/fishes/pinky.html", it.next());
+        assertEquals("(org,archive,www,)/fishes/", it.next());
+        assertEquals("(org,archive,www,)/", it.next());
+        assertEquals("(org,archive,www,", it.next());
+        assertEquals("(org,archive,", it.next());
+        assertEquals("(org,", it.next());
+        assertEquals("(", it.next());
+        assertFalse(it.hasNext());
+    }
 }

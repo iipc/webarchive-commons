@@ -5,8 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeSet;
 
-import org.archive.surt.SURTTokenizer2;
-
+import org.archive.surt.NewSurtTokenizer;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
@@ -67,16 +66,10 @@ public class RuleSet implements Iterable<Rule> {
     public Rule getMatchingRule(String surt, Date captureDate,
             Date retrievalDate, String who) {
 
-        SURTTokenizer2 tok = SURTTokenizer2.newFromSURT(surt);
+        NewSurtTokenizer tok = new NewSurtTokenizer(surt);
         boolean done = false;
 
-        while (!done) {
-            String key = tok.nextSearch();
-            if (key == null) {
-                key = "(";
-                done = true;
-            }
-
+        for (String key: tok.getSearchList()) {
             Iterable<Rule> rules = rulemap.get(key);
             if (rules != null) {
                 for (Rule rule : rules) {

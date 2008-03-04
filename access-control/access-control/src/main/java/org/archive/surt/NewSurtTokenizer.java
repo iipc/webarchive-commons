@@ -8,9 +8,9 @@ import java.util.regex.Pattern;
 /**
  * The new SURT tokenizer breaks a SURT up into tokens.
  * 
- * For example "(org,archive,www,)/path/file.html?query#anchor" is broken up into:
+ * For example "http://(org,archive,www,)/path/file.html?query#anchor" is broken up into:
  * 
- * ["(" 
+ * ["http://(" 
  *  "org,"
  *  "archive," 
  *  "www," 
@@ -76,9 +76,13 @@ public class NewSurtTokenizer implements Iterable<String> {
                 return surtLength;
             }
             
-            // ROOT: "(..."
+            // Scheme: "http://(..."
             if (pos == 0) {
-                return 1; // "("
+                int i = surt.indexOf('(');
+                if (i == -1) {
+                    return preTabLength;
+                }
+                return i + 1; // "http://("
             }
             // Host components: "foo,..."
             if (pos < endOfAuthority || endOfAuthority == -1) {
@@ -148,6 +152,28 @@ public class NewSurtTokenizer implements Iterable<String> {
     }
     public String[] toArray() {
         return (String[]) toList().toArray();
+    }
+
+    /**
+     * Return a list of searches in order of decreasing length.  For example
+     * given the surt "(org,archive,)/fishing" return:
+     * 
+     * [ "(org,archive,)/fishing",
+     *   "(org,archive,)/",
+     *   "(org,archive,",
+     *   "(org,",
+     *   "("
+     * ]
+     * @return
+     */
+    public List<String> getSearchList() {
+        List<String> searches = new ArrayList<String>();
+        String running = "";
+        for (String token: this) {
+            running += token;
+            searches.add(0, running);
+        }
+        return searches;
     }
 
 }

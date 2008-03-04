@@ -1,3 +1,3 @@
 <%
-response.sendRedirect("admin?surt=(");
+response.sendRedirect("admin");
 %>

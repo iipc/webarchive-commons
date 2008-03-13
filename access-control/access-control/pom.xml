@@ -29,7 +29,7 @@
     <repository>
       <releases />
       <snapshots>
-        <enabled>false</enabled>
+        <enabled>true</enabled>
       </snapshots>
       <id>archive</id>
       <url>http://builds.archive.org:8080/maven2</url>

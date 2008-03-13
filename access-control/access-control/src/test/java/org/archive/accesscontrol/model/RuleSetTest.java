@@ -81,4 +81,9 @@ public class RuleSetTest extends TestCase {
         assertEquals("robots", ruleset.getMatchingRule("(org,archive,)/classified-photons", new Date(), new Date(), "public").getPolicy());               
     }
     
+    public void testIterator() {
+    	ruleset = new RuleSet();
+    	assertFalse(ruleset.iterator().hasNext());
+    }
+    
 }

@@ -24,12 +24,13 @@ public class RuleSet implements Iterable<Rule> {
 
         public RuleSetIterator() {
             mapIterator = rulemap.values().iterator();
-            setIterator = mapIterator.next().iterator();
+            setIterator = null;
+            hasNext();
         }
 
         public boolean hasNext() {
             while (true) {
-                if (setIterator.hasNext())
+                if (setIterator != null && setIterator.hasNext())
                     return true;
                 if (!mapIterator.hasNext())
                     return false;

@@ -28,10 +28,10 @@
 	<bean id="dataSource"
 		class="org.apache.commons.dbcp.BasicDataSource"
 		destroy-method="close">
-		<property name="driverClassName" value="org.postgresql.Driver" />
+		<property name="driverClassName" value="org.hsqldb.jdbcDriver" />
 		<property name="url"
-			value="jdbc:postgresql://localhost/exclusions" />
-		<property name="username" value="ato" />
+			value="jdbc:hsqldb:file:db/oracle.db" />
+		<property name="username" value="sa" />
 		<!-- <property name="password" value="" />  -->
 	</bean>
 
@@ -46,8 +46,8 @@
 		</property>
 		<property name="hibernateProperties">
 			<value>
-				hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-				hibernate.hbm2ddl.auto=update
+				hibernate.dialect=org.hibernate.dialect.HSQLDialect
+				hibernate.hbm2ddl.auto=create
 			</value>
 		</property>
 	</bean>

@@ -241,9 +241,21 @@ public class RulesController extends AbstractController {
      * @throws URIException
      */
     public ModelAndView getRuleTree(String surt) throws URIException {
+    	surt = fixupSchemeSlashes(surt);
     	System.out.println("*** getRuleTree: " + surt);
         return new ModelAndView(view, "object", ruleDao.getRuleTree(surt));        
     }
+
+    /**
+     * Ensure scheme has a double slash. eg replaces "http:/blah" with "http://blah"
+     */ 
+	private String fixupSchemeSlashes(String surt) {
+		if (surt.indexOf(":/(") == surt.indexOf(":")) {
+    		int i = surt.indexOf(":");
+    		surt = surt.substring(0, i + 1) + "/" + surt.substring(i+1);
+    	}
+		return surt;
+	}
 
     
     @Override

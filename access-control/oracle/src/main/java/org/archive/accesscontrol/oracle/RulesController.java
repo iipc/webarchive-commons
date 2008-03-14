@@ -241,6 +241,7 @@ public class RulesController extends AbstractController {
      * @throws URIException
      */
     public ModelAndView getRuleTree(String surt) throws URIException {
+    	System.out.println("*** getRuleTree: " + surt);
         return new ModelAndView(view, "object", ruleDao.getRuleTree(surt));        
     }
 
@@ -267,10 +268,16 @@ public class RulesController extends AbstractController {
                 ruleDao.deleteAllRules();
                 return null;
             }
-        } else if (idParam.startsWith("(")) {                // GET /rules/(some,surt,)
+        }
+        
+        Long id = null;
+        try {
+        	id = new Long(idParam);
+        } catch (NumberFormatException e) {}
+        
+        if (id == null) {                // GET /rules/(some,surt,)
             return getRuleNode(idParam);
         } else {
-            Long id = new Long(idParam);
             if (request.getMethod().equals("GET")) {         // GET /rules/:id
                 return getRule(id);
             } else if (request.getMethod().equals("PUT")) {  // PUT /rules/:id

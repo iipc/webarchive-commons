@@ -70,4 +70,11 @@ public class RuleTest extends TestCase {
         assertFalse("under embargo, so non-match", rule.matches("(org,archive,)/", new GregorianCalendar(2007, 4, 10).getTime(), new GregorianCalendar(2007, 4, 12).getTime()));
         assertTrue("outside embargo, so match", rule.matches("(org,archive,)/", new GregorianCalendar(2007, 4, 10).getTime(), new GregorianCalendar(2007, 4, 25).getTime()));
     }
+    
+    public void testBlankGroupMatching() {
+    	rule = new Rule();
+    	rule.setSurt("(");
+    	rule.setWho("");
+    	assertTrue(rule.matches("(org,",null, null, "blah"));
+    }
 }

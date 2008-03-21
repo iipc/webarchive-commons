@@ -19,6 +19,8 @@ import org.archive.accesscontrol.model.HibernateRuleDao;
 import org.archive.accesscontrol.model.Rule;
 import org.archive.accesscontrol.model.RuleSet;
 import org.archive.surt.NewSurtTokenizer;
+import org.archive.util.ArchiveUtils;
+import org.archive.util.SURT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
@@ -52,9 +54,40 @@ public class AdminController extends AbstractController {
         }
         return ruleList(surt, editingRuleId, request, response);
     }
+
+    /**
+     * Return true if the given string appears to be a SURT.
+     * @param s
+     * @return
+     */
+    protected boolean isSurt(String s) {
+        return s.charAt(0) == '(' || s.indexOf("://") == s.indexOf("://(");
+    }
+    
+    /**
+     * Perform a several cleanups on the given surt:
+     *   * Convert a URL to a SURT
+     *   * Add a trailing slash to SURTs of the form: http://(...)
+     * @param surt
+     * @return
+     */
+    protected String cleanSurt(String surt) {
+        if (!isSurt(surt)) {
+            surt = ArchiveUtils.addImpliedHttpIfNecessary(surt);
+            surt = SURT.fromURI(surt);
+        }
+        
+        if (surt.endsWith(",)") && surt.indexOf(")") == surt.length()-1) {
+            surt = surt + "/";
+        }
+        
+        return surt;
+    }
     
     protected ModelAndView ruleList(String surt, Long editingRuleId, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
+        
+        surt = cleanSurt(surt);        
         int surtSegments = new NewSurtTokenizer(surt).toList().size();
         Map<String, Object> model = new HashMap<String, Object>();
         RuleSet rules = ruleDao.getRuleTree(surt);

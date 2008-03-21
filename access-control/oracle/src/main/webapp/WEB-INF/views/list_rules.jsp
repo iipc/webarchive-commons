@@ -69,13 +69,14 @@
 						<p><label for="policy">Policy:</label> <input name="policy"
 							id="policy" value="<c:out value="${rule.rule.policy}"/>" /></p>
 						
-						<div class="altButtons">
-					    <input type="submit" value="Delete Rule" name="delete" />
-						</div>
-						
 						<div class="priButtons">
-						  <input type="submit" value="Save" name="saveRule" />
-						  <input type="submit" value="Cancel" name="cancel" />
+              <input type="submit" value="Save" name="saveRule" />
+              <input type="submit" value="Cancel" name="cancel" />
+            </div>
+						<div class="altButtons">
+						  <c:if test="${rule.rule.id != -1}">
+					      <input type="submit" value="Delete Rule" name="delete" />
+					    </c:if>
 						</div>
 						</fieldset>
 						</form>

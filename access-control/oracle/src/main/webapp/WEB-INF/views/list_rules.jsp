@@ -68,6 +68,12 @@
 
 						<p><label for="policy">Policy:</label> <input name="policy"
 							id="policy" value="<c:out value="${rule.rule.policy}"/>" /></p>
+						<p><label for="privateComment">Private comment:</label><br />
+							<textarea name="privateComment" rows="4" cols="50"><c:out value="${rule.rule.privateComment}" /></textarea>
+						</p>	
+						<p><label for="publicComment">Public comment:</label><br />
+							<textarea name="publicComment" rows="4" cols="50"><c:out value="${rule.rule.publicComment}" /></textarea>
+						</p>
 						
 						<div class="priButtons">
               <input type="submit" value="Save" name="saveRule" />

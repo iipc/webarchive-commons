@@ -195,6 +195,8 @@ public class AdminController extends AbstractController {
         rule.setRetrievalStart(parseDate(request.getParameter("retrievalStart")));
         rule.setRetrievalEnd(parseDate(request.getParameter("retrievalEnd")));
         rule.setSecondsSinceCapture(parseInteger(request.getParameter("secondsSinceCapture")));
+        rule.setPrivateComment(request.getParameter("privateComment"));
+        rule.setPublicComment(request.getParameter("publicComment"));
         ruleDao.saveRule(rule);
         
         return redirectToSurt(request, response, surt);

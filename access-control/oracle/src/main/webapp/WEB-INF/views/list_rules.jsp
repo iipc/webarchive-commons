@@ -1,7 +1,7 @@
 <%@ include file="header.inc"%>
 
 <form action="<c:url value="/admin"/>" method="GET" id="navForm">
-<label for="surtNavBox">SURT or URL:</label> <input size="50"
+<label for="surtNavBox"><a href="http://crawler.archive.org/articles/user_manual/glossary.html#surt"><acronym title="Sort-friendly URI Reordering Transform">SURT</acronym> or URL:</label> <input size="50"
 	name="surt" value="<c:out value="${surt}"/>" id="surtNavBox" /> <input
 	type="submit" value="Go!" /></form>
 

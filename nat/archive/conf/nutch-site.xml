@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<!-- Put site-specific property overrides in this file. -->
+
+<configuration>
+
+<property>
+  <name>plugin.includes</name>
+  <!-- Add 'index-nutchwax' and 'query-nutchwax' to plugin list. -->
+  <!-- Also, add 'parse-pdf' -->
+  <!-- Remove 'urlfilter-regex' and 'normalizer-(pass|regex|basic)' -->
+  <value>protocol-http|parse-(text|html|js|pdf)|index-(basic|anchor|nutchwax)|query-(basic|site|url|nutchwax)|summary-basic|scoring-opic</value>
+</property>
+
+<property>
+  <!-- Configure the 'index-nutchwax' plugin.  Specify how the metadata fields added by the ArcsToSegment are mapped to the Lucene documents during indexing.
+       The specifications here are of the form "src-key:lowercase:store:tokenize:dest-key"
+       Where the only required part is the "src-key", the rest will assume the following defaults:
+          lowercase = true
+          store     = true
+          tokenize  = false
+          dest-key  = src-key
+    -->
+  <name>nutchwax.filter.index</name>
+  <value>
+    arcname:false
+    collection
+    date
+    type
+  </value>
+</property>
+
+<property>
+  <!-- Configure the 'query-nutchwax' plugin.  Specify which fields to make searchable via "field:[term|phrase]" query syntax, and whether they are "raw" fields or not.  
+       The specification format is "raw:name:lowercase:boost" or "field:name:boost".  Default values are
+          lowercase = true
+          boost     = 1.0f
+       There is no "lowercase" property for "field" specification because the Nutch FieldQueryFilter doesn't expose the option, unlike the RawFieldQueryFilter.
+       AFAICT, the order isn't important. -->
+  <!-- We do *not* use this filter for handling "date" queries, there is a specific filter for that: DateQueryFilter -->
+  <name>nutchwax.filter.query</name>
+  <value>
+    raw:arcname:false
+    raw:collection
+    raw:type
+    field:anchor
+    field:content
+    field:host
+    field:title
+  </value>
+</property>
+
+<!-- Over-ride setting in Nutch "nutch-default.xml" file.  We do *not* want Content-Type detection via magic resolution because the implementation 
+     in Nutch reads in the entire content body (which could be a 1GB MPG movie), then converts it to a String before examining the first dozen or
+     so bytes/characters for magic matching.  Since we archvie large files, this is bad, and OOMs occur.  So, we disable this feature and keep
+     the Content-Type that is already in the (W)ARC file. -->
+<property>
+  <name>mime.type.magic</name>
+  <value>false</value>
+  <description>Defines if the mime content type detector uses magic resolution.
+  </description>
+</property>
+
+</configuration>

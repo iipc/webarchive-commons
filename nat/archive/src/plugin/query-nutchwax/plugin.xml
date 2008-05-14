@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<plugin
+   id="query-nutchwax"
+   name="NutchWax Query Filter"
+   version="1.0.0"
+   provider-name="archive.org">
+
+   <runtime>
+      <library name="query-nutchwax.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+
+   <requires>
+      <import plugin="nutch-extensionpoints"/>
+   </requires>
+
+<!--
+   <extension id="org.archive.nutchwax.query"
+              name="Multiple Field Query Filter"
+              point="org.apache.nutch.searcher.QueryFilter">
+      <implementation id="MultipleFieldQueryFilter"
+                      class="org.archive.nutchwax.query.MultipleFieldQueryFilter">
+        <parameter name="raw-fields" value="arcname,collection,date,type"   />
+        <parameter name="fields"     value="anchor,content,host,title" />
+      </implementation>
+   </extension>
+-->
+
+   <extension id="org.archive.nutchwax.query"
+              name="Configurable Query Filter"
+              point="org.apache.nutch.searcher.QueryFilter">
+      <implementation id="ConfigurableQueryFilter"
+                      class="org.archive.nutchwax.query.ConfigurableQueryFilter">
+        <parameter name="raw-fields" value="arcname,collection,date,type"   />
+        <parameter name="fields"     value="anchor,content,host,title" />
+      </implementation>
+   </extension>
+              
+   <extension id="org.archive.nutchwax.query"
+              name="Date Field Query Filter"
+              point="org.apache.nutch.searcher.QueryFilter">
+      <implementation id="DateQueryFilter"
+                      class="org.archive.nutchwax.query.DateQueryFilter">
+        <parameter name="raw-fields" value="date" />
+      </implementation>
+   </extension>
+              
+</plugin>

@@ -1,0 +1,25 @@
+<project name="Nutch" default="deploy-core" basedir=".">
+
+  <target name="deploy-core">
+    <ant target="compile-core" inheritall="false" dir="../../../../"/>
+    <ant target="deploy"/>
+  </target>
+
+  <!-- ====================================================== -->
+  <!-- Build & deploy all the plugin jars.                    -->
+  <!-- ====================================================== -->
+  <target name="deploy">
+    <ant dir="index-nutchwax" target="deploy"/>
+    <ant dir="query-nutchwax" target="deploy"/>
+  </target>
+
+  <!-- ====================================================== -->
+  <!-- Clean all of the plugins.                              -->
+  <!-- ====================================================== -->
+  <target name="clean">
+    <ant dir="index-nutchwax" target="clean"/>
+    <ant dir="query-nutchwax" target="clean"/>
+  </target>
+
+</project>
+

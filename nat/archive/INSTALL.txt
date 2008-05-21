@@ -1,236 +1,93 @@
 
 INSTALL.txt
-2008-05-06
+2008-05-20
 Aaron Binns
 
+This installation guide assumes the reader is already familiar with
+building, packaging and deploying Nutch 1.0-dev.
 
-The NutchWAX 0.12 build and installation is as an "add-on" to an
-existing Nutch 1.0-dev installation.
 
-NutchWAX 0.12 uses a simple 'ant' build script.  The script compiles
-the NutchWAX sources, using the libraries in the installed
-Nutch-1.0-dev.
+The NutchWAX 0.12 source and build system are designed to integrate
+into the existing Nutch 1.0-dev source and build.
 
-We strongly recommend having *two* Nutch-1.0-dev installation
-directories: one that you build NutchWAX against, and another into
-which NutchWAX is deployed.
+The long-term goal is for the NutchWAX components to be fully
+integrated into mainline Nutch.  As a stepping-stone toward that goal,
+we have packaged the NutchWAX source to be dropped into the Nutch
+"contrib" directory and built from there.
 
-NutchWAX is deployed by un-tar'ing the nutchwax-0.12.tar.gz file
-*into* an existing Nutch-1.0-dev installation.  Think of NutchWAX as
-an add-on.  We over-write a few Nutch config files, but the rest is
-simply added to the existing Nutch-1.0-dev installation.
+Like Nutch, NutchWAX 0.12 uses a simple 'ant' build script.  The
+NutchWAX build script calls out to the Nutch script to build Nutch
+proper, then builds NutchWAX components and integrates them into the
+Nutch build directory.
+
+We recommend that you execute all build commands from the NutchWAX
+directory.  This way, NutchWAX will ensure that any and all
+dependencies in Nutch will be properly built and kept up-to-date.
+Towards this goal, we have duplicated the most common build targets
+from the Nutch 'build.xml' file to the NutchWAX 'build.xml' file,
+such as:
+
+  o compile
+  o jar
+  o job
+  o tar
+  o clean
+
+Again, the idea is that if you're already used to building Nutch, you
+can easily transition to building Nutch and NutchWAX together.  All of
+the build artifacts will still be placed in Nutch's 'build'
+sub-directory as normal.
 
 
 Nutch-1.0-dev
 -------------
-
-As mentioned above, NutchWAX 0.12 is built against Nutch-1.0-dev.  Now
+As mentioned above, NutchWAX 0.12 is built against Nutch-1.0-dev.
 Nutch doesn't have a 1.0 release package yet, so we have to use the
-Nutch SVN trunk.  The specific SVN revision that NutchWAX 0.12 is 
+Nutch SVN trunk.  The specific SVN revision that NutchWAX 0.12 is
 built against is:
 
   650739
 
 To checkout this revision of Nutch, use:
 
- $ mkdir nutch
+ $ svn checkout -r 650739 http://svn.apache.org/repos/asf/lucene/nutch/trunk nutch
  $ cd nutch
- $ svn checkout -r 650739 http://svn.apache.org/repos/asf/lucene/nutch/trunk
 
-To build the nutch-1.0-dev.tar.gz package, use 'ant'
 
- $ cd trunk
- $ ant tar
+NutchWAX
+--------
+Once you have Nutch-1.0-dev checked-out, check-out NutchWAX into
+Nutch's "contrib" directory.
 
-This produces
+ $ cd contrib
+ $ svn checkout http://archive-access.svn.sourceforge.net/svnroot/archive-access/trunk/archive-access/projects/nat/archive
 
-  build/nutch-1.0-dev.tar.gz
-
-Which we then install *twice*
-
- $ mkdir -p ~/nutchwax-0.12/nutch-1.0-dev
- $ tar xfz -C ~/nutchwax-0.12/nutch-1.0-dev build/nutch-1.0-dev.tar.gz
- $ mkdir -p /opt/nutch-1.0-dev
- $ tar xfz -C /opt/nutch-1.0-dev build/nutch-1.0-dev.tar.gz
-
-The idea is that we keep /opt/nutch-1.0-dev as our pristine copy which
-we compile against, then, when we want to test NutcWAX, we deploy it
-into ~/nutchwax-0.12/nutch-1.0-dev.
-
-Why can't we just use one installation of Nutch?  Mainly to avoid
-weirdness where we are compiling NutchWAX source against the same set
-of libraries where we would be installing NutchWAX.  Consider, when we
-deploy NutchWAX, we copy the nutchwax.jar into the Nutch 'lib'
-directory.  If we use that same 'lib' directory for dependencies when
-compiling the source, 'ant'/'javac' will likely get confused when
-calculating dependencies.
-
-It's possible that you could successfully go through the
-build/test/release cycle using one Nutch-1.0-dev directory, but these
-instructions assume you will have two.
+This will create a sub-directory named "archive" containing the
+NutchWAX sources.
 
 
 Build and install
 -----------------
+Assuming you already have the required tool-set for building Nutch,
+building NutchWAX is a snap.
 
-  1. Install two Nutch-1.0-dev packages per the instructions above.
+Simply execute the same 'ant' build command in
 
-  2. Edit build.xml to point to the "pristine" installation of Nutch-1.0-dev
+  nutch/contrib/archive
 
-       <!-- NOTE: Point this to your Nutch 1.0-dev directory -->
-       <property name="nutch.dir" value="/opt/nutch-1.0-dev" />
+as you normally would and everything will build as normal.
 
-  3. Build NutchWAX-0.12
+For example
 
-      $ ant
+  $ cd nutch/contrib/archive
+  $ ant tar
 
-     The default build rule is "package" which will compile all the source
-     and build an intallation tarball: nutchwax-0.12.tar.gz
+This command will build all of Nutch, then the NutchWAX add-ons and
+finally will package everything up into the "nutch-1.0-dev.tar.gz"
+release package.
 
-     The "build.xml" file is pretty straightforward and just grepping
-     for the targets should be pretty obvious: compile, clean, etc.
-
-  4. Install NutchWAX into the build/test Nutch installation
-
-     $ tar xfz -C ~/nutchwax-0.12/nutch-1.0-dev nutchwax-0.12.tar.gz
-
-That's it!
-
-All we do is add our libraries (nutchwax.jar and dependencies), the
-'nutchwax' helper script, plugins for indexing and querying, and a few
-config files.
-
-Except for the config files, no files in the Nutch-1.0-dev
-installation are over-written, only added.  The "nutch-site.xml" file
-is over-written, but that file is empty in a vanilla Nutch
-installation, so there's small risk of over-writing something.
-
-
-HOWTO run and test
-------------------
-
-The 'nutchwax' helper script is installed in the Nutch-1.0-dev 'bin'
-directory next to the 'nutch' helper script.
-
-The 'nutchwax' script is used to run the NutchWAX-specific tools, use
-the regular 'nutch' script for regular Nutch activities.
-
-The 'nutchwax' script runs two tools
-
-  "import"     Import a set of .arc/.warc files from a manifest, creating
-               a Nutch segment.
-
-  "dumpindex"  Debug tool that dumps a Lucene index, such as the ones
-               created by Nutch's "index" tool.
-
-The idea is that the NutchWAX "import" tool supplants the Nutch
-generate and fetch cycle.  Rather than generating and fetching
-segments, we import the .arc/.warc files directly into a newly created
-segment.  Then, we process that segment just as we normally would with
-Nutch.
-
-For example,
-
-  $ cd nutch-test
-  $ cat > manifest
-    http://someserver/foo-bar-baz.arc mycollection
-    ^D
-  $ nutch-1.0-dev/bin/nutchwax import manifest
-
-This will import the arc file listed in the manifest into a newly
-created segment.  The segment is created by default in a directory
-hierarchy of the form:
-
-  segments/[date-timestamp]
-
-This mirrors the way segments are created in vanilla Nutch by the
-"generate" command.
-
-You can explicitly name the segment if you want, e.g.
-
-  nutchwax import manifest mysegment
-
-Once the segment is created by the importing of ARC files with
-NutchWAX, you can use Nutch to perform the rest of the steps.  For
+Then, install the "nutch-1.0-dev.tar.gz" tarball as normal.  For
 example:
 
-  $ nutch-1.0-dev/bin/nutchwax import manifest
-  $ nutch-1.0-dev/bin/nutch updatedb crawldb -dir segments
-  $ nutch-1.0-dev/bin/nutch invertlinks linkdb -dir segments
-  $ nutch-1.0-dev/bin/nutch index indexes crawldb linkdb segments/*
-  $ nutch-1.0-dev/bin/nutch merge index indexes
-
-This is pretty much the minimal set of steps to import and index a set
-of ARC files.  The crawldb update and link inversion steps are pro
-forma and don't have anything to do with NutchWAX specifically, but
-are a part of regular Nutch processing.
-
-Now you have a Nutch "index" directory and are ready to search!
-
-Searching is done as in vanilla Nutch.  Either launch the Nutch webapp
-or use the command-line interface to NutchBean to run some test
-searches.  Nothing NutchWAX-specific here.
-
-
-Miscellaneous notes
--------------------
-
-1. Plugins
-
-There are two plugins bundled with NutchWAX: 
-
-   index-nutchwax
-   query-nutchwax
-
-See the "plugin.includes" property in nutch-site.xml to see where
-these plugins are added to the filter chain.
-
-The index-nutchwax plugin ensures that WAX-specifici metadata is
-transferred from the Nutch Content object to the Lucene Document
-object, which is placed in the Lucene index.
-
-The query-nutchwax plugin is used to process query requests against
-those same meta-data fields.  It also expands the capabilities of
-searching the basic Nutch fields as well.
-
-2. URL filters
-
-Nutch's URL filter by default filters-out many common URL oddities
-that would normally trip-up Nutch's crawler.  However, when importing
-content from ARC files, filtering out content probably doens't make
-sense.  That is, whatever content made it into the ARC file should be
-imported, no matter what the URL looks like.
-
-To change the URL filter, edit the Nutch file 'conf/regex-urlfilter.txt'.
-To pass all content through the filter, remove all filter rules except
-for the last one:
-
-  # accept anything else
-  +.
-
-3. conf/tika-mimetypes.xml
-
-NutchWAX comes with a fixed copy of tika-mimetypes.xml.  The version
-in Nutch revision 650739 has a few bugs in it which cause parsing to
-fail for many document types.  The bugs are:
-
- o Move
-
-	<mime-type type="application/xml">
-		<alias type="text/xml" />
-		<glob pattern="*.xml" />
-	</mime-type>
-
-   definition higher up in the file, before the reference to it.
-
- o Remove
-
-	<mime-type type="application/x-ms-dos-executable">
-		<alias type="application/x-dosexec;exe" />
-	</mime-type>
-
-   as the ';' character is illegal according to the comments in the
-   Nutch code.
-
-The copy of "conf/tika-mimetypes.xml" bundled with NutchWAX fixes
-these two bugs.
+  $ cd /opt
+  $ tar xvfz nutch-1.0-dev.tar.gz

@@ -1,105 +1,122 @@
 
 README.txt
-2008-05-06
+2008-05-20
 Aaron Binns
 
+Welcome to NutchWAX 0.12!
 
-This is the NutchWAX-0.12 source that John Lee handed-off to me.  It
-is a work-in-progress.
+NutchWAX is a set of add-ons to Nutch in order to index and search
+archived web data.
 
-Compared to NutchWAX-0.10 (and earlier) it is *much* simpler.  The
-main WAX-specific code is in just a few files really:
+These add-ons are developed and maintained by the Internet Archive Web
+Team in conjunction with a broad community of contributors, partners
+and end-users.
 
-src/java/org/archive/nutchwax/ArcsToSegment.java
+The name "NutchWAX" stands for "Nutch (W)eb (A)rchive e(X)tensions".
 
-  This is the meat of the WAX logic for processing .arc files and
-  generating Nutch segments.  Once we use this to generate a set of
-  segments for the .arc files, we can use the rest of vanilla
-  Nutch-1.0-dev to invert links and index the content with Lucene.
+Since NutchWAX is a set of add-ons to Nutch, you should already be
+familiar with Nutch before using NutchWAX.
 
-  This conversion code is heavily edited from:
+======================================================================
 
-    nutch-1.0-dev/src/java/org/apache/nutch/tools/arc/ArcSegmentCreator.java
+The goal of NutchWAX is to enable full-text indexing and searching of
+documents stored in web archive file formats (ARC and WARC).
 
-  taken from the Nutch SVN head (a.k.a the "1.0-dev" in-development).
+The way we achieve that goal is by providing add-on tools and plugins
+to Nutch to read documents directly from ARC/WARC files.  We call this
+process "importing" archive files.
 
-  Ours differs in a few important ways:
+Importing produces a Nutch segment, the same as if Nutch had actually
+crawled the documents itself.  In this scenario, document importing
+replaces the conventional "generate/fetch/update" cycle of Nutch.
 
-    o Rather than taking a directory with .arc files as input, we take
-      a manifest file with URLs to .arc files.  This way, the manifest
-      is split up among the distributed Hadoop jobs and the .arc files
-      are processed in whole by each worker.
+Once the archival documents have been imported into a segment, the
+regular Nutch commands to update the 'crawldb', invert the links and
+index the document contents can proceed as normal.
 
-      In the Nutch-1.0-dev, the ArcSegmentCreator.java expects the
-      input directory to contain the .arc files and (AFAICT) splits
-      them up and distributes them across the Hadoop workers.  This
-      seems really inefficient to me, I think our approach is much
-      better -- at least for us.
+======================================================================
 
-    o Related to the way input files are split and processed, we use
-      the standard Archive ARCReader class just like Heritrix and
-      Wayback.
+The NutchWAX add-ons consist of:
 
-      The ArcSegmentCreator.java in Nutch-1.0-dev doesn't use our
-      ARCReader because of licensing imcompatibility.  Ours is under
-      GPL and Nutch-1.0-dev forbids the use of GPL code.
-      
-      We are in the process of re-licensing or dual-licensing with
-      Apache License, but until then, our ARCReader code won't be incldued      
-      in mainline Nutch.
+ bin/nutchwax
 
-      This isn's a problem per se, but worth noting in case anyone
-      looks at the Nutch-1.0-dev code and wonders why they built their
-      own (horribly inefficient) .arc reader.
+   A shell script that is used to run the NutchWAX command-line tools,
+   such as document importing.
 
-    o We add metadata fields to the processed document for WAX-specific
-      purposes:
+   This is patterned after the 'bin/nutch' shell script.
 
-        content.getMetadata().set( NutchWax.CONTENT_TYPE_KEY, meta.getMimetype() );
-        content.getMetadata().set( NutchWax.ARCNAME_KEY,      meta.getArcFile().getName() ) ;
-        content.getMetadata().set( NutchWax.COLLECTION_KEY,   collection);
-        content.getMetadata().set( NutchWax.ARCHIVE_DATE_KEY, meta.getDate() );
+ plugins/index-nutchwax
 
-      The addition of the arcname and collection key is pretty
-      obvious.  I don't know why the content-type isn't added in the
-      vanilla Nutch-1.0-dev.
-      
-      Also, we should review the use of the ARCHIVE_DATE_KEY in that
-      John Lee mentioned to me that there was possibly duplicate date
-      fields put in the index: one that is a plain old Java date, and
-      one that is a 14-digit date string for use with Wayback.
+   Indexing plugin which adds NutchWAX-specific metadata fields to the
+   indexed document.
 
-src/java/plugin/index-nutchwax/src/java/org/archive/nutchwax/index/NutchWaxIndexingFilter.java
-src/java/plugin/index-nutchwax/plugin.xml
+ plugins/query-nutchwax
 
-  This filter is pretty straightforward.  All it does is take the
-  metadata fields that were added to the document (as described above)
-  and placed in the Lucene index so that we can make use of them at
-  search-time.
+   Query plugin which allows for querying against the metadata fields
+   added by 'index-nutchwax'.
 
-src/java/plugin/query-nutchwax/src/java/org/archive/nutchwax/query/MultipleFieldQueryFilter.java
-src/java/plugin/query-nutchwax/plugin.xml
+There is no separate 'lib/nutchwax.jar' file for NutchWAX.  NutchWAX
+is distributed in source code form and is intended to be built in
+conjunction with Nutch.
 
-  This is a single query filter that can be used for querying single
-  fields from a single implementation.  It does *not* allow for
-  querying multiple fields as you can already do that via Nutch.
+See "INSTALL.txt" for details on building NutchWAX and Nutch.
 
-  What this filter does is allows one to more-or-less create query
-  filters in a data-driven manner rather than having to code-up a new
-  class for each field.  That is, before one would have to create a
-  CollectionQueryFilter class to filter on the "collection" field.
-  With the MultipleFieldQueryFilter class, you can specify that the
-  "collection" field is to be filterable via the plugin.xml file and
-  "nutchwax.filter.query" configuration property.
+See "HOWTO.txt" for a quick tutorial on importing, indexing and
+searching a set of documents in a web archive file.
 
-src/java/org/archive/nutchwax/NutchWax.java
+======================================================================
 
-  Just a simple enum used by the above two classes for the metadata
-  keys.
+This 0.12 release of NutchWAX is radically different in source-code
+form compared to the previous release, 0.10.
 
-src/java/org/archive/nutchwax/tools/DumpIndex.java
+One of the design goals of 0.12 was to reduce or even eliminate the
+"copy/paste/edit" approach of 0.10.  The 0.10 (and prior) NutchWAX
+releases had to copy/paste/edit large chunks of Nutch source code in
+order to add the NutchWAX features.
 
-  A simple command-line utility to dump the contents of a Lucene
-  index.  Used for debugging.
+Also, the NutchWAX 0.12 sources and build are designed to one day be
+added into mainline Nutch as a proper "contrib" package; then
+eventually be fully integrated into the core Nutch source code.
 
+======================================================================
 
+Most of the NutchWAX source code is relatively straightfoward to those
+already familiar with the inner workings of Nutch.  Still, special
+attention on one class is worth while:
+
+  src/java/org/archive/nutchwax/ArcsToSegment.java
+
+This is where ARC/WARC files are read and their documents are imported
+into a Nutch segment.
+
+It is inspired by:
+
+  nutch/src/java/org/apache/nutch/tools/arc/ArcSegmentCreator.java
+
+on the Nutch SVN head.
+
+Our implementation differs in a few important ways:
+
+  o Rather than taking a directory with ARC files as input, we take a
+    manifest file with URLs to ARC files.  This way, the manifest is
+    split up among the distributed Hadoop jobs and the ARC files are
+    processed in whole by each worker.
+
+    In the Nutch SVN, the ArcSegmentCreator.java expects the input
+    directory to contain the ARC files and (AFAICT) splits them up and
+    distributes them across the Hadoop workers.
+
+  o We use the standard Internet Archive ARCReader and WARCReader
+    classes.  Thus, NutchWAX can read both ARC and WARC files, whereas
+    the ArcSegmentCreator class can only read ARC files.
+
+  o We add metadata fields to the document, which are then available
+    to the "index-nutchwax" plugin at indexing-time.
+
+    ArcsToSegment.importRecord()
+      ...
+      contentMetadata.set( NutchWax.CONTENT_TYPE_KEY, meta.getMimetype()          );
+      contentMetadata.set( NutchWax.ARCNAME_KEY,      meta.getArcFile().getName() );
+      contentMetadata.set( NutchWax.COLLECTION_KEY,   collectionName              );
+      contentMetadata.set( NutchWax.DATE_KEY,         meta.getDate()              );
+      ...

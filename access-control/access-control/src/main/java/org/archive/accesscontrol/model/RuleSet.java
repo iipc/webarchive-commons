@@ -68,7 +68,6 @@ public class RuleSet implements Iterable<Rule> {
             Date retrievalDate, String who) {
 
         NewSurtTokenizer tok = new NewSurtTokenizer(surt);
-        boolean done = false;
 
         for (String key: tok.getSearchList()) {
             Iterable<Rule> rules = rulemap.get(key);

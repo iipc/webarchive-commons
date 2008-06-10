@@ -3,7 +3,6 @@ package org.archive.accesscontrol.model;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.SortedSet;
 
 import org.apache.commons.lang.ArrayUtils;
 
@@ -348,7 +347,8 @@ public class Rule implements Comparable<Rule> {
      * @return
      */
     public boolean matches(String surt, Date captureDate, Date retrievalDate, String who2) {
-        return (who == null || "".equals(who) || who == who2) && matches(surt, captureDate, retrievalDate);
+        return (who == null || who.length() == 0 || who.equals(who2))
+        	&& matches(surt, captureDate, retrievalDate);
     }
 
     public boolean isExactMatch() {

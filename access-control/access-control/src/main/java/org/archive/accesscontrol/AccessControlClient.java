@@ -46,6 +46,22 @@ public class AccessControlClient {
         this(new CachingRuleDao(oracleUrl), new CachingRobotClient());
     }
 
+    private String getPolicy(String url, Rule rule)
+        throws RobotsUnavailableException {
+        if (robotLookupsEnabled && rule != null && "robots".equals(rule.getPolicy())) {
+            try {
+                if (robotClient.isRobotPermitted(url, robotUserAgent)) {
+                    return "allow";
+                } else {
+                    return "block";
+                }
+            } catch (IOException e) {
+                throw new RobotsUnavailableException(e);
+            }
+        }
+        return rule.getPolicy();
+    }
+
     /**
      * Return the best-matching policy for the requested document.
      * 
@@ -63,21 +79,31 @@ public class AccessControlClient {
      * @throws RuleOracleUnavailableException 
      */
     public String getPolicy(String url, Date captureDate, Date retrievalDate,
-            String who) throws RobotsUnavailableException, RuleOracleUnavailableException {
-        Rule matchingRule = getRule(url, captureDate, retrievalDate, who);
-        
-        if (robotLookupsEnabled && matchingRule != null && "robots".equals(matchingRule.getPolicy())) {
-            try {
-                if (robotClient.isRobotPermitted(url, robotUserAgent)) {
-                    return "allow";
-                } else {
-                    return "block";
-                }
-            } catch (IOException e) {
-                throw new RobotsUnavailableException(e);
-            }
-        }
-        return matchingRule.getPolicy();
+            String who) throws RobotsUnavailableException, 
+                               RuleOracleUnavailableException {
+        return getPolicy(url, getRule(url, captureDate, retrievalDate, who));
+    }
+
+    /**
+     * Return the best-matching policy for the requested document.
+     * 
+     * @param url
+     *            URL of the requested document.
+     * @param captureDate
+     *            Date the document was archived.
+     * @param retrievalDate
+     *            Date of retrieval (usually now).
+     * @param groups
+     *            Group names of the user accessing the document.
+     * @return Access-control policy that should be enforced. eg "robots",
+     *         "block" or "allow".
+     * @throws RobotsUnavailableException 
+     * @throws RuleOracleUnavailableException 
+     */
+    public String getPolicy(String url, Date captureDate, Date retrievalDate,
+            Collection<String> groups) throws RobotsUnavailableException, 
+                                              RuleOracleUnavailableException {
+        return getPolicy(url, getRule(url, captureDate, retrievalDate, groups));
     }
 
     /**
@@ -108,6 +134,41 @@ public class AccessControlClient {
         return matchingRule;
     }
     
+    /**
+     * Return the most specific matching rule for the requested document.
+     * 
+     * @param url
+     *            URL of the requested document.
+     * @param captureDate
+     *            Date the document was archived.
+     * @param retrievalDate
+     *            Date of retrieval (usually now).
+     * @param groups
+     *            Group names of the user accessing the document.
+     * @return
+     * @throws RuleOracleUnavailableException 
+     */
+    public Rule getRule(String url, Date captureDate, Date retrievalDate,
+                        Collection<String> groups) 
+        throws RuleOracleUnavailableException {
+        Rule bestRule = null;
+        for (String who: groups) {
+            Rule rule = getRule(url, captureDate, retrievalDate, who);
+            
+            /* We compare policies not the rules themselves as
+             * a user should have full access to something one of their
+             * groups has access to, even if another group they are
+             * member of does not.
+             */
+            if (bestRule == null || 
+                rule.getPolicyId().compareTo(bestRule.getPolicyId()) < 0) {
+                bestRule = rule;
+            }
+        }
+        return bestRule;
+    }
+    
+
     
     /**
      * This method allows the client to prepare for lookups from a given set of

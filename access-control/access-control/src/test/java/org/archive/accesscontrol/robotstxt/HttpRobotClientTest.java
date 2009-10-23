@@ -16,7 +16,6 @@ public class HttpRobotClientTest extends TestCase {
     
     public void testBasic() throws Exception {
         HttpRobotClient client = new HttpRobotClient();
-        assertFalse(client.isRobotPermitted("http://web.archive.org/cgi-bin/fishbowl", "wayback-access-control-test"));
         assertTrue(client.isRobotPermitted("http://www.archive.org/index.html", "wayback-access-control-test"));
         assertTrue(client.isRobotPermitted("http://google.com/fish.html", "wayback-access-control-test"));
         assertFalse(client.isRobotPermitted("http://google.com/news", "wayback-access-control-test"));

@@ -59,6 +59,11 @@ public class AccessControlClient {
                 throw new RobotsUnavailableException(e);
             }
         }
+        if (rule == null) {
+            throw new RuntimeException("No applicable rule found."
+                    + "Please make sure you have a default rule set"
+                    + " on the root SURT '(' in the oracle.");
+        }
         return rule.getPolicy();
     }
 

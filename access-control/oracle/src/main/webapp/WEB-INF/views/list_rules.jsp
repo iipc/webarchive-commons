@@ -67,10 +67,10 @@
 						to <input name="retrievalEnd" id="retrievalEnd"
 							value="<fmt:formatDate value="${rule.rule.retrievalEnd }" type="both" pattern="yyyy-MM-dd HH:mm:ss"/>" /></p>
 
-						<p><label for="secondsSinceCapture">Seconds since
-						capture (embargo):</label> <input name="secondsSinceCapture"
+						<p><label for="secondsSinceCapture">Applies after
+						</label> <input name="secondsSinceCapture"
 							id="secondsSinceCapture"
-							value="<c:out value="${rule.rule.secondsSinceCapture }"/>" /></p>
+							value="<c:out value="${rule.rule.secondsSinceCapture }"/>" /> seconds since capture</p>
 
 						<p><label for="policy">Policy:</label> <input name="policy"
 							id="policy" value="<c:out value="${rule.rule.policy}"/>" /></p>

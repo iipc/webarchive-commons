@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>access-control</artifactId>
     <groupId>org.archive</groupId>
@@ -14,9 +14,9 @@
   <build>
     <extensions>
       <extension>
-        <groupId>hsqldb</groupId>
-        <artifactId>hsqldb</artifactId>
-        <version>1.8.0.7</version>
+       <groupId>org.hsqldb</groupId>
+       <artifactId>hsqldb</artifactId>
+       <version>2.2.4</version>
       </extension>
     </extensions>
     <plugins>
@@ -48,6 +48,24 @@
           </componentProperties>
         </configuration>
       </plugin>
+      
+      <plugin>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>maven-jetty-plugin</artifactId>
+        <configuration>
+          <systemProperties>
+            <systemProperty>
+              <name>jetty.port</name>
+              <value>8080</value>
+            </systemProperty>
+          </systemProperties>
+          <scanIntervalSeconds>5</scanIntervalSeconds>
+          <contextPath>oracle</contextPath>
+          <stopKey>foo</stopKey>
+          <stopPort>9995</stopPort>
+        </configuration>
+      </plugin>
+      
     </plugins>
   </build>
   <repositories>
@@ -115,9 +133,9 @@
       <version>8.2-504.jdbc3</version>
     </dependency>
     <dependency>
-      <groupId>hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
-      <version>1.8.0.7</version>
+     <groupId>org.hsqldb</groupId>
+     <artifactId>hsqldb</artifactId>
+     <version>2.2.4</version>
     </dependency>
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>

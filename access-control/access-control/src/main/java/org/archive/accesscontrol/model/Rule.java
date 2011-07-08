@@ -277,6 +277,8 @@ public class Rule implements Comparable<Rule> {
                 i = -1;
             } else if (getWho() == null && o.getWho() != null) {
                 i = 1;
+            } else if (getWho() != null && o.getWho() != null) {
+            	i = getWho().compareTo(o.getWho());
             } else {
                 i = getPolicyId().compareTo(o.getPolicyId());                
             }

@@ -129,8 +129,9 @@ public class AccessControlClient {
             String who) throws RuleOracleUnavailableException {
         url = ArchiveUtils.addImpliedHttpIfNecessary(url);
         String surt = SURT.fromURI(url);
+//        PublicSuffixes.reduceSurtToAssignmentLevel(surt)
         String publicSuffix = PublicSuffixes
-                .reduceSurtToTopmostAssigned(getSurtAuthority(surt));
+                .reduceSurtToAssignmentLevel(getSurtAuthority(surt));
 
             RuleSet rules =  ruleDao.getRuleTree(getScheme(surt) + "(" + publicSuffix);
 
@@ -187,7 +188,7 @@ public class AccessControlClient {
         for (String url: urls) {
             String surt = SURT.fromURI(ArchiveUtils.addImpliedHttpIfNecessary(url));
             publicSuffixes.add(PublicSuffixes
-                    .reduceSurtToTopmostAssigned(getSurtAuthority(surt)));
+                    .reduceSurtToAssignmentLevel(getSurtAuthority(surt)));
         }
         ruleDao.prepare(publicSuffixes);
         

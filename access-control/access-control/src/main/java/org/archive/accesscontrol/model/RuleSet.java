@@ -68,18 +68,28 @@ public class RuleSet implements Iterable<Rule> {
             Date retrievalDate, String who) {
 
         NewSurtTokenizer tok = new NewSurtTokenizer(surt);
+        
+        // Best general rule (when accessGroup is blank)
+        Rule ruleGeneral = null;
 
         for (String key: tok.getSearchList()) {
-            Iterable<Rule> rules = rulemap.get(key);
+            Iterable<Rule> rules = rulemap.get(key); 
             if (rules != null) {
                 for (Rule rule : rules) {
                     if (rule.matches(surt, captureDate, retrievalDate, who)) {
-                        return rule;
+                    	// Return this if accessGroup (who) matches exactly
+                    	if ((who != null) && who.equals(rule.getWho())) {
+                    		return rule;
+                    	// otherwise, store the first/best one
+                    	} else if (ruleGeneral == null) {
+                    		ruleGeneral = rule;
+                    	}
                     }
                 }
             }
         }
-        return null;
+        
+        return ruleGeneral;
     }
 
     public void addAll(Iterable<Rule> rules) {

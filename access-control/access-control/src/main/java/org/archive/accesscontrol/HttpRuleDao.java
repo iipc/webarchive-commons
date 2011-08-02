@@ -14,7 +14,7 @@ import com.thoughtworks.xstream.XStream;
 
 /**
  * The HTTP Rule Data Access Object enables a rule database to be queried via
- * the REST interface an oracle.
+ * the REST interface.
  * 
  * For details of the protocol, see:
  * http://webteam.archive.org/confluence/display/wayback/Exclusions+API
@@ -44,8 +44,8 @@ public class HttpRuleDao implements RuleDao {
 
         try {
             http.executeMethod(method);
-            String response = method.getResponseBodyAsString();
-            System.out.println(response);
+//            String response = method.getResponseBodyAsString();
+//            System.out.println(response);
             rules = (RuleSet) xstream.fromXML(method.getResponseBodyAsStream());
         } catch (IOException e) {
             throw new RuleOracleUnavailableException(e);

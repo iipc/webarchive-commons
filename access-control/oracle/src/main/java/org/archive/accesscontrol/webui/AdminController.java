@@ -32,6 +32,12 @@ public class AdminController extends AbstractController {
     static {
         dateFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
+    
+    protected enum ErrorStatus
+    {
+    	SUCCESS,
+    	DUP_RULE,
+    }
 
     @Autowired
     public AdminController(HibernateRuleDao ruleDao) {
@@ -132,13 +138,22 @@ public class AdminController extends AbstractController {
         model.put("encodedSurt", URLEncoder.encode(surt, "utf-8"));
         model.put("breadcrumbs", SurtNode.nodesFromSurt(surt));
         model.put("editingRuleId", request.getParameter("edit"));
+        model.put("errorStatus", request.getParameter("errorStatus"));
         return new ModelAndView("list_rules", model);
     }
     
-    protected ModelAndView redirectToSurt(HttpServletRequest request, HttpServletResponse response, String surt) throws UnsupportedEncodingException {
-        response.setHeader("Location", request.getContextPath() + "/admin?surt=" + URLEncoder.encode(surt, "UTF-8"));
+    protected ModelAndView redirectToSurt(HttpServletRequest request, HttpServletResponse response, String surt, ErrorStatus errStatus) throws UnsupportedEncodingException {
+        String newUrl = request.getContextPath() + "/admin?surt=" + URLEncoder.encode(surt, "UTF-8");
+        if (errStatus != ErrorStatus.SUCCESS) {
+        	newUrl += "&errorStatus=" + errStatus.toString();
+        }
+    	response.setHeader("Location", newUrl);
         response.setStatus(302);
         return null;
+    }
+    
+    protected ModelAndView redirectToSurt(HttpServletRequest request, HttpServletResponse response, String surt) throws UnsupportedEncodingException {
+    	return redirectToSurt(request, response, surt, ErrorStatus.SUCCESS);
     }
     
     @Override
@@ -197,9 +212,19 @@ public class AdminController extends AbstractController {
         rule.setSecondsSinceCapture(parseInteger(request.getParameter("secondsSinceCapture")));
         rule.setPrivateComment(request.getParameter("privateComment"));
         rule.setPublicComment(request.getParameter("publicComment"));
-        ruleDao.saveRule(rule);
+        rule.setExactMatch(request.getParameter("exactMatch") != null);
         
-        return redirectToSurt(request, response, surt);
+        boolean saved = true;
+        
+        // If adding a new rule, make sure it doesn't match any existing rules
+        // or we'll have duplicates (and only one of the dups will show up in the list)
+        if (ruleId == NEW_RULE) {
+        	saved = ruleDao.saveRuleIfNotDup(rule);
+        } else {
+        	ruleDao.saveRule(rule);
+        }
+        
+        return redirectToSurt(request, response, surt, saved ? ErrorStatus.SUCCESS : ErrorStatus.DUP_RULE);
     }
     
     private Date parseDate(String s) {

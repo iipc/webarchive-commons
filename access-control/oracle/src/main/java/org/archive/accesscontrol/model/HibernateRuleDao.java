@@ -75,6 +75,24 @@ public class HibernateRuleDao extends HibernateDaoSupport implements RuleDao {
         getHibernateTemplate().saveOrUpdate(rule);
     }
     
+    public boolean saveRuleIfNotDup(Rule rule)
+    {
+    	List<Rule> allRules = getAllRules();
+    	
+    	for (Rule existingRule : allRules)
+    	{
+    		if (existingRule.compareTo(rule) == 0) {
+    			// If we're not the same, rule then we're a dup!
+    			if ((rule.getId() == null) || !rule.getId().equals(existingRule.getId())) {
+    				return false;	
+    			}
+    		}
+    	}
+    	
+    	saveRule(rule);
+    	return true;
+    } 
+    
     /**
      * Save a rule and a change log entry in one go. (Uses a transaction).
      * @param rule

@@ -301,7 +301,8 @@ public class Rule implements Comparable<Rule> {
      * @see #matches(String, Date, Date, String)
      */
     public boolean matches(String surt) {
-        return surt.startsWith(getSurt());
+    	String mySurt = getSurt();
+    	return (isExactMatch() ? surt.equals(mySurt) : surt.startsWith(mySurt));
     }
 
     /**

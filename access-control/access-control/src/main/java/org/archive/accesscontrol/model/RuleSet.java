@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 import org.archive.surt.NewSurtTokenizer;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * A set of acess control rules which can be queried to find the governing rule
@@ -46,7 +45,7 @@ public class RuleSet implements Iterable<Rule> {
         }
 
         public void remove() {
-            throw new NotImplementedException();
+            throw new UnsupportedOperationException();
         }
     }
 

@@ -25,6 +25,6 @@
 		<property name="privateComment" column="private_comment" type="text" />
 		<property name="publicComment" column="public_comment" type="text" />
 		<property name="enabled" column="enabled" type="java.lang.Boolean" />
-    <property name="exactMatch" column="exactMatch" type="boolean" />
+    <property name="exactMatch" column="exactMatch" type="java.lang.Boolean" />
  	</class>
 </hibernate-mapping>

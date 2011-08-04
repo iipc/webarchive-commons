@@ -32,20 +32,21 @@ public class Rule implements Comparable<Rule> {
     private String privateComment;
     private String publicComment;
     private Boolean enabled;
-    private boolean exactMatch;
+    private Boolean exactMatch;
 
     public Rule() {
-        
+    	super();
+        exactMatch = Boolean.FALSE;
     }
     
     public Rule(String policy, String surt) {
-        super();
+        this();
         this.policy = policy;
         this.surt = surt;
     }
 
     public Rule(String policy, String surt, Integer secondsSinceCapture) {
-        super();
+        this();
         this.policy = policy;
         this.surt = surt;
         this.secondsSinceCapture = secondsSinceCapture;
@@ -366,11 +367,11 @@ public class Rule implements Comparable<Rule> {
         	&& matches(surt, captureDate, retrievalDate);
     }
 
-    public boolean isExactMatch() {
+    public Boolean isExactMatch() {
         return exactMatch;
     }
 
-    public void setExactMatch(boolean exactMatch) {
+    public void setExactMatch(Boolean exactMatch) {
         this.exactMatch = exactMatch;
     }
 }

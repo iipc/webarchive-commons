@@ -258,6 +258,20 @@ public class Rule implements Comparable<Rule> {
         return ArrayUtils.indexOf(POLICIES, getPolicy());
     }
     
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	public int doCompare(Comparable mine, Comparable other)
+    {
+    	if ((mine == null) && (other == null)) {
+    		return 0;
+    	}
+    	
+    	if ((mine != null) && (other != null)) {
+    		return mine.compareTo(other);
+    	}
+    	
+    	return ((mine == null) ? -1 : 1);
+    }
+    
     /*
      * Rules are sorted in descending order of "specificity".
      * So we order first by SURT, exact-match,
@@ -271,28 +285,26 @@ public class Rule implements Comparable<Rule> {
                 i = -1;
             } else if (!isExactMatch() && o.isExactMatch()) {
                 i = 1;
-                
-            // non-null groups come before null groups
-            } else if (getWho() != null && o.getWho() == null) {
-                i = -1;
-            } else if (getWho() == null && o.getWho() != null) {
-                i = 1;
-            } else if (getWho() != null && o.getWho() != null) {
-            	i = getWho().compareTo(o.getWho());
-            } else {
-                i = getPolicyId().compareTo(o.getPolicyId());                
             }
             
-            
+            if (i == 0) {
+            	i = doCompare(this.getWho(), o.getWho());
+            }
+                
             // if we're still equal try capture date start
-            if (i == 0 && getCaptureStart() != null) {
-                i = getCaptureStart().compareTo(o.getCaptureStart());
+            if (i == 0) {
+            	i = doCompare(this.getCaptureStart(), o.getCaptureStart());
             }
             
             // and retrieval date
-            if (i == 0 && getRetrievalStart() != null) {
-                i = getRetrievalStart().compareTo(o.getRetrievalStart());                
+            if (i == 0) {
+            	i = doCompare(this.getRetrievalStart(), o.getRetrievalStart());
             }
+            
+            if (i == 0) {
+            	i = doCompare(this.getPolicyId(), o.getPolicyId());         
+            }
+                        
         }
         return i;
     }

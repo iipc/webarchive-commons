@@ -35,11 +35,11 @@ public class RuleSetTest extends TestCase {
 
     public void testSimplePrecedence() {
         ruleset = new RuleSet();
-        ruleset.add(new Rule("robots", "("));
+        //ruleset.add(new Rule("robots", "("));
         ruleset.add(new Rule("allow", "("));
         ruleset.add(new Rule("block", "(org,archive,)/secret/"));
         ruleset.add(new Rule("allow", "(org,archive,)/secret/public/"));
-        ruleset.add(new Rule("block", "(org,archive,)/secret/public/"));
+        //ruleset.add(new Rule("block", "(org,archive,)/secret/public/"));
      
         assertEquals("allow", ruleset.getMatchingRule("(org", new Date(), new Date(), null).getPolicy());
         assertEquals("allow", ruleset.getMatchingRule("(org,archive,)/", new Date(), new Date(), null).getPolicy());
@@ -79,6 +79,37 @@ public class RuleSetTest extends TestCase {
         assertEquals("allow", ruleset.getMatchingRule("(org,archive,)/classified/presto", new Date(), new Date(), "admins").getPolicy());
         assertEquals("block", ruleset.getMatchingRule("(org,archive,)/classified/presto", new Date(), new Date(), "public").getPolicy());
         assertEquals("robots", ruleset.getMatchingRule("(org,archive,)/classified-photons", new Date(), new Date(), "public").getPolicy());               
+    }
+    
+    public void testGroupMore() {
+        ruleset = new RuleSet();
+        ruleset.add(new Rule("allow", "("));
+        ruleset.add(new Rule("block", "(org,", "coll"));
+        ruleset.add(new Rule("block", "(org,archive,)/collonly/"));
+        ruleset.add(new Rule("block", "(org,archive,)/collonly/index.html"));
+        ruleset.add(new Rule("allow", "(org,archive,)/collonly/", "coll"));
+        
+        assertEquals("allow", ruleset.getMatchingRule("(org,archive,www,)/index.html", new Date(), new Date(), "dinosaurs").getPolicy());
+        assertEquals("block", ruleset.getMatchingRule("(org,archive,www,)/index.html", new Date(), new Date(), "coll").getPolicy());
+        assertEquals("allow", ruleset.getMatchingRule("(org,archive,)/collonly/index.html", new Date(), new Date(), "coll").getPolicy());        
+        assertEquals("block", ruleset.getMatchingRule("(org,archive,)/collonly/index.html", new Date(), new Date(), "dinosaurs").getPolicy());        
+    }
+    
+    public void testExact() {
+        ruleset = new RuleSet();
+        ruleset.add(new Rule("block", "(org,archive,)/", true));
+        ruleset.add(new Rule("allow", "(org,archive,)/", false));
+        
+        assertEquals("allow", ruleset.getMatchingRule("(org,archive,)/somefile", new Date(), new Date(), null).getPolicy());
+        assertEquals("block", ruleset.getMatchingRule("(org,archive,)/", new Date(), new Date(), null).getPolicy());
+        
+        
+        ruleset = new RuleSet();
+        ruleset.add(new Rule("allow", "(org,archive,)/", false));        
+        ruleset.add(new Rule("block", "(org,archive,)/", true));
+        
+        assertEquals("allow", ruleset.getMatchingRule("(org,archive,)/somefile", new Date(), new Date(), null).getPolicy());
+        assertEquals("block", ruleset.getMatchingRule("(org,archive,)/", new Date(), new Date(), null).getPolicy());        
     }
     
     public void testIterator() {

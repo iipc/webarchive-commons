@@ -4,8 +4,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.apache.commons.lang.ArrayUtils;
-
 /**
  * An access control rules. Rules are organized into a tree based on SURT
  * components. The leafmost (most specific) matching rule takes precedence. In
@@ -18,7 +16,7 @@ import org.apache.commons.lang.ArrayUtils;
 public class Rule implements Comparable<Rule> {
     
     // in decreasing order of precedence
-    public static final String[] POLICIES = { "allow", "block", "robots" };
+    //public static final String[] POLICIES = { "allow", "block", "robots" };
     
     private Long id;
     private String policy;
@@ -32,11 +30,10 @@ public class Rule implements Comparable<Rule> {
     private String privateComment;
     private String publicComment;
     private Boolean enabled;
-    private Boolean exactMatch;
+    private Boolean exactMatch = Boolean.FALSE;
 
     public Rule() {
     	super();
-        exactMatch = Boolean.FALSE;
     }
     
     public Rule(String policy, String surt) {
@@ -55,6 +52,11 @@ public class Rule implements Comparable<Rule> {
     public Rule(String policy, String surt, String who) {
         this(policy, surt);
         this.who = who;
+    }
+    
+    public Rule(String policy, String surt, boolean exact) {
+        this(policy, surt);
+        this.exactMatch = exact;
     }
 
     
@@ -255,9 +257,9 @@ public class Rule implements Comparable<Rule> {
         this.publicComment = publicComment;
     }
 
-    public Integer getPolicyId() {
-        return ArrayUtils.indexOf(POLICIES, getPolicy());
-    }
+//    public Integer getPolicyId() {
+//        return ArrayUtils.indexOf(POLICIES, getPolicy());
+//    }
     
     @SuppressWarnings({ "rawtypes", "unchecked" })
 	public int doCompare(Comparable mine, Comparable other)
@@ -267,10 +269,10 @@ public class Rule implements Comparable<Rule> {
     	}
     	
     	if ((mine != null) && (other != null)) {
-    		return mine.compareTo(other);
+    		return -mine.compareTo(other);
     	}
     	
-    	return ((mine == null) ? -1 : 1);
+    	return -((mine == null) ? -1 : 1);
     }
     
     /*
@@ -279,34 +281,45 @@ public class Rule implements Comparable<Rule> {
      * then group, then policy.
      */
     public int compareTo(Rule o) {
-        int i = getSurt().compareTo(o.getSurt());
-        if (i == 0) {
-            // exact matches come before non-exact
-            if (isExactMatch() && !o.isExactMatch()) {
-                i = -1;
-            } else if (!isExactMatch() && o.isExactMatch()) {
-                i = 1;
-            }
-            
-            if (i == 0) {
-            	i = doCompare(this.getWho(), o.getWho());
-            }
-                
-            // if we're still equal try capture date start
-            if (i == 0) {
-            	i = doCompare(this.getCaptureStart(), o.getCaptureStart());
-            }
-            
-            // and retrieval date
-            if (i == 0) {
-            	i = doCompare(this.getRetrievalStart(), o.getRetrievalStart());
-            }
-            
-            if (i == 0) {
-            	i = doCompare(this.getPolicyId(), o.getPolicyId());         
-            }
-                        
+    	
+    	int i; 
+        
+        i = doCompare(this.getSurt(), o.getSurt());
+        
+        if (i != 0) {
+        	return i;
         }
+        
+        // exact matches come after non-exact
+    	i = doCompare(this.getExactMatch(), o.getExactMatch());
+    	
+        if (i != 0) {
+        	return i;
+        }
+        
+    	// Compare by accessGroup, specific accessGroups take precedence
+    	i = doCompare(this.getWho(), o.getWho());
+        
+        if (i != 0) {
+        	return i;
+        }         
+
+        // if we're still equal try capture date start
+    	i = doCompare(this.getCaptureStart(), o.getCaptureStart());
+        
+        if (i != 0) {
+        	return i;
+        }    	
+
+        // and retrieval date
+    	i = doCompare(this.getRetrievalStart(), o.getRetrievalStart());
+
+        if (i != 0) {
+        	return i;
+        }    	
+    	
+    	i = doCompare(this.getSecondsSinceCapture(), o.getSecondsSinceCapture());
+            
         return i;
     }
 
@@ -367,11 +380,15 @@ public class Rule implements Comparable<Rule> {
         	&& matches(surt, captureDate, retrievalDate);
     }
 
-    public Boolean isExactMatch() {
-        return exactMatch;
+    public boolean isExactMatch() {
+        return exactMatch.booleanValue();
     }
+    
+    public Boolean getExactMatch() {
+        return exactMatch;
+    }    
 
     public void setExactMatch(Boolean exactMatch) {
-        this.exactMatch = exactMatch;
+        this.exactMatch = ((exactMatch == null) ? Boolean.FALSE : exactMatch);
     }
 }

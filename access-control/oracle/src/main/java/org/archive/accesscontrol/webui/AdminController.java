@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -117,7 +118,14 @@ public class AdminController extends AbstractController {
                 }
             }
         }
-        Collections.sort(ruleList);
+        String order = request.getParameter("order");
+        boolean reverse = order != null && order.equals("1");
+        
+        if (!reverse) {
+            Collections.sort(ruleList, Collections.reverseOrder());
+        } else {
+        	Collections.sort(ruleList);
+        }
         
         if (editingRuleId != null && editingRuleId == NEW_RULE) {
             Rule rule = new Rule();
@@ -129,9 +137,11 @@ public class AdminController extends AbstractController {
             ruleList.add(newRule);
         }
         
-        ArrayList<String> childSurtsList = new ArrayList<String>(childSurts);
+        ArrayList<String> childSurtsList = new ArrayList<String>(childSurts); 
         Collections.sort(childSurtsList);
         
+        doURLCheck(rules, ruleList, request, model); 
+                
         model.put("rules", ruleList);
         model.put("surt", surt);
         model.put("childSurts", childSurtsList);
@@ -141,6 +151,59 @@ public class AdminController extends AbstractController {
         model.put("errorStatus", request.getParameter("errorStatus"));
         return new ModelAndView("list_rules", model);
     }
+    
+    protected void doURLCheck(RuleSet rules, List<DisplayRule> ruleList, HttpServletRequest request, Map<String, Object> model) {
+		
+		String url = request.getParameter("checkURL");
+
+		if (url == null || url.isEmpty()) {
+			return;
+		}
+		
+		String surt;
+		
+		if (!this.isSurt(url)) {
+			surt = url;
+		} else {
+	        url = ArchiveUtils.addImpliedHttpIfNecessary(url);
+	        surt = SURT.fromURI(url);
+		}
+		surt = this.cleanSurt(surt);
+		
+		String dateStamp = request.getParameter("checkDate");
+		String group = request.getParameter("checkGroup");
+		model.put("checkGroup", group);
+		model.put("dateStamp", dateStamp);
+		model.put("checkURL", url);		
+		
+		Date captureDate = null;
+		
+		if ((dateStamp != null) && !dateStamp.isEmpty()) {
+			String paddedDateStr = ArchiveUtils.padTo(dateStamp, 14, '0');
+			try {
+				captureDate = ArchiveUtils.parse14DigitDate(paddedDateStr);
+			} catch (ParseException e) {
+				captureDate = null;
+			}
+		}
+		
+		Date retrivealDate = new Date();
+		
+		Rule theRule = rules.getMatchingRule(surt, captureDate, retrivealDate, group);
+		
+		if (theRule == null) {
+			return;
+		}
+		
+		// Now, find displayRule that contains matched rule, if any, and set it to highlight
+		for (DisplayRule displayRule : ruleList)
+		{
+			if (displayRule.getRule().getId().equals(theRule.getId())) {
+				displayRule.setHighlight(true);
+				break;
+			}
+		}
+	}
     
     protected ModelAndView redirectToSurt(HttpServletRequest request, HttpServletResponse response, String surt, ErrorStatus errStatus) throws UnsupportedEncodingException {
         String newUrl = request.getContextPath() + "/admin?surt=" + URLEncoder.encode(surt, "UTF-8");

@@ -154,6 +154,7 @@ public class AccessControlClient {
      * @return
      * @throws RuleOracleUnavailableException 
      */
+    @Deprecated
     public Rule getRule(String url, Date captureDate, Date retrievalDate,
                         Collection<String> groups) 
         throws RuleOracleUnavailableException {
@@ -167,7 +168,7 @@ public class AccessControlClient {
              * member of does not.
              */
             if (bestRule == null || 
-                rule.getPolicyId().compareTo(bestRule.getPolicyId()) < 0) {
+                rule.getPolicy().compareTo(bestRule.getPolicy()) < 0) {
                 bestRule = rule;
             }
         }

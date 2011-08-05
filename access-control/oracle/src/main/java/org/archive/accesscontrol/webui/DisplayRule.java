@@ -14,6 +14,7 @@ public class DisplayRule implements Comparable<DisplayRule> {
     private Rule rule;
     private boolean inherited;
     private boolean editing;
+    private boolean highlight;
     
     public DisplayRule(Rule rule, boolean inherited) {
         super();
@@ -52,5 +53,14 @@ public class DisplayRule implements Comparable<DisplayRule> {
     public String getEncodedSurt() throws UnsupportedEncodingException {
         return URLEncoder.encode(rule.getSurt(), "utf-8");
     }
+
+	public void setHighlight(boolean highlight) {
+		this.highlight = highlight;		
+	}
+	
+	public boolean isHighlight()
+	{
+		return this.highlight;
+	}
     
 }

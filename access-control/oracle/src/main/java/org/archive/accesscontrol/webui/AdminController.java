@@ -162,7 +162,7 @@ public class AdminController extends AbstractController {
 		
 		String surt;
 		
-		if (!this.isSurt(url)) {
+		if (this.isSurt(url)) {
 			surt = url;
 		} else {
 	        url = ArchiveUtils.addImpliedHttpIfNecessary(url);
@@ -173,23 +173,32 @@ public class AdminController extends AbstractController {
 		String dateStamp = request.getParameter("checkDate");
 		String group = request.getParameter("checkGroup");
 		model.put("checkGroup", group);
-		model.put("dateStamp", dateStamp);
 		model.put("checkURL", url);		
 		
 		Date captureDate = null;
 		
 		if ((dateStamp != null) && !dateStamp.isEmpty()) {
-			String paddedDateStr = ArchiveUtils.padTo(dateStamp, 14, '0');
+			String paddedDateStr = dateStamp;
+			int pad = 14 - dateStamp.length();
+			for (int i = 0; i < pad; i++) {
+				paddedDateStr += '0';
+			}
+			
 			try {
 				captureDate = ArchiveUtils.parse14DigitDate(paddedDateStr);
+				model.put("checkDate", dateStamp);				
 			} catch (ParseException e) {
 				captureDate = null;
 			}
 		}
 		
-		Date retrivealDate = new Date();
+		Date retrievalDate = new Date();
 		
-		Rule theRule = rules.getMatchingRule(surt, captureDate, retrivealDate, group);
+		if (captureDate == null) {
+			captureDate = retrievalDate;
+		}
+		
+		Rule theRule = rules.getMatchingRule(surt, captureDate, retrievalDate, group);
 		
 		if (theRule == null) {
 			return;

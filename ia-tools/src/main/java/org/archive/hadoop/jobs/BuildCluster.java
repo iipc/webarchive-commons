@@ -145,9 +145,9 @@ public class BuildCluster implements Tool {
 		job.setJarByClass(BuildCluster.class);
 		
 		if(SURTOutput) {
-			job.setMapperClass(SimpleTextMapper.class);
-		} else {
 			job.setMapperClass(CDXMapper.class);
+		} else {
+			job.setMapperClass(SimpleTextMapper.class);
 		}
 		
 		job.setReducerClass(IdentityTextReducer.class);

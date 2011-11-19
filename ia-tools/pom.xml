@@ -28,10 +28,10 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-        <groupId>org.apache.pig</groupId>
-        <artifactId>pig</artifactId>
-        <version>0.8.0</version>
-        <scope>provided</scope>
+      <groupId>org.apache.pig</groupId>
+      <artifactId>pig</artifactId>
+      <version>0.8.0</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>
@@ -45,6 +45,15 @@
       </plugins>
     </pluginManagement>  
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.2-beta-1</version>

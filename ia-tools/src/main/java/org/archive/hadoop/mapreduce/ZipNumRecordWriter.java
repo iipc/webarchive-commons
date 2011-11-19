@@ -9,6 +9,12 @@ import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.archive.format.gzip.zipnum.ZipNumWriter;
 
+/**
+ * Warning - this has a bug.. leaves empty SUMMARY files in some cases.
+ * 
+ * @author brad
+ *
+ */
 public class ZipNumRecordWriter extends RecordWriter<Text, Text>{
 	protected ZipNumWriter znw;
 	

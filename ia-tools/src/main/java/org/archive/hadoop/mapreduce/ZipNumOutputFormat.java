@@ -51,7 +51,10 @@ public class ZipNumOutputFormat extends FileOutputFormat<Text, Text> {
 		FSDataOutputStream mainOut = mainFs.create(mainFile, false);
 		FSDataOutputStream summaryOut = summaryFs.create(summaryFile, false);
 		if(dayLimit == -1) {
-			return new ZipNumRecordWriter(count, mainOut, summaryOut);
+			// This (should be) a better implementation, but appears to have a 
+			// bug - summary files are empty in some cases.. Should track it down
+//			return new ZipNumRecordWriter(count, mainOut, summaryOut);
+			return new ZipNumRecordWriterOld(count, mainOut, summaryOut);
 		} else {
 			return new OvercrawlZipNumRecordWriter(count,dayLimit, mainOut, summaryOut);
 		}

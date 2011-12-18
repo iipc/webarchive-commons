@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -49,8 +48,6 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 		System.err.println("\tOPT can be one of:");
 		System.err.println("\t\t-cdx\tProduce output in NEW-SURT-Wayback CDX format");
 		System.err.println("\t\t\t (note that column 1 is NOT standard Wayback canonicalized)\n");
-		System.err.println("\t\t-arc-cdx\tProduce output in semi-Wayback CDX format");
-		System.err.println("\t\t\t (note that column 1 is NOT canonicalized)\n");
 		System.err.println("\t\t-wat\tembed JSON output in a compressed WARC" +
 				"wrapper, for storage, or sharing.");
 		return exitCode;
@@ -87,18 +84,13 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 	    if(args.length == arg + 2) {
 	    	if(args[arg].equals("-cdx")) {
 	    		path = args[arg+1];
-//	    		out = new CDXExtractorOutput(os);
 	    		out = new RealCDXExtractorOutput(new PrintWriter(new OutputStreamWriter(os, Charset.forName("UTF-8"))));
-	    	} else if(args[arg].equals("-arc-cdx")) {
-	    		path = args[arg+1];
-	    		out = new CDXExtractorOutput(new PrintStream(os));
-	    		
+
 	    	} else if(args[arg].equals("-wat")) {
 	    		path = args[arg+1];
 	    		out = new WATExtractorOutput(os);
 	    	} else {
 	    		String filter = args[arg+1];
-//	    		out = new FilteredExtractorOuput(os, filter);
 	    		out = new JSONViewExtractorOutput(os, filter);
 	    	}
 	    } else {

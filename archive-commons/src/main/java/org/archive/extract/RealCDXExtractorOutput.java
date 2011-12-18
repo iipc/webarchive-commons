@@ -62,6 +62,8 @@ public class RealCDXExtractorOutput implements ExtractorOutput {
 	public RealCDXExtractorOutput(PrintWriter out, URLKeyMaker keyMaker) {
 		this.out = out;
 		this.keyMaker = keyMaker;
+		out.println(" CDX N b a m s k r M S V g");
+		out.flush();
 	}
 
 	public RealCDXExtractorOutput(PrintWriter out) {
@@ -225,10 +227,10 @@ public class RealCDXExtractorOutput implements ExtractorOutput {
 						mime,
 						httpCode,
 						digest,
-						meta,
 						redir,
-						offset, 
+						meta,
 						gzLen, 
+						offset, 
 						filename, 
 						m.toString(1));
 			} else {
@@ -239,10 +241,10 @@ public class RealCDXExtractorOutput implements ExtractorOutput {
 						mime,
 						httpCode,
 						digest,
-						meta,
 						redir,
-						offset, 
+						meta,
 						gzLen, 
+						offset, 
 						filename);
 
 			}

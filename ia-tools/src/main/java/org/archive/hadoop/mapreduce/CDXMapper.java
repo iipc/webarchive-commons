@@ -1,6 +1,7 @@
 package org.archive.hadoop.mapreduce;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
@@ -11,7 +12,12 @@ import org.archive.url.WaybackURLKeyMaker;
 
 public class CDXMapper extends Mapper<Object, Text, Text, Text>
 		implements Configurable {
-
+	private static final Logger LOG =
+		Logger.getLogger(CDXMapper.class.getName());
+	
+	// Note the (unbelievably) new "S" for "Size in Compressed Bytes..."
+	public final static String NEW_CDX_HEADER =
+		"CDX N b a m s k r M S V g";
 	private static String TEXT_OUTPUT_DELIM_CONFIG = "text.output.delim";
 	public static int MODE_GLOBAL = 0;
 	public static int MODE_FULL = 1;
@@ -30,8 +36,7 @@ public class CDXMapper extends Mapper<Object, Text, Text, Text>
 	
 	public StringPair convert(String cdxLine) {
 		if(cdxLine.startsWith(" CDX ")) {
-			return new StringPair("", cdxLine.substring(1));
-//			return null
+			return new StringPair("", NEW_CDX_HEADER);
 		}
 		String[] parts = cdxLine.split(delim);
 		int offsetIdx = 8;
@@ -45,6 +50,9 @@ public class CDXMapper extends Mapper<Object, Text, Text, Text>
 					return null;
 				}
 			}
+		} else {
+			LOG.warning("Skipping line:" + cdxLine);
+			return null;
 		}
 	
 		// don't care about the old key:
@@ -68,8 +76,9 @@ public class CDXMapper extends Mapper<Object, Text, Text, Text>
 		valSB.append(responseCode).append(delim);
 		valSB.append(digest).append(delim);
 		valSB.append(redirect).append(delim);
-		valSB.append(offset).append(delim);
+		valSB.append(metaInstructions).append(delim);
 		valSB.append(DEFAULT_GZ_LEN).append(delim);
+		valSB.append(offset).append(delim);
 		valSB.append(filename);
 		return new StringPair(keySB.toString(), valSB.toString());
 	}

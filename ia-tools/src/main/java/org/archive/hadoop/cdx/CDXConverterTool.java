@@ -39,10 +39,12 @@ public class CDXConverterTool implements Tool {
 				break;
 			}
 			StringPair pair = mapper.convert(cdxLine);
-			pw.print(pair.first);
-			pw.print(" ");
-			pw.print(pair.second);
-			pw.println();
+			if(pair != null) {
+				pw.print(pair.first);
+				pw.print(" ");
+				pw.print(pair.second);
+				pw.println();
+			}
 		}
 		pw.flush();
 		return 0;

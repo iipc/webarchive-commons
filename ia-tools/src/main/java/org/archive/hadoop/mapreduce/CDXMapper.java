@@ -44,7 +44,7 @@ public class CDXMapper extends Mapper<Object, Text, Text, Text>
 		if(parts.length == 9) {
 			offsetIdx = 7;
 		} else if(parts.length == 10) {
-			metaInstructions = parts[8];
+			metaInstructions = parts[7];
 			if(omitNoArchive) {
 				if(metaInstructions.contains("A")) {
 					return null;

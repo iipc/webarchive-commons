@@ -76,8 +76,8 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 	    ExtractorOutput out;
 	    int arg = 0;
 	    if(args.length > 0) {
-	    	if(args[0].equals("-nostrict")) {
-	    		ProducerUtils.STRICT_GZ = false;
+	    	if(args[0].equals("-strict")) {
+	    		ProducerUtils.STRICT_GZ = true;
 	    		arg++;
 	    	}	   
 	    }

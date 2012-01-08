@@ -378,6 +378,9 @@ public class ExtractingParseObserver implements ParseObserver {
 			int urlStart = m.start(1);
 			int urlEnd = m.end(1);
 			idx = urlEnd;
+			if(url.length() < 2) {
+				continue;
+			}
 			if ((url.charAt(0) == '(') 
 					&& (url.charAt(origUrlLength-1) == ')')) {
 				url = url.substring(1, origUrlLength - 1);

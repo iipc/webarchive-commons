@@ -3,6 +3,7 @@ package org.archive.resource.warc.record;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.archive.RecoverableRecordFormatException;
 import org.archive.format.dns.DNSResponse;
 import org.archive.format.dns.DNSResponseParser;
 import org.archive.resource.MetaData;
@@ -20,7 +21,11 @@ public class DNSResourceFactory implements ResourceFactory, ResourceConstants {
 			ResourceContainer container) throws ResourceParseException,
 			IOException {
 		DNSResponse response = new DNSResponse();
-		parser.parse(is, response);
+		try {
+			parser.parse(is, response);
+		} catch(RecoverableRecordFormatException e) {
+			throw new ResourceParseException(e);
+		}
 		parentMetaData.putString(PAYLOAD_CONTENT_TYPE, PAYLOAD_TYPE_DNS);
 		return new DNSResource(parentMetaData.createChild(DNS_METADATA), container, response);
 	}

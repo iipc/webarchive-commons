@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+import org.archive.RecoverableRecordFormatException;
 import org.archive.format.gzip.GZIPFormatException;
 import org.archive.resource.Resource;
 import org.archive.resource.ResourceConstants;
@@ -66,7 +67,7 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 		if(args.length < 1) {
 			return USAGE(1);
 		}
-		if(args.length > 2) {
+		if(args.length > 3) {
 			return USAGE(1);
 		}
 		int max = Integer.MAX_VALUE;
@@ -118,14 +119,31 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 				
 				out.output(r);
 			} catch(GZIPFormatException e) {
+				LOG.severe(String.format("%s: %s",exProducer.getContext(),e.getMessage()));
+				//Log is not coming out for some damn reason....needs to be studied
+				System.err.format("%s: %s",exProducer.getContext(),e.getMessage());
+				
 				if(ProducerUtils.STRICT_GZ) {
-					LOG.severe(String.format("%s: %s",exProducer.getContext(),e.getMessage()));
 					throw e;
 				}
 				e.printStackTrace();
 			} catch(ResourceParseException e) {
 				LOG.severe(String.format("%s: %s",exProducer.getContext(),e.getMessage()));
-				throw e;
+				//Log is not coming out for some damn reason....needs to be studied
+				System.err.format("%s: %s",exProducer.getContext(),e.getMessage());
+				
+				if(ProducerUtils.STRICT_GZ) {
+					throw e;
+				}
+				e.printStackTrace();
+			} catch(RecoverableRecordFormatException e) {
+				// this should not get here - ResourceFactory et al should wrap as ResourceParseExceptions...
+				LOG.severe(String.format("RECOVERABLE - %s: %s",exProducer.getContext(),e.getMessage()));
+				//Log is not coming out for some damn reason....needs to be studied
+				System.err.format("%s: %s",exProducer.getContext(),e.getMessage());
+
+				e.printStackTrace();
+				
 			}
 		}
 		return 0;

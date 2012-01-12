@@ -394,6 +394,8 @@ public class ExtractingParseObserver implements ParseObserver {
 				url = url.substring(1, origUrlLength - 1);
 				urlStart += 1;
 			} else if (url.charAt(0) == '\\') {
+				if(origUrlLength == 2)
+					continue;
 				url = url.substring(2, origUrlLength - 2);
 				urlStart += 2;
 			}

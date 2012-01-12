@@ -152,8 +152,12 @@ public class GoogleURLCanonicalizer implements URLCanonicalizer {
 						if(m2Group == null)
 							return null;
 						//int octet = Integer.parseInt(m2.group(i+1).substring((i==0)?0:1));
-						int octet = Integer.parseInt(m2Group.substring((i==0)?0:1));
-						
+						int octet;
+						try {
+							octet = Integer.parseInt(m2Group.substring((i==0)?0:1));
+						} catch (NumberFormatException e){
+							return null;
+						}
 						if((octet < 0) || (octet > 255)) {
 							return null;
 //							throw new URIException("Bad Host("+host+")");

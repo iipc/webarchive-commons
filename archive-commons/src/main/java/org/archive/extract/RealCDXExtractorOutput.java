@@ -311,8 +311,11 @@ public class RealCDXExtractorOutput implements ExtractorOutput {
 			URL cUrl = new URL(context);
 			URL resolved = new URL(cUrl,spec);
 			return resolved.toURI().toASCIIString();
+			
 		} catch (URISyntaxException e) {			
 		} catch (MalformedURLException e) {
+		} catch (NullPointerException e) {
+			
 		}
 		return spec;
 	}

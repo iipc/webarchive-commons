@@ -147,7 +147,13 @@ public class GoogleURLCanonicalizer implements URLCanonicalizer {
 					}
 					int[] ip = new int[]{0,0,0,0};
 					for(int i=0; i < parts; i++) {
-						int octet = Integer.parseInt(m2.group(i+1).substring((i==0)?0:1));
+						
+						String m2Group = m2.group(i+1);
+						if(m2Group == null)
+							return null;
+						//int octet = Integer.parseInt(m2.group(i+1).substring((i==0)?0:1));
+						int octet = Integer.parseInt(m2Group.substring((i==0)?0:1));
+						
 						if((octet < 0) || (octet > 255)) {
 							return null;
 //							throw new URIException("Bad Host("+host+")");

@@ -64,7 +64,7 @@ implements ResourceConstants, EOFObserver {
 		for(HttpHeader h : response.getHeaders()) {
 			headers.putString(h.getName(),h.getValue());
 		}
-		if(forceCheck && (length != -1)) {
+		if(forceCheck && (length != -1) && (length >= 0)) {
 			LimitInputStream lis = new LimitInputStream(response, length);
 			countingIS = new CountingInputStream(lis);
 		} else {

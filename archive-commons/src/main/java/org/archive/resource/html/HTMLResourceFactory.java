@@ -35,6 +35,8 @@ public class HTMLResourceFactory implements ResourceFactory {
 		} catch (ParserException e) {
 			e.printStackTrace();
 			throw new ResourceParseException(e);
+		} catch(OutOfMemoryError e) {
+			throw new ResourceParseException(null);
 		}
 
 		return new HTMLResource(hmd,container);

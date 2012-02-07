@@ -99,6 +99,14 @@ public class JobDriver {
 					GZRangeClientTool.class,
 					GZRangeClientTool.TOOL_DESCRIPTION);
 
+			pgd.addClass(GZRangeClientTool.TOOL_NAME,
+					GZRangeClientTool.class,
+					GZRangeClientTool.TOOL_DESCRIPTION);
+			
+			pgd.addClass(WATExtractorJob.TOOL_NAME,
+					WATExtractorJob.class,
+					WATExtractorJob.TOOL_DESCRIPTION);
+			
 			pgd.driver(args);
 
 			exitCode = 0;

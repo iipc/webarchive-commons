@@ -23,19 +23,22 @@ public class GoogleURLCanonicalizer implements URLCanonicalizer {
 		url.setQuery(minimalEscape(url.getQuery()));
 		String hostE = unescapeRepeatedly(url.getHost());
 		String host = null;
-		try {
-			host = IDN.toASCII(hostE);
-		} catch(IllegalArgumentException e) {
-			if(!e.getMessage().contains("A prohibited code point was found")) {
-				// TODO: What to do???
-//				throw e;
+		if (hostE != null) {
+			try {
+				host = IDN.toASCII(hostE);
+			} catch(IllegalArgumentException e) {
+				if(!e.getMessage().contains("A prohibited code point was found")) {
+					// TODO: What to do???
+					//				throw e;
+				}
+				host = hostE;
+
 			}
-			host = hostE;
-			
-		}
-		host = host.replaceAll("^\\.+", "").
+			host = host.replaceAll("^\\.+", "").
 					replaceAll("\\.\\.+", ".").
 					replaceAll("\\.$", "");
+		}
+		
 		String ip = null;
 //			try {
 				ip = attemptIPFormats(host);
@@ -44,7 +47,7 @@ public class GoogleURLCanonicalizer implements URLCanonicalizer {
 //			}
 		if(ip != null) {
 			host = ip;
-		} else {
+		} else if (host != null) {
 			host = escapeOnce(host.toLowerCase());
 		}
 		url.setHost(host);

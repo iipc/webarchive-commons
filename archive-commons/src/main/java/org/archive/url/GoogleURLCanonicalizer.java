@@ -131,7 +131,12 @@ public class GoogleURLCanonicalizer implements URLCanonicalizer {
 				}
 				int[] ip = new int[]{0,0,0,0};
 				for(int i=0; i < parts; i++) {
-					int octet = Integer.parseInt(m.group(i+1).substring((i==0)?0:1),8);
+					int octet;
+					try {
+						octet = Integer.parseInt(m.group(i+1).substring((i==0)?0:1),8);
+					} catch (Exception e) {
+						return null;
+					}
 					if((octet < 0) || (octet > 255)) {
 						return null;
 //						throw new URIException("Bad Host("+host+")");
@@ -158,7 +163,7 @@ public class GoogleURLCanonicalizer implements URLCanonicalizer {
 						int octet;
 						try {
 							octet = Integer.parseInt(m2Group.substring((i==0)?0:1));
-						} catch (NumberFormatException e){
+						} catch (Exception e){
 							return null;
 						}
 						if((octet < 0) || (octet > 255)) {

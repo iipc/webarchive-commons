@@ -48,7 +48,7 @@
     <dependency>
     	<groupId>org.apache.hadoop</groupId>
     	<artifactId>hadoop-core</artifactId>
-    	<version>0.20.2</version>
+    	<version>0.20.2-cdh3u4</version>
         <exclusions>
           <exclusion>
             <groupId>commons-httpclient</groupId>
@@ -177,6 +177,25 @@
           <checksumPolicy>warn</checksumPolicy>
         </snapshots>
       </repository>
+      
+      <repository>
+        <id>cloudera</id>
+        <name>Cloudera Hadoop</name>
+        <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+        <layout>default</layout>
+
+        <releases>
+          <enabled>true</enabled>
+          <updatePolicy>daily</updatePolicy>
+          <checksumPolicy>warn</checksumPolicy>
+        </releases>
+        <snapshots>
+          <enabled>true</enabled>
+          <updatePolicy>daily</updatePolicy>
+          <checksumPolicy>warn</checksumPolicy>
+        </snapshots>
+      </repository>
+            
     </repositories>
   
 

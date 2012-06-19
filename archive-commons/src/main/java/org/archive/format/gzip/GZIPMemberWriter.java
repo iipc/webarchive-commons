@@ -10,7 +10,6 @@ import org.archive.util.StreamCopy;
 import org.archive.util.io.CRCInputStream;
 
 import com.google.common.io.CountingOutputStream;
-import com.google.common.io.FileBackedOutputStream;
 
 public class GZIPMemberWriter implements GZIPConstants {
 	private static final int MAX_RAM_BUFFER = 1024 * 1024;
@@ -36,52 +35,6 @@ public class GZIPMemberWriter implements GZIPConstants {
 		out.flush();
 	}
 
-	public void writeWithLengthHeader(InputStream is) throws IOException {
-
-		// stuff all the deflate data into the file backed OS:
-		FileBackedOutputStream outTmp = new FileBackedOutputStream(maxBuffer);
-		
-		CRCInputStream crc = new CRCInputStream(is);
-		Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
-		DeflaterOutputStream deflateOut = new DeflaterOutputStream(outTmp,deflater);
-		StreamCopy.copy(crc, deflateOut);
-		deflateOut.finish();
-		outTmp.flush();
-
-		// now calculate and write the gzip header:
-		GZIPHeader gzHeader = new GZIPHeader();
-		gzHeader.addRecord(slRecordName, deflater.getBytesWritten() + GZIP_FOOTER_BYTES);
-		gzHeader.writeBytes(out);
-
-		StreamCopy.copy(outTmp.getSupplier().getInput(), out);
-
-		GZIPFooter gzFooter = new GZIPFooter(crc.getCRCValue(), crc.getByteCount());
-		gzFooter.writeBytes(out);
-		out.flush();
-	}
-	public void writeWithAlexaHeader(InputStream is) throws IOException {
-
-		// stuff all the deflate data into the file backed OS:
-		FileBackedOutputStream outTmp = new FileBackedOutputStream(maxBuffer);
-		
-		CRCInputStream crc = new CRCInputStream(is);
-		Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
-		DeflaterOutputStream deflateOut = new DeflaterOutputStream(outTmp,deflater);
-		StreamCopy.copy(crc, deflateOut);
-		deflateOut.finish();
-		outTmp.flush();
-
-		// now calculate and write the gzip header:
-		GZIPHeader gzHeader = new GZIPHeader();
-		gzHeader.addRecord(LX_RECORD, LX_RECORD_VALUE);
-		gzHeader.writeBytes(out);
-
-		StreamCopy.copy(outTmp.getSupplier().getInput(), out);
-
-		GZIPFooter gzFooter = new GZIPFooter(crc.getCRCValue(), crc.getByteCount());
-		gzFooter.writeBytes(out);
-		out.flush();
-	}
 	public long getBytesWritten() {
 		return out.getCount();
 	}

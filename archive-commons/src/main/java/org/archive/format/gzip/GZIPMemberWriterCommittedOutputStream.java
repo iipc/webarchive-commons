@@ -1,10 +1,10 @@
 package org.archive.format.gzip;
 
 import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 import org.archive.util.io.CommitedOutputStream;
-
-import com.google.common.io.FileBackedOutputStream;
 
 public class GZIPMemberWriterCommittedOutputStream extends CommitedOutputStream {
 	private static int DEFAULT_BUFFER_RAM = 1024 * 1024;
@@ -13,15 +13,14 @@ public class GZIPMemberWriterCommittedOutputStream extends CommitedOutputStream 
 		this(gzW,DEFAULT_BUFFER_RAM);
 	}
 	public GZIPMemberWriterCommittedOutputStream(GZIPMemberWriter gzW, int bufferRAM) {
-		super(new FileBackedOutputStream(bufferRAM,true));
+                super(new ByteArrayOutputStream());
 		this.gzW = gzW;
 	}
 
 	@Override
 	public void commit() throws IOException {
-		FileBackedOutputStream fbos = (FileBackedOutputStream) out;
-		gzW.writeWithLengthHeader(fbos.getSupplier().getInput());
-		fbos.reset();
+                ByteArrayOutputStream bos = (ByteArrayOutputStream) out;
+		gzW.write(new ByteArrayInputStream(bos.toByteArray()));
 	}
 	public long getBytesWritten() {
 		return gzW.getBytesWritten();

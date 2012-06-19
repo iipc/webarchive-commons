@@ -296,8 +296,7 @@ http-header-from: archive-crawler-agent@lists.sourceforge.net
 		currentArcOS = new FileOutputStream(currentArcTmp);
 		byte[] header = getARCHeader(newArcName);
 		GZIPMemberWriter w = new GZIPMemberWriter(currentArcOS);
-//		w.writeWithLengthHeader(new ByteArrayInputStream(header));
-		w.writeWithAlexaHeader(new ByteArrayInputStream(header));
+                w.write(new ByteArrayInputStream(header));
 		currentArcSize = w.getBytesWritten();
 		LOGGER.info(String.format("Openned(%s)",currentArc.getAbsolutePath()));
 	}
@@ -311,7 +310,7 @@ http-header-from: archive-crawler-agent@lists.sourceforge.net
 
 		byte[] header = getWARCHeader(newWarcName);
 		GZIPMemberWriter w = new GZIPMemberWriter(currentWarcOS);
-		w.writeWithLengthHeader(new ByteArrayInputStream(header));
+                w.write(new ByteArrayInputStream(header));
 		currentWarcSize = w.getBytesWritten();
 		LOGGER.info(String.format("Openned(%s)",currentWarc.getAbsolutePath()));
 	}

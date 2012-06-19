@@ -22,8 +22,6 @@ import org.archive.util.StreamCopy;
 import org.archive.util.io.CommitedOutputStream;
 import org.json.JSONException;
 
-import com.google.common.io.FileBackedOutputStream;
-
 public class WATExtractorOutput implements ExtractorOutput {
 	WARCRecordWriter recW;
 	private boolean wroteFirst;
@@ -79,8 +77,7 @@ public class WATExtractorOutput implements ExtractorOutput {
 		headers.addDateHeader("Extracted-Date", new Date());
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		headers.write(baos);
-		ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-		recW.writeWARCInfoRecord(recOut, filename, bais);
+                recW.writeWARCInfoRecord(recOut,filename,baos.toByteArray());
 	}
 
 	private String extractOrIO(MetaData md, String path) throws IOException {
@@ -118,10 +115,9 @@ public class WATExtractorOutput implements ExtractorOutput {
 			String targetURI, String capDateString, String recId)
 	throws IOException {
 
-		FileBackedOutputStream fbos = 
-			new FileBackedOutputStream(DEFAULT_BUFFER_RAM);
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-		OutputStreamWriter osw = new OutputStreamWriter(fbos, UTF8);
+		OutputStreamWriter osw = new OutputStreamWriter(bos, UTF8);
 		try {
 			md.write(osw);
 		} catch (JSONException e1) {
@@ -140,9 +136,8 @@ public class WATExtractorOutput implements ExtractorOutput {
 			capDate = new Date();
 		}
 		
-		recW.writeJSONMetadataRecord(recOut, fbos.getSupplier().getInput(), 
+		recW.writeJSONMetadataRecord(recOut, bos.toByteArray(),
 				targetURI, capDate, recId);
-		fbos.reset();
 	}
 
 	private static String transformWARCDate(final String input) {

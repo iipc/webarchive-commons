@@ -17,15 +17,20 @@ public class WARCRecordWriter implements WARCConstants, HttpConstants
   private static final String SCHEME_COLON = SCHEME + ":";
 	
   /** 
-   * Alternate version of writeRecord() which takes a byte[] rather
-   * than an InputStream.  This is handy so we don't have to copy the
-   * input into another buffer just to count the number of bytes, which
-   * we do in the other one.      
+   * Write the headers and contents as a WARC record to the given
+   * output stream.
+   *
+   * WARC record format:
+   * <pre>warc-file = 1*warc-record
+   * warc-record = header CRLF block CRLF CRLF
+   * header = version warc-fields
+   * version = "WARC/0.18" CRLF
+   * warc-fields = *named-field CRLF
+   * block = *OCTET</pre>
    */
   private void writeRecord( OutputStream out, 
                             HttpHeaders headers, 
-                            byte[] contents, 
-                            int trailingCRLFs) throws IOException
+                            byte[] contents) throws IOException
   {
     if ( contents == null ) 
       {
@@ -39,17 +44,21 @@ public class WARCRecordWriter implements WARCConstants, HttpConstants
     out.write(WARC_ID.getBytes(DEFAULT_ENCODING));
     out.write(CR);
     out.write(LF);
+
+    // NOTE: HttpHeaders.write() method includes the trailing CRLF.
+    //       So we don't need to write it out here.
     headers.write(out);
   
-    if (contents != null) 
+    if ( contents != null ) 
       {
         out.write( contents );
       }
-    for (int i = 0; i < trailingCRLFs; i++)
-      {
-        out.write(CR);
-        out.write(LF);
-      }
+
+    // Emit the 2 trailing CRLF sequences.
+    out.write(CR);
+    out.write(LF);
+    out.write(CR);
+    out.write(LF);
   }
 
   public void writeWARCInfoRecord(OutputStream out, 
@@ -70,7 +79,7 @@ public class WARCRecordWriter implements WARCConstants, HttpConstants
     headers.add(HEADER_KEY_FILENAME, filename);
     headers.add(HEADER_KEY_ID, makeRecordId());
     headers.add(CONTENT_TYPE,WARC_FIELDS_TYPE);
-    writeRecord(out,headers,contents,2);			
+    writeRecord(out,headers,contents);
   }
 
   public void writeJSONMetadataRecord( OutputStream out,
@@ -87,7 +96,7 @@ public class WARCRecordWriter implements WARCConstants, HttpConstants
     headers.add(HEADER_KEY_REFERS_TO, origRecordId);
     
     headers.add(CONTENT_TYPE,"application/json");
-    writeRecord(out, headers, contents, 1);
+    writeRecord(out, headers, contents);
   }
 
   private String makeRecordId() 

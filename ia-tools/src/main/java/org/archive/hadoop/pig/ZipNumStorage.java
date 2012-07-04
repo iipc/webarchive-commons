@@ -73,12 +73,12 @@ public class ZipNumStorage extends StoreFunc
         
         if ( DataType.findType( tuple.get(0) ) != DataType.CHARARRAY )
           {
-            throw new IOException( "Invalid type, not CHARARRAY" );
+            throw new IOException( "Invalid type for tuple 0, not CHARARRAY: " + DataType.findTypeName( DataType.findType( tuple.get(0) ) ) + ":" + tuple.get(0) + ":" + tuple.get(1) );
           }
         
         if ( DataType.findType( tuple.get(1) ) != DataType.CHARARRAY )
           {
-            throw new IOException( "Invalid type, not CHARARRAY" );
+            throw new IOException( "Invalid type for tuple 1, not CHARARRAY: " + DataType.findTypeName( DataType.findType( tuple.get(1) ) ) + ":" + tuple.get(0) + ":" + tuple.get(1) );
           }
         
         this.key  .set( (String) tuple.get(0) );

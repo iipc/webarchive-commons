@@ -5,6 +5,23 @@ import org.apache.commons.httpclient.URIException;
 public class WaybackURLKeyMaker implements URLKeyMaker {
 //	URLCanonicalizer canonicalizer = new NonMassagingIAURLCanonicalizer();
 	URLCanonicalizer canonicalizer = new DefaultIAURLCanonicalizer();
+	
+	private boolean surtMode = true;
+	
+	public WaybackURLKeyMaker()
+	{
+
+	}
+	
+	public boolean isSurtMode()
+	{
+		return surtMode;
+	}
+	
+	public WaybackURLKeyMaker(boolean surtMode)
+	{
+		this.surtMode = surtMode;
+	}
 
 	public String makeKey(String url) {
 		if(url == null) {
@@ -21,6 +38,9 @@ public class WaybackURLKeyMaker implements URLKeyMaker {
 		}
 		if(url.startsWith("dns:")) {
 			String authority = url.substring(4);
+			if (!surtMode) {
+				return authority;
+			}
 			String surt = URLRegexTransformer.hostToSURT(authority);
 			return surt + ")";
 		}
@@ -28,7 +48,10 @@ public class WaybackURLKeyMaker implements URLKeyMaker {
 		try {
 			hURL = URLParser.parse(url);
 			canonicalizer.canonicalize(hURL);
-			String key = hURL.getURLString(true, false);
+			String key = hURL.getURLString(surtMode, surtMode, false);
+			if (!surtMode) {
+				return key;
+			}
 			int parenIdx = key.indexOf('(');
 			if(parenIdx == -1) {
 				// something very wrong..

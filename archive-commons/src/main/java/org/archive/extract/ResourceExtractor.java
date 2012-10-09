@@ -19,6 +19,7 @@ import org.archive.resource.Resource;
 import org.archive.resource.ResourceConstants;
 import org.archive.resource.ResourceParseException;
 import org.archive.resource.ResourceProducer;
+import org.archive.url.WaybackURLKeyMaker;
 
 public class ResourceExtractor implements ResourceConstants, Tool {
 	
@@ -46,7 +47,8 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 		System.err.println("extractor [OPT] SRC");
 		System.err.println("\tSRC is the local path, HTTP or HDFS URL to an " +
 				"arc, warc, arc.gz, or warc.gz.");
-		System.err.println("\tOPT can be one of:");
+		System.err.println("\tOPT can be one of:");		
+		System.err.println("\t\t-cdxURL\tProduce output in old URL Wayback CDX format");
 		System.err.println("\t\t-cdx\tProduce output in NEW-SURT-Wayback CDX format");
 		System.err.println("\t\t\t (note that column 1 is NOT standard Wayback canonicalized)\n");
 		System.err.println("\t\t-wat\tembed JSON output in a compressed WARC" +
@@ -58,6 +60,11 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 	public static void main(String[] args) throws Exception {
 		int res = ToolRunner.run(new Configuration(), new ResourceExtractor(), args);
 		System.exit(res);
+	}
+	
+	private PrintWriter makePrintWriter(OutputStream os)
+	{
+		return new PrintWriter(new OutputStreamWriter(os, Charset.forName("UTF-8")));
 	}
 
 	public int run(String[] args) 
@@ -85,7 +92,11 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 	    if(args.length == arg + 2) {
 	    	if(args[arg].equals("-cdx")) {
 	    		path = args[arg+1];
-	    		out = new RealCDXExtractorOutput(new PrintWriter(new OutputStreamWriter(os, Charset.forName("UTF-8"))));
+	    		out = new RealCDXExtractorOutput(makePrintWriter(os));
+	    		
+	    	} else if(args[arg].equals("-cdxURL")) {
+	    		path = args[arg+1];
+	    		out = new RealCDXExtractorOutput(makePrintWriter(os), new WaybackURLKeyMaker(false));
 
 	    	} else if(args[arg].equals("-wat")) {
 	    		path = args[arg+1];

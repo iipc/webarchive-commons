@@ -60,29 +60,48 @@ public class ZipNumStorage extends StoreFunc
   }
 
   /**
-   * Tuples must have 2 (and only 2) chararray fields.  This is due to
-   * the requirements of ZipNumOutputFormat's RecordWriter.
+   * Tuples can have either one or two chararray values.
+   *
+   * If there is only 1, then we split it on the first space.
+   * If there are 2, then we just accept them as-is.
+   *
+   * The underlying ZipNumOutputFormat requires that the data
+   * be split into a (key,value) pair, with both the key and
+   * value being Strings (Pig chararray).
    */
   public void putNext( Tuple tuple ) throws IOException
   {
     try
       {
         int size = tuple.size();
-        
-        if ( size != 2 ) throw new IOException( "Tuple size != 2" );
+
+        if ( size != 1 && size != 2 )
+          {
+            throw new IOException( "Invalid tuple size, must be 1 or 2: " + size );
+          }
         
         if ( DataType.findType( tuple.get(0) ) != DataType.CHARARRAY )
           {
             throw new IOException( "Invalid type for tuple 0, not CHARARRAY: " + DataType.findTypeName( DataType.findType( tuple.get(0) ) ) + ":" + tuple.get(0) + ":" + tuple.get(1) );
           }
         
-        if ( DataType.findType( tuple.get(1) ) != DataType.CHARARRAY )
+        if ( size == 2 )
           {
-            throw new IOException( "Invalid type for tuple 1, not CHARARRAY: " + DataType.findTypeName( DataType.findType( tuple.get(1) ) ) + ":" + tuple.get(0) + ":" + tuple.get(1) );
+            if ( DataType.findType( tuple.get(1) ) != DataType.CHARARRAY )
+              {
+                throw new IOException( "Invalid type for tuple 1, not CHARARRAY: " + DataType.findTypeName( DataType.findType( tuple.get(1) ) ) + ":" + tuple.get(0) + ":" + tuple.get(1) );
+              }
+            
+            this.key  .set( (String) tuple.get(0) );
+            this.value.set( (String) tuple.get(1) );
           }
-        
-        this.key  .set( (String) tuple.get(0) );
-        this.value.set( (String) tuple.get(1) );
+        else
+          {
+            String s[] = ((String)tuple.get(0)).split( " ", 2 );
+            
+            this.key  .set( s[0] );
+            this.value.set( s[1] );
+          }
         
         this.writer.write( this.key, this.value );
       }

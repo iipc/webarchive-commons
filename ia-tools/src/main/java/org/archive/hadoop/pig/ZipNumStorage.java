@@ -26,12 +26,10 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.OutputFormat;
 import org.apache.hadoop.mapreduce.RecordWriter;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-
 import org.apache.pig.StoreFunc;
 import org.apache.pig.data.DataType;
 import org.apache.pig.data.Tuple;
-
-import org.archive.hadoop.mapreduce.ZipNumOutputFormat;
+import org.archive.hadoop.mapreduce.ZipNumAllOutputFormat;
 
 /**
  * Very simple/minimal StoreFunc to write {key,value} pairs into IA's
@@ -46,7 +44,7 @@ public class ZipNumStorage extends StoreFunc
   
   public OutputFormat getOutputFormat() throws IOException
   {
-    return new ZipNumOutputFormat();
+    return new ZipNumAllOutputFormat();
   }
   
   public void setStoreLocation( String location, Job job ) throws IOException
@@ -97,10 +95,9 @@ public class ZipNumStorage extends StoreFunc
           }
         else
           {
-            String s[] = ((String)tuple.get(0)).split( " ", 2 );
-            
-            this.key  .set( s[0] );
-            this.value.set( s[1] );
+            //String s[] = ((String)tuple.get(0)).split( " ", 2 );           
+            this.key  .set( "" );
+            this.value.set( (String)tuple.get(0) );
           }
         
         this.writer.write( this.key, this.value );

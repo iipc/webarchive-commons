@@ -7,11 +7,19 @@
 	<groupId>org.archive</groupId>
 	<artifactId>archive-commons-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0-SNAPSHOT</version>
 
 	<modules>
 		<module>archive-commons</module>
 		<module>ia-tools</module>
 		<module>archive-surt</module>
 	</modules>
+
+	<distributionManagement>
+		<repository>
+			<id>repository</id>
+			<!--Pass as command-line system property to maven-->
+			<url>${repository.url}</url>
+		</repository>
+	</distributionManagement>
 </project>

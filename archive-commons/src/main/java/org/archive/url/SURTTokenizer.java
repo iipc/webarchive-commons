@@ -20,8 +20,6 @@
 package org.archive.url;
 
 import org.apache.commons.httpclient.URIException;
-import org.archive.net.UURI;
-import org.archive.net.UURIFactory;
 import org.archive.util.SURT;
 
 /**

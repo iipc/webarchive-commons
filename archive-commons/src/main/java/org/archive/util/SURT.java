@@ -30,7 +30,7 @@ import java.io.PrintStream;
 import java.util.regex.Matcher;
 
 import org.apache.commons.httpclient.URIException;
-import org.archive.url.UURIFactory;
+import org.archive.url.UsableURIFactory;
 
 /**
  * Sort-friendly URI Reordering Transform.
@@ -204,7 +204,7 @@ public class SURT {
         boolean trailingSlash = u.endsWith("/");
         // ensure all typical UURI cleanup (incl. IDN-punycoding) is done
         try {
-            u = UURIFactory.getInstance(u).toString();
+            u = UsableURIFactory.getInstance(u).toString();
         } catch (URIException e) {
             e.printStackTrace();
             // allow to continue with original string uri

@@ -51,7 +51,7 @@ import org.archive.util.TextUtils;
  *
  * @see org.apache.commons.httpclient.URI
  */
-public class UURI extends LaxURI
+public class UsableURI extends LaxURI
 implements CharSequence, Serializable {
 
     private static final long serialVersionUID = -1277570889914647093L;
@@ -112,7 +112,7 @@ implements CharSequence, Serializable {
     /**
      * Shutdown access to default constructor.
      */
-    protected UURI() {
+    protected UsableURI() {
         super();
     }
     
@@ -122,7 +122,7 @@ implements CharSequence, Serializable {
      * @param charset Charset to use.
      * @throws org.apache.commons.httpclient.URIException
      */
-    protected UURI(String uri, boolean escaped, String charset)
+    protected UsableURI(String uri, boolean escaped, String charset)
     throws URIException {
         super(uri, escaped, charset);
         normalize();
@@ -133,7 +133,7 @@ implements CharSequence, Serializable {
      * @param base Parent UURI to use derelativizing.
      * @throws org.apache.commons.httpclient.URIException
      */
-    protected UURI(UURI base, UURI relative) throws URIException {
+    protected UsableURI(UsableURI base, UsableURI relative) throws URIException {
         super(base, relative);
         normalize();
     }
@@ -144,7 +144,7 @@ implements CharSequence, Serializable {
      * @throws NullPointerException
      * @throws URIException
      */
-    protected UURI(String uri, boolean escaped) throws URIException, NullPointerException {
+    protected UsableURI(String uri, boolean escaped) throws URIException, NullPointerException {
         super(uri,escaped);
         normalize();
     }
@@ -154,7 +154,7 @@ implements CharSequence, Serializable {
      * @return UURI that uses this UURI as base.
      * @throws URIException
      */
-    public UURI resolve(String uri)
+    public UsableURI resolve(String uri)
     throws URIException {
         return resolve(uri, false, // assume not escaped
             this.getProtocolCharset());
@@ -166,7 +166,7 @@ implements CharSequence, Serializable {
      * @return UURI that uses this UURI as base.
      * @throws URIException
      */
-    public UURI resolve(String uri, boolean e)
+    public UsableURI resolve(String uri, boolean e)
     throws URIException {
         return resolve(uri, e, this.getProtocolCharset());
     }
@@ -178,9 +178,9 @@ implements CharSequence, Serializable {
      * @return UURI that uses this UURI as base.
      * @throws URIException
      */
-    public UURI resolve(String uri, boolean e, String charset)
+    public UsableURI resolve(String uri, boolean e, String charset)
     throws URIException {
-        return new UURI(this, new UURI(uri, e, charset));
+        return new UsableURI(this, new UsableURI(uri, e, charset));
     }
 
     /**
@@ -195,10 +195,10 @@ implements CharSequence, Serializable {
         if (obj == this) {
             return true;
         }
-        if (!(obj instanceof UURI)) {
+        if (!(obj instanceof UsableURI)) {
             return false;
         }
-        UURI another = (UURI) obj;
+        UsableURI another = (UsableURI) obj;
         // scheme
         if (!equals(this._scheme, another._scheme)) {
             return false;
@@ -242,7 +242,7 @@ implements CharSequence, Serializable {
         return (this.getReferencedHost() == null) 
             ? null 
             : TextUtils.replaceFirst(MASSAGEHOST_PATTERN, 
-                    this.getReferencedHost(), UURIFactory.EMPTY_STRING);
+                    this.getReferencedHost(), UsableURIFactory.EMPTY_STRING);
     }
 
     /**
@@ -433,7 +433,7 @@ implements CharSequence, Serializable {
     public static String parseFilename(final String pathOrUri)
     throws URISyntaxException {
         String path = pathOrUri;
-        if (UURI.hasScheme(pathOrUri)) {
+        if (UsableURI.hasScheme(pathOrUri)) {
             URI url = new URI(pathOrUri);
             path = url.getPath();
         }

@@ -26,8 +26,8 @@ import junit.framework.TestCase;
 
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.lang.SerializationUtils;
-import org.archive.url.UURI;
-import org.archive.url.UURIFactory;
+import org.archive.url.UsableURI;
+import org.archive.url.UsableURIFactory;
 
 /**
  * Test UURIFactory for proper UURI creation across variety of
@@ -42,64 +42,64 @@ public class UURIFactoryTest extends TestCase {
 	public final void testEscaping() throws URIException {
 		// Note: single quote is not being escaped by URI class.
 		final String ESCAPED_URISTR = "http://archive.org/" +
-		    UURIFactory.ESCAPED_SPACE +
-			UURIFactory.ESCAPED_SPACE +
-			UURIFactory.ESCAPED_CIRCUMFLEX +
-			UURIFactory.ESCAPED_QUOT +
-			UURIFactory.SQUOT +
-			UURIFactory.ESCAPED_APOSTROPH +
-			UURIFactory.ESCAPED_LSQRBRACKET +
-			UURIFactory.ESCAPED_RSQRBRACKET +
-			UURIFactory.ESCAPED_LCURBRACKET +
-			UURIFactory.ESCAPED_RCURBRACKET +
-			UURIFactory.SLASH + "a.gif"; // NBSP and SPACE should be trimmed;
+		    UsableURIFactory.ESCAPED_SPACE +
+			UsableURIFactory.ESCAPED_SPACE +
+			UsableURIFactory.ESCAPED_CIRCUMFLEX +
+			UsableURIFactory.ESCAPED_QUOT +
+			UsableURIFactory.SQUOT +
+			UsableURIFactory.ESCAPED_APOSTROPH +
+			UsableURIFactory.ESCAPED_LSQRBRACKET +
+			UsableURIFactory.ESCAPED_RSQRBRACKET +
+			UsableURIFactory.ESCAPED_LCURBRACKET +
+			UsableURIFactory.ESCAPED_RCURBRACKET +
+			UsableURIFactory.SLASH + "a.gif"; // NBSP and SPACE should be trimmed;
 		
 		final String URISTR = "http://archive.org/.././" + "\u00A0" +
-		    UURIFactory.SPACE + UURIFactory.CIRCUMFLEX +
-			UURIFactory.QUOT + UURIFactory.SQUOT +
-			UURIFactory.APOSTROPH + UURIFactory.LSQRBRACKET +
-			UURIFactory.RSQRBRACKET + UURIFactory.LCURBRACKET +
-			UURIFactory.RCURBRACKET + UURIFactory.BACKSLASH +
-			"test/../a.gif" + "\u00A0" + UURIFactory.SPACE;
+		    UsableURIFactory.SPACE + UsableURIFactory.CIRCUMFLEX +
+			UsableURIFactory.QUOT + UsableURIFactory.SQUOT +
+			UsableURIFactory.APOSTROPH + UsableURIFactory.LSQRBRACKET +
+			UsableURIFactory.RSQRBRACKET + UsableURIFactory.LCURBRACKET +
+			UsableURIFactory.RCURBRACKET + UsableURIFactory.BACKSLASH +
+			"test/../a.gif" + "\u00A0" + UsableURIFactory.SPACE;
 		
-		UURI uuri = UURIFactory.getInstance(URISTR);
+		UsableURI uuri = UsableURIFactory.getInstance(URISTR);
 		final String uuriStr = uuri.toString();
 		assertEquals("expected escaping", ESCAPED_URISTR, uuriStr);
 	}
 
     public final void testUnderscoreMakesPortParseFail() throws URIException {
-        UURI uuri = UURIFactory.getInstance("http://one-two_three:8080/index.html");
+        UsableURI uuri = UsableURIFactory.getInstance("http://one-two_three:8080/index.html");
         int port = uuri.getPort();
         assertTrue("Failed find of port " + uuri, port == 8080);
     }
     
     public final void testRelativeURIWithTwoSlashes() throws URIException {
-        UURI base = UURIFactory.getInstance("http://www.archive.org");
-        UURI uuri = UURIFactory.getInstance(base, "one//index.html");
+        UsableURI base = UsableURIFactory.getInstance("http://www.archive.org");
+        UsableURI uuri = UsableURIFactory.getInstance(base, "one//index.html");
         assertTrue("Doesn't do right thing with two slashes " + uuri,
             uuri.toString().equals(
                 "http://www.archive.org/one//index.html"));
     }
     
     public final void testSchemelessURI() throws URIException {
-        UURI base = UURIFactory.getInstance("https://www.archive.org");
-        UURI uuri = UURIFactory.getInstance(base, "//example.com/monkey?this:uri:has:colons");
+        UsableURI base = UsableURIFactory.getInstance("https://www.archive.org");
+        UsableURI uuri = UsableURIFactory.getInstance(base, "//example.com/monkey?this:uri:has:colons");
         assertTrue("Doesn't do right thing with a schemeless URI " + uuri,
             uuri.toString().equals(
                 "https://example.com/monkey?this:uri:has:colons"));
     }
     
     public final void testTrailingEncodedSpace() throws URIException {
-        UURI uuri = UURIFactory.getInstance("http://www.nps-shoes.co.uk%20");
+        UsableURI uuri = UsableURIFactory.getInstance("http://www.nps-shoes.co.uk%20");
         assertTrue("Doesn't strip trailing encoded space 1 " + uuri,
             uuri.toString().equals("http://www.nps-shoes.co.uk/"));
-        uuri = UURIFactory.getInstance("http://www.nps-shoes.co.uk%20%20%20");
+        uuri = UsableURIFactory.getInstance("http://www.nps-shoes.co.uk%20%20%20");
         assertTrue("Doesn't strip trailing encoded space 2 " + uuri,
             uuri.toString().equals("http://www.nps-shoes.co.uk/"));
     }
     
     public final void testPort0080is80() throws URIException {
-        UURI uuri = UURIFactory.getInstance("http://archive.org:0080");
+        UsableURI uuri = UsableURIFactory.getInstance("http://archive.org:0080");
         assertTrue("Doesn't strip leading zeros " + uuri,
             uuri.toString().equals("http://archive.org/"));
     }
@@ -129,7 +129,7 @@ public class UURIFactoryTest extends TestCase {
 //    }   
     
     public final void testEscapeEncoding() throws URIException {
-        UURI uuri = UURIFactory.getInstance("http://www.y1y1.com/" +
+        UsableURI uuri = UsableURIFactory.getInstance("http://www.y1y1.com/" +
             "albums/userpics/11111/normal_%E3%E4%EC%EC%EC.jpg", "windows-1256");
         uuri.getPath();
     }   
@@ -143,7 +143,7 @@ public class UURIFactoryTest extends TestCase {
         buffer.append("/index.html");
         String message = null;
         try {
-        	UURIFactory.getInstance(buffer.toString());
+        	UsableURIFactory.getInstance(buffer.toString());
         } catch (URIException e) {
             message = e.getMessage();
         }
@@ -156,7 +156,7 @@ public class UURIFactoryTest extends TestCase {
 		final String AUTHORITY = "pfbuser:pfbuser@mprsrv.agri.gov.cn";
 		final String PATH = "/clzreceive/";
 		final String uri = FTP + "://" + AUTHORITY + PATH;
-		UURI uuri = UURIFactory.getInstance(uri);
+		UsableURI uuri = UsableURIFactory.getInstance(uri);
 		assertTrue("Failed to get matching scheme: " + uuri.getScheme(),
 				(uuri.getScheme()).equals(FTP));
 		assertTrue("Failed to get matching authority: " +
@@ -170,18 +170,18 @@ public class UURIFactoryTest extends TestCase {
         // already escaped.
         String uri = "http://archive.org/index%25 .html";
         String tgtUri = "http://archive.org/index%25%20.html";
-        UURI uuri = UURIFactory.getInstance(uri);
+        UsableURI uuri = UsableURIFactory.getInstance(uri);
         assertTrue("Not equal " + uuri.toString(),
                 uuri.toString().equals(tgtUri));     
         uri = "http://archive.org/index%25\u001D.html";
         tgtUri = "http://archive.org/index%25%1D.html".toLowerCase();
-        uuri = UURIFactory.getInstance(uri);
+        uuri = UsableURIFactory.getInstance(uri);
         assertEquals("whitespace escaping", tgtUri, uuri.toString());
         uri = "http://gemini.info.usaid.gov/directory/" +
             "pbResults.cfm?&urlNameLast=Rumplestiltskin";
         tgtUri = "http://gemini.info.usaid.gov/directory/faxResults.cfm?" +
             "name=Ebenezer%20+Rumplestiltskin,&location=RRB%20%20%20%205%2E08%2D006";
-        uuri = UURIFactory.getInstance(UURIFactory.getInstance(uri),
+        uuri = UsableURIFactory.getInstance(UsableURIFactory.getInstance(uri),
             "faxResults.cfm?name=Ebenezer +Rumplestiltskin,&location=" +
             "RRB%20%20%20%205%2E08%2D006");
         assertEquals("whitespace escaping", tgtUri, uuri.toString());
@@ -200,15 +200,15 @@ public class UURIFactoryTest extends TestCase {
     
     public final void testDnsHost() throws URIException {
         String uri = "dns://ads.nandomedia.com:81/one.html";
-        UURI uuri = UURIFactory.getInstance(uri);
+        UsableURI uuri = UsableURIFactory.getInstance(uri);
         String host = uuri.getReferencedHost();
         assertTrue("Host is wrong " + host, host.equals("ads.nandomedia.com"));
         uri = "dns:ads.nandomedia.com";
-        uuri = UURIFactory.getInstance(uri);
+        uuri = UsableURIFactory.getInstance(uri);
         host = uuri.getReferencedHost();
         assertTrue("Host is wrong " + host, host.equals("ads.nandomedia.com"));
         uri = "dns:ads.nandomedia.com?a=b";
-        uuri = UURIFactory.getInstance(uri);
+        uuri = UsableURIFactory.getInstance(uri);
         host = uuri.getReferencedHost();
         assertTrue("Host is wrong " + host, host.equals("ads.nandomedia.com"));
     }
@@ -217,30 +217,30 @@ public class UURIFactoryTest extends TestCase {
 		final String uri = "http://archive.org/%a%%%%%.html";
         // tests indicate firefox (1.0.6) does not encode '%' at all
         final String tgtUri = "http://archive.org/%a%%%%%.html";
-		UURI uuri = UURIFactory.getInstance(uri);
+		UsableURI uuri = UsableURIFactory.getInstance(uri);
 		assertEquals("Not equal",tgtUri, uuri.toString());
 	}
     
 	public final void testRelativeDblPathSlashes() throws URIException {
-		UURI base = UURIFactory.getInstance("http://www.archive.org/index.html");
-		UURI uuri = UURIFactory.getInstance(base, "JIGOU//KYC//INDEX.HTM");
+		UsableURI base = UsableURIFactory.getInstance("http://www.archive.org/index.html");
+		UsableURI uuri = UsableURIFactory.getInstance(base, "JIGOU//KYC//INDEX.HTM");
         assertTrue("Double slash not working " + uuri.toString(),
                 uuri.getPath().equals("/JIGOU//KYC//INDEX.HTM"));
 	}
     
     public final void testRelativeWithScheme() throws URIException {
-        UURI base = UURIFactory.getInstance("http://www.example.com/some/page");
-        UURI uuri = UURIFactory.getInstance(base, "http:boo");
+        UsableURI base = UsableURIFactory.getInstance("http://www.example.com/some/page");
+        UsableURI uuri = UsableURIFactory.getInstance(base, "http:boo");
         assertTrue("Relative with scheme not working " + uuri.toString(),
                 uuri.toString().equals("http://www.example.com/some/boo"));
     }
     
     public final void testBadBaseResolve() throws URIException {
-        UURI base = UURIFactory.getInstance("http://license.joins.com/board/" +
+        UsableURI base = UsableURIFactory.getInstance("http://license.joins.com/board/" +
             "etc_board_list.asp?board_name=new_main&b_type=&nPage=" +
             "2&category=G&lic_id=70&site=changeup&g_page=changeup&g_sPage=" +
             "notice&gate=02");
-        UURIFactory.getInstance(base, "http://www.changeup.com/...</a");
+        UsableURIFactory.getInstance(base, "http://www.changeup.com/...</a");
     }
     
     public final void testTilde() throws URIException {
@@ -251,35 +251,35 @@ public class UURIFactoryTest extends TestCase {
         // Firefox allows curlies in the query string portion of a URL only
         // (converts curlies if they are in the path portion ahead of the
         // query string).
-        UURI uuri =
+        UsableURI uuri =
             noChangeExpected("http://license.joins.com/igor?one={curly}");
         assertEquals(uuri.getQuery(), "one={curly}");
-        assertEquals(UURIFactory.
+        assertEquals(UsableURIFactory.
                 getInstance("http://license.joins.com/igor{curly}.html").
                     toString(),
             "http://license.joins.com/igor%7Bcurly%7D.html");
         boolean exception = false;
         try {
-            UURIFactory.getInstance("http://license.{curly}.com/igor.html");
+            UsableURIFactory.getInstance("http://license.{curly}.com/igor.html");
         } catch (URIException u) {
             exception = true;
         }
         assertTrue("Did not get exception.", exception);
     }
     
-    protected UURI noChangeExpected(final String original)
+    protected UsableURI noChangeExpected(final String original)
     throws URIException {
-        UURI uuri = UURIFactory.getInstance(original);
+        UsableURI uuri = UsableURIFactory.getInstance(original);
         assertEquals(original, uuri.toString());
         return uuri;
     }
     
 	public final void testTrimSpaceNBSP() throws URIException {
 		final String uri = "   http://archive.org/DIR WITH SPACES/" +
-		UURIFactory.NBSP + "home.html    " + UURIFactory.NBSP + "   ";
+		UsableURIFactory.NBSP + "home.html    " + UsableURIFactory.NBSP + "   ";
 		final String tgtUri =
 			"http://archive.org/DIR%20WITH%20SPACES/%20home.html";
-		UURI uuri = UURIFactory.getInstance(uri);
+		UsableURI uuri = UsableURIFactory.getInstance(uri);
 		assertTrue("Not equal " + uuri.toString(),
 				uuri.toString().equals(tgtUri));
 	}
@@ -293,7 +293,7 @@ public class UURIFactoryTest extends TestCase {
 		final String uri = "http://www.brook.edu/i.html? %20taxonomy=Politics";
 		final String encodedUri =
 			"http://www.brook.edu/i.html?%20%20taxonomy=Politics";
-		UURI uuri = UURIFactory.getInstance(uri, "ISO-8859-1");
+		UsableURI uuri = UsableURIFactory.getInstance(uri, "ISO-8859-1");
 		assertTrue("Not equal " + uuri.toString(),
 				uuri.toString().equals(encodedUri));
 	}
@@ -309,20 +309,20 @@ public class UURIFactoryTest extends TestCase {
 		    ae + ".html";
 		final String encodedUri =
 			"http://archive.org/DIR%20WITH%20SPACES/home%E6.html";
-		UURI uuri = UURIFactory.getInstance(uri, "ISO-8859-1");
+		UsableURI uuri = UsableURIFactory.getInstance(uri, "ISO-8859-1");
 		assertEquals("single encoding", encodedUri, uuri.toString());
 		// Dbl-encodes.
-		uuri = UURIFactory.getInstance(uuri.toString(), "ISO-8859-1");
-		uuri = UURIFactory.getInstance(uuri.toString(), "ISO-8859-1");
+		uuri = UsableURIFactory.getInstance(uuri.toString(), "ISO-8859-1");
+		uuri = UsableURIFactory.getInstance(uuri.toString(), "ISO-8859-1");
 		assertEquals("double encoding", encodedUri, uuri.toString());
 		// Do default utf-8 test.
-		uuri = UURIFactory.getInstance(uri);
+		uuri = UsableURIFactory.getInstance(uri);
 		final String encodedUtf8Uri =
 			"http://archive.org/DIR%20WITH%20SPACES/home%C3%A6.html";
 		assertEquals("Not equal utf8", encodedUtf8Uri, uuri.toString());      
 		// Now dbl-encode.
-		uuri = UURIFactory.getInstance(uuri.toString());
-		uuri = UURIFactory.getInstance(uuri.toString());
+		uuri = UsableURIFactory.getInstance(uuri.toString());
+		uuri = UsableURIFactory.getInstance(uuri.toString());
 		assertEquals("Not equal (dbl-encoding) utf8", encodedUtf8Uri, uuri.toString());
 	}
 	
@@ -332,21 +332,21 @@ public class UURIFactoryTest extends TestCase {
 	 * @throws URIException
 	 */
 	public final void testThreeSlashes() throws URIException {
-		UURI goodURI = UURIFactory.
+		UsableURI goodURI = UsableURIFactory.
 		getInstance("http://lcweb.loc.gov/rr/goodtwo.html");
 		String uuri = "http:///lcweb.loc.gov/rr/goodtwo.html";
-		UURI rewrittenURI = UURIFactory.getInstance(uuri);
+		UsableURI rewrittenURI = UsableURIFactory.getInstance(uuri);
 		assertTrue("Not equal " + goodURI + ", " + uuri,
 				goodURI.toString().equals(rewrittenURI.toString()));
 		uuri = "http:////lcweb.loc.gov/rr/goodtwo.html";
-		rewrittenURI = UURIFactory.getInstance(uuri);
+		rewrittenURI = UsableURIFactory.getInstance(uuri);
 		assertTrue("Not equal " + goodURI + ", " + uuri,
 				goodURI.toString().equals(rewrittenURI.toString()));
 		// Check https.
-		goodURI = UURIFactory.
+		goodURI = UsableURIFactory.
 		getInstance("https://lcweb.loc.gov/rr/goodtwo.html");
 		uuri = "https:////lcweb.loc.gov/rr/goodtwo.html";
-		rewrittenURI = UURIFactory.getInstance(uuri);
+		rewrittenURI = UsableURIFactory.getInstance(uuri);
 		assertTrue("Not equal " + goodURI + ", " + uuri,
 				goodURI.toString().equals(rewrittenURI.toString()));
 	}
@@ -355,7 +355,7 @@ public class UURIFactoryTest extends TestCase {
 		boolean expectedException = false;
 		String uuri = "www.loc.gov/rr/european/egw/polishex.html";
 		try {
-			UURIFactory.getInstance(uuri);
+			UsableURIFactory.getInstance(uuri);
 		} catch (URIException e) {
 			// Expected exception.
 			expectedException = true;
@@ -365,22 +365,22 @@ public class UURIFactoryTest extends TestCase {
 	}
 	
 	public final void testRelative() throws URIException {
-		UURI uuriTgt = UURIFactory.
+		UsableURI uuriTgt = UsableURIFactory.
 		getInstance("http://archive.org:83/home.html");
-		UURI uri = UURIFactory.
+		UsableURI uri = UsableURIFactory.
 		getInstance("http://archive.org:83/one/two/three.html");
-		UURI uuri = UURIFactory.
+		UsableURI uuri = UsableURIFactory.
 		getInstance(uri, "/home.html");
 		assertTrue("Not equal",
 				uuriTgt.toString().equals(uuri.toString()));
 	}
 	
 	public void testSchemelessRelative() throws URIException {
-	    UURI base = UURIFactory.getInstance("http://www.itsnicethat.com/articles/laura-hobson");
-	    UURI test1 = UURIFactory.getInstance(base, "//www.facebook.com/plugins/like.php");
+	    UsableURI base = UsableURIFactory.getInstance("http://www.itsnicethat.com/articles/laura-hobson");
+	    UsableURI test1 = UsableURIFactory.getInstance(base, "//www.facebook.com/plugins/like.php");
 	    assertEquals("schemaless relative 1", "http://www.facebook.com/plugins/like.php", test1.toString());
 	    // reported by Erin Staniland
-	    UURI test2 = UURIFactory.getInstance(base, "//www.facebook.com/plugins/like.php?href=http://www.itsnicethat.com/articles/laura-hobson");
+	    UsableURI test2 = UsableURIFactory.getInstance(base, "//www.facebook.com/plugins/like.php?href=http://www.itsnicethat.com/articles/laura-hobson");
 	    assertEquals("schemeless relative 2", "http://www.facebook.com/plugins/like.php?href=http://www.itsnicethat.com/articles/laura-hobson",
 	            test2.toString());
 	}
@@ -392,22 +392,22 @@ public class UURIFactoryTest extends TestCase {
 	 * @throws URIException
 	 */
 	public final void testRelativeEmpty() throws URIException {
-		UURI uuriTgt = UURIFactory.
+		UsableURI uuriTgt = UsableURIFactory.
 		getInstance("http://archive.org:83/one/two/three.html");
-		UURI uri = UURIFactory.
+		UsableURI uri = UsableURIFactory.
 		getInstance("http://archive.org:83/one/two/three.html");
-		UURI uuri = UURIFactory.
+		UsableURI uuri = UsableURIFactory.
 		getInstance(uri, "");
 		assertTrue("Empty length don't work",
 				uuriTgt.toString().equals(uuri.toString()));
 	}
 	
 	public final void testAbsolute() throws URIException {
-		UURI uuriTgt = UURIFactory.
+		UsableURI uuriTgt = UsableURIFactory.
 		getInstance("http://archive.org:83/home.html");
-		UURI uri = UURIFactory.
+		UsableURI uri = UsableURIFactory.
 		getInstance("http://archive.org:83/one/two/three.html");
-		UURI uuri = UURIFactory.
+		UsableURI uuri = UsableURIFactory.
 		getInstance(uri, "http://archive.org:83/home.html");
 		assertTrue("Not equal",
 				uuriTgt.toString().equals(uuri.toString()));
@@ -436,12 +436,12 @@ public class UURIFactoryTest extends TestCase {
 			buffer.append(subPath);
 		}
 		// String should be 2080 characters long.  Legal.
-		UURIFactory.getInstance(buffer.toString());
+		UsableURIFactory.getInstance(buffer.toString());
 		boolean gotException = false;
 		// Add ten more characters and make size illegal.
 		buffer.append(subPath);
 		try {
-			UURIFactory.getInstance(buffer.toString()); 
+			UsableURIFactory.getInstance(buffer.toString()); 
 		} catch (URIException e) {
 			gotException = true;
 		}
@@ -452,7 +452,7 @@ public class UURIFactoryTest extends TestCase {
 	private void checkExceptionOnIllegalDomainlabel(String uuri) {
 		boolean expectedException = false;
         try {
-			UURIFactory.getInstance(uuri);
+			UsableURIFactory.getInstance(uuri);
 		} catch (URIException e) {
 			// Expected exception.
 			expectedException = true;
@@ -468,9 +468,9 @@ public class UURIFactoryTest extends TestCase {
 	 * @throws URIException
 	 */
 	public final void testHostWithPeriod() throws URIException {
-		UURI uuri1 = UURIFactory.
+		UsableURI uuri1 = UsableURIFactory.
 		getInstance("http://www.loc.gov./index.html");
-		UURI uuri2 = UURIFactory.
+		UsableURI uuri2 = UsableURIFactory.
 		getInstance("http://www.loc.gov/index.html");
 		assertEquals("Failed equating hosts with dot",
 				uuri1.getHost(), uuri2.getHost());
@@ -487,7 +487,7 @@ public class UURIFactoryTest extends TestCase {
 		"PS=10274&NC=10009&CE=42&CP=949&HL=" +
 		"&#65533;&#65533;&#65533;?&#65533;&#65533;";
 		assertNotNull("Encoded chars " + s, 
-				UURIFactory.getInstance(s));
+				UsableURIFactory.getInstance(s));
 	}
 	
 	/**
@@ -498,7 +498,7 @@ public class UURIFactoryTest extends TestCase {
 	public final void testSpaceInHost() {
 		boolean expectedException = false;
 		try {
-			UURIFactory.getInstance(
+			UsableURIFactory.getInstance(
 					"http://www.local-regions.odpm%20.gov.uk" +
 			"/lpsa/challenge/pdf/propect.pdf");
 		} catch (URIException e) {
@@ -508,7 +508,7 @@ public class UURIFactoryTest extends TestCase {
 		
 		expectedException = false;
 		try {
-			UURIFactory.getInstance(
+			UsableURIFactory.getInstance(
 					"http://www.local-regions.odpm .gov.uk" +
 			"/lpsa/challenge/pdf/propect.pdf");
 		} catch (URIException e) {
@@ -524,7 +524,7 @@ public class UURIFactoryTest extends TestCase {
 	 * @throws URIException
 	 */
 	public final void testHostWithUnderscores() throws URIException {
-		UURI uuri = UURIFactory.getInstance(
+		UsableURI uuri = UsableURIFactory.getInstance(
 		"http://x_underscore_underscore.2u.com.tw/nonexistent_page.html");
 		assertEquals("Failed get of host with underscore",
 				"x_underscore_underscore.2u.com.tw", uuri.getHost());
@@ -537,7 +537,7 @@ public class UURIFactoryTest extends TestCase {
 	public final void testTwoDots() {
 		boolean expectedException = false;
 		try {
-			UURIFactory.getInstance(
+			UsableURIFactory.getInstance(
 			"http://x_underscore_underscore..2u.com/nonexistent_page.html");
 		} catch (URIException e) {
 			expectedException = true;
@@ -552,7 +552,7 @@ public class UURIFactoryTest extends TestCase {
 	 * @throws URIException
 	 */
 	public final void testHostWithDigit() throws URIException {
-		UURI uuri = UURIFactory.
+		UsableURI uuri = UsableURIFactory.
 		getInstance("http://0204chat.2u.com.tw/nonexistent_page.html");
 		assertEquals("Failed get of host with digit",
 				"0204chat.2u.com.tw", uuri.getHost());
@@ -580,7 +580,7 @@ public class UURIFactoryTest extends TestCase {
 	private void checkBadPort(String uri) {
 		boolean exception = false;
 		try {
-			UURIFactory.getInstance(uri);
+			UsableURIFactory.getInstance(uri);
 		}
 		catch (URIException e) {
 			exception = true;
@@ -595,7 +595,7 @@ public class UURIFactoryTest extends TestCase {
 	public final void testUserinfo() throws URIException {
         final String authority = "stack:StAcK@www.tyopaikat.com";
         final String uri = "http://" + authority + "/robots.txt";
-		UURI uuri = UURIFactory.getInstance(uri);
+		UsableURI uuri = UsableURIFactory.getInstance(uri);
 		assertEquals("Authority not equal", uuri.getAuthority(),
             authority);
         /*
@@ -614,7 +614,7 @@ public class UURIFactoryTest extends TestCase {
         final int port = 8080;
         final String uri = "http://" + userInfo + "@" + authority + ":" + port 
         	+ "/robots.txt";
-		UURI uuri = UURIFactory.getInstance(uri);
+		UsableURI uuri = UsableURIFactory.getInstance(uri);
 		assertEquals("Host not equal", authority,uuri.getHost());
 		assertEquals("Userinfo Not equal",userInfo,uuri.getUserinfo());
 		assertEquals("Port not equal",port,uuri.getPort());
@@ -626,7 +626,7 @@ public class UURIFactoryTest extends TestCase {
 	}
 	
     public final void testRFC3986RelativeChange() throws URIException {
-         UURI base = UURIFactory.getInstance("http://a/b/c/d;p?q");
+         UsableURI base = UsableURIFactory.getInstance("http://a/b/c/d;p?q");
          tryRelative(base, "?y", "http://a/b/c/d;p?y");
     }
 	        
@@ -662,7 +662,7 @@ public class UURIFactoryTest extends TestCase {
      * @throws URIException
      */
     public final void testRFC3986Relative() throws URIException {
-        UURI base = UURIFactory.getInstance("http://a/b/c/d;p?q");
+        UsableURI base = UsableURIFactory.getInstance("http://a/b/c/d;p?q");
         tryRelative(base, "g:h",    "g:h");
         tryRelative(base, "g",      "http://a/b/c/g");
         tryRelative(base, "./g",    "http://a/b/c/g");
@@ -688,12 +688,12 @@ public class UURIFactoryTest extends TestCase {
         tryRelative(base, "../../g","http://a/g");
     }
 	    
-    protected void tryRelative(UURI base, String relative, String expected) 
+    protected void tryRelative(UsableURI base, String relative, String expected) 
     throws URIException {
-        UURI uuri = UURIFactory.getInstance(base, relative);
+        UsableURI uuri = UsableURIFactory.getInstance(base, relative);
         assertEquals("Derelativized " + relative + " gave " 
               + uuri + " not " + expected,
-	                UURIFactory.getInstance(expected),uuri);
+	                UsableURIFactory.getInstance(expected),uuri);
     }
 	
 	/**
@@ -728,7 +728,7 @@ public class UURIFactoryTest extends TestCase {
 	 * @throws URIException
 	 */
 	public final void testRFC2396Relative() throws URIException {
-		UURI base = UURIFactory.
+		UsableURI base = UsableURIFactory.
 		getInstance("http://a/b/c/d;p?q");
 		TreeMap<String,String> m = new TreeMap<String,String>();
 		m.put("..", "http://a/b/");
@@ -761,9 +761,9 @@ public class UURIFactoryTest extends TestCase {
 		for (Iterator<String> i = m.keySet().iterator(); i.hasNext();) {
 			String key = (String)i.next();
 			String value = (String)m.get(key);
-			UURI uuri = UURIFactory.getInstance(base, key);
+			UsableURI uuri = UsableURIFactory.getInstance(base, key);
 			assertTrue("Unexpected " + key + " " + value + " " + uuri,
-					uuri.equals(UURIFactory.getInstance(value)));
+					uuri.equals(UsableURIFactory.getInstance(value)));
 		}
 	}
 	
@@ -776,7 +776,7 @@ public class UURIFactoryTest extends TestCase {
 	 * @throws URIException
 	 */
 	public final void testAnchors() throws URIException {
-		UURI uuri = UURIFactory.
+		UsableURI uuri = UsableURIFactory.
 		getInstance("http://www.example.com/path?query#anchor");
 		assertEquals("Not equal", "http://www.example.com/path?query",
 				uuri.toString());
@@ -791,8 +791,8 @@ public class UURIFactoryTest extends TestCase {
      * @throws URIException
      */
     public void testStartsWithColon() throws URIException {
-        UURI base = UURIFactory.getInstance("http://www.example.com/path/page");
-        UURI uuri = UURIFactory.getInstance(base,":foo");
+        UsableURI base = UsableURIFactory.getInstance("http://www.example.com/path/page");
+        UsableURI uuri = UsableURIFactory.getInstance(base,":foo");
         assertEquals("derelativize starsWithColon",
                 uuri.getURI(),
                 "http://www.example.com/path/:foo");
@@ -806,12 +806,12 @@ public class UURIFactoryTest extends TestCase {
      * @throws URIException
      */
     public void testLateColon() throws URIException {
-        UURI base = UURIFactory.getInstance("http://www.example.com/path/page");
-        UURI uuri1 = UURIFactory.getInstance(base,"example.html;jsessionid=deadbeef:deadbeed?parameter=this:value");
+        UsableURI base = UsableURIFactory.getInstance("http://www.example.com/path/page");
+        UsableURI uuri1 = UsableURIFactory.getInstance(base,"example.html;jsessionid=deadbeef:deadbeed?parameter=this:value");
         assertEquals("derelativize lateColon",
                 uuri1.getURI(),
                 "http://www.example.com/path/example.html;jsessionid=deadbeef:deadbeed?parameter=this:value");
-        UURI uuri2 = UURIFactory.getInstance(base,"example.html?parameter=this:value");
+        UsableURI uuri2 = UsableURIFactory.getInstance(base,"example.html?parameter=this:value");
         assertEquals("derelativize lateColon",
                 uuri2.getURI(),
                 "http://www.example.com/path/example.html?parameter=this:value");
@@ -826,14 +826,14 @@ public class UURIFactoryTest extends TestCase {
      */
     public void testTrailingPercents() throws URIException {
         String plainPath = "http://www.example.com/path%";
-        UURI plainPathUuri = UURIFactory.getInstance(plainPath);
+        UsableURI plainPathUuri = UsableURIFactory.getInstance(plainPath);
         assertEquals("plainPath getURI", plainPath, plainPathUuri.getURI());
         assertEquals("plainPath getEscapedURI", 
                 "http://www.example.com/path%", // browsers don't escape '%'
                 plainPathUuri.getEscapedURI());
         
         String partiallyEscapedPath = "http://www.example.com/pa%20th%";
-        UURI partiallyEscapedPathUuri = UURIFactory.getInstance(
+        UsableURI partiallyEscapedPathUuri = UsableURIFactory.getInstance(
                 partiallyEscapedPath);
 //        assertEquals("partiallyEscapedPath getURI", 
 //                "http://www.example.com/pa th%", // TODO: is this desirable?
@@ -844,7 +844,7 @@ public class UURIFactoryTest extends TestCase {
                 partiallyEscapedPathUuri.getEscapedURI());
         
         String plainQueryString = "http://www.example.com/path?q=foo%";
-        UURI plainQueryStringUuri = UURIFactory.getInstance(
+        UsableURI plainQueryStringUuri = UsableURIFactory.getInstance(
                 plainQueryString);
 //        assertEquals("plainQueryString getURI", 
 //                plainQueryString,
@@ -855,7 +855,7 @@ public class UURIFactoryTest extends TestCase {
         
         String partiallyEscapedQueryString = 
             "http://www.example.com/pa%20th?q=foo%";
-        UURI partiallyEscapedQueryStringUuri = UURIFactory.getInstance(
+        UsableURI partiallyEscapedQueryStringUuri = UsableURIFactory.getInstance(
                 partiallyEscapedQueryString);
         assertEquals("partiallyEscapedQueryString getURI", 
                 "http://www.example.com/pa th?q=foo%",
@@ -874,14 +874,14 @@ public class UURIFactoryTest extends TestCase {
      */
     public void testStrayPercents() throws URIException {
         String oneStray = "http://www.example.com/pa%th";
-        UURI oneStrayUuri = UURIFactory.getInstance(oneStray);
+        UsableURI oneStrayUuri = UsableURIFactory.getInstance(oneStray);
         assertEquals("oneStray getURI", oneStray, oneStrayUuri.getURI());
         assertEquals("oneStray getEscapedURI", 
                 "http://www.example.com/pa%th", // browsers don't escape '%'
                 oneStrayUuri.getEscapedURI());
         
         String precededByValidEscape = "http://www.example.com/pa%20th%way";
-        UURI precededByValidEscapeUuri = UURIFactory.getInstance(
+        UsableURI precededByValidEscapeUuri = UsableURIFactory.getInstance(
                 precededByValidEscape);
         assertEquals("precededByValidEscape getURI", 
                 "http://www.example.com/pa th%way", // getURI interprets escapes
@@ -891,7 +891,7 @@ public class UURIFactoryTest extends TestCase {
                 precededByValidEscapeUuri.getEscapedURI());
         
         String followedByValidEscape = "http://www.example.com/pa%th%20way";
-        UURI followedByValidEscapeUuri = UURIFactory.getInstance(
+        UsableURI followedByValidEscapeUuri = UsableURIFactory.getInstance(
                 followedByValidEscape);
         assertEquals("followedByValidEscape getURI", 
                 "http://www.example.com/pa%th way", // getURI interprets escapes
@@ -910,7 +910,7 @@ public class UURIFactoryTest extends TestCase {
                 .length() - 3);
         assertEquals("escapes unnecessary", 
                 expected, 
-                UURIFactory.getInstance(escapesUnnecessary).toString());
+                UsableURIFactory.getInstance(escapesUnnecessary).toString());
     }
     
     public void testIdn() throws URIException {
@@ -918,34 +918,34 @@ public class UURIFactoryTest extends TestCase {
         // http://räksmörgås.josefßon.org/
         String idn1 = "http://r\u00e4ksm\u00f6rg\u00e5s.josef\u00dfon.org/";
         String puny1 = "http://xn--rksmrgs-5wao1o.josefsson.org/";
-        assertEquals("encoding of " + idn1, puny1, UURIFactory
+        assertEquals("encoding of " + idn1, puny1, UsableURIFactory
                 .getInstance(idn1).toString());
         // http://www.pølse.dk/
         String idn2 = "http://www.p\u00f8lse.dk/";
         String puny2 = "http://www.xn--plse-gra.dk/";
-        assertEquals("encoding of " + idn2, puny2, UURIFactory
+        assertEquals("encoding of " + idn2, puny2, UsableURIFactory
                 .getInstance(idn2).toString());
         // http://例子.測試
         String idn3 = "http://\u4F8B\u5B50.\u6E2C\u8A66";
         String puny3 = "http://xn--fsqu00a.xn--g6w251d/";
-        assertEquals("encoding of " + idn3, puny3, UURIFactory
+        assertEquals("encoding of " + idn3, puny3, UsableURIFactory
                 .getInstance(idn3).toString());
     }
     
     public void testNewLineInURL() throws URIException {
-    	UURI uuri = UURIFactory.getInstance("http://www.ar\rchive\n." +
+    	UsableURI uuri = UsableURIFactory.getInstance("http://www.ar\rchive\n." +
     	    "org/i\n\n\r\rndex.html");
     	assertEquals("http://www.archive.org/index.html", uuri.toString());
     }
     
     public void testTabsInURL() throws URIException {
-        UURI uuri = UURIFactory.getInstance("http://www.ar\tchive\t." +
+        UsableURI uuri = UsableURIFactory.getInstance("http://www.ar\tchive\t." +
             "org/i\t\r\n\tndex.html");
         assertEquals("http://www.archive.org/index.html", uuri.toString());
     }
     
     public void testQueryEscaping() throws URIException {
-        UURI uuri = UURIFactory.getInstance(
+        UsableURI uuri = UsableURIFactory.getInstance(
             "http://www.yahoo.com/foo?somechars!@$%^&*()_-+={[}]|\'\";:/?.>,<");
         assertEquals(
             // tests in FF1.5 indicate it only escapes " < > 
@@ -960,34 +960,34 @@ public class UURIFactoryTest extends TestCase {
      * @throws URIException
      */
     public void testSameAsNutchURLFilterBasic() throws URIException {
-        assertEquals(UURIFactory.getInstance(" http://foo.com/ ").toString(),
+        assertEquals(UsableURIFactory.getInstance(" http://foo.com/ ").toString(),
             "http://foo.com/");
 
         // check that protocol is lower cased
-        assertEquals(UURIFactory.getInstance("HTTP://foo.com/").toString(),
+        assertEquals(UsableURIFactory.getInstance("HTTP://foo.com/").toString(),
             "http://foo.com/");
         
         // check that host is lower cased
-        assertEquals(UURIFactory.
+        assertEquals(UsableURIFactory.
                 getInstance("http://Foo.Com/index.html").toString(),
             "http://foo.com/index.html");
-        assertEquals(UURIFactory.
+        assertEquals(UsableURIFactory.
                 getInstance("http://Foo.Com/index.html").toString(),
             "http://foo.com/index.html");
 
         // check that port number is normalized
-        assertEquals(UURIFactory.
+        assertEquals(UsableURIFactory.
                 getInstance("http://foo.com:80/index.html").toString(),
             "http://foo.com/index.html");
-        assertEquals(UURIFactory.getInstance("http://foo.com:81/").toString(),
+        assertEquals(UsableURIFactory.getInstance("http://foo.com:81/").toString(),
             "http://foo.com:81/");
 
         // check that null path is normalized
-        assertEquals(UURIFactory.getInstance("http://foo.com").toString(),
+        assertEquals(UsableURIFactory.getInstance("http://foo.com").toString(),
             "http://foo.com/");
 
         // check that references are removed
-        assertEquals(UURIFactory.
+        assertEquals(UsableURIFactory.
                 getInstance("http://foo.com/foo.html#ref").toString(),
             "http://foo.com/foo.html");
 
@@ -995,10 +995,10 @@ public class UURIFactoryTest extends TestCase {
         //     normalizeTest("http://foo.com/%66oo.html", "http://foo.com/foo.html");
 
         // check that unnecessary "../" are removed
-        assertEquals(UURIFactory.
+        assertEquals(UsableURIFactory.
                 getInstance("http://foo.com/aa/../").toString(),
             "http://foo.com/" );
-        assertEquals(UURIFactory.
+        assertEquals(UsableURIFactory.
                 getInstance("http://foo.com/aa/bb/../").toString(),
             "http://foo.com/aa/");
 
@@ -1008,41 +1008,41 @@ public class UURIFactoryTest extends TestCase {
             "http://foo.com/aa/..");
          */
         
-        assertEquals(UURIFactory.
+        assertEquals(UsableURIFactory.
             getInstance("http://foo.com/aa/bb/cc/../../foo.html").toString(),
                 "http://foo.com/aa/foo.html");
-        assertEquals(UURIFactory.
+        assertEquals(UsableURIFactory.
             getInstance("http://foo.com/aa/bb/../cc/dd/../ee/foo.html").
                 toString(),
                     "http://foo.com/aa/cc/ee/foo.html");
-        assertEquals(UURIFactory.
+        assertEquals(UsableURIFactory.
             getInstance("http://foo.com/../foo.html").toString(),
                 "http://foo.com/foo.html" );
-        assertEquals(UURIFactory.
+        assertEquals(UsableURIFactory.
             getInstance("http://foo.com/../../foo.html").toString(),
                 "http://foo.com/foo.html" );
-        assertEquals(UURIFactory.
+        assertEquals(UsableURIFactory.
             getInstance("http://foo.com/../aa/../foo.html").toString(),
                 "http://foo.com/foo.html" );
-        assertEquals(UURIFactory.
+        assertEquals(UsableURIFactory.
             getInstance("http://foo.com/aa/../../foo.html").toString(),
                 "http://foo.com/foo.html" );
-        assertEquals(UURIFactory.
+        assertEquals(UsableURIFactory.
                 getInstance("http://foo.com/aa/../bb/../foo.html/../../").
                     toString(),
             "http://foo.com/" );
-        assertEquals(UURIFactory.getInstance("http://foo.com/../aa/foo.html").
+        assertEquals(UsableURIFactory.getInstance("http://foo.com/../aa/foo.html").
             toString(), "http://foo.com/aa/foo.html" );
-        assertEquals(UURIFactory.
+        assertEquals(UsableURIFactory.
                 getInstance("http://foo.com/../aa/../foo.html").toString(),
             "http://foo.com/foo.html" );
-        assertEquals(UURIFactory.
+        assertEquals(UsableURIFactory.
                 getInstance("http://foo.com/a..a/foo.html").toString(),
             "http://foo.com/a..a/foo.html" );
-        assertEquals(UURIFactory.
+        assertEquals(UsableURIFactory.
                 getInstance("http://foo.com/a..a/../foo.html").toString(),
             "http://foo.com/foo.html" );
-        assertEquals(UURIFactory.
+        assertEquals(UsableURIFactory.
             getInstance("http://foo.com/foo.foo/../foo.html").toString(),
                  "http://foo.com/foo.html" );
     }
@@ -1050,14 +1050,14 @@ public class UURIFactoryTest extends TestCase {
     public void testHttpSchemeColonSlash() {
     	boolean exception = false;
     	try {
-    		UURIFactory.getInstance("https:/");
+    		UsableURIFactory.getInstance("https:/");
     	} catch (URIException e) {
     		exception = true;
     	}
     	assertTrue("Didn't throw exception when one expected", exception);
     	exception = false;
     	try {
-    		UURIFactory.getInstance("http://");
+    		UsableURIFactory.getInstance("http://");
     	} catch (URIException e) {
     		exception = true;
     	}
@@ -1067,15 +1067,15 @@ public class UURIFactoryTest extends TestCase {
     public void testNakedHttpsSchemeColon() {
         boolean exception = false;
         try {
-            UURIFactory.getInstance("https:");
+            UsableURIFactory.getInstance("https:");
         } catch (URIException e) {
             exception = true;
         }
         assertTrue("Didn't throw exception when one expected", exception);
         exception = false;
         try {
-            UURI base = UURIFactory.getInstance("http://www.example.com");
-            UURIFactory.getInstance(base, "https:");
+            UsableURI base = UsableURIFactory.getInstance("http://www.example.com");
+            UsableURIFactory.getInstance(base, "https:");
         } catch (URIException e) {
             exception = true;
         }
@@ -1090,10 +1090,10 @@ public class UURIFactoryTest extends TestCase {
      */
     public void testMissingHttpColon() throws URIException {
         String suspectUri = "http//www.test.foo";
-        UURI base = UURIFactory.getInstance("http://www.example.com");
+        UsableURI base = UsableURIFactory.getInstance("http://www.example.com");
         boolean exceptionThrown = false; 
         try {
-            UURI badUuri = UURIFactory.getInstance(suspectUri);
+            UsableURI badUuri = UsableURIFactory.getInstance(suspectUri);
             badUuri.getReferencedHost(); // not reached
         } catch (URIException e) {
             // should get relative-uri-no-base exception
@@ -1101,7 +1101,7 @@ public class UURIFactoryTest extends TestCase {
         } finally {
             assertTrue("expected exception not thrown",exceptionThrown);
         }
-        UURI goodUuri = UURIFactory.getInstance(base,suspectUri);
+        UsableURI goodUuri = UsableURIFactory.getInstance(base,suspectUri);
         goodUuri.getReferencedHost();
     }
     
@@ -1112,14 +1112,14 @@ public class UURIFactoryTest extends TestCase {
      * @throws URIException
      */
     public final void testSerializationRoundtrip() throws URIException {
-        UURI uuri = UURIFactory.
+        UsableURI uuri = UsableURIFactory.
             getInstance("http://www.example.com/path?query#anchor");
-        UURI uuri2 = (UURI) SerializationUtils.deserialize(
+        UsableURI uuri2 = (UsableURI) SerializationUtils.deserialize(
                 SerializationUtils.serialize(uuri));
         assertEquals("Not equal", uuri.toString(), uuri2.toString());
-        uuri = UURIFactory.
+        uuri = UsableURIFactory.
             getInstance("file://///boo_hoo/wwwroot/CMS/Images1/Banner.gif");
-        uuri2 = (UURI) SerializationUtils.deserialize(
+        uuri2 = (UsableURI) SerializationUtils.deserialize(
             SerializationUtils.serialize(uuri));
         assertEquals("Not equal", uuri.toString(), uuri2.toString());
     }
@@ -1131,9 +1131,9 @@ public class UURIFactoryTest extends TestCase {
      * @throws URIException
      */
     public final void testToCustomStringRoundtrip() throws URIException {
-        UURI uuri = UURIFactory.
+        UsableURI uuri = UsableURIFactory.
             getInstance("http://www.example.com/path?query#anchor");
-        UURI uuri2 = UURIFactory.getInstance(uuri.toCustomString());
+        UsableURI uuri2 = UsableURIFactory.getInstance(uuri.toCustomString());
         assertEquals("Not equal", uuri.toString(), uuri2.toString());
         // TODO: fix
         // see [HER-1470] UURI String roundtrip (UURIFactory.getInstance(uuri.toString()) results in different URI for file: (and perhaps other) URIs
@@ -1151,12 +1151,12 @@ public class UURIFactoryTest extends TestCase {
      * @throws URIException
      */
     public final void testHostnamePortRoundtrip() throws URIException {
-        UURI base = UURIFactory.
+        UsableURI base = UsableURIFactory.
             getInstance("http://www.example.com/path?query#anchor");
-        UURI test = UURIFactory.getInstance(base,"boom1.hostname.com:9999");
+        UsableURI test = UsableURIFactory.getInstance(base,"boom1.hostname.com:9999");
         System.out.println("scheme:"+test.getScheme());
         System.out.println(test.toCustomString());
-        UURI roundtrip = UURIFactory.getInstance(test.toCustomString());
+        UsableURI roundtrip = UsableURIFactory.getInstance(test.toCustomString());
         assertEquals("Not equal", test.toString(), roundtrip.toString());
     }
     
@@ -1166,7 +1166,7 @@ public class UURIFactoryTest extends TestCase {
      */
     public void testExtremePort() {
         try {
-            UURI uuri = UURIFactory.getInstance("http://Tel.:010101010101");
+            UsableURI uuri = UsableURIFactory.getInstance("http://Tel.:010101010101");
             System.out.println(uuri); 
             fail("expected exception not thrown");
         } catch (URIException ue){
@@ -1181,10 +1181,10 @@ public class UURIFactoryTest extends TestCase {
      * @throws URIException
      */
     public void testBarsInRelativePath() throws URIException {
-        UURI base = UURIFactory.getInstance("http://www.example.com");
+        UsableURI base = UsableURIFactory.getInstance("http://www.example.com");
         String relative = "foo/bar|baz|yorple";
         base.resolve(relative);
-        UURIFactory.getInstance(base,relative); 
+        UsableURIFactory.getInstance(base,relative); 
     }
 
     /**
@@ -1195,7 +1195,7 @@ public class UURIFactoryTest extends TestCase {
      * @throws URIException
      */
     public void testBackslashes() throws URIException {
-        UURI uuri = UURIFactory.getInstance("http:\\/www.example.com\\a/b\\c/d?q\\r\\|s/t\\v");
+        UsableURI uuri = UsableURIFactory.getInstance("http:\\/www.example.com\\a/b\\c/d?q\\r\\|s/t\\v");
         String expected = "http://www.example.com/a/b/c/d?q%5Cr%5C|s/t%5Cv";
         assertEquals(expected, uuri.toString());
     }

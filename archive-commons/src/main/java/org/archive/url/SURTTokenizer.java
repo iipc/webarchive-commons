@@ -181,7 +181,7 @@ public class SURTTokenizer {
 	throws URIException {
 
 		String key = addImpliedHttpIfNecessary(url);
-		UURI uuri = UURIFactory.getInstance(key);
+		UsableURI uuri = UsableURIFactory.getInstance(key);
 		key = uuri.getScheme() + "://" + uuri.getAuthority() + 
 			uuri.getEscapedPathQuery();
 

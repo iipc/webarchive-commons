@@ -32,7 +32,7 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.util.Iterator;
 
-import org.archive.url.UURI;
+import org.archive.url.UsableURI;
 import org.archive.util.iterator.LineReadingIterator;
 import org.archive.util.iterator.RegexLineIterator;
 
@@ -239,7 +239,7 @@ public class SurtPrefixSet extends PrefixSet {
      * @param object CandidateURI or UURI
      * @return SURT form of URI for evaluation, or null if unavailable
      */
-    public static String getCandidateSurt(UURI u) {
+    public static String getCandidateSurt(UsableURI u) {
         if (u == null) {
             return null;
         }

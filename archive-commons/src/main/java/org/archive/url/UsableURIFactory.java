@@ -48,7 +48,7 @@ import org.archive.util.TextUtils;
  * 
  * @author stack
  */
-public class UURIFactory extends URI {
+public class UsableURIFactory extends URI {
     
     private static final long serialVersionUID = -6146295130382209042L;
 
@@ -56,12 +56,12 @@ public class UURIFactory extends URI {
      * Logging instance.
      */
     private static Logger logger =
-        Logger.getLogger(UURIFactory.class.getName());
+        Logger.getLogger(UsableURIFactory.class.getName());
     
     /**
      * The single instance of this factory.
      */
-    private static final UURIFactory factory = new UURIFactory();
+    private static final UsableURIFactory factory = new UsableURIFactory();
     
     /**
      * RFC 2396-inspired regex.
@@ -220,7 +220,7 @@ public class UURIFactory extends URI {
     /**
      * Protected constructor.
      */
-    protected UURIFactory() {
+    protected UsableURIFactory() {
         super();
     }
     
@@ -229,8 +229,8 @@ public class UURIFactory extends URI {
      * @return An instance of UURI
      * @throws URIException
      */
-    public static UURI getInstance(String uri) throws URIException {
-        return UURIFactory.factory.create(uri);
+    public static UsableURI getInstance(String uri) throws URIException {
+        return UsableURIFactory.factory.create(uri);
     }
     
     /**
@@ -239,9 +239,9 @@ public class UURIFactory extends URI {
      * @return An instance of UURI
      * @throws URIException
      */
-    public static UURI getInstance(String uri, String charset)
+    public static UsableURI getInstance(String uri, String charset)
     		throws URIException {
-        return UURIFactory.factory.create(uri, charset);
+        return UsableURIFactory.factory.create(uri, charset);
     }
     
     /**
@@ -250,10 +250,10 @@ public class UURIFactory extends URI {
      * @return An instance of UURI
      * @throws URIException
      */
-    public static UURI getInstance(UURI base, String relative)
+    public static UsableURI getInstance(UsableURI base, String relative)
     		throws URIException {
 //      return base.resolve(relative);
-        return UURIFactory.factory.create(base, relative);
+        return UsableURIFactory.factory.create(base, relative);
     }
 
     /**
@@ -261,8 +261,8 @@ public class UURIFactory extends URI {
      * @return Instance of UURI.
      * @throws URIException
      */
-    private UURI create(String uri) throws URIException {
-        return create(uri, UURI.getDefaultProtocolCharset());
+    protected UsableURI create(String uri) throws URIException {
+        return create(uri, UsableURI.getDefaultProtocolCharset());
     }
     
     /**
@@ -271,14 +271,24 @@ public class UURIFactory extends URI {
      * @return Instance of UURI.
      * @throws URIException
      */
-    private UURI create(String uri, String charset) throws URIException {
-        UURI uuri  = new UURI(fixup(uri, null, charset), true, charset);
+    protected UsableURI create(String uri, String charset) throws URIException {
+        UsableURI uuri  = newUURI(charset, true, fixup(uri, null, charset));
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("URI " + uri +
                 " PRODUCT " + uuri.toString() +
                 " CHARSET " + charset);
         }
         return validityCheck(uuri);
+    }
+
+    /* for subclasses to override and call their own constructor */
+    protected UsableURI newUURI(String charset, boolean escaped, String fixedUpUri)
+            throws URIException {
+        return new UsableURI(fixedUpUri, escaped, charset);
+    }
+    
+    protected UsableURI newUURI(UsableURI base, UsableURI relative) throws URIException {
+        return new UsableURI(base, relative); 
     }
     
     /**
@@ -287,8 +297,8 @@ public class UURIFactory extends URI {
      * @return Instance of UURI.
      * @throws URIException
      */
-    private UURI create(UURI base, String relative) throws URIException {
-        UURI uuri = new UURI(base, new UURI(fixup(relative, base, base.getProtocolCharset()),
+    protected UsableURI create(UsableURI base, String relative) throws URIException {
+        UsableURI uuri = newUURI(base, newUURI(fixup(relative, base, base.getProtocolCharset()),
             true, base.getProtocolCharset()));
         if (logger.isLoggable(Level.FINE)) {
             logger.fine(" URI " + relative +
@@ -310,10 +320,10 @@ public class UURIFactory extends URI {
      * @return The passed <code>uuri</code> so can easily inline this check.
      * @throws URIException
      */
-    protected UURI validityCheck(UURI uuri) throws URIException {
-        if (uuri.getRawURI().length > UURI.MAX_URL_LENGTH) {
+    protected UsableURI validityCheck(UsableURI uuri) throws URIException {
+        if (uuri.getRawURI().length > UsableURI.MAX_URL_LENGTH) {
            throw new URIException("Created (escaped) uuri > " +
-              UURI.MAX_URL_LENGTH +": "+uuri.toString());
+              UsableURI.MAX_URL_LENGTH +": "+uuri.toString());
         }
         return uuri;
     }
@@ -341,9 +351,9 @@ public class UURIFactory extends URI {
             throw new URIException("URI length is zero (and not relative).");
         }
         
-        if (uri.length() > UURI.MAX_URL_LENGTH) {
+        if (uri.length() > UsableURI.MAX_URL_LENGTH) {
             // We check length here and again later after all convertions.
-            throw new URIException("URI length > " + UURI.MAX_URL_LENGTH +
+            throw new URIException("URI length > " + UsableURI.MAX_URL_LENGTH +
                 ": " + uri);
         }
         

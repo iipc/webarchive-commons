@@ -21,36 +21,36 @@ package org.archive.url;
 import java.net.URISyntaxException;
 
 import org.apache.commons.httpclient.URIException;
-import org.archive.url.UURI;
+import org.archive.url.UsableURI;
 
 import junit.framework.TestCase;
 
 public class UURITest extends TestCase {
     public void testHasScheme() {
-        assertTrue(UURI.hasScheme("http://www.archive.org"));
-        assertTrue(UURI.hasScheme("http:"));
-        assertFalse(UURI.hasScheme("ht/tp://www.archive.org"));
-        assertFalse(UURI.hasScheme("/tmp"));
+        assertTrue(UsableURI.hasScheme("http://www.archive.org"));
+        assertTrue(UsableURI.hasScheme("http:"));
+        assertFalse(UsableURI.hasScheme("ht/tp://www.archive.org"));
+        assertFalse(UsableURI.hasScheme("/tmp"));
     }
     
     public void testGetFileName() throws URISyntaxException {
         final String filename = "x.arc.gz";
         assertEquals(filename,
-            UURI.parseFilename("/tmp/one.two/" + filename));
+            UsableURI.parseFilename("/tmp/one.two/" + filename));
         assertEquals(filename,
-            UURI.parseFilename("http://archive.org/tmp/one.two/" +
+            UsableURI.parseFilename("http://archive.org/tmp/one.two/" +
                     filename));
         assertEquals(filename,
-            UURI.parseFilename("rsync://archive.org/tmp/one.two/" +
+            UsableURI.parseFilename("rsync://archive.org/tmp/one.two/" +
                     filename)); 
     }
     
     public void testSchemalessRelative() throws URIException {
-        UURI base = new UURI("http://www.archive.org/a", true, "UTF-8");
-        UURI relative = new UURI("//www.facebook.com/?href=http://www.archive.org/a", true, "UTF-8");
+        UsableURI base = new UsableURI("http://www.archive.org/a", true, "UTF-8");
+        UsableURI relative = new UsableURI("//www.facebook.com/?href=http://www.archive.org/a", true, "UTF-8");
         assertEquals(null, relative.getScheme());
         assertEquals("www.facebook.com", relative.getAuthority());
-        UURI test = new UURI(base, relative);
+        UsableURI test = new UsableURI(base, relative);
         assertEquals("http://www.facebook.com/?href=http://www.archive.org/a", test.toString());
     }
 }

@@ -37,7 +37,7 @@ import org.archive.url.UsableURIFactory;
  *
  * @author igor stack gojomo
  */
-public class UURIFactoryTest extends TestCase {
+public class UsableURIFactoryTest extends TestCase {
 	
 	public final void testEscaping() throws URIException {
 		// Note: single quote is not being escaped by URI class.

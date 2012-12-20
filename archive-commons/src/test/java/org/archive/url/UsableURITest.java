@@ -25,7 +25,7 @@ import org.archive.url.UsableURI;
 
 import junit.framework.TestCase;
 
-public class UURITest extends TestCase {
+public class UsableURITest extends TestCase {
     public void testHasScheme() {
         assertTrue(UsableURI.hasScheme("http://www.archive.org"));
         assertTrue(UsableURI.hasScheme("http:"));

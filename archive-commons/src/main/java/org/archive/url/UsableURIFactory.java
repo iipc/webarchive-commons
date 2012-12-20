@@ -34,7 +34,7 @@ import org.apache.commons.httpclient.URIException;
 import org.archive.util.TextUtils;
 
 /**
- * Factory that returns UURIs.
+ * Factory that returns UsableURIs.
  * 
  * Does escaping and fixup on URIs massaging in accordance with RFC2396 and to
  * match browser practice. For example, it removes any '..' if first thing in
@@ -272,7 +272,7 @@ public class UsableURIFactory extends URI {
      * @throws URIException
      */
     protected UsableURI create(String uri, String charset) throws URIException {
-        UsableURI uuri  = newUURI(charset, true, fixup(uri, null, charset));
+        UsableURI uuri  = makeOne(fixup(uri, null, charset), true, charset);
         if (logger.isLoggable(Level.FINE)) {
             logger.fine("URI " + uri +
                 " PRODUCT " + uuri.toString() +
@@ -282,12 +282,12 @@ public class UsableURIFactory extends URI {
     }
 
     /* for subclasses to override and call their own constructor */
-    protected UsableURI newUURI(String charset, boolean escaped, String fixedUpUri)
+    protected UsableURI makeOne(String fixedUpUri, boolean escaped, String charset)
             throws URIException {
         return new UsableURI(fixedUpUri, escaped, charset);
     }
     
-    protected UsableURI newUURI(UsableURI base, UsableURI relative) throws URIException {
+    protected UsableURI makeOne(UsableURI base, UsableURI relative) throws URIException {
         return new UsableURI(base, relative); 
     }
     
@@ -298,8 +298,9 @@ public class UsableURIFactory extends URI {
      * @throws URIException
      */
     protected UsableURI create(UsableURI base, String relative) throws URIException {
-        UsableURI uuri = newUURI(base, newUURI(fixup(relative, base, base.getProtocolCharset()),
-            true, base.getProtocolCharset()));
+        UsableURI relativeUURI = makeOne(fixup(relative, base, base.getProtocolCharset()),
+            true, base.getProtocolCharset());
+        UsableURI uuri = makeOne(base, relativeUURI);
         if (logger.isLoggable(Level.FINE)) {
             logger.fine(" URI " + relative +
                 " PRODUCT " + uuri.toString() +

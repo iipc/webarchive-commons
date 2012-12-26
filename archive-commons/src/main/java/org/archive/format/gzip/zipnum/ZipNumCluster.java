@@ -2,10 +2,12 @@ package org.archive.format.gzip.zipnum;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.archive.RecoverableRecordFormatException;
 import org.archive.format.cdx.CDXInputSource;
+import org.archive.format.cdx.CDXSearchResult;
 import org.archive.util.GeneralURIStreamFactory;
 import org.archive.util.binsearch.SeekableLineReaderFactory;
 import org.archive.util.binsearch.SortedTextFile;
@@ -18,8 +20,16 @@ public class ZipNumCluster implements CDXInputSource {
 
 	protected String clusterUri;
 	
-	protected int maxBlocks = 1000;
+	protected int maxBlocks = 100;
 	
+	public int getMaxBlocks() {
+		return maxBlocks;
+	}
+
+	public void setMaxBlocks(int maxBlocks) {
+		this.maxBlocks = maxBlocks;
+	}
+
 	protected String summaryFile;
 	
 	protected SortedTextFile summary;
@@ -45,27 +55,33 @@ public class ZipNumCluster implements CDXInputSource {
 		summary = new SortedTextFile(summaryFactory);
 	}
 	
-	public ArrayList<ZipNumStreamingBlock> getBlockList(String prefix, boolean exact)
-	throws IOException {
+	public CDXSearchResult getLineIterator(String key, boolean exact) throws IOException {
 		ArrayList<ZipNumStreamingBlock> blocks = new ArrayList<ZipNumStreamingBlock>();
 		
 		boolean first = true;
 		int numBlocks = 0;
+		boolean truncated = false;
 		
 		CloseableIterator<String> itr = null;
 		
-		try {
-			itr = summary.getRecordIterator(prefix, true);
+		try {			
+			
+			itr = summary.getRecordIteratorLT(key);
 			
 			ZipNumStreamingLoader currLoader = null;
 			
+			String blockDescriptor = null;
+			
 			while(itr.hasNext()) {
 				if (numBlocks >= maxBlocks) {
-					LOGGER.warning("Truncated by blocks for " + prefix);
+					truncated = true;
+					if (LOGGER.isLoggable(Level.INFO)) {
+						LOGGER.info("Truncated by blocks for " + key);
+					}
 					break;
 				}
 				
-				String blockDescriptor = itr.next();
+				blockDescriptor = itr.next();
 				numBlocks++;
 				String parts[] = blockDescriptor.split("\t");
 				if((parts.length < 3) || (parts.length > 4)) {
@@ -73,9 +89,10 @@ public class ZipNumCluster implements CDXInputSource {
 					throw new RecoverableRecordFormatException("Bad line(" + blockDescriptor + ")");
 				}
 				// only compare the correct length:
-				String prefCmp = prefix;
+				String prefCmp = key;
 				String blockCmp = parts[0];
-				if(first) {
+				
+				if (first) {
 					// always add first:
 					first = false;
 				} else if (exact && !blockCmp.equals(prefCmp)) {
@@ -103,7 +120,7 @@ public class ZipNumCluster implements CDXInputSource {
 				int length = Integer.parseInt(parts[3]);
 				
 				if ((currLoader == null) || !currLoader.isSameBlock(offset, partUri)) {
-					if (currLoader != null) {
+					if ((currLoader != null) && LOGGER.isLoggable(Level.INFO)) {
 						LOGGER.info("Added " + currLoader.toString());
 					}
 					currLoader = new ZipNumStreamingLoader(offset, partUri);
@@ -112,24 +129,18 @@ public class ZipNumCluster implements CDXInputSource {
 				blocks.add(new ZipNumStreamingBlock(length, currLoader));
 			}
 			
-			if (currLoader != null) {
+			if ((currLoader != null) && LOGGER.isLoggable(Level.INFO)) {
 				LOGGER.info("Added " + currLoader.toString());			
 			}
 			
-		} finally {			
+			ZipNumStreamingBlockIterator zipIter = new ZipNumStreamingBlockIterator(blocks);
+			return new CDXSearchResult(new StartBoundedStringIterator(zipIter, key), truncated);
+			
+		} finally {
 			if(itr != null) {
 				itr.close();
 			}
 		}
-		
-		return blocks;
-	}
-	
-	public CloseableIterator<String> getLineIterator(String key, boolean exact) throws IOException
-	{
-		ArrayList<ZipNumStreamingBlock> blocks = getBlockList(key, exact);
-		ZipNumStreamingBlockIterator blockIter = new ZipNumStreamingBlockIterator(blocks);
-		return new StartBoundedStringIterator(blockIter, key);
 	}
 	
 	public String getClusterUri() {

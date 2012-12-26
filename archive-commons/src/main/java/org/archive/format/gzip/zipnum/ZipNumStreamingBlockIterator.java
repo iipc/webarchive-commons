@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.archive.util.iterator.CloseableIterator;
@@ -21,12 +22,13 @@ public class ZipNumStreamingBlockIterator implements CloseableIterator<String> {
 	private ZipNumStreamingBlock currBlock = null;
 	private Iterator<ZipNumStreamingBlock> blockItr = null;
 	private String cachedNext = null;
-	private boolean truncated = false;
 	/**
 	 * @param blocks which should be fetched and unzipped, one after another
 	 */
 	public ZipNumStreamingBlockIterator(List<ZipNumStreamingBlock> blocks) {
-		LOGGER.info("initialized with " + blocks.size() + " blocks");
+		if (LOGGER.isLoggable(Level.INFO)) {
+			LOGGER.info("Iterating over " + blocks.size() + " blocks");
+		}
 		blockItr = blocks.iterator();
 	}
 	/* (non-Javadoc)
@@ -130,16 +132,4 @@ public class ZipNumStreamingBlockIterator implements CloseableIterator<String> {
 //			System.exit(1);
 //		}
 //	}
-	/**
-	 * @return the truncated
-	 */
-	public boolean isTruncated() {
-		return truncated;
-	}
-	/**
-	 * @param truncated the truncated to set
-	 */
-	public void setTruncated(boolean truncated) {
-		this.truncated = truncated;
-	}
 }

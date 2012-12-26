@@ -47,6 +47,6 @@ public class ZipNumStreamingLoader {
 	@Override
 	public String toString()
 	{
-		return "Streaming " + numBlocks + " from " + partName + " (offset,len) = (" + offset + "," + count + ")";
+		return "Streaming " + numBlocks + " blocks from " + partName + " (offset,len) = (" + offset + "," + count + ")";
 	}
 }

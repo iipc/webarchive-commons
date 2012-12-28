@@ -9,11 +9,17 @@ import org.archive.util.binsearch.SeekableLineReaderFactory;
 
 public class RandomAccessFileSeekableLineReaderFactory implements SeekableLineReaderFactory {
 	private File file;
+	private int blockSize = BINSEARCH_BLOCK_SIZE;
+	
 	public RandomAccessFileSeekableLineReaderFactory(File file) {
 		this.file = file;
 	}
+	public RandomAccessFileSeekableLineReaderFactory(File file, int blockSize) {
+		this.file = file;
+		this.blockSize = blockSize;
+	}
 	public SeekableLineReader get() throws IOException {
 		return new RandomAccessFileSeekableLineReader(new RandomAccessFile(file, "r"),
-				4096);
+				blockSize);
 	}
 }

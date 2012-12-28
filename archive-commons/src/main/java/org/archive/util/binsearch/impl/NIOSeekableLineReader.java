@@ -17,12 +17,15 @@ public class NIOSeekableLineReader implements SeekableLineReader {
 	private InputStreamReader isr;
 	private BufferedReader br;
 
-	private int blockSize = 4096;
-	public NIOSeekableLineReader(FileChannel fc) throws IOException {
+	private int blockSize;
+	
+	public NIOSeekableLineReader(FileChannel fc, int blockSize) throws IOException {
 		this.fc = fc;
 		size = fc.size();
 		fcis = null;
+		this.blockSize = blockSize;
 	}
+	
 	public void seek(long offset) throws IOException {
 		fcis = new FileChannelInputStream(fc, offset);
     	isr = new InputStreamReader(fcis, UTF8);

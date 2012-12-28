@@ -13,12 +13,14 @@ public class ZipNumStreamingLoader {
 	
 	protected StreamWrappedInputStream source;
 	protected String partName;
+	protected String[] partLocations = null;
 	protected long offset;
 	protected int count;
 	protected int numBlocks;
 	
-	public ZipNumStreamingLoader(long offset, String partName) {
+	public ZipNumStreamingLoader(long offset, String partName, String[] partLocations) {
 		this.partName = partName;
+		this.partLocations = partLocations;
 		this.offset = offset;
 		this.count = 0;
 		this.numBlocks = 0;
@@ -37,10 +39,25 @@ public class ZipNumStreamingLoader {
 		
 	public InputStream getSourceInputStream() throws IOException
 	{
-		if (source == null) {
-			source = new StreamWrappedInputStream(GeneralURIStreamFactory.createStream(partName, offset, count));
-			source.setCloseOnClose(true);
+		if (source != null) {
+			return source;
 		}
+		
+		// Either load from specified location, or from partName path
+		if (partLocations != null) {
+			for (String location : partLocations) {
+				try {
+					source = new StreamWrappedInputStream(GeneralURIStreamFactory.createStream(location, offset, count));
+					break;
+				} catch (IOException io) {
+					continue;
+				}
+			}
+		} else {
+			source = new StreamWrappedInputStream(GeneralURIStreamFactory.createStream(partName, offset, count));
+		}
+				
+		source.setCloseOnClose(true);
 		return source;
 	}
 	

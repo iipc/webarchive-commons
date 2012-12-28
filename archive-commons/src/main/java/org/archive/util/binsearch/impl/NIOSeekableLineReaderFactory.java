@@ -19,11 +19,17 @@ import org.archive.util.binsearch.SeekableLineReaderFactory;
  */
 public class NIOSeekableLineReaderFactory implements SeekableLineReaderFactory {
 	private FileChannel fc;
+	private int blockSize = BINSEARCH_BLOCK_SIZE;
+	
+	public NIOSeekableLineReaderFactory(File file, int blockSize) throws IOException {
+		this.blockSize = blockSize;
+		fc = new RandomAccessFile(file,"r").getChannel();
+	}
 	public NIOSeekableLineReaderFactory(File file) throws IOException {
 		fc = new RandomAccessFile(file,"r").getChannel();
 	}
 	public SeekableLineReader get() throws IOException {
-		return new NIOSeekableLineReader(fc);
+		return new NIOSeekableLineReader(fc, blockSize);
 	}
 
 }

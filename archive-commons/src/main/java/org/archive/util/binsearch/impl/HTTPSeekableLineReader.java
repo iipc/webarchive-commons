@@ -13,7 +13,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
 import org.archive.util.binsearch.SeekableLineReader;
 
-public class HTTPSeakableLineReader implements SeekableLineReader {
+public class HTTPSeekableLineReader implements SeekableLineReader {
 	private final static String CONTENT_LENGTH = "Content-Length";
 	private int blockSize = 128 * 1024;
 	private HttpClient http;
@@ -22,7 +22,7 @@ public class HTTPSeakableLineReader implements SeekableLineReader {
 	private BufferedReader br;
 	private InputStreamReader isr;
 	private HttpMethod activeMethod;
-	public HTTPSeakableLineReader(HttpClient http, String url) throws HttpException, URISyntaxException, IOException {
+	public HTTPSeekableLineReader(HttpClient http, String url) throws HttpException, URISyntaxException, IOException {
 		this.http = http;
 		this.url = url;
 		acquireLength();

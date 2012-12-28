@@ -77,8 +77,7 @@ public class GeneralURIStreamFactory {
 		if (isHttp(uri)) {
 			return new HTTP11Stream(new URL(uri));
 		} else if (isHdfs(uri)) {
-			FileSystem fs = initHdfs();
-			return new HDFSStream(fs.open(new Path(uri)));			
+			return new HDFSStream(initHdfs().open(new Path(uri)));			
 		} else {
 			return new RandomAccessFileStream(new File(uri));
 		}
@@ -88,8 +87,7 @@ public class GeneralURIStreamFactory {
 		if (isHttp(uri)) {
 			return new HTTP11Stream(new URL(uri), offset, count);
 		} else if (isHdfs(uri)) {
-			FileSystem fs = initHdfs();
-			return new HDFSStream(fs.open(new Path(uri)));
+			return new HDFSStream(initHdfs().open(new Path(uri)));
 		} else {
 			return new RandomAccessFileStream(new File(uri), offset, count);
 		}
@@ -100,10 +98,10 @@ public class GeneralURIStreamFactory {
 		if (isHttp(uri)) {
 			return new HTTPSeekableLineReaderFactory(uri);
 		} else if (isHdfs(uri)) {
-			FileSystem fs = initHdfs();
-			return new HDFSSeekableLineReaderFactory(fs, new Path(uri));			
+			return new HDFSSeekableLineReaderFactory(initHdfs(), new Path(uri));			
 		} else {
 			return new NIOSeekableLineReaderFactory(new File(uri));
+			//return new RandomAccessFileSeekableLineReaderFactory(new File(uri));
 		}
 	}
 }

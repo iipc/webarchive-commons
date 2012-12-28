@@ -2,6 +2,7 @@ package org.archive.format.gzip.zipnum;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,6 +11,7 @@ import org.archive.format.cdx.CDXInputSource;
 import org.archive.format.cdx.CDXSearchResult;
 import org.archive.util.GeneralURIStreamFactory;
 import org.archive.util.binsearch.SeekableLineReaderFactory;
+import org.archive.util.binsearch.SeekableLineReaderIterator;
 import org.archive.util.binsearch.SortedTextFile;
 import org.archive.util.iterator.CloseableIterator;
 import org.archive.util.iterator.StartBoundedStringIterator;
@@ -22,17 +24,11 @@ public class ZipNumCluster implements CDXInputSource {
 	
 	protected int maxBlocks = 100;
 	
-	public int getMaxBlocks() {
-		return maxBlocks;
-	}
-
-	public void setMaxBlocks(int maxBlocks) {
-		this.maxBlocks = maxBlocks;
-	}
-
 	protected String summaryFile;
 	
 	protected SortedTextFile summary;
+	
+	protected HashMap<String, String[]> locMap = null;
 	
 	public ZipNumCluster(String clusterUri) throws IOException
 	{
@@ -53,6 +49,42 @@ public class ZipNumCluster implements CDXInputSource {
 		}
 		
 		summary = new SortedTextFile(summaryFactory);
+	}
+	
+	public ZipNumCluster(String clusterUri, String summaryFile, String locUri) throws IOException {
+		this(clusterUri, summaryFile);
+		loadPartLocations(locUri);
+	}
+	
+	protected void loadPartLocations(String locUri) throws IOException
+	{
+		locMap = new HashMap<String, String[]>();
+		SeekableLineReaderIterator lines = null;
+		
+		try {
+			SeekableLineReaderFactory readerFactory = GeneralURIStreamFactory.createSeekableStreamFactory(locUri);
+			
+			lines = new SeekableLineReaderIterator(readerFactory.get());
+			
+			while(lines.hasNext()) {
+				String line = lines.next();
+				String[] parts = line.split("\\s");
+				if (parts.length < 2) {
+					String msg = "Bad line(" + line +") in (" + locUri + ")";
+					throw new IOException(msg);
+				}
+				
+				String locations[] = new String[parts.length - 1];
+			
+				for (int i = 1; i < parts.length; i++) {
+					locations[i-1] = parts[i];
+				}
+				
+				locMap.put(parts[0], locations);
+			}
+		} finally {
+			lines.close();	
+		}
 	}
 	
 	public CDXSearchResult getLineIterator(String key, boolean exact) throws IOException {
@@ -114,16 +146,24 @@ public class ZipNumCluster implements CDXInputSource {
 							"No size for multi-block load at offset(" + parts[2] + ")");
 				}
 				
-				String partUri = clusterUri + "/" + parts[1] + ".gz";
-								
+				String partId = parts[1];
+				
+				String locations[] = null;
+				
+				if (locMap != null) {
+					locations = locMap.get(partId);
+				} else {
+					partId = clusterUri + "/" + partId + ".gz";
+				}
+		
 				long offset = Long.parseLong(parts[2]);
 				int length = Integer.parseInt(parts[3]);
 				
-				if ((currLoader == null) || !currLoader.isSameBlock(offset, partUri)) {
+				if ((currLoader == null) || !currLoader.isSameBlock(offset, partId)) {
 					if ((currLoader != null) && LOGGER.isLoggable(Level.INFO)) {
 						LOGGER.info("Added " + currLoader.toString());
 					}
-					currLoader = new ZipNumStreamingLoader(offset, partUri);
+					currLoader = new ZipNumStreamingLoader(offset, partId, locations);
 				}
 				
 				blocks.add(new ZipNumStreamingBlock(length, currLoader));
@@ -146,16 +186,16 @@ public class ZipNumCluster implements CDXInputSource {
 	public String getClusterUri() {
 		return clusterUri;
 	}
-
-	public void setClusterUri(String clusterUri) {
-		this.clusterUri = clusterUri;
-	}
 	
 	public String getSummaryFile() {
 		return summaryFile;
 	}
+	
+	public int getMaxBlocks() {
+		return maxBlocks;
+	}
 
-	public void setSummaryFile(String summaryFile) {
-		this.summaryFile = summaryFile;
+	public void setMaxBlocks(int maxBlocks) {
+		this.maxBlocks = maxBlocks;
 	}
 }

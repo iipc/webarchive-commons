@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.archive.util.iterator.AbstractPeekableIterator;
 import org.archive.util.iterator.CloseableIterator;
 
 public class SortedTextFile {
@@ -38,7 +37,7 @@ public class SortedTextFile {
 	private CloseableIterator<String> search(SeekableLineReader slr,
 			final String key, boolean lessThan) throws IOException {
 
-		int blockSize = 8192;
+		int blockSize = SeekableLineReaderFactory.BINSEARCH_BLOCK_SIZE;
 		long fileSize = slr.getSize();
 		long min = 0;
 		long max = (long) fileSize / blockSize;
@@ -89,30 +88,6 @@ public class SortedTextFile {
 	    	prev = null;
 	    }
 	    return new CachedStringIterator(slr, prev, line);
-	}
-
-	public class SeekableLineReaderIterator extends AbstractPeekableIterator<String> {
-		SeekableLineReader slr;
-		public SeekableLineReaderIterator(SeekableLineReader slr) {
-			this.slr = slr;
-		}
-		@Override
-		public String getNextInner() {
-			String next = null;
-			if(slr != null) {
-				try {
-					next = slr.readLine();
-				} catch (IOException e) {
-					e.printStackTrace();
-					throw new RuntimeException(e);
-				}
-			}
-			return next;
-		}
-		@Override
-		public void close() throws IOException {
-			slr.close();
-		}
 	}
 
 	public class CachedStringIterator implements CloseableIterator<String> {

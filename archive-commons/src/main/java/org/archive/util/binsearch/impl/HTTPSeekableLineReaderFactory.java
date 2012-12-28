@@ -28,7 +28,7 @@ public class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory 
 
 	public SeekableLineReader get() throws IOException {
 		try {
-			return new HTTPSeakableLineReader(http, uriString);
+			return new HTTPSeekableLineReader(http, uriString);
 		} catch (URISyntaxException e) {
 			throw new IOException(e);
 		}

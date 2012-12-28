@@ -12,26 +12,44 @@ import com.google.common.io.LimitInputStream;
 public class ZipNumStreamingBlock {
 		
 	protected ZipNumStreamingLoader loader;
+	protected BufferedReader reader;
 	protected int length;
 	protected int numInLoader;
 
 	public ZipNumStreamingBlock(int length, ZipNumStreamingLoader loader) {
 		this.length = length;
 		this.loader = loader;
-		numInLoader = loader.addBlock(length);
+		this.reader = null;
+		this.numInLoader = loader.addBlock(length);
 	}
 
-	public BufferedReader readBlock() throws IOException
+	protected BufferedReader readBlock() throws IOException
 	{
 		InputStream nextStream = new LimitInputStream(loader.getSourceInputStream(), length);
 		nextStream = new OpenJDK7GZIPInputStream(nextStream);
 		return new BufferedReader(new InputStreamReader(nextStream));
 	}
 	
-	public void closeIfLast(BufferedReader reader) throws IOException
+	public String readLine() throws IOException
 	{
-		// If last block in loader
-		if (numInLoader == loader.numBlocks) {
+		if (reader == null) {
+			reader = readBlock();
+		}
+		
+		return reader.readLine();
+	}
+	
+	public void close() throws IOException
+	{
+		if (reader != null) {
+			reader.close();
+		}
+	}
+	
+	public void closeIfLast() throws IOException
+	{
+		// Close only last block in loader
+		if (reader != null && (numInLoader == loader.numBlocks)) {
 			reader.close();
 		}
 	}

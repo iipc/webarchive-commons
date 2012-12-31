@@ -2,7 +2,6 @@ package org.archive.format.gzip.zipnum;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.archive.format.cdx.CDXInputSource;
@@ -12,6 +11,7 @@ import org.archive.util.binsearch.SeekableLineReaderIterator;
 import org.archive.util.binsearch.SortedTextFile;
 import org.archive.util.iterator.AbstractPeekableIterator;
 import org.archive.util.iterator.CloseableIterator;
+import org.archive.util.iterator.PrefixMatchStringIterator;
 import org.archive.util.iterator.StartBoundedStringIterator;
 
 public class ZipNumCluster implements CDXInputSource {
@@ -83,130 +83,174 @@ public class ZipNumCluster implements CDXInputSource {
 		}
 	}
 	
-	class ZipNumBlockIterator extends AbstractPeekableIterator<ZipNumStreamingBlock>
+	class SummaryStreamingLoaderIterator extends AbstractPeekableIterator<ZipNumStreamingLoader>
 	{
 		protected CloseableIterator<String> summaryIterator;
-		protected ZipNumStreamingLoader currLoader = null;
-		protected int numBlocks = 0;
-		
-		protected boolean exact;
-		protected String key;
-
-		protected boolean first = true;
-		
-		ZipNumBlockIterator(String key, boolean exact) throws IOException
-		{
-			this.key = key;
-			this.exact = exact;
-			
-			if (key.equals("-")) {
-				this.summaryIterator = summary.getRecordIterator(0);
-			} else {
-				this.summaryIterator = summary.getRecordIteratorLT(key);
-			}
-		}
-
-		@Override
-		public ZipNumStreamingBlock getNextInner() {
-//			if (numBlocks >= maxBlocks) {
-//				truncated = true;
-//				if (LOGGER.isLoggable(Level.INFO)) {
-//					LOGGER.info("Truncated by blocks for " + key);
-//				}
-//				return null;
-//			}
+		protected String lastPartId = null;
 						
-			if (LOGGER.isLoggable(Level.INFO)) {
-				if ((currLoader != null) && (numBlocks > 0) && (numBlocks % 10) == 0) {
-					LOGGER.info("So far, read " + currLoader.toString());
-				}
-			}
-			
-			numBlocks++;
-			
-			String blockDescriptor = summaryIterator.next();
-			String parts[] = blockDescriptor.split("\t");
-			if ((parts.length < 3) || (parts.length > 4)) {
-				LOGGER.severe("Bad line(" + blockDescriptor +") ");
-				//throw new RecoverableRecordFormatException("Bad line(" + blockDescriptor + ")");
-				return null;
-			}
-			// only compare the correct length:
-			String prefCmp = key;
-			String blockCmp = parts[0];
-			
-			if (first) {
-				// always add first:
-				first = false;
-			} else if (key.equals("-")) {
-				//
-			} else if (exact && !blockCmp.equals(prefCmp)) {
-				return null;
-			} else if (!exact && !blockCmp.startsWith(prefCmp)) {
-				return null;
-			}
-			
-			if (parts.length < 3) {
-				LOGGER.severe("No size for multi-block load at offset(" + parts[2] + ")");
-				return null;
-			}
-			
-			String partId = parts[1];
-			
-			String locations[] = null;
-			
-			if (locMap != null) {
-				locations = locMap.get(partId);
-				if (locations == null) {
-					LOGGER.severe("No locations for block(" + partId +")");
-				}
-			} else {
-				partId = clusterUri + "/" + partId + ".gz";
-			}
-	
-			long offset = Long.parseLong(parts[2]);
-			int length = Integer.parseInt(parts[3]);
-			
-			if ((currLoader == null) || !currLoader.isSameBlock(offset, partId)) {
-				closeLoader();
-				currLoader = new ZipNumStreamingLoader(offset, partId, locations);
-			}
-			
-			return new ZipNumStreamingBlock(length, currLoader);
-		}
-		
-		protected void closeLoader()
+		SummaryStreamingLoaderIterator(CloseableIterator<String> summaryIterator)
 		{
-			if (currLoader != null) {
-				if (LOGGER.isLoggable(Level.INFO)) {
-					LOGGER.info("Read " + currLoader.toString());
-				}
-				try {
-					currLoader.close();
-				} catch (IOException e) {
-					LOGGER.warning(e.toString());
-				}
-				currLoader = null;
-			}
+			this.summaryIterator = summaryIterator;
 		}
 
 		@Override
-		public void close() throws IOException {
+		public ZipNumStreamingLoader getNextInner() {
+			
+			while (summaryIterator.hasNext()) {
+				
+//				if (LOGGER.isLoggable(Level.INFO)) {
+//					if ((currLoader != null) && (numBlocks > 0) && (numBlocks % 10) == 0) {
+//						LOGGER.info("So far, read " + currLoader.toString());
+//					}
+//				}
+				
+//				numBlocks++;
+				
+				String blockDescriptor = summaryIterator.next();
+				
+				String parts[] = blockDescriptor.split("\t");
+			
+				if ((parts.length < 3) || (parts.length > 4)) {
+					LOGGER.severe("Bad line(" + blockDescriptor +") ");
+					//throw new RecoverableRecordFormatException("Bad line(" + blockDescriptor + ")");
+					return null;
+				}
+				
+				String partId = parts[1];
+				
+				if ((lastPartId == null) || !lastPartId.equals(partId)) {
+					
+					lastPartId = partId;
+					
+					String locations[] = null;
+					
+					if (locMap != null) {
+						locations = locMap.get(partId);
+						if (locations == null) {
+							LOGGER.severe("No locations for block(" + partId +")");
+						}
+					} else {
+						partId = clusterUri + "/" + partId + ".gz";
+					}
+					
+					long offset = Long.parseLong(parts[2]);
+					
+					return new ZipNumStreamingLoader(offset, partId, locations);
+				}
+			}
+			
+			return null;
+		}
+		
+		@Override
+		public void close() throws IOException
+		{
 			if (summaryIterator != null) {
 				summaryIterator.close();
-			}
-			closeLoader();
+				summaryIterator = null;
+			}	
 		}
 	}
+		
+//	class ZipNumBlockIterator extends AbstractPeekableIterator<ZipNumStreamingBlock>
+//	{
+//		protected CloseableIterator<String> summaryIterator;
+//		protected ZipNumStreamingLoader currLoader = null;
+//		protected int numBlocks = 0;
+//				
+//		ZipNumBlockIterator(CloseableIterator<String> summaryIterator)
+//		{
+//			this.summaryIterator = summaryIterator;
+//		}
+//
+//		@Override
+//		public ZipNumStreamingBlock getNextInner() {
+//			
+//			if (!summaryIterator.hasNext()) {
+//				return null;
+//			}
+//						
+//			if (LOGGER.isLoggable(Level.INFO)) {
+//				if ((currLoader != null) && (numBlocks > 0) && (numBlocks % 10) == 0) {
+//					LOGGER.info("So far, read " + currLoader.toString());
+//				}
+//			}
+//			
+//			numBlocks++;
+//			
+//			String blockDescriptor = summaryIterator.next();
+//			
+//			String parts[] = blockDescriptor.split("\t");
+//		
+//			if ((parts.length < 3) || (parts.length > 4)) {
+//				LOGGER.severe("Bad line(" + blockDescriptor +") ");
+//				//throw new RecoverableRecordFormatException("Bad line(" + blockDescriptor + ")");
+//				return null;
+//			}
+//			
+//			String partId = parts[1];
+//			
+//			String locations[] = null;
+//			
+//			if (locMap != null) {
+//				locations = locMap.get(partId);
+//				if (locations == null) {
+//					LOGGER.severe("No locations for block(" + partId +")");
+//				}
+//			} else {
+//				partId = clusterUri + "/" + partId + ".gz";
+//			}
+//	
+//			long offset = Long.parseLong(parts[2]);
+//			int length = Integer.parseInt(parts[3]);
+//			
+//			if ((currLoader == null) || !currLoader.isSameBlock(offset, partId)) {
+//				currLoader = new ZipNumStreamingLoader(offset, partId, locations, currLoader);
+//			}
+//			
+//			return new ZipNumStreamingBlock(length, currLoader);
+//		}
+//
+//		@Override
+//		public void close() throws IOException {
+//			if (summaryIterator != null) {
+//				summaryIterator.close();
+//			}
+//			
+//			if (currLoader != null) {
+//				currLoader.close();
+//				currLoader = null;
+//			}
+//		}
+//	}
 	
-	public CloseableIterator<String> getLineIterator(String key, boolean exact) throws IOException {		
-		ZipNumBlockIterator blockIter = new ZipNumBlockIterator(key, exact);
-		ZipNumStreamingBlockIterator zipIter = new ZipNumStreamingBlockIterator(blockIter);
+//	protected List<ZipNumStreamingBlock> accumBlocks(String key) throws IOException
+//	{
+//		SummaryRecordIterator startIter = new SummaryRecordIterator(summary.getRecordIteratorLT(key), key, false);
+//		ZipNumBlockIterator blockIter = new ZipNumBlockIterator(startIter);
+//		
+//		ZipNumStreamingBlock lastBlock = null, block = null;
+//		
+//		while (blockIter.hasNext()) {
+//			lastBlock = block;
+//			block = blockIter.next();
+//		}
+//				
+//		return null;
+//	}
+	
+	public CloseableIterator<String> getCDXLineIterator(String key) throws IOException {
 		
 		if (key.equals("-")) {
-			return zipIter;
+			return new StreamingLoaderStringIterator(new SummaryStreamingLoaderIterator(summary.getRecordIterator(0)));
 		}
+				
+		PrefixMatchStringIterator startIter = new PrefixMatchStringIterator(summary.getRecordIteratorLT(key), key, true);
+		 
+		SummaryStreamingLoaderIterator blockIter = new SummaryStreamingLoaderIterator(startIter);
 		
+		StreamingLoaderStringIterator zipIter = new StreamingLoaderStringIterator(blockIter);
+				
 		return new StartBoundedStringIterator(zipIter, key);
 	}
 	

@@ -9,6 +9,10 @@ public class HDFSStream extends AbstractBufferingStream {
 	public HDFSStream(FSDataInputStream hdfs) {
 		this.hdfs = hdfs;
 	}
+	public HDFSStream(FSDataInputStream hdfs, long offset) throws IOException {
+		this.hdfs = hdfs;
+		doSeek(offset);
+	}
 
 	@Override
 	public int doRead(byte[] b, int off, int len) throws IOException {

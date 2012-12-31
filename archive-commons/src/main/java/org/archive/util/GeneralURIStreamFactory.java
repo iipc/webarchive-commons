@@ -83,13 +83,13 @@ public class GeneralURIStreamFactory {
 		}
 	}
 	
-	public static Stream createStream(String uri, long offset, int count) throws IOException {
+	public static Stream createStream(String uri, long offset) throws IOException {
 		if (isHttp(uri)) {
-			return new HTTP11Stream(new URL(uri), offset, count);
+			return new HTTP11Stream(new URL(uri), offset);
 		} else if (isHdfs(uri)) {
-			return new HDFSStream(initHdfs().open(new Path(uri)));
+			return new HDFSStream(initHdfs().open(new Path(uri)), offset);
 		} else {
-			return new RandomAccessFileStream(new File(uri), offset, count);
+			return new RandomAccessFileStream(new File(uri), offset);
 		}
 	}
 	

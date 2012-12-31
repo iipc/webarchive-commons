@@ -1,26 +1,27 @@
 package org.archive.format.gzip.zipnum;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 import org.archive.util.iterator.AbstractPeekableIterator;
-import org.archive.util.iterator.CloseableIterator;
+import org.archive.util.iterator.CloseableIteratorUtil;
 
 /**
  * @author brad, ilya
  *
  */
-public class ZipNumStreamingBlockIterator extends AbstractPeekableIterator<String> {
+public class StreamingLoaderStringIterator extends AbstractPeekableIterator<String> {
 	private static final Logger LOGGER = Logger.getLogger(
-			ZipNumStreamingBlockIterator.class.getName());
+			StreamingLoaderStringIterator.class.getName());
 
-	private ZipNumStreamingBlock currBlock = null;
-	private CloseableIterator<ZipNumStreamingBlock> blockItr = null;
+	private ZipNumStreamingLoader currLoader = null;
+	private Iterator<ZipNumStreamingLoader> blockItr = null;
 
 	/**
 	 * @param blocks which should be fetched and unzipped, one after another
 	 */
-	public ZipNumStreamingBlockIterator(CloseableIterator<ZipNumStreamingBlock> blockItr) {
+	public StreamingLoaderStringIterator(Iterator<ZipNumStreamingLoader> blockItr) {
 //		if (LOGGER.isLoggable(Level.INFO)) {
 //			LOGGER.info("Iterating over " + blocks.size() + " blocks");
 //		}
@@ -32,23 +33,23 @@ public class ZipNumStreamingBlockIterator extends AbstractPeekableIterator<Strin
 				
 		try {		
 			while (true) {
-				if (currBlock == null) {
+				if (currLoader == null) {
 					if (blockItr.hasNext()) {
-						currBlock = blockItr.next();
+						currLoader = blockItr.next();
 					} else {
 						return null;
 					}
 				}
 				
 				// attempt to read the next line from this:
-				String next = currBlock.readLine();
+				String next = currLoader.readLine();
 				
 				if (next != null) {
 					return next;
 				}
 		
-				currBlock.close();
-				currBlock = null;
+				currLoader.close();
+				currLoader = null;
 			}
 		} catch (IOException io) {
 			LOGGER.warning(io.toString());
@@ -58,13 +59,13 @@ public class ZipNumStreamingBlockIterator extends AbstractPeekableIterator<Strin
 
 	@Override
 	public void close() throws IOException {
-		if (currBlock != null) {
-			currBlock.close();
-			currBlock = null;
+		if (currLoader != null) {
+			currLoader.close();
+			currLoader = null;
 		}
 		
 		if (blockItr != null) {
-			blockItr.close();
+			CloseableIteratorUtil.attemptClose(blockItr);
 			blockItr = null;
 		}
 	}

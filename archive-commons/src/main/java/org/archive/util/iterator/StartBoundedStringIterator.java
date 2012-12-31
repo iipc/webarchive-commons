@@ -38,7 +38,7 @@ public class StartBoundedStringIterator extends AbstractPeekableIterator<String>
 			if(cmp > 0) {
 //				System.out.format("Skipping: %s\n", tmp);
 			}
-			if(boundary.compareTo(tmp) <= 0) {
+			if (boundary.compareTo(tmp) <= 0) {
 				started = true;
 				return tmp;
 			}

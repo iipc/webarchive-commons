@@ -24,7 +24,7 @@ public class CDXFile extends SortedTextFile implements CDXInputSource {
 		super(factory);
 	}
 
-	public CloseableIterator<String> getLineIterator(String key, boolean exact) throws IOException {
+	public CloseableIterator<String> getCDXLineIterator(String key) throws IOException {
 		return getRecordIteratorLT(key);
 	}
 	

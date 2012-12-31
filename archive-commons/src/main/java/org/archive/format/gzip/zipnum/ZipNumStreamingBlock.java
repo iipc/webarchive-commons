@@ -43,14 +43,7 @@ public class ZipNumStreamingBlock {
 	{
 		if (reader != null) {
 			reader.close();
-		}
-	}
-	
-	public void closeIfLast() throws IOException
-	{
-		// Close only last block in loader
-		if (reader != null && (numInLoader == loader.numBlocks)) {
-			reader.close();
+			reader = null;
 		}
 	}
 }

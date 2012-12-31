@@ -1,8 +1,15 @@
 package org.archive.util.iterator;
 
-import java.io.IOException;
+import java.io.Closeable;
 import java.util.Iterator;
 
-public interface CloseableIterator<E> extends Iterator<E> {
-	public void close() throws IOException;
+/**
+ * Iterator with a close method that frees up any resources associated with 
+ * the Iterator.
+ *
+ * @author brad
+ * @version $Date$, $Revision$
+ * @param <E> 
+ */
+public interface CloseableIterator<E> extends Iterator<E>, Closeable {
 }

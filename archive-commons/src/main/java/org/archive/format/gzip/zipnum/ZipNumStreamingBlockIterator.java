@@ -1,12 +1,10 @@
 package org.archive.format.gzip.zipnum;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.archive.util.iterator.AbstractPeekableIterator;
+import org.archive.util.iterator.CloseableIterator;
 
 /**
  * @author brad, ilya
@@ -17,16 +15,16 @@ public class ZipNumStreamingBlockIterator extends AbstractPeekableIterator<Strin
 			ZipNumStreamingBlockIterator.class.getName());
 
 	private ZipNumStreamingBlock currBlock = null;
-	private Iterator<ZipNumStreamingBlock> blockItr = null;
+	private CloseableIterator<ZipNumStreamingBlock> blockItr = null;
 
 	/**
 	 * @param blocks which should be fetched and unzipped, one after another
 	 */
-	public ZipNumStreamingBlockIterator(List<ZipNumStreamingBlock> blocks) {
-		if (LOGGER.isLoggable(Level.INFO)) {
-			LOGGER.info("Iterating over " + blocks.size() + " blocks");
-		}
-		blockItr = blocks.iterator();
+	public ZipNumStreamingBlockIterator(CloseableIterator<ZipNumStreamingBlock> blockItr) {
+//		if (LOGGER.isLoggable(Level.INFO)) {
+//			LOGGER.info("Iterating over " + blocks.size() + " blocks");
+//		}
+		this.blockItr = blockItr;
 	}
 	
 	@Override
@@ -49,7 +47,7 @@ public class ZipNumStreamingBlockIterator extends AbstractPeekableIterator<Strin
 					return next;
 				}
 		
-				currBlock.closeIfLast();
+				currBlock.close();
 				currBlock = null;
 			}
 		} catch (IOException io) {
@@ -62,6 +60,12 @@ public class ZipNumStreamingBlockIterator extends AbstractPeekableIterator<Strin
 	public void close() throws IOException {
 		if (currBlock != null) {
 			currBlock.close();
+			currBlock = null;
+		}
+		
+		if (blockItr != null) {
+			blockItr.close();
+			blockItr = null;
 		}
 	}
 }

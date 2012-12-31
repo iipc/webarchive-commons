@@ -28,6 +28,13 @@ public class SortedTextFile {
 	throws IOException {
 		return getRecordIterator(prefix, false);
 	}
+	
+	public CloseableIterator<String> getRecordIterator(final long offset) throws IOException
+	{
+		SeekableLineReader slr = factory.get();
+		slr.seek(offset);
+		return new SeekableLineReaderIterator(slr);
+	}
 
 	public CloseableIterator<String> getRecordIterator(final String prefix, 
 			boolean lessThan) throws IOException {
@@ -89,7 +96,7 @@ public class SortedTextFile {
 	    }
 	    return new CachedStringIterator(slr, prev, line);
 	}
-
+	
 	public class CachedStringIterator implements CloseableIterator<String> {
 		private String first;
 		private String second;

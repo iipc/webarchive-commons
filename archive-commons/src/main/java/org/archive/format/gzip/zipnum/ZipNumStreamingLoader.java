@@ -7,10 +7,10 @@ import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.archive.io.GZIPMembersInputStream;
 import org.archive.streamcontext.Stream;
 import org.archive.streamcontext.StreamWrappedInputStream;
 import org.archive.util.GeneralURIStreamFactory;
-import org.archive.util.zip.OpenJDK7GZIPInputStream;
 
 public class ZipNumStreamingLoader {
 
@@ -93,10 +93,12 @@ public class ZipNumStreamingLoader {
 	
 	public BufferedReader getReader() throws IOException
 	{
+		final int BUFFER_SIZE = 8192;
+		
 		if (reader == null) {
 			InputStream nextStream = new StreamWrappedInputStream(getSourceStream());
-			nextStream = new OpenJDK7GZIPInputStream(nextStream);
-			reader = new BufferedReader(new InputStreamReader(nextStream));
+			nextStream = new GZIPMembersInputStream(nextStream, BUFFER_SIZE);
+			reader = new BufferedReader(new InputStreamReader(nextStream), BUFFER_SIZE);
 		}
 		
 		return reader;

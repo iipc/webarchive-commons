@@ -38,9 +38,9 @@ public class URLParserTest extends TestCase {
 		dumpParse("http://www.archive.org:8080/index.html?query#foo");
 		dumpParse("http://www.archive.org:8080/index.html?#foo");
 		dumpParse("http://www.archive.org:8080?#foo");
-		dumpParse("http://bücher.ch:8080?#foo");
+		dumpParse("http://b≈∏cher.ch:8080?#foo");
 		
-		dumpParse("dns:bücher.ch");
+		dumpParse("dns:b≈∏cher.ch");
 
 	}
 	

@@ -10,6 +10,7 @@ import org.archive.util.binsearch.SeekableLineReaderFactory;
 import org.archive.util.binsearch.SeekableLineReaderIterator;
 import org.archive.util.binsearch.SortedTextFile;
 import org.archive.util.iterator.AbstractPeekableIterator;
+import org.archive.util.iterator.BoundedStringIterator;
 import org.archive.util.iterator.CloseableIterator;
 import org.archive.util.iterator.StartBoundedStringIterator;
 
@@ -149,6 +150,11 @@ public class ZipNumCluster implements CDXInputSource {
 				summaryIterator = null;
 			}	
 		}
+	}
+	
+	public CloseableIterator<String> getClusterRange(String start, String end, boolean inclusive) throws IOException
+	{
+		return new BoundedStringIterator(summary.getRecordIteratorLT(start), end, inclusive);
 	}
 			
 	public CloseableIterator<String> getCDXLineIterator(String key) throws IOException {

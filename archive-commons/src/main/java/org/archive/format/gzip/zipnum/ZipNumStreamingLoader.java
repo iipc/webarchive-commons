@@ -4,9 +4,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.input.CountingInputStream;
 import org.archive.io.GZIPMembersInputStream;
 import org.archive.streamcontext.Stream;
 import org.archive.streamcontext.StreamWrappedInputStream;
@@ -20,6 +22,7 @@ public class ZipNumStreamingLoader {
 
 	protected Stream stream;
 	protected BufferedReader reader;
+	protected CountingInputStream countStream;
 	
 	protected long offset = 0;
 	//protected int count = 0;
@@ -37,8 +40,8 @@ public class ZipNumStreamingLoader {
 	public void close()
 	{		
 		try {
-			if (LOGGER.isLoggable(Level.INFO)) {
-				LOGGER.info("FINISHED " + toString());
+			if (LOGGER.isLoggable(Level.INFO) && (countStream != null)) {
+				LOGGER.info("FINISHED READ " + countStream.getByteCount() + " from " + toString());
 			}
 			if (stream != null) {
 				stream.close();
@@ -93,12 +96,18 @@ public class ZipNumStreamingLoader {
 	
 	public BufferedReader getReader() throws IOException
 	{
-		final int BUFFER_SIZE = 8192;
+		//Using default buff sizes for now
+		//final int BUFFER_SIZE = 4096;
 		
 		if (reader == null) {
 			InputStream nextStream = new StreamWrappedInputStream(getSourceStream());
-			nextStream = new GZIPMembersInputStream(nextStream, BUFFER_SIZE);
-			reader = new BufferedReader(new InputStreamReader(nextStream), BUFFER_SIZE);
+			
+			if (LOGGER.isLoggable(Level.INFO)) {
+				nextStream = countStream = new CountingInputStream(nextStream);
+			}
+			
+			nextStream = new GZIPMembersInputStream(nextStream);
+			reader = new BufferedReader(new InputStreamReader(nextStream));
 		}
 		
 		return reader;
@@ -106,7 +115,8 @@ public class ZipNumStreamingLoader {
 	
 	public String readLine() throws IOException
 	{
-		return getReader().readLine();
+		String line = getReader().readLine();
+		return line;
 	}
 	
 	@Override

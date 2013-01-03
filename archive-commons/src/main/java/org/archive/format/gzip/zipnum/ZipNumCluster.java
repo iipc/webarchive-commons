@@ -4,17 +4,16 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-import org.archive.format.cdx.CDXInputSource;
+import org.archive.format.cdx.CDXFile;
 import org.archive.util.GeneralURIStreamFactory;
 import org.archive.util.binsearch.SeekableLineReaderFactory;
 import org.archive.util.binsearch.SeekableLineReaderIterator;
-import org.archive.util.binsearch.SortedTextFile;
 import org.archive.util.iterator.AbstractPeekableIterator;
 import org.archive.util.iterator.BoundedStringIterator;
 import org.archive.util.iterator.CloseableIterator;
 import org.archive.util.iterator.StartBoundedStringIterator;
 
-public class ZipNumCluster implements CDXInputSource {
+public class ZipNumCluster extends CDXFile {
 	private final static Logger LOGGER = 
 		Logger.getLogger(ZipNumCluster.class.getName());
 
@@ -22,7 +21,7 @@ public class ZipNumCluster implements CDXInputSource {
 		
 	protected String summaryFile;
 	
-	protected SortedTextFile summary;
+	//protected SortedTextFile summary;
 	
 	protected HashMap<String, String[]> locMap = null;
 	
@@ -31,24 +30,26 @@ public class ZipNumCluster implements CDXInputSource {
 		this(clusterUri, "ALL.summary");
 	}
 	
+	protected static String getStreamFactoryUri(String clusterUri, String summaryFile)
+	{
+		if (summaryFile.startsWith("/")) {
+			return (summaryFile);
+		} else {
+			return (clusterUri + "/" + summaryFile);
+		}
+	}
+	
 	public ZipNumCluster(String clusterUri, String summaryFile) throws IOException {
+		
+		super(getStreamFactoryUri(clusterUri, summaryFile));
 		
 		this.clusterUri = clusterUri;
 		this.summaryFile = summaryFile;
-		
-		SeekableLineReaderFactory summaryFactory;
-		
-		if (summaryFile.startsWith("/")) {
-			summaryFactory = GeneralURIStreamFactory.createSeekableStreamFactory(summaryFile);
-		} else {
-			summaryFactory = GeneralURIStreamFactory.createSeekableStreamFactory(clusterUri + "/" + summaryFile);
-		}
-		
-		summary = new SortedTextFile(summaryFactory);
 	}
 	
 	public ZipNumCluster(String clusterUri, String summaryFile, String locUri) throws IOException {
 		this(clusterUri, summaryFile);
+		
 		loadPartLocations(locUri);
 	}
 	
@@ -154,14 +155,14 @@ public class ZipNumCluster implements CDXInputSource {
 	
 	public CloseableIterator<String> getClusterRange(String start, String end, boolean inclusive) throws IOException
 	{
-		return new BoundedStringIterator(summary.getRecordIteratorLT(start), end, inclusive);
+		return new BoundedStringIterator(super.getRecordIteratorLT(start), end, inclusive);
 	}
 			
 	public CloseableIterator<String> getCDXLineIterator(String key) throws IOException {
 			
 		//PrefixMatchStringIterator startIter = new PrefixMatchStringIterator(summary.getRecordIteratorLT(key), key, true);
 		
-		SummaryStreamingLoaderIterator blockIter = new SummaryStreamingLoaderIterator(summary.getRecordIteratorLT(key));
+		SummaryStreamingLoaderIterator blockIter = new SummaryStreamingLoaderIterator(super.getRecordIteratorLT(key));
 		
 		StreamingLoaderStringIterator zipIter = new StreamingLoaderStringIterator(blockIter);
 				

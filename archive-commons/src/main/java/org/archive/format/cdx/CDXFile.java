@@ -17,7 +17,7 @@ import org.archive.util.zip.OpenJDK7GZIPInputStream;
 public class CDXFile extends SortedTextFile implements CDXInputSource {
 
 	public CDXFile(String uri) throws IOException {
-		super(getUriFactory(uri));
+		super(getUriFactory(uri, false));
 	}
 
 	public CDXFile(SeekableLineReaderFactory factory) {
@@ -28,9 +28,9 @@ public class CDXFile extends SortedTextFile implements CDXInputSource {
 		return getRecordIteratorLT(key);
 	}
 	
-	public static SeekableLineReaderFactory getUriFactory(String uri) throws IOException
+	public static SeekableLineReaderFactory getUriFactory(String uri, boolean decodeToTemp) throws IOException
 	{
-		if (uri.endsWith(".gz")) {
+		if (decodeToTemp) {
 			return new RandomAccessFileSeekableLineReaderFactory(decodeGZToTemp(uri));
 		}
 		

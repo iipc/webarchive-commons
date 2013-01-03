@@ -40,10 +40,9 @@ public class SortedTextFile {
 			boolean lessThan) throws IOException {
 		return search(factory.get(),prefix,lessThan);
 	}
-
-	private CloseableIterator<String> search(SeekableLineReader slr,
-			final String key, boolean lessThan) throws IOException {
-
+	
+	protected long findOffset(SeekableLineReader slr, final String key) throws IOException
+	{
 		int blockSize = SeekableLineReaderFactory.BINSEARCH_BLOCK_SIZE;
 		long fileSize = slr.getSize();
 		long min = 0;
@@ -76,12 +75,114 @@ public class SortedTextFile {
 	    }
 	    // find the right line
 	    min = min * blockSize;
+	    return min;
+	}
+	
+//	public CloseableIterator<String> getNthSplit(long startOffset, long endOffset, int numSplits, int split)
+//	{
+//		SeekableLineReader slr = factory.get();
+//		long step = (endOffset - startOffset) / numSplits;
+//		
+//		long start = startOffset + (split * step);
+//		long end = start + step;
+//		
+//		return null;
+//	}
+	
+	public CloseableIterator<String> getSplitIterator(long startOffset, long endOffset, int numSplits) throws IOException
+	{
+		SeekableLineReader slr = factory.get();
+		long step = (endOffset - startOffset) / numSplits;
+		
+		return new StepSeekingIterator(slr, startOffset, endOffset, step);
+	}
+	
+	public CloseableIterator<String> getSplitIterator(String start, String end, int numSplits) throws IOException
+	{
+		SeekableLineReader slr = factory.get();
+		
+		long startOffset = 0;
+		
+		if (start != null) {
+			startOffset = findOffset(slr, start);	
+		}
+		
+		long endOffset = 0;
+		
+		if (end != null) {
+			endOffset = findOffset(slr, end);
+		} else {
+			endOffset = slr.getSize();
+		}
+		
+		long step = (endOffset - startOffset) / numSplits;
+		
+		return new StepSeekingIterator(slr, startOffset, endOffset, step);
+	}
+	
+	class StepSeekingIterator implements CloseableIterator<String>
+	{
+		long currOffset;
+		long step;
+		long endOffset;
+		SeekableLineReader slr;
+		
+		public StepSeekingIterator(SeekableLineReader slr, long startOffset, long endOffset, long step) throws IOException
+		{
+			this.slr = slr;
+			this.currOffset = startOffset;
+			this.step = step;
+			this.endOffset = endOffset;
+			
+			slr.seek(currOffset);
+		}
+
+		public boolean hasNext() {
+			return (currOffset + 128) < endOffset;
+		}
+
+		public String next() {
+			
+			String line = null;
+			
+			try {				
+				if (currOffset > 0) {
+					slr.readLine();
+				}
+				
+				line = slr.readLine();
+				
+				currOffset += step;
+				slr.seek(currOffset);
+				
+			} catch (IOException io) {
+				io.printStackTrace();
+			}
+			
+			return line;
+		}
+
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+
+		public void close() throws IOException {
+			slr.close();
+		}
+	}
+
+	private CloseableIterator<String> search(SeekableLineReader slr,
+			final String key, boolean lessThan) throws IOException {
+
+		long min = findOffset(slr, key);
 
 		if(LOGGER.isLoggable(Level.FINE)) {
 			LOGGER.fine(String.format("Aligning(%d)",min));
 		}
 
 	    slr.seek(min);
+	    
+	    String line;
 	    
 	    if(min > 0) line = slr.readLine();
 	    String prev = null;

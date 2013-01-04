@@ -157,8 +157,17 @@ public class ZipNumCluster extends CDXFile {
 	{
 		return new BoundedStringIterator(super.getRecordIteratorLT(start), end, inclusive);
 	}
-			
+	
 	public CloseableIterator<String> getCDXLineIterator(String key) throws IOException {
+		return getCDXLineIterator(key, key);
+	}
+	
+	public CloseableIterator<String> getLastBlockCDXLineIterator(String key) throws IOException {
+		// the next line after last key<space> is key! so this will return last key<space> block
+		return getCDXLineIterator(key + "!", key);
+	}
+			
+	public CloseableIterator<String> getCDXLineIterator(String key, String prefix) throws IOException {
 			
 		//PrefixMatchStringIterator startIter = new PrefixMatchStringIterator(summary.getRecordIteratorLT(key), key, true);
 		
@@ -166,7 +175,7 @@ public class ZipNumCluster extends CDXFile {
 		
 		StreamingLoaderStringIterator zipIter = new StreamingLoaderStringIterator(blockIter);
 				
-		return new StartBoundedStringIterator(zipIter, key);
+		return new StartBoundedStringIterator(zipIter, prefix);
 	}
 		
 	public String getClusterUri() {

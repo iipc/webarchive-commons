@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  * 
  * @author gojomo
  */
-public class LineReadingIterator extends LookaheadIterator<String> {
+public class LineReadingIterator extends LookaheadIterator<String> implements CloseableIterator<String> {
     private static final Logger logger =
         Logger.getLogger(LineReadingIterator.class.getName());
 
@@ -56,4 +56,10 @@ public class LineReadingIterator extends LookaheadIterator<String> {
             return false;
         }
     }
+
+	public void close() throws IOException {
+		if (reader != null) {
+			reader.close();
+		}
+	}
 }

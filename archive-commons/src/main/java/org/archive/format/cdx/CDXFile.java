@@ -1,9 +1,11 @@
 package org.archive.format.cdx;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.archive.streamcontext.Stream;
 import org.archive.streamcontext.StreamWrappedInputStream;
@@ -68,5 +70,21 @@ public class CDXFile extends SortedTextFile implements CDXInputSource {
 				stream.close();
 			}
 		}
+	}
+	
+	public static BufferedReader createStreamingLineReader(String uri, boolean gzipped) throws IOException
+	{
+		Stream stream = GeneralURIStreamFactory.createStream(uri);
+		StreamWrappedInputStream swis = new StreamWrappedInputStream(stream);
+		swis.setCloseOnClose(true);
+		
+		InputStream input = swis;
+		
+		if (gzipped) {
+			input = new OpenJDK7GZIPInputStream(swis);	
+		}
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+		return reader;
 	}
 }

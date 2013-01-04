@@ -4,15 +4,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.input.CountingInputStream;
-import org.archive.io.GZIPMembersInputStream;
 import org.archive.streamcontext.Stream;
 import org.archive.streamcontext.StreamWrappedInputStream;
 import org.archive.util.GeneralURIStreamFactory;
+import org.archive.util.zip.GZIPMembersInputStream;
 
 public class ZipNumStreamingLoader {
 

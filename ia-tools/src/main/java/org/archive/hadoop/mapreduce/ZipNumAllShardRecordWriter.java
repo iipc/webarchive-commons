@@ -27,10 +27,10 @@ public class ZipNumAllShardRecordWriter  extends RecordWriter<Text, Text>{
     private ByteArrayOutputStream gzBuffer;
     public static int DEFAULT_MAX_GZ_BUFFER = 1024 * 1024 * 2;
     public static int DEFAULT_MAX_BUFFER = 1024 * 1024 * 10;
-    public static int DEFAULT_DELIM = 32;
+    public static char DEFAULT_DELIM = ' ';
     
     public static int newline = 10;
-    public int delim = DEFAULT_DELIM;
+    public char delim = DEFAULT_DELIM;
     private final static Charset UTF8 = Charset.forName("utf-8");
     
     protected String partName;
@@ -157,7 +157,7 @@ public class ZipNumAllShardRecordWriter  extends RecordWriter<Text, Text>{
 	/**
 	 * @param delim the delim to set
 	 */
-	public void setDelim(int delim) {
+	public void setDelim(char delim) {
 		this.delim = delim;
 	}
 

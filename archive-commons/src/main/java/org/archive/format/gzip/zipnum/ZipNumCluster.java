@@ -193,7 +193,7 @@ public class ZipNumCluster extends CDXFile {
 			lastParts = parts;
 			parts = block.split("\t");
 			
-			if (lastParts != null) {
+			if ((lastParts != null) && (parts.length >= 3) && (lastParts.length >= 3)) {
 				// If same shard, simply subtract
 				long newOffset = Long.parseLong(parts[2]);
 				

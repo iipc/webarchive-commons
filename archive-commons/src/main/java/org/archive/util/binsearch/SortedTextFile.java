@@ -172,7 +172,7 @@ public class SortedTextFile {
 			String line = null;
 			
 			try {				
-				if (startOffset > 0) {
+				if (startOffset + currSplit != 0) {
 					slr.readLine();
 				}
 				

@@ -29,12 +29,14 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.CompressionCodecFactory;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.input.LineRecordReader;
-import org.archive.util.io.MultiMemberOpenJDKGZIPInputStream;
 
 /**
  * RecordReader which reads pointers to actual files from an internal 
@@ -58,6 +60,7 @@ public class LineDereferencingRecordReader extends RecordReader<Text, Text>{
 	long curLine = 0;
 	float progress = 0.0f;
 	boolean forceCompressed = false;
+	CompressionCodec codec;
 	public static void forceCompressed(Configuration conf) {
 		conf.setBoolean(FORCE_COMPRESSED_FLAG, true);
 	}
@@ -65,11 +68,15 @@ public class LineDereferencingRecordReader extends RecordReader<Text, Text>{
 	@Override
 	public void initialize(InputSplit split, TaskAttemptContext context)
 			throws IOException, InterruptedException {
-		Configuration conf = context.getConfiguration();
+		Configuration conf = context.getConfiguration();		
 		forceCompressed = conf.getBoolean(FORCE_COMPRESSED_FLAG, false);
+		
+		CompressionCodecFactory ccf = new CompressionCodecFactory(conf);
+		codec = ccf.getCodecByClassName(GzipCodec.class.getName());
+		
 		FileSplit fileSplit = (FileSplit) split;
 		fileSystem = fileSplit.getPath().getFileSystem(conf);
-		internal.initialize(split, context);
+		internal.initialize(split, context);		
 	}
 
 	@Override
@@ -88,11 +95,11 @@ public class LineDereferencingRecordReader extends RecordReader<Text, Text>{
 					curFile = internal.getCurrentValue().toString();
 					Path path = new Path(curFile);
 					InputStream is = fileSystem.open(path);
-					// TODO: use the real Codec stuff..
 					if(forceCompressed || curFile.endsWith(".gz")) {
 //						is = new MultiMemberGZIPInputStream(is);
-						is = new MultiMemberOpenJDKGZIPInputStream(is);
-						
+//						is = new MultiMemberOpenJDKGZIPInputStream(is);
+//						is = new GZIPInputStream(is);					
+						is = codec.createInputStream(is);		
 					}
 					curReader = new BufferedReader(new InputStreamReader(is,UTF8));
 					

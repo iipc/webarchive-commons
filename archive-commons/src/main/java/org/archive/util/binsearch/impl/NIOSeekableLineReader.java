@@ -8,6 +8,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 import org.archive.util.binsearch.SeekableLineReader;
+import org.archive.util.zip.GZIPMembersInputStream;
+
+import com.google.common.io.LimitInputStream;
 
 public class NIOSeekableLineReader implements SeekableLineReader {
 	private FileChannel fc;
@@ -30,6 +33,22 @@ public class NIOSeekableLineReader implements SeekableLineReader {
 		fcis = new FileChannelInputStream(fc, offset);
     	isr = new InputStreamReader(fcis, UTF8);
     	br = new BufferedReader(isr, blockSize);
+	}
+	
+	public void seekWithMaxRead(long offset, boolean gzip, int maxLength) throws IOException {
+		fcis = new FileChannelInputStream(fc, offset);
+    	
+    	InputStream is = new LimitInputStream(fcis, maxLength);
+    	if (gzip) {
+    		is = new GZIPMembersInputStream(is, blockSize);
+    	}    	
+    	isr = new InputStreamReader(is, UTF8);
+    	br = new BufferedReader(isr, blockSize);
+    }
+	
+	public long getOffset() throws IOException
+	{
+		return fcis.fcOffset;
 	}
 
 	public String readLine() throws IOException {

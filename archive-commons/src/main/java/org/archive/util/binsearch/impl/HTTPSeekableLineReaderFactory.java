@@ -1,7 +1,6 @@
 package org.archive.util.binsearch.impl;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
@@ -27,11 +26,7 @@ public class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory 
     }
 
 	public SeekableLineReader get() throws IOException {
-		try {
-			return new HTTPSeekableLineReader(http, uriString);
-		} catch (URISyntaxException e) {
-			throw new IOException(e);
-		}
+		return new HTTPSeekableLineReader(http, uriString);
 	}
     /**
      * @param hostPort to proxy requests through - ex. "localhost:3128"

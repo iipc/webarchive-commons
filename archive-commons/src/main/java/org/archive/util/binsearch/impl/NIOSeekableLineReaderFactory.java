@@ -31,5 +31,4 @@ public class NIOSeekableLineReaderFactory implements SeekableLineReaderFactory {
 	public SeekableLineReader get() throws IOException {
 		return new NIOSeekableLineReader(fc, blockSize);
 	}
-
 }

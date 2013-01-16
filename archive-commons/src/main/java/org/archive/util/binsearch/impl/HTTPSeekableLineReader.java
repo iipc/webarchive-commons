@@ -2,6 +2,7 @@ package org.archive.util.binsearch.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 
@@ -12,20 +13,20 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
 import org.archive.util.binsearch.SeekableLineReader;
+import org.archive.util.zip.GZIPMembersInputStream;
 
 public class HTTPSeekableLineReader implements SeekableLineReader {
 	private final static String CONTENT_LENGTH = "Content-Length";
 	private int blockSize = 128 * 1024;
 	private HttpClient http;
 	private String url;
-	private long length;
+	private long length = -1;
 	private BufferedReader br;
 	private InputStreamReader isr;
 	private HttpMethod activeMethod;
-	public HTTPSeekableLineReader(HttpClient http, String url) throws HttpException, URISyntaxException, IOException {
+	public HTTPSeekableLineReader(HttpClient http, String url) {
 		this.http = http;
 		this.url = url;
-		acquireLength();
 	}
 	
 	private void acquireLength() throws URISyntaxException, HttpException, IOException {
@@ -61,12 +62,37 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
     	isr = new InputStreamReader(activeMethod.getResponseBodyAsStream(), UTF8);
     	br = new BufferedReader(isr, blockSize);
 	}
+	
+	public void seekWithMaxRead(long offset, boolean gzip, int maxLength) throws IOException {
+		if(activeMethod != null) {
+			activeMethod.abort();
+			activeMethod.releaseConnection();
+		}
+		activeMethod = new GetMethod(url);
+		activeMethod.setRequestHeader("Range", 
+				String.format("bytes=%d-%d", offset, maxLength));
+		int code = http.executeMethod(activeMethod);
+		if((code != 206) && (code != 200)) {
+			throw new IOException("Non 200/6 response code for " + url + ":" + offset);
+		}
+		InputStream is = activeMethod.getResponseBodyAsStream();
+    	if (gzip) {
+    		is = new GZIPMembersInputStream(is, blockSize);
+    	}   
+    	isr = new InputStreamReader(is, UTF8);
+    	br = new BufferedReader(isr, blockSize);
+    }
 
 	public String readLine() throws IOException {
 		if(br == null) {
 			seek(0);
 		}
 		return br.readLine();
+	}
+	
+	public long getOffset() throws IOException {
+		//Unsupported for now
+		return -1;
 	}
 
 	public void close() throws IOException {
@@ -83,6 +109,13 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 	}
 
 	public long getSize() throws IOException {
+		if (length < 0) {
+			try {
+				acquireLength();
+			} catch (URISyntaxException e) {
+				throw new IOException(e);
+			}
+		}
 		return length;
 	}
 

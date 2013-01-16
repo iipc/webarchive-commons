@@ -48,7 +48,7 @@ public class StreamingLoaderStringIterator extends AbstractPeekableIterator<Stri
 					return next;
 				}
 		
-				currLoader.close();
+				//currLoader.close();
 				currLoader = null;
 			}
 		} catch (IOException io) {

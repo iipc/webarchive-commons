@@ -2,10 +2,14 @@ package org.archive.util.binsearch.impl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.archive.util.binsearch.SeekableLineReader;
+import org.archive.util.zip.GZIPMembersInputStream;
+
+import com.google.common.io.LimitInputStream;
 
 public class HDFSSeekableLineReader implements SeekableLineReader {
 	private FSDataInputStream fsdis;
@@ -28,12 +32,27 @@ public class HDFSSeekableLineReader implements SeekableLineReader {
     	isr = new InputStreamReader(fsdis, UTF8);
     	br = new BufferedReader(isr, blockSize);
 	}
+	
+	public void seekWithMaxRead(long offset, boolean gzip, int maxLength) throws IOException {
+		fsdis.seek(offset);
+		
+		InputStream is = new LimitInputStream(fsdis, maxLength);
+    	if (gzip) {
+    		is = new GZIPMembersInputStream(is, blockSize);
+    	}    	
+    	isr = new InputStreamReader(is, UTF8);
+    	br = new BufferedReader(isr, blockSize);
+    }
 
 	public String readLine() throws IOException {
 		if(br == null) {
 			seek(0);
 		}
 		return br.readLine();
+	}
+	
+	public long getOffset() throws IOException {
+		return fsdis.getPos();
 	}
 
 	public void close() throws IOException {

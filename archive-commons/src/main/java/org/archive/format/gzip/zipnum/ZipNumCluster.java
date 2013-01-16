@@ -87,27 +87,37 @@ public class ZipNumCluster extends CDXFile {
 	class SummaryStreamingLoaderIterator extends AbstractPeekableIterator<ZipNumStreamingLoader>
 	{
 		protected CloseableIterator<String> summaryIterator;
-		protected String lastPartId = null;
+		
+		protected ZipNumStreamingLoader currLoader = null;
+		
+		protected String currLine;
+		protected String nextLine;
+		protected boolean isFirst = true;
 						
 		SummaryStreamingLoaderIterator(CloseableIterator<String> summaryIterator)
 		{
 			this.summaryIterator = summaryIterator;
+			this.isFirst = true;
 		}
 
 		@Override
 		public ZipNumStreamingLoader getNextInner() {
+						
+			if (summaryIterator.hasNext()) {
+				nextLine = summaryIterator.next();
+			}
 			
-			while (summaryIterator.hasNext()) {
+			while (nextLine != null) {
 				
-//				if (LOGGER.isLoggable(Level.INFO)) {
-//					if ((currLoader != null) && (numBlocks > 0) && (numBlocks % 10) == 0) {
-//						LOGGER.info("So far, read " + currLoader.toString());
-//					}
-//				}
+				currLine = nextLine;
 				
-//				numBlocks++;
+				if (summaryIterator.hasNext()) {
+					nextLine = summaryIterator.next();
+				} else {
+					nextLine = null;
+				}
 				
-				String blockDescriptor = summaryIterator.next();
+				String blockDescriptor = currLine;
 				
 				String parts[] = blockDescriptor.split("\t");
 			
@@ -118,26 +128,41 @@ public class ZipNumCluster extends CDXFile {
 				}
 				
 				String partId = parts[1];
+
+				String locations[] = null;
 				
-				if ((lastPartId == null) || !lastPartId.equals(partId)) {
-					
-					lastPartId = partId;
-					
-					String locations[] = null;
-					
-					if (locMap != null) {
-						locations = locMap.get(partId);
-						if (locations == null) {
-							LOGGER.severe("No locations for block(" + partId +")");
-						}
-					} else {
-						partId = clusterUri + "/" + partId + ".gz";
+				if (locMap != null) {
+					locations = locMap.get(partId);
+					if (locations == null) {
+						LOGGER.severe("No locations for block(" + partId +")");
+					}
+				} else {
+					partId = clusterUri + "/" + partId + ".gz";
+				}
+				
+				long offset = Long.parseLong(parts[2]);
+				int length = Integer.parseInt(parts[3]);
+				
+				if ((currLoader == null) || !currLoader.isSameBlock(offset, partId)) {
+					if (currLoader != null) {
+						currLoader.close();
 					}
 					
-					long offset = Long.parseLong(parts[2]);
+					currLoader = new ZipNumStreamingLoader(offset, length, partId, locations);
 					
-					return new ZipNumStreamingLoader(offset, partId, locations);
+					if (isFirst) {
+						currLoader.setIsFirst(true);
+						isFirst = false;
+					}
+				} else {
+					currLoader.addBlock(length);
 				}
+				
+				if (nextLine == null) {
+					currLoader.setIsLast(true);
+				}
+				
+				return currLoader;
 			}
 			
 			return null;
@@ -149,13 +174,68 @@ public class ZipNumCluster extends CDXFile {
 			if (summaryIterator != null) {
 				summaryIterator.close();
 				summaryIterator = null;
-			}	
+			}
+			
+			if (currLoader != null) {
+				currLoader.close();
+				currLoader = null;
+			}
 		}
 	}
 	
-	public CloseableIterator<String> getClusterRange(String start, String end, boolean inclusive) throws IOException
+	public long getEstimateSplitSize(String[] blocks)
 	{
-		return new BoundedStringIterator(super.getRecordIteratorLT(start), end, inclusive);
+		String parts[] = null, lastParts[] = null;
+		
+		long totalSize = 0;
+		
+		for (String block : blocks) {
+			lastParts = parts;
+			parts = block.split("\t");
+			
+			if (lastParts != null) {
+				// If same shard, simply subtract
+				long newOffset = Long.parseLong(parts[2]);
+				
+				if (parts[1].equals(lastParts[1])) {
+					long lastOffset = Long.parseLong(lastParts[2]);
+					totalSize += (newOffset - lastOffset);
+				} else {
+					totalSize += newOffset;
+					//TODO: Compute size of all in between shards
+					//computeBlockSizeDiff();
+				}
+			}
+		}
+		
+		return totalSize;
+	}
+	
+	public CloseableIterator<String> getClusterRange(String start, String end, boolean inclusive, boolean includePrevLine) throws IOException
+	{
+		CloseableIterator<String> iter = null;
+		iter = super.getRecordIterator(start, includePrevLine);
+		return wrapEndIterator(iter, end, inclusive);
+		//return wrapStartEndIterator(iter, start, end, inclusive);
+	}
+	
+	public CloseableIterator<String> wrapStartEndIterator(CloseableIterator<String> iter, String start, String end, boolean inclusive)
+	{
+		return wrapEndIterator(wrapStartIterator(iter, start), end, inclusive);
+	}
+	
+	public CloseableIterator<String> wrapStartIterator(CloseableIterator<String> iter, String start)
+	{
+		return new StartBoundedStringIterator(iter, start);
+	}
+	
+	public CloseableIterator<String> wrapEndIterator(CloseableIterator<String> iter, String end, boolean inclusive)
+	{		
+		if (end.isEmpty()) {
+			return iter;
+		} else {
+			return new BoundedStringIterator(iter, end, inclusive);	
+		}
 	}
 	
 	public CloseableIterator<String> getCDXLineIterator(String key) throws IOException {
@@ -176,6 +256,13 @@ public class ZipNumCluster extends CDXFile {
 		StreamingLoaderStringIterator zipIter = new StreamingLoaderStringIterator(blockIter);
 				
 		return new StartBoundedStringIterator(zipIter, prefix);
+	}
+	
+	public CloseableIterator<String> getCDXIterator(CloseableIterator<String> summaryIterator)
+	{
+		SummaryStreamingLoaderIterator blockIter = new SummaryStreamingLoaderIterator(summaryIterator);
+		StreamingLoaderStringIterator zipIter = new StreamingLoaderStringIterator(blockIter);
+		return zipIter;
 	}
 		
 	public String getClusterUri() {

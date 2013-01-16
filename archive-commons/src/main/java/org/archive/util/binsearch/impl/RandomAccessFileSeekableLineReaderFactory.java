@@ -22,4 +22,7 @@ public class RandomAccessFileSeekableLineReaderFactory implements SeekableLineRe
 		return new RandomAccessFileSeekableLineReader(new RandomAccessFile(file, "r"),
 				blockSize);
 	}
+	public void close() throws IOException {
+
+	}
 }

@@ -25,7 +25,7 @@ public class BoundedStringIterator extends AbstractPeekableIterator<String>
 		String tmp = null;
 		if(inner.hasNext()) {
 			tmp = inner.next();
-			if(tmp.compareTo(boundary) > 0 && (!inclusive || !tmp.startsWith(boundary))) {
+			if(tmp.compareTo(boundary) >= 0 && (!inclusive || !tmp.startsWith(boundary))) {
 				tmp = null;
 				try {
 					close();

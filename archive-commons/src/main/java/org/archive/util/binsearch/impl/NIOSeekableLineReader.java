@@ -59,7 +59,10 @@ public class NIOSeekableLineReader implements SeekableLineReader {
 	}
 
 	public void close() throws IOException {
-		// NO-OP
+		if (br != null) {
+			br.close();
+			br = null;
+		}
 	}
 
 	public long getSize() throws IOException {

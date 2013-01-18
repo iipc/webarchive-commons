@@ -78,12 +78,13 @@ public class SortedTextFile {
 	    return min;
 	}
 	
-	protected long[] getStartEndOffsets(SeekableLineReader slr, String start, String end, int numSplits) throws IOException
+	protected long[] getStartEndOffsets(SeekableLineReader slr, String start, String end) throws IOException
 	{
 		long endOffset = 0;
 		
 		if ((end != null) && !end.isEmpty()) {
-			endOffset = this.findOffset(slr, end);
+			//endOffset = this.findOffset(slr, end);
+			endOffset = this.searchOffset(slr, end, false);
 		} else {
 			endOffset = slr.getSize();
 		}
@@ -108,37 +109,47 @@ public class SortedTextFile {
 	{
 		SeekableLineReader slr = factory.get();
 		
-		long[] offsets = getStartEndOffsets(slr, start, end, numSplits);
+		long[] offsets = getStartEndOffsets(slr, start, end);
 		
 		return new StepSeekingIterator(slr, offsets[0], offsets[1], numSplits);
 	}
 	
 	public String[] getNthSplit(String start, String end, int split, int numSplits) throws IOException
 	{
-		SeekableLineReader slr = factory.get();
-		
-		long[] offsets = getStartEndOffsets(slr, start, end, numSplits);
-		long startOffset = offsets[0];
-		long diff = offsets[1] - offsets[0];
-			
-		long seekDiff = (diff * split) / numSplits;
-		
-		slr.seek(startOffset + seekDiff);
-		
-		if ((startOffset + seekDiff) > 0) {
-			slr.readLine();
-		}
-		
-		String startLine = slr.readLine();
+		SeekableLineReader slr = null;
+		String startLine = null;
 		String endLine = null;
 		
-		if (split < (numSplits - 1)) {
-			seekDiff = (diff * (split + 1)) / numSplits;
+		try {
+			slr = factory.get();
+			
+			long[] offsets = getStartEndOffsets(slr, start, end);
+			long startOffset = offsets[0];
+			long diff = offsets[1] - offsets[0];
+				
+			long seekDiff = (diff * split) / numSplits;
+			
 			slr.seek(startOffset + seekDiff);
-			slr.readLine();
-			endLine = slr.readLine();
-		} else {
-			endLine = end;
+			
+			if ((startOffset + seekDiff) > 0) {
+				slr.readLine();
+			}
+			
+			startLine = slr.readLine();
+			endLine = null;
+			
+			if (split <= (numSplits - 1)) {
+				seekDiff = (diff * (split + 1)) / numSplits;
+				slr.seek(startOffset + seekDiff);
+				slr.readLine();
+				endLine = slr.readLine();
+			} else {
+				endLine = end;
+			}
+		} finally {
+			if (slr != null) {
+				slr.close();
+			}
 		}
 		
 		return new String[]{startLine, endLine};

@@ -6,7 +6,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.logging.Logger;
 
-import org.apache.commons.io.input.CountingInputStream;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Counter;
@@ -28,7 +27,7 @@ public class HttpInputLineRecordReader extends RecordReader<LongWritable, Text> 
 	protected int linesRead = 0;
 	protected long maxLines = 0;
 	
-	protected long maxSizeEstimate = 0;
+	protected long totalLines = 0;
 		
 	protected PigStatusReporter reporter;
 	protected Counter counter;
@@ -37,7 +36,7 @@ public class HttpInputLineRecordReader extends RecordReader<LongWritable, Text> 
 	protected HttpURLConnection conn;
 	
 	protected LineReader reader;
-	protected CountingInputStream cis;
+	//protected CountingInputStream cis;
 	
 	enum StreamReaderCounters
 	{
@@ -91,6 +90,7 @@ public class HttpInputLineRecordReader extends RecordReader<LongWritable, Text> 
 		}
 		
 		long bytesRead = reader.readLine(value);
+		
 		if (bytesRead <= 0) {
 			return false;
 		}
@@ -107,14 +107,16 @@ public class HttpInputLineRecordReader extends RecordReader<LongWritable, Text> 
 //		}
 				
 		linesRead++;
+		
 		key.set(key.get() + bytesRead);
+		
 		return true;
 	}
 
 	@Override
 	public float getProgress() throws IOException, InterruptedException {
-		if (maxSizeEstimate > 0) {
-			return (float)cis.getByteCount() / (float)maxSizeEstimate;
+		if (totalLines > 0) {
+			return (float)linesRead / (float)totalLines;
 		}
 		
 		return 0;
@@ -133,11 +135,11 @@ public class HttpInputLineRecordReader extends RecordReader<LongWritable, Text> 
 		conn = (HttpURLConnection)url.openConnection();
 		conn.connect();
 				
-		String clusterSizeEstimate = conn.getHeaderField("X-Cluster-Size");
+		String linesEstimate = conn.getHeaderField("X-Cluster-Num-Lines");
 		
-		if (clusterSizeEstimate != null) {
+		if (linesEstimate != null) {
 			try {
-				maxSizeEstimate = Integer.parseInt(clusterSizeEstimate);
+				totalLines = Integer.parseInt(linesEstimate);
 			} catch (NumberFormatException n) {
 				
 			}
@@ -145,13 +147,12 @@ public class HttpInputLineRecordReader extends RecordReader<LongWritable, Text> 
 		
 		InputStream is = conn.getInputStream();
 		
-		is = cis = new CountingInputStream(is);
+		//is = cis = new CountingInputStream(is);
 		
 		if (urlString.contains("&output=gzip")) {
 			is = new OpenJDK7GZIPInputStream(is);
 		}
 		
 		reader = new LineReader(is);
-		//maxLines = (split != null ? split.getLength() : 0);
 	}
 }

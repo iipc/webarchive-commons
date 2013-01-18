@@ -46,7 +46,12 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 			throw new IOException("Bad Content-Length value " +url+ ": " + val);
 		}
 	}
-
+	
+	public String getUrl()
+	{
+		return url;
+	}
+	
 	public void seek(long offset) throws IOException {
 		if(activeMethod != null) {
 			activeMethod.abort();
@@ -64,11 +69,15 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 	}
 	
 	public void seekWithMaxRead(long offset, boolean gzip, int maxLength) throws IOException {
-		if(activeMethod != null) {
-			activeMethod.abort();
-			activeMethod.releaseConnection();
+//		if (activeMethod != null) {
+//			activeMethod.abort();
+//			activeMethod.releaseConnection();
+//		}
+		
+		if (activeMethod == null) {
+			activeMethod = new GetMethod(url);
 		}
-		activeMethod = new GetMethod(url);
+		
 		activeMethod.setRequestHeader("Range", 
 				String.format("bytes=%d-%d", offset, maxLength));
 		int code = http.executeMethod(activeMethod);

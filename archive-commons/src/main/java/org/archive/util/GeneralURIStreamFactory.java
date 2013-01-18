@@ -10,6 +10,9 @@ import java.util.logging.Logger;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.archive.format.gzip.zipnum.blockloader.BlockLoader;
+import org.archive.format.gzip.zipnum.blockloader.FileSystemBlockLoader;
+import org.archive.format.gzip.zipnum.blockloader.HttpBlockLoader;
 import org.archive.streamcontext.HDFSStream;
 import org.archive.streamcontext.HTTP11Stream;
 import org.archive.streamcontext.RandomAccessFileStream;
@@ -18,6 +21,7 @@ import org.archive.util.binsearch.SeekableLineReaderFactory;
 import org.archive.util.binsearch.impl.HDFSSeekableLineReaderFactory;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReaderFactory;
 import org.archive.util.binsearch.impl.NIOSeekableLineReaderFactory;
+import org.archive.util.binsearch.impl.RandomAccessFileSeekableLineReaderFactory;
 
 public class GeneralURIStreamFactory {
 	
@@ -93,15 +97,25 @@ public class GeneralURIStreamFactory {
 		}
 	}
 	
-	public static SeekableLineReaderFactory createSeekableStreamFactory(String uri) throws IOException
+	public static SeekableLineReaderFactory createSeekableStreamFactory(String uri, boolean useNio) throws IOException
 	{
 		if (isHttp(uri)) {
 			return new HTTPSeekableLineReaderFactory(uri);
 		} else if (isHdfs(uri)) {
 			return new HDFSSeekableLineReaderFactory(initHdfs(), new Path(uri));			
-		} else {
+		} else if (useNio) {
 			return new NIOSeekableLineReaderFactory(new File(uri));
-			//return new RandomAccessFileSeekableLineReaderFactory(new File(uri));
+		} else {
+			return new RandomAccessFileSeekableLineReaderFactory(new File(uri));
+		}
+	}
+	
+	public static BlockLoader createBlockLoader(String uri, boolean useNio) throws IOException
+	{
+		if (isHttp(uri)) {
+			return new HttpBlockLoader();
+		} else {
+			return new FileSystemBlockLoader(useNio);
 		}
 	}
 }

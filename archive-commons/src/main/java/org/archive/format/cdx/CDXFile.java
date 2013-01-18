@@ -26,7 +26,7 @@ public class CDXFile extends SortedTextFile implements CDXInputSource {
 		super(factory);
 	}
 
-	public CloseableIterator<String> getCDXLineIterator(String key) throws IOException {
+	public CloseableIterator<String> getCDXLineIterator(String key, String prefix) throws IOException {
 		return getRecordIteratorLT(key);
 	}
 	
@@ -36,7 +36,7 @@ public class CDXFile extends SortedTextFile implements CDXInputSource {
 			return new RandomAccessFileSeekableLineReaderFactory(decodeGZToTemp(uri));
 		}
 		
-		return GeneralURIStreamFactory.createSeekableStreamFactory(uri);
+		return GeneralURIStreamFactory.createSeekableStreamFactory(uri, false);
 	}
 	
 	// Decode gzipped cdx to a temporary file	

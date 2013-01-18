@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
+import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.iterator.AbstractPeekableIterator;
 import org.archive.util.iterator.CloseableIteratorUtil;
 
@@ -11,17 +12,17 @@ import org.archive.util.iterator.CloseableIteratorUtil;
  * @author brad, ilya
  *
  */
-public class StreamingLoaderStringIterator extends AbstractPeekableIterator<String> {
+public class MultiBlockIterator extends AbstractPeekableIterator<String> {
 	private static final Logger LOGGER = Logger.getLogger(
-			StreamingLoaderStringIterator.class.getName());
+			MultiBlockIterator.class.getName());
 
-	private ZipNumStreamingLoader currLoader = null;
-	private Iterator<ZipNumStreamingLoader> blockItr = null;
+	private SeekableLineReader currLoader = null;
+	private Iterator<SeekableLineReader> blockItr = null;
 
 	/**
 	 * @param blocks which should be fetched and unzipped, one after another
 	 */
-	public StreamingLoaderStringIterator(Iterator<ZipNumStreamingLoader> blockItr) {
+	public MultiBlockIterator(Iterator<SeekableLineReader> blockItr) {
 //		if (LOGGER.isLoggable(Level.INFO)) {
 //			LOGGER.info("Iterating over " + blocks.size() + " blocks");
 //		}

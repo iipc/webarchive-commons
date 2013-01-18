@@ -6,5 +6,5 @@ import org.archive.util.iterator.CloseableIterator;
 
 public interface CDXInputSource {
 	
-	public CloseableIterator<String> getCDXLineIterator(String key) throws IOException;
+	public CloseableIterator<String> getCDXLineIterator(String key, String prefix) throws IOException;
 }

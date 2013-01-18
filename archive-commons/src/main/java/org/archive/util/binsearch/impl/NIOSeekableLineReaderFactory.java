@@ -31,4 +31,10 @@ public class NIOSeekableLineReaderFactory implements SeekableLineReaderFactory {
 	public SeekableLineReader get() throws IOException {
 		return new NIOSeekableLineReader(fc, blockSize);
 	}
+	public void close() throws IOException
+	{
+		if (fc != null) {
+			fc.close();
+		}
+	}
 }

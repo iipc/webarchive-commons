@@ -5,31 +5,40 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.archive.format.cdx.CDXFile;
+import org.archive.format.gzip.zipnum.blockloader.BlockLoader;
 import org.archive.util.GeneralURIStreamFactory;
+import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.binsearch.SeekableLineReaderFactory;
 import org.archive.util.binsearch.SeekableLineReaderIterator;
-import org.archive.util.iterator.AbstractPeekableIterator;
 import org.archive.util.iterator.BoundedStringIterator;
 import org.archive.util.iterator.CloseableIterator;
 import org.archive.util.iterator.StartBoundedStringIterator;
 
 public class ZipNumCluster extends CDXFile {
-	private final static Logger LOGGER = 
+	final static Logger LOGGER = 
 		Logger.getLogger(ZipNumCluster.class.getName());
 
 	protected String clusterUri;
 		
 	protected String summaryFile;
 	
-	//protected SortedTextFile summary;
+	protected BlockLoader blockLoader;
 	
 	protected HashMap<String, String[]> locMap = null;
+	
+	//protected HashMap<String, SeekableLineReaderFactory> factoryPool = new HashMap<String, SeekableLineReaderFactory>();
 	
 	public ZipNumCluster(String clusterUri) throws IOException
 	{
 		this(clusterUri, "ALL.summary");
 	}
 	
+	public ZipNumCluster(String clusterUri, String summaryFile, String locUri) throws IOException {
+		this(clusterUri, summaryFile);
+		
+		loadPartLocations(locUri);
+	}
+		
 	protected static String getStreamFactoryUri(String clusterUri, String summaryFile)
 	{
 		if (summaryFile.startsWith("/")) {
@@ -45,21 +54,17 @@ public class ZipNumCluster extends CDXFile {
 		
 		this.clusterUri = clusterUri;
 		this.summaryFile = summaryFile;
-	}
-	
-	public ZipNumCluster(String clusterUri, String summaryFile, String locUri) throws IOException {
-		this(clusterUri, summaryFile);
 		
-		loadPartLocations(locUri);
+		this.blockLoader = GeneralURIStreamFactory.createBlockLoader(clusterUri, true);
 	}
-	
+		
 	protected void loadPartLocations(String locUri) throws IOException
 	{
 		locMap = new HashMap<String, String[]>();
 		SeekableLineReaderIterator lines = null;
 		
 		try {
-			SeekableLineReaderFactory readerFactory = GeneralURIStreamFactory.createSeekableStreamFactory(locUri);
+			SeekableLineReaderFactory readerFactory = GeneralURIStreamFactory.createSeekableStreamFactory(locUri, true);
 			
 			lines = new SeekableLineReaderIterator(readerFactory.get());
 			
@@ -84,105 +89,116 @@ public class ZipNumCluster extends CDXFile {
 		}
 	}
 	
-	class SummaryStreamingLoaderIterator extends AbstractPeekableIterator<ZipNumStreamingLoader>
-	{
-		protected CloseableIterator<String> summaryIterator;
-		
-		protected ZipNumStreamingLoader currLoader = null;
-		
-		protected String currLine;
-		protected String nextLine;
-		protected boolean isFirst = true;
-						
-		SummaryStreamingLoaderIterator(CloseableIterator<String> summaryIterator)
-		{
-			this.summaryIterator = summaryIterator;
-			this.isFirst = true;
-		}
-
-		@Override
-		public ZipNumStreamingLoader getNextInner() {
-						
-			if (summaryIterator.hasNext()) {
-				nextLine = summaryIterator.next();
-			}
-			
-			while (nextLine != null) {
-				
-				currLine = nextLine;
-				
-				if (summaryIterator.hasNext()) {
-					nextLine = summaryIterator.next();
-				} else {
-					nextLine = null;
+	protected SeekableLineReaderFactory createFactory(String partName, String[] partLocations) throws IOException
+	{					
+			// Either load from specified location, or from partName path
+		if (partLocations != null && partLocations.length > 0) {
+			for (String location : partLocations) {
+				try {
+					return GeneralURIStreamFactory.createSeekableStreamFactory(location, false);
+				} catch (IOException io) {
+					continue;
 				}
-				
-				String blockDescriptor = currLine;
-				
-				String parts[] = blockDescriptor.split("\t");
-			
-				if ((parts.length < 3) || (parts.length > 4)) {
-					LOGGER.severe("Bad line(" + blockDescriptor +") ");
-					//throw new RecoverableRecordFormatException("Bad line(" + blockDescriptor + ")");
-					return null;
-				}
-				
-				String partId = parts[1];
-
-				String locations[] = null;
-				
-				if (locMap != null) {
-					locations = locMap.get(partId);
-					if (locations == null) {
-						LOGGER.severe("No locations for block(" + partId +")");
-					}
-				} else {
-					partId = clusterUri + "/" + partId + ".gz";
-				}
-				
-				long offset = Long.parseLong(parts[2]);
-				int length = Integer.parseInt(parts[3]);
-				
-				if ((currLoader == null) || !currLoader.isSameBlock(offset, partId)) {
-					if (currLoader != null) {
-						currLoader.close();
-					}
-					
-					currLoader = new ZipNumStreamingLoader(offset, length, partId, locations);
-					
-					if (isFirst) {
-						currLoader.setIsFirst(true);
-						isFirst = false;
-					}
-				} else {
-					currLoader.addBlock(length);
-				}
-				
-				if (nextLine == null) {
-					currLoader.setIsLast(true);
-				}
-				
-				return currLoader;
-			}
-			
-			return null;
-		}
-		
-		@Override
-		public void close() throws IOException
-		{
-			if (summaryIterator != null) {
-				summaryIterator.close();
-				summaryIterator = null;
-			}
-			
-			if (currLoader != null) {
-				currLoader.close();
-				currLoader = null;
 			}
 		}
+		
+		return GeneralURIStreamFactory.createSeekableStreamFactory(partName, false);
 	}
 	
+	protected static int extractLineCount(String line)
+	{
+		String[] parts = line.split("\t");
+		
+		if (parts.length < 5) {
+			return -1;
+		}
+		
+		int count = -1;
+		
+		try {
+			count = Integer.parseInt(parts[4]);
+		} catch (NumberFormatException n) {
+
+		}
+		
+		return count;
+	}
+	
+	public int getNumLines(String[] blocks)
+	{
+		if (blocks.length < 2) {
+			return 0;
+		}
+		
+		int lastLine = -1;
+		int line = -1;
+		
+		int size = 0;
+		
+		for (String block : blocks) {
+			lastLine = line;
+			line = extractLineCount(block);
+				
+			if (lastLine >= 0) {
+				size += (line - lastLine);
+			}
+		}
+		
+		return size;
+	}
+	
+	public int getNumLines(String start, String end) throws IOException
+	{
+		SeekableLineReader slr = null;
+		String startLine = null;
+		String endLine = null;
+		
+		int startCount = 0;
+		int endCount = 0;
+		
+		try {
+			slr = factory.get();
+		
+			long[] offsets = getStartEndOffsets(slr, start, end);
+			
+			if (offsets[0] > 0) {
+				slr.seek(offsets[0]);
+				slr.readLine();
+				
+				startLine = slr.readLine();
+			}
+			
+			if (offsets[1] < slr.getSize()) {
+				slr.seek(offsets[1]);
+				slr.readLine();
+			
+				endLine = slr.readLine();
+			}
+			
+			if (endLine != null) {
+				endCount = extractLineCount(endLine);
+			} else {
+				//TODO: A bit hacky, try to get last field of last line
+				slr.seek(slr.getSize() - 100);
+				endLine = slr.readLine();
+				int lastSp = endLine.lastIndexOf(' ');
+				endCount = Integer.parseInt(endLine.substring(lastSp + 1));
+			}
+			
+			if (startLine != null) {
+				startCount = extractLineCount(startLine);
+			}
+			
+		} finally {
+			if (slr != null) {
+				slr.close();
+			}
+		}
+		
+		return endCount - startCount;
+	}
+	
+	//TODO: Experimental?
 	public long getEstimateSplitSize(String[] blocks)
 	{
 		String parts[] = null, lastParts[] = null;
@@ -251,17 +267,19 @@ public class ZipNumCluster extends CDXFile {
 			
 		//PrefixMatchStringIterator startIter = new PrefixMatchStringIterator(summary.getRecordIteratorLT(key), key, true);
 		
-		SummaryStreamingLoaderIterator blockIter = new SummaryStreamingLoaderIterator(super.getRecordIteratorLT(key));
+//		SummaryBlockIterator blockIter = new SummaryBlockIterator(super.getRecordIteratorLT(key), this);
+//		
+//		MultiBlockIterator zipIter = new MultiBlockIterator(blockIter);
+//				
+//		return new StartBoundedStringIterator(zipIter, prefix);
 		
-		StreamingLoaderStringIterator zipIter = new StreamingLoaderStringIterator(blockIter);
-				
-		return new StartBoundedStringIterator(zipIter, prefix);
+		return wrapStartIterator(getCDXIterator(super.getRecordIteratorLT(key)), prefix);
 	}
 	
 	public CloseableIterator<String> getCDXIterator(CloseableIterator<String> summaryIterator)
 	{
-		SummaryStreamingLoaderIterator blockIter = new SummaryStreamingLoaderIterator(summaryIterator);
-		StreamingLoaderStringIterator zipIter = new StreamingLoaderStringIterator(blockIter);
+		SummaryBlockIterator blockIter = new SummaryBlockIterator(summaryIterator, this);
+		MultiBlockIterator zipIter = new MultiBlockIterator(blockIter);
 		return zipIter;
 	}
 		

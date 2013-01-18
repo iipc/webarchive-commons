@@ -28,6 +28,10 @@ public class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory 
 	public SeekableLineReader get() throws IOException {
 		return new HTTPSeekableLineReader(http, uriString);
 	}
+	
+	public HTTPSeekableLineReader get(String url) throws IOException {
+		return new HTTPSeekableLineReader(http, url);
+	}
     /**
      * @param hostPort to proxy requests through - ex. "localhost:3128"
      */

@@ -47,12 +47,12 @@ public class MultiCDXInputSource implements CDXInputSource {
 	};
 	
 	
-	public CloseableIterator<String> getCDXLineIterator(String key) throws IOException {
+	public CloseableIterator<String> getCDXLineIterator(String key, String prefix) throws IOException {
 		
 		SortedCompositeIterator<String> scitr = new SortedCompositeIterator<String>(cdx.size(), comparator);
 		
 		for (CDXInputSource cdxReader : cdx) {
-			scitr.addIterator(cdxReader.getCDXLineIterator(key));
+			scitr.addIterator(cdxReader.getCDXLineIterator(key, prefix));
 		}
 		
 		return scitr;

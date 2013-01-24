@@ -3,6 +3,7 @@ package org.archive.hadoop.mapreduce;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import org.apache.commons.httpclient.URIException;
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
@@ -65,7 +66,13 @@ public class CDXMapper extends Mapper<Object, Text, Text, Text>
 		String redirect = parts[6];
 		String offset = parts[offsetIdx];
 		String filename = parts[offsetIdx+1];
-		String urlKey = keyMaker.makeKey(origUrl);
+		String urlKey;
+		try {
+			urlKey = keyMaker.makeKey(origUrl);
+		} catch (URIException e) {
+			urlKey = origUrl;
+			e.printStackTrace();
+		}
 		
 		keySB.setLength(0);
 		keySB.append(urlKey).append(delim).append(timestamp);

@@ -1,10 +1,12 @@
 package org.archive.url;
 
+import org.apache.commons.httpclient.URIException;
+
 import junit.framework.TestCase;
 
 public class WaybackURLKeyMakerTest extends TestCase {
 
-	public void testMakeKey() {
+	public void testMakeKey() throws URIException {
 		WaybackURLKeyMaker km = new WaybackURLKeyMaker();
 		assertEquals("-", km.makeKey(null));
 		assertEquals("-", km.makeKey(""));

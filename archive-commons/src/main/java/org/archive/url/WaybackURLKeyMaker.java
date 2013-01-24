@@ -23,7 +23,7 @@ public class WaybackURLKeyMaker implements URLKeyMaker {
 		this.surtMode = surtMode;
 	}
 
-	public String makeKey(String url) {
+	public String makeKey(String url) throws URIException {
 		if(url == null) {
 			return "-";
 		}
@@ -45,7 +45,7 @@ public class WaybackURLKeyMaker implements URLKeyMaker {
 			return surt + ")";
 		}
 		HandyURL hURL;
-		try {
+
 			hURL = URLParser.parse(url);
 			canonicalizer.canonicalize(hURL);
 			String key = hURL.getURLString(surtMode, surtMode, false);
@@ -58,9 +58,9 @@ public class WaybackURLKeyMaker implements URLKeyMaker {
 				return url;
 			}
 			return key.substring(parenIdx+1);
-		} catch (URIException e) {
-			e.printStackTrace();
-		}
-		return url;
+//		} catch (URIException e) {
+//			e.printStackTrace();
+//		}
+//		return url;
 	}
 }

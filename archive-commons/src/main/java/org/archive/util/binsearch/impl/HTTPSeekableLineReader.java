@@ -77,12 +77,12 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 		if (activeMethod == null) {
 			activeMethod = new GetMethod(url);
 		}
-		
+		long endOffset = (offset + maxLength) - 1;
 		activeMethod.setRequestHeader("Range", 
-				String.format("bytes=%d-%d", offset, maxLength));
+				String.format("bytes=%d-%d", offset, endOffset));
 		int code = http.executeMethod(activeMethod);
 		if((code != 206) && (code != 200)) {
-			throw new IOException("Non 200/6 response code for " + url + ":" + offset);
+			throw new IOException("Non 200/6 response code for " + url + " " + offset + ":" + endOffset);
 		}
 		InputStream is = activeMethod.getResponseBodyAsStream();
     	if (gzip) {

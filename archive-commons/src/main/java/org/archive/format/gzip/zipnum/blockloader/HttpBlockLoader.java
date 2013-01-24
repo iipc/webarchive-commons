@@ -8,11 +8,18 @@ import org.archive.util.binsearch.impl.HTTPSeekableLineReaderFactory;
 
 public class HttpBlockLoader implements BlockLoader {
 	
-	HTTPSeekableLineReaderFactory factory;
+	protected HTTPSeekableLineReaderFactory factory;
 	
 	public HttpBlockLoader()
 	{
 		factory = new HTTPSeekableLineReaderFactory("");
+		factory.setMaxHostConnections(400);
+		factory.setMaxTotalConnections(500);
+	}
+	
+	public HttpBlockLoader(HTTPSeekableLineReaderFactory factory)
+	{
+		this.factory = factory;
 	}
 
 	@Override

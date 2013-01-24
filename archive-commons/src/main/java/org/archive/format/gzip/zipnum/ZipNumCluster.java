@@ -15,8 +15,7 @@ import org.archive.util.iterator.CloseableIterator;
 import org.archive.util.iterator.StartBoundedStringIterator;
 
 public class ZipNumCluster extends CDXFile {
-	final static Logger LOGGER = 
-		Logger.getLogger(ZipNumCluster.class.getName());
+	final static Logger LOGGER = Logger.getLogger(ZipNumCluster.class.getName());
 
 	protected String clusterUri;
 		
@@ -26,7 +25,8 @@ public class ZipNumCluster extends CDXFile {
 	
 	protected HashMap<String, String[]> locMap = null;
 	
-	//protected HashMap<String, SeekableLineReaderFactory> factoryPool = new HashMap<String, SeekableLineReaderFactory>();
+	protected final static boolean USE_NIO = true;
+	
 	
 	public ZipNumCluster(String clusterUri) throws IOException
 	{
@@ -39,13 +39,17 @@ public class ZipNumCluster extends CDXFile {
 		loadPartLocations(locUri);
 	}
 		
-	protected static String getStreamFactoryUri(String clusterUri, String summaryFile)
+	protected static SeekableLineReaderFactory getStreamFactoryUri(String clusterUri, String summaryFile) throws IOException
 	{
+		String fullPath;
+		
 		if (summaryFile.startsWith("/")) {
-			return (summaryFile);
+			fullPath = (summaryFile);
 		} else {
-			return (clusterUri + "/" + summaryFile);
+			fullPath = (clusterUri + "/" + summaryFile);
 		}
+		
+		return GeneralURIStreamFactory.createSeekableStreamFactory(fullPath, USE_NIO);
 	}
 	
 	public ZipNumCluster(String clusterUri, String summaryFile) throws IOException {
@@ -55,16 +59,18 @@ public class ZipNumCluster extends CDXFile {
 		this.clusterUri = clusterUri;
 		this.summaryFile = summaryFile;
 		
-		this.blockLoader = GeneralURIStreamFactory.createBlockLoader(clusterUri, true);
+		this.blockLoader = GeneralURIStreamFactory.createBlockLoader(clusterUri, USE_NIO);
 	}
 		
 	protected void loadPartLocations(String locUri) throws IOException
 	{
 		locMap = new HashMap<String, String[]>();
 		SeekableLineReaderIterator lines = null;
+		SeekableLineReaderFactory readerFactory = null;
 		
 		try {
-			SeekableLineReaderFactory readerFactory = GeneralURIStreamFactory.createSeekableStreamFactory(locUri, true);
+			
+			readerFactory = GeneralURIStreamFactory.createSeekableStreamFactory(locUri, true);
 			
 			lines = new SeekableLineReaderIterator(readerFactory.get());
 			
@@ -85,26 +91,11 @@ public class ZipNumCluster extends CDXFile {
 				locMap.put(parts[0], locations);
 			}
 		} finally {
-			lines.close();	
+			lines.close();
+			readerFactory.close();
 		}
 	}
-	
-	protected SeekableLineReaderFactory createFactory(String partName, String[] partLocations) throws IOException
-	{					
-			// Either load from specified location, or from partName path
-		if (partLocations != null && partLocations.length > 0) {
-			for (String location : partLocations) {
-				try {
-					return GeneralURIStreamFactory.createSeekableStreamFactory(location, false);
-				} catch (IOException io) {
-					continue;
-				}
-			}
-		}
 		
-		return GeneralURIStreamFactory.createSeekableStreamFactory(partName, false);
-	}
-	
 	protected static int extractLineCount(String line)
 	{
 		String[] parts = line.split("\t");

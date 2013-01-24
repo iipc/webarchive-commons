@@ -25,4 +25,11 @@ public class HDFSSeekableLineReaderFactory implements SeekableLineReaderFactory 
 		FSDataInputStream fsdis = fs.open(path);
 		return new HDFSSeekableLineReader(fsdis, length, 4096);
 	}
+	
+	public void close() throws IOException
+	{
+		if (this.fs != null) {
+			fs.close();
+		}
+	}
 }

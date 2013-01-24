@@ -24,6 +24,11 @@ public class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory 
     	http.setHostConfiguration(hostConfiguration);
     	this.uriString = uriString;
     }
+    
+    public void close() throws IOException
+    {
+    	connectionManager.deleteClosedConnections();
+    }
 
 	public SeekableLineReader get() throws IOException {
 		return new HTTPSeekableLineReader(http, uriString);

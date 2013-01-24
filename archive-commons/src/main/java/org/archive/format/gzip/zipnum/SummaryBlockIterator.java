@@ -43,6 +43,11 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 				
 		currLine = nextLine;
 		
+		if (currLine == null) {
+			isFirst = false;
+			return null;
+		}
+		
 		if (summaryIterator.hasNext()) {
 			nextLine = summaryIterator.next();
 		} else {
@@ -53,7 +58,7 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 		
 		String parts[] = blockDescriptor.split("\t");
 	
-		if ((parts.length < 3) || (parts.length > 4)) {
+		if ((parts.length < 3)) {
 			ZipNumCluster.LOGGER.severe("Bad line(" + blockDescriptor +") ");
 			//throw new RecoverableRecordFormatException("Bad line(" + blockDescriptor + ")");
 			isFirst = false;

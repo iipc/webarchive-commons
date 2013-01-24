@@ -23,6 +23,6 @@ public class RandomAccessFileSeekableLineReaderFactory implements SeekableLineRe
 				blockSize);
 	}
 	public void close() throws IOException {
-
+		this.file = null;
 	}
 }

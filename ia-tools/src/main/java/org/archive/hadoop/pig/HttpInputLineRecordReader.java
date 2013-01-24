@@ -21,6 +21,8 @@ public class HttpInputLineRecordReader extends RecordReader<LongWritable, Text> 
 	private final static Logger LOGGER =
 		Logger.getLogger(HttpTextLoader.class.getName());
 	
+	protected final static String GZIP_PARAM = "&output=gzip";
+	
 	protected LongWritable key;
 	protected Text value;
 		
@@ -135,7 +137,7 @@ public class HttpInputLineRecordReader extends RecordReader<LongWritable, Text> 
 		conn = (HttpURLConnection)url.openConnection();
 		conn.connect();
 				
-		String linesEstimate = conn.getHeaderField("X-Cluster-Num-Lines");
+		String linesEstimate = conn.getHeaderField(HttpTextLoader.NUM_LINES_HEADER_FIELD);
 		
 		if (linesEstimate != null) {
 			try {
@@ -149,7 +151,7 @@ public class HttpInputLineRecordReader extends RecordReader<LongWritable, Text> 
 		
 		//is = cis = new CountingInputStream(is);
 		
-		if (urlString.contains("&output=gzip")) {
+		if (urlString.contains(GZIP_PARAM)) {
 			is = new OpenJDK7GZIPInputStream(is);
 		}
 		

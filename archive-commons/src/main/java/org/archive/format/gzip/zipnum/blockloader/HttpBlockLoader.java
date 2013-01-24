@@ -20,7 +20,6 @@ public class HttpBlockLoader implements BlockLoader {
 			throws IOException {
 			
 		HTTPSeekableLineReader reader = factory.get(filename);
-		//reader.seekWithMaxRead(offset, true, length);
 		return reader;
 	}
 }

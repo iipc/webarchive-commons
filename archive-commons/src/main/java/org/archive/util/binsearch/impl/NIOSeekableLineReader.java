@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileChannel.MapMode;
 
 import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.zip.GZIPMembersInputStream;
@@ -17,28 +18,39 @@ public class NIOSeekableLineReader implements SeekableLineReader {
 	private long size;
 	
 	private FileChannelInputStream fcis;
+	private ByteBufferBackedInputStream bbis;
+	
 	private InputStreamReader isr;
 	private BufferedReader br;
 
 	private int blockSize;
 	
+	protected boolean useMMap;
+	
 	public NIOSeekableLineReader(FileChannel fc, int blockSize) throws IOException {
 		this.fc = fc;
 		size = fc.size();
 		fcis = null;
+		bbis = null;
 		this.blockSize = blockSize;
 	}
 	
 	public void seek(long offset) throws IOException {
 		fcis = new FileChannelInputStream(fc, offset);
+		bbis = null;
     	isr = new InputStreamReader(fcis, UTF8);
     	br = new BufferedReader(isr, blockSize);
 	}
 	
 	public void seekWithMaxRead(long offset, boolean gzip, int maxLength) throws IOException {
-		fcis = new FileChannelInputStream(fc, offset);
+		
+		ByteBuffer mapBuff = fc.map(MapMode.READ_ONLY, offset, maxLength);
+		
+		bbis = new ByteBufferBackedInputStream(mapBuff, offset);
+		
+		//fcis = new FileChannelInputStream(fc, offset);
     	
-    	InputStream is = new LimitInputStream(fcis, maxLength);
+    	InputStream is = new LimitInputStream(bbis, maxLength);
     	if (gzip) {
     		is = new GZIPMembersInputStream(is, blockSize);
     	}    	
@@ -48,7 +60,13 @@ public class NIOSeekableLineReader implements SeekableLineReader {
 	
 	public long getOffset() throws IOException
 	{
-		return fcis.fcOffset;
+		if (fcis != null) {
+			return fcis.fcOffset;
+		} else if (bbis != null) {
+			return bbis.position();
+		} else {
+			return 0;
+		}
 	}
 
 	public String readLine() throws IOException {
@@ -68,6 +86,44 @@ public class NIOSeekableLineReader implements SeekableLineReader {
 	public long getSize() throws IOException {
 		return size;
 	}
+	
+	//From
+	//http://stackoverflow.com/questions/4332264/wrapping-a-bytebuffer-with-an-inputstream/6603018#6603018
+	public static class ByteBufferBackedInputStream extends InputStream {
+
+	    ByteBuffer buf;
+	    long fcOffset;
+
+	    public ByteBufferBackedInputStream(ByteBuffer buf, long offset) {
+	        this.buf = buf;
+	        this.fcOffset = offset;
+	    }
+
+	    public synchronized int read() throws IOException {
+	        if (!buf.hasRemaining()) {
+	            return -1;
+	        }
+	        return buf.get() & 0xFF;
+	    }
+
+	    public synchronized int read(byte[] bytes, int off, int len)
+	            throws IOException {
+	        if (!buf.hasRemaining()) {
+	            return -1;
+	        }
+
+	        len = Math.min(len, buf.remaining());
+	        buf.get(bytes, off, len);
+	        return len;
+	    }
+	    
+	    public long position()
+	    {
+	    	return fcOffset + buf.position();
+	    }
+	}
+	
+	
 	public class FileChannelInputStream extends InputStream {
 		FileChannel fc;
 		long fcOffset;

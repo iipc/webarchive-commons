@@ -255,7 +255,12 @@ public class ZipNumCluster extends CDXFile {
 	
 	public CloseableIterator<String> getCDXIterator(CloseableIterator<String> summaryIterator, String start, String end, int split, int numSplits)	
 	{
-		CloseableIterator<String> blocklines = this.getCDXIterator(summaryIterator);
+		return getCDXIterator(summaryIterator, start, end, split, numSplits, null);
+	}
+
+	public CloseableIterator<String> getCDXIterator(CloseableIterator<String> summaryIterator, String start, String end, int split, int numSplits, ZipNumParams params)	
+	{
+		CloseableIterator<String> blocklines = this.getCDXIterator(summaryIterator, params);
 		
 		if (split == 0) {
 			blocklines = this.wrapStartIterator(blocklines, start);

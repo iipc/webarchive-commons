@@ -6,20 +6,20 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.archive.format.gzip.zipnum.ZipNumCluster;
+import org.archive.format.gzip.zipnum.ZipNumParams;
 import org.archive.util.iterator.CloseableIterator;
 
 public class HttpZipNumDerefLineRecordReader extends HttpInputLineRecordReader {
 	
 	protected ZipNumCluster cluster;
+	protected ZipNumParams params;
 	
 	protected String clusterUri;
 	
 	protected String start, end;
 	
 	protected Text nextCdxLine;
-	
-	protected int maxAggregateBlocks = 1;
-	
+		
 	protected CloseableIterator<String> cdxReader;
 
 	public HttpZipNumDerefLineRecordReader(String clusterUri, String summaryQueryUrl, int split, int maxAggregateBlocks)
@@ -30,7 +30,8 @@ public class HttpZipNumDerefLineRecordReader extends HttpInputLineRecordReader {
 		
 		this.nextCdxLine = new Text("");
 		
-		this.maxAggregateBlocks = maxAggregateBlocks;
+		this.params = new ZipNumParams();
+		this.params.setMaxAggregateBlocks(maxAggregateBlocks);
 	}
 	
 	protected String getParam(String query, String key)
@@ -54,7 +55,6 @@ public class HttpZipNumDerefLineRecordReader extends HttpInputLineRecordReader {
 		super.initialize(split, context);
 		
 		cluster = new ZipNumCluster(clusterUri);
-		cluster.setMaxAggregateBlocks(maxAggregateBlocks);
 		
 		String query = super.urlString.substring(super.urlString.indexOf('?') + 1);
 		start = getParam(query, "start=");

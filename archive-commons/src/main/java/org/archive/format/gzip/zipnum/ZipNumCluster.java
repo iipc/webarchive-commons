@@ -273,17 +273,27 @@ public class ZipNumCluster extends CDXFile {
 		return blocklines;
 	}
 	
-//	public CloseableIterator<String> getCDXLineIterator(String key) throws IOException {
-//		return getCDXLineIterator(key, key);
-//	}
+	public static String endKey(String key)
+	{
+		return key + "!";
+	}
 	
 	public CloseableIterator<String> getLastBlockCDXLineIterator(String key) throws IOException {
 		// the next line after last key<space> is key! so this will return last key<space> block
-		return getCDXLineIterator(key + "!", key);
+		return getCDXLineIterator(endKey(key), key);
 	}
 			
-	public CloseableIterator<String> getCDXIterator(String key, String prefix, ZipNumParams params) throws IOException {
-		return wrapStartIterator(getCDXIterator(super.getRecordIteratorLT(key), params), prefix);
+	public CloseableIterator<String> getCDXIterator(String key, String start, boolean exact, ZipNumParams params) throws IOException {
+		
+		CloseableIterator<String> summaryIter = super.getRecordIteratorLT(key);
+		
+		if (exact) {
+			summaryIter = wrapEndIterator(summaryIter, endKey(start), false);
+		} else {
+			summaryIter = wrapEndIterator(summaryIter, start, true);
+		}
+		
+		return wrapStartIterator(getCDXIterator(summaryIter, params), start);
 	}
 	
 	public CloseableIterator<String> getCDXIterator(CloseableIterator<String> summaryIterator, ZipNumParams params)

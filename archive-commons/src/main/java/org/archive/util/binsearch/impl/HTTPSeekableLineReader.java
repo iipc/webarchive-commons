@@ -24,9 +24,13 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 	private BufferedReader br;
 	private InputStreamReader isr;
 	private HttpMethod activeMethod;
-	public HTTPSeekableLineReader(HttpClient http, String url) {
+	
+	protected boolean noKeepAlive = false;
+	
+	public HTTPSeekableLineReader(HttpClient http, String url, boolean noKeepAlive) {
 		this.http = http;
 		this.url = url;
+		this.noKeepAlive = noKeepAlive;
 	}
 	
 	private void acquireLength() throws URISyntaxException, HttpException, IOException {
@@ -60,6 +64,9 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 		activeMethod = new GetMethod(url);
 		activeMethod.setRequestHeader("Range", 
 				String.format("bytes=%d-", offset));
+		
+		activeMethod.setRequestHeader("Connection", "Close");
+		
 		int code = http.executeMethod(activeMethod);
 		if((code != 206) && (code != 200)) {
 			throw new IOException("Non 200/6 response code for " + url + ":" + offset);
@@ -105,14 +112,16 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 	}
 
 	public void close() throws IOException {
-		if(activeMethod != null) {
-			activeMethod.abort();
+		if (activeMethod != null) {
 			activeMethod.releaseConnection();
+			activeMethod = null;
 		}
-		if(br != null) {
+		
+		if (br != null) {
 			br = null;
 		}
-		if(isr != null) {
+		
+		if (isr != null) {
 			isr = null;
 		}
 	}

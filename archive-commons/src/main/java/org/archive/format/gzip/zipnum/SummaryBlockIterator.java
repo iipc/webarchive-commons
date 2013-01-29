@@ -11,6 +11,79 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 {
 	final static Logger LOGGER = 
 		Logger.getLogger(SummaryBlockIterator.class.getName());
+		
+	class SplitLine
+	{
+		String line;
+		String partId;
+		String[] parts;
+		
+		String timestamp;
+		
+		long offset;
+		int length;
+		
+		SplitLine(String line)
+		{
+			this.line = line;
+			if (this.line == null) {
+				return;
+			}
+			parts = this.line.split("\t");
+			partId = parts[1];
+			if (parts.length < 3) {
+				return;
+			}
+			offset = Long.parseLong(parts[2]);
+			length = Integer.parseInt(parts[3]);
+			timestamp = makeTimestamp(parts[0]);
+		}
+		
+		String makeTimestamp(String key)
+		{
+			if (params.getTimestampDedupLength() <= 0) {
+				return null;
+			}
+			
+			int space = key.indexOf(' ');
+			if (space >= 0) {
+				return key.substring(0, space + 1 + params.getTimestampDedupLength());
+			} else {
+				return null;
+			}
+		}
+		
+		boolean isContinuous(SplitLine next)
+		{
+			if (next == null || next.line == null) {
+				return false;
+			}
+			
+			// Must be same part
+			if (!partId.equals(next.partId)) {
+				return false;
+			}
+			
+			if ((offset + length) != next.offset) {
+				return false;
+			}
+			
+			return true;
+		}
+		
+		boolean sameTimestamp(SplitLine next)
+		{
+			if (next == null || next.timestamp == null) {
+				return false;
+			}
+			
+			if (timestamp == null) {
+				return false;
+			}
+			
+			return timestamp.equals(next.timestamp);
+		}
+	}
 	
 	protected CloseableIterator<String> summaryIterator;
 	
@@ -18,114 +91,150 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 	
 	protected SeekableLineReader currReader = null;
 	
-	protected String currLine;
-	protected String nextLine;
+	protected SplitLine nextLine, currLine;
+	
 	protected boolean isFirst = true;
 	
 	protected String currPartId = null;
-					
-	public SummaryBlockIterator(CloseableIterator<String> summaryIterator, ZipNumCluster cluster)
+	
+	protected int totalBlocks = 0;
+	
+	protected final ZipNumParams params;	
+
+	public SummaryBlockIterator(CloseableIterator<String> summaryIterator, ZipNumCluster cluster, ZipNumParams params)
 	{
 		this.cluster = cluster;
 		
 		this.summaryIterator = summaryIterator;
 		this.isFirst = true;
+		
+		if (params != null) {
+			this.params = params;
+		} else {
+			this.params = new ZipNumParams();
+		}
 	}
-
+	
 	@Override
 	public SeekableLineReader getNextInner() {
 					
 		if (isFirst) {
 			if (summaryIterator.hasNext()) {
-				nextLine = summaryIterator.next();
+				nextLine = new SplitLine(summaryIterator.next());
 			}
-		}
-				
-		currLine = nextLine;
-		
-		if (currLine == null) {
 			isFirst = false;
+		}
+		
+		if ((params.getMaxBlocks() > 0) && (totalBlocks >= params.getMaxBlocks())) {
 			return null;
 		}
-		
-		if (summaryIterator.hasNext()) {
-			nextLine = summaryIterator.next();
-		} else {
-			nextLine = null;
-		}
-		
-		String blockDescriptor = currLine;
-		
-		String parts[] = blockDescriptor.split("\t");
-	
-		if ((parts.length < 3)) {
-			ZipNumCluster.LOGGER.severe("Bad line(" + blockDescriptor +") ");
-			//throw new RecoverableRecordFormatException("Bad line(" + blockDescriptor + ")");
-			isFirst = false;
-			return null;
-		}
-		
-		String partId = parts[1];
-
-		String locations[] = null;
-		
-		if (cluster.locMap != null) {
-			locations = cluster.locMap.get(partId);
-			
-			if (locations == null) {
-				ZipNumCluster.LOGGER.severe("No locations for block(" + partId +")");
-			}
-			
-		} else {
-			partId = cluster.clusterUri + "/" + partId + ".gz";
-		}
-		
-		long offset = Long.parseLong(parts[2]);
-		int length = Integer.parseInt(parts[3]);
 		
 		try {
-			if ((currReader == null) || (currPartId == null) || !currPartId.equals(partId)) {
+			
+			int numBlocks = 0;
+			int maxAggregateBlocks = params.getMaxAggregateBlocks();
+			
+			long startOffset = 0;
+			int totalLength = 0;
+		
+			do {					
+				currLine = nextLine;
 				
-				if (currReader != null) {
-					currReader.close();
-					currReader = null;
+				if (currLine == null) {
+					isFirst = false;
+					return null;
 				}
 				
-				if (locations != null && locations.length > 0) {
-					for (String location : locations) {
-						try {
-							currReader = cluster.blockLoader.createBlockReader(location);
-							break;
-						} catch (IOException io) {
-							continue;
-						}
+				if (summaryIterator.hasNext()) {
+					nextLine = new SplitLine(summaryIterator.next());
+				} else {
+					nextLine = null;
+				}
+			
+				if (currLine.parts.length < 3) {
+					LOGGER.severe("Bad line(" + currLine.line +") ");
+					return null;
+				}
+				
+				if (currLine.sameTimestamp(nextLine)) {
+					if (numBlocks == 0) {
+						continue;
+					} else {
+						break;
 					}
 				}
-				
-				if (currReader == null) {
-					currReader = cluster.blockLoader.createBlockReader(partId);	
+	
+				if (initReader(currLine.partId) || (numBlocks == 0)) {
+					startOffset = currLine.offset;
+					totalLength = 0;					
 				}
-								
-				currPartId = partId;
-				isFirst = false;
-			}
-			
-			currReader.seekWithMaxRead(offset, true, length);
-			
+				
+				totalLength += currLine.length;
+				numBlocks++;
+				
+			} while (((maxAggregateBlocks <= 0) || (numBlocks < maxAggregateBlocks)) && 
+					  ((params.getMaxBlocks() <= 0) || (totalBlocks + numBlocks) < params.getMaxBlocks()) 
+					  && currLine.isContinuous(nextLine));
+				
+			currReader.seekWithMaxRead(startOffset, true, totalLength);
+			totalBlocks += numBlocks;
+				
 		} catch (IOException io) {
 			LOGGER.severe(io.toString());
 			if (currReader != null) {
 				try {
 					currReader.close();
 				} catch (IOException e) {
-
+	
 				}
+				currReader = null;
 			}
-			currReader = null;
 		}
 		
-		isFirst = false;			
 		return currReader;
+	}
+		
+	protected boolean initReader(String partId) throws IOException
+	{
+		if ((currReader == null) || (currPartId == null) || !currPartId.equals(partId)) {
+			
+			if (currReader != null) {
+				currReader.close();
+				currReader = null;
+			}
+			
+			if (cluster.locMap != null) {
+				initLocationReader(partId);
+			}
+			
+			if (currReader == null) {
+				String partUrl = cluster.clusterUri + "/" + partId + ".gz";
+				currReader = cluster.blockLoader.createBlockReader(partUrl);	
+			}
+			
+			currPartId = partId;			
+			return true;
+		}
+		
+		return false;
+	}
+	
+	protected void initLocationReader(String partId)
+	{
+		String[] locations = cluster.locMap.get(partId);
+		
+		if (locations == null) {
+			LOGGER.severe("No locations for block(" + partId +")");
+		} else if (locations != null && locations.length > 0) {
+			for (String location : locations) {
+				try {
+					currReader = cluster.blockLoader.createBlockReader(location);
+					break;
+				} catch (IOException io) {
+					continue;
+				}
+			}
+		}
 	}
 	
 	@Override

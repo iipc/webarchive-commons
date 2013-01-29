@@ -24,7 +24,7 @@ public class ZipNumCluster extends CDXFile {
 	protected BlockLoader blockLoader;
 	
 	protected HashMap<String, String[]> locMap = null;
-	
+		
 	protected final static boolean USE_NIO = true;
 	
 	
@@ -53,13 +53,21 @@ public class ZipNumCluster extends CDXFile {
 	}
 	
 	public ZipNumCluster(String clusterUri, String summaryFile) throws IOException {
+		this(clusterUri, summaryFile, (BlockLoader)null);
+	}
+	
+	public ZipNumCluster(String clusterUri, String summaryFile, BlockLoader blockLoader) throws IOException {
 		
 		super(getStreamFactoryUri(clusterUri, summaryFile));
 		
 		this.clusterUri = clusterUri;
 		this.summaryFile = summaryFile;
-		
-		this.blockLoader = GeneralURIStreamFactory.createBlockLoader(clusterUri, USE_NIO);
+				
+		if (blockLoader == null) {
+			this.blockLoader = GeneralURIStreamFactory.createBlockLoader(clusterUri, USE_NIO);
+		} else {
+			this.blockLoader = blockLoader;
+		}
 	}
 		
 	protected void loadPartLocations(String locUri) throws IOException
@@ -245,33 +253,44 @@ public class ZipNumCluster extends CDXFile {
 		}
 	}
 	
-	public CloseableIterator<String> getCDXLineIterator(String key) throws IOException {
-		return getCDXLineIterator(key, key);
+	public CloseableIterator<String> getCDXIterator(CloseableIterator<String> summaryIterator, String start, String end, int split, int numSplits)	
+	{
+		CloseableIterator<String> blocklines = this.getCDXIterator(summaryIterator);
+		
+		if (split == 0) {
+			blocklines = this.wrapStartIterator(blocklines, start);
+		}
+		
+		if (split >= (numSplits - 1)) {
+			blocklines = this.wrapEndIterator(blocklines, end, false);
+		}
+		
+		return blocklines;
 	}
+	
+//	public CloseableIterator<String> getCDXLineIterator(String key) throws IOException {
+//		return getCDXLineIterator(key, key);
+//	}
 	
 	public CloseableIterator<String> getLastBlockCDXLineIterator(String key) throws IOException {
 		// the next line after last key<space> is key! so this will return last key<space> block
 		return getCDXLineIterator(key + "!", key);
 	}
 			
-	public CloseableIterator<String> getCDXLineIterator(String key, String prefix) throws IOException {
-			
-		//PrefixMatchStringIterator startIter = new PrefixMatchStringIterator(summary.getRecordIteratorLT(key), key, true);
-		
-//		SummaryBlockIterator blockIter = new SummaryBlockIterator(super.getRecordIteratorLT(key), this);
-//		
-//		MultiBlockIterator zipIter = new MultiBlockIterator(blockIter);
-//				
-//		return new StartBoundedStringIterator(zipIter, prefix);
-		
+	public CloseableIterator<String> getCDXLineIterator(String key, String prefix, ZipNumParams params) throws IOException {
 		return wrapStartIterator(getCDXIterator(super.getRecordIteratorLT(key)), prefix);
+	}
+	
+	public CloseableIterator<String> getCDXIterator(CloseableIterator<String> summaryIterator, ZipNumParams params)
+	{
+		SummaryBlockIterator blockIter = new SummaryBlockIterator(summaryIterator, this, params);
+		MultiBlockIterator zipIter = new MultiBlockIterator(blockIter);
+		return zipIter;
 	}
 	
 	public CloseableIterator<String> getCDXIterator(CloseableIterator<String> summaryIterator)
 	{
-		SummaryBlockIterator blockIter = new SummaryBlockIterator(summaryIterator, this);
-		MultiBlockIterator zipIter = new MultiBlockIterator(blockIter);
-		return zipIter;
+		return getCDXIterator(summaryIterator, null);
 	}
 		
 	public String getClusterUri() {

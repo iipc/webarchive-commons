@@ -99,11 +99,11 @@ public class SortedTextFile {
 	}
 	
 
-	public CloseableIterator<String> getSplitIterator(long startOffset, long endOffset, int numSplits) throws IOException
-	{
-		SeekableLineReader slr = factory.get();		
-		return new StepSeekingIterator(slr, startOffset, endOffset, numSplits);
-	}
+//	public CloseableIterator<String> getSplitIterator(long startOffset, long endOffset, int numSplits) throws IOException
+//	{
+//		SeekableLineReader slr = factory.get();		
+//		return new StepSeekingIterator(slr, startOffset, endOffset, numSplits);
+//	}
 	
 	public CloseableIterator<String> getSplitIterator(String start, String end, int numSplits) throws IOException
 	{

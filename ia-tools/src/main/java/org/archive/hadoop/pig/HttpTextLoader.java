@@ -32,8 +32,15 @@ public class HttpTextLoader extends TextLoader {
 	protected final static String HTTP_TEXTLOADER_URL = "httptextloader.url";
 	protected final static String HTTP_TEXTLOADER_NUM_SPLITS = "httptextloader.numSplits";
 	protected final static String HTTP_TEXTLOADER_MAX_LINES = "httptextloader.maxLines";
+	protected final static String HTTP_TEXTLOADER_GZIP = "httptextloader.gzip";
+	protected final static String HTTP_TEXTLOADER_ZIPNUM_CLUSTER = "httptextloader.clusterUri";
+	protected final static String HTTP_TEXTLOADER_MAX_AGGREGATE_BLOCKS = "httptextloader.maxAggregateBlocks";
 	
 	protected final static String COUNT_LINES_PARAM = "&countLines=true";
+	
+	protected final static String GZIP_PARAM = "&output=gzip";
+	
+	protected final static String CDX_PARAM = "&cdx=true";
 	
 	protected final static String SPLIT_PARAM = "&split=";
 	protected final static String NUM_SPLIT_PARAM = "&numSplits=";
@@ -80,10 +87,20 @@ public class HttpTextLoader extends TextLoader {
 					throw new RuntimeException("Wrong Input Split, must be HttpClusterInputSplit");
 				}
 				
+				Configuration conf = job.getConfiguration();
+				
+				String clusterUri = conf.get(HTTP_TEXTLOADER_ZIPNUM_CLUSTER);
+				
+				
 				HttpClusterInputSplit clusterSplit = (HttpClusterInputSplit)split;
 				
 				try {
-					return new HttpInputLineRecordReader(clusterSplit.getUrl());
+					if (clusterUri != null) {
+						int maxAggBlocks = Integer.parseInt(conf.get(HTTP_TEXTLOADER_MAX_AGGREGATE_BLOCKS, "1"));
+						return new HttpZipNumDerefLineRecordReader(clusterUri, clusterSplit.getUrl(), clusterSplit.getSplit(), maxAggBlocks);
+					} else {
+						return new HttpInputLineRecordReader(clusterSplit.getUrl() + CDX_PARAM, clusterSplit.getSplit());
+					}
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
@@ -114,9 +131,15 @@ public class HttpTextLoader extends TextLoader {
 	public void setLocation(String location, Job job) throws IOException {
 		Configuration conf = job.getConfiguration();
 		
-		location = URLDecoder.decode(location, "UTF-8");
+		String savedLoc = conf.get(HTTP_TEXTLOADER_URL);
 		
-		conf.set(HTTP_TEXTLOADER_URL, location);
+		if (savedLoc == null) {
+			location = URLDecoder.decode(location, "UTF-8");
+			
+			conf.set(HTTP_TEXTLOADER_URL, location);	
+		} else {
+			location = savedLoc;
+		}
 				
 		if (maxLinesPerSplit > 0) {
 			

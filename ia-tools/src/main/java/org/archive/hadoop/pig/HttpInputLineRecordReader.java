@@ -6,6 +6,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.logging.Logger;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Counter;
@@ -13,25 +14,25 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.util.LineReader;
-import org.apache.pig.tools.pigstats.PigStatusReporter;
+import org.apache.pig.tools.counters.PigCounterHelper;
 import org.archive.util.zip.OpenJDK7GZIPInputStream;
 
 public class HttpInputLineRecordReader extends RecordReader<LongWritable, Text> {
 	
 	private final static Logger LOGGER =
 		Logger.getLogger(HttpTextLoader.class.getName());
-	
-	protected final static String GZIP_PARAM = "&output=gzip";
-	
+		
 	protected LongWritable key;
 	protected Text value;
 		
 	protected int linesRead = 0;
+	
 	protected long maxLines = 0;
 	
 	protected long totalLines = 0;
+	
+	protected String splitInfo;
 		
-	protected PigStatusReporter reporter;
 	protected Counter counter;
 	protected String urlString;
 	
@@ -40,25 +41,21 @@ public class HttpInputLineRecordReader extends RecordReader<LongWritable, Text> 
 	protected LineReader reader;
 	//protected CountingInputStream cis;
 	
-	enum StreamReaderCounters
+	protected PigCounterHelper counterHelper;
+	
+	protected final static String HTTP_INPUT_COUNTER_GROUP = "Http Input";
+	protected final static String LINE_COUNTER = "Lines Read";
+	protected final static String BYTE_COUNTER = "Bytes Read";
+	
+	public HttpInputLineRecordReader(String urlString, int split) throws IOException
 	{
-		BYTES_READ;
-	}
-
-	public HttpInputLineRecordReader(String urlString) throws IOException
-	{
-		this.urlString = urlString;
-		reporter = PigStatusReporter.getInstance();
-		
-		if (reporter != null) {
-			counter = reporter.getCounter("StreamReader", urlString);
-			if (counter != null) {
-				counter.setValue(0);
-			}
-		}
-		
+		this.urlString = urlString;	
 		this.key = new LongWritable(0);
 		this.value = new Text("");
+		
+		splitInfo = "Split #" + split + " ";
+		
+		counterHelper = new PigCounterHelper();
 	}
 
 	@Override
@@ -96,19 +93,16 @@ public class HttpInputLineRecordReader extends RecordReader<LongWritable, Text> 
 		if (bytesRead <= 0) {
 			return false;
 		}
-		
-//		if (reporter != null && counter == null) {
-//			counter = reporter.getCounter("StreamReader", urlString);
-//			if (counter == null) {
-//				counter = reporter.getCounter(StreamReaderCounters.BYTES_READ);
-//			}
-//		}
-//		
-//		if (counter != null) {
-//			counter.increment(bytesRead);
-//		}
 				
 		linesRead++;
+		
+		counterHelper.incrCounter(HTTP_INPUT_COUNTER_GROUP, LINE_COUNTER, 1);
+		//counterHelper.incrCounter(HTTP_INPUT_COUNTER_GROUP, splitInfo + LINE_COUNTER, 1);
+		
+		//if (cis != null) {
+		counterHelper.incrCounter(HTTP_INPUT_COUNTER_GROUP, BYTE_COUNTER, bytesRead);
+			//counterHelper.incrCounter(HTTP_INPUT_COUNTER_GROUP, splitInfo + BYTE_COUNTER, newByteCount - bytesRead);			
+		//}
 		
 		key.set(key.get() + bytesRead);
 		
@@ -125,14 +119,21 @@ public class HttpInputLineRecordReader extends RecordReader<LongWritable, Text> 
 	}
 
 	@Override
-	public void initialize(InputSplit split, TaskAttemptContext arg1)
+	public void initialize(InputSplit split, TaskAttemptContext context)
 			throws IOException, InterruptedException {
 		
 		close();
 		
-		LOGGER.info("Loader initialize - " + urlString);
+		Configuration conf = context.getConfiguration();
+		
+		boolean useGzip = conf.getBoolean(HttpTextLoader.HTTP_TEXTLOADER_GZIP, true);
+		
+		if (useGzip) {
+			urlString += HttpTextLoader.GZIP_PARAM;
+		}
 		
 		URL url = new URL(urlString);
+		LOGGER.info("Loader initialize - " + urlString);
 		
 		conn = (HttpURLConnection)url.openConnection();
 		conn.connect();
@@ -151,7 +152,7 @@ public class HttpInputLineRecordReader extends RecordReader<LongWritable, Text> 
 		
 		//is = cis = new CountingInputStream(is);
 		
-		if (urlString.contains(GZIP_PARAM)) {
+		if (useGzip) {
 			is = new OpenJDK7GZIPInputStream(is);
 		}
 		

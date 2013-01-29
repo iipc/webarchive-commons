@@ -22,8 +22,6 @@ public class HttpClusterInputSplit extends InputSplit implements Writable
 	
 	public HttpClusterInputSplit(String url, int split, int numSplits)
 	{
-		this.estLength = 0;
-
 		this.split = split;
 		this.numSplits = numSplits;
 		this.url = url;
@@ -42,6 +40,16 @@ public class HttpClusterInputSplit extends InputSplit implements Writable
 	public String getUrl()
 	{
 		return this.url;
+	}
+	
+	public int getSplit()
+	{
+		return split;
+	}
+	
+	public int getNumSplits()
+	{
+		return numSplits;
 	}
 			
 	@Override

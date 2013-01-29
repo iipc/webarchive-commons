@@ -1,6 +1,7 @@
 package org.archive.format.gzip.zipnum;
 
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.archive.util.binsearch.SeekableLineReader;
@@ -175,8 +176,13 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 			} while (((maxAggregateBlocks <= 0) || (numBlocks < maxAggregateBlocks)) && 
 					  ((params.getMaxBlocks() <= 0) || (totalBlocks + numBlocks) < params.getMaxBlocks()) 
 					  && currLine.isContinuous(nextLine));
-				
+			
+			if (LOGGER.isLoggable(Level.INFO)) {
+				LOGGER.info("Loading " + numBlocks + " blocks - " + startOffset + ":" + totalLength + " from " + currPartId);
+			}
+			
 			currReader.seekWithMaxRead(startOffset, true, totalLength);
+			
 			totalBlocks += numBlocks;
 				
 		} catch (IOException io) {

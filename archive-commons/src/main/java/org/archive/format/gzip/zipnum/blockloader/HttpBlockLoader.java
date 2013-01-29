@@ -7,10 +7,13 @@ import org.archive.util.binsearch.impl.HTTPSeekableLineReader;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReaderFactory;
 
 public class HttpBlockLoader extends HTTPSeekableLineReaderFactory implements BlockLoader {
+	
+	protected boolean bufferFully = false;
+	protected boolean noKeepAlive = false;
 
 	public HttpBlockLoader()
 	{
-		super("");
+		super();
 		this.setMaxHostConnections(400);
 		this.setMaxTotalConnections(500);
 	}
@@ -20,6 +23,24 @@ public class HttpBlockLoader extends HTTPSeekableLineReaderFactory implements Bl
 			throws IOException {
 			
 		HTTPSeekableLineReader reader = get(filename);
+		reader.setBufferFully(bufferFully);
+		reader.setNoKeepAlive(noKeepAlive);
 		return reader;
+	}
+
+	public boolean isBufferFully() {
+		return bufferFully;
+	}
+
+	public void setBufferFully(boolean bufferFully) {
+		this.bufferFully = bufferFully;
+	}
+	
+	public boolean isNoKeepAlive() {
+		return noKeepAlive;
+	}
+
+	public void setNoKeepAlive(boolean noKeepAlive) {
+		this.noKeepAlive = noKeepAlive;
 	}
 }

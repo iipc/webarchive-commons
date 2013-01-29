@@ -14,16 +14,19 @@ public class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory 
     private HostConfiguration hostConfiguration = null;
     private HttpClient http = null;
     private String uriString;
-    private boolean noKeepAlive = false;
-
+    
     public HTTPSeekableLineReaderFactory(String uriString) {
+    	this();
+    	this.uriString = uriString;
+    }
+
+    protected HTTPSeekableLineReaderFactory() {
     	connectionManager = new MultiThreadedHttpConnectionManager();
     	hostConfiguration = new HostConfiguration();
 		HttpClientParams params = new HttpClientParams();
 //        params.setParameter(HttpClientParams.RETRY_HANDLER, new NoRetryHandler());
     	http = new HttpClient(params,connectionManager);
     	http.setHostConfiguration(hostConfiguration);
-    	this.uriString = uriString;
     }
     
     public void close() throws IOException
@@ -32,11 +35,11 @@ public class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory 
     }
 
 	public SeekableLineReader get() throws IOException {
-		return new HTTPSeekableLineReader(http, uriString, noKeepAlive);
+		return new HTTPSeekableLineReader(http, uriString);
 	}
 	
 	public HTTPSeekableLineReader get(String url) throws IOException {
-		return new HTTPSeekableLineReader(http, url, noKeepAlive);
+		return new HTTPSeekableLineReader(http, url);
 	}
     /**
      * @param hostPort to proxy requests through - ex. "localhost:3128"
@@ -108,13 +111,4 @@ public class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory 
 	public void setSocketTimeoutMS(int socketTimeoutMS) {
     	connectionManager.getParams().setSoTimeout(socketTimeoutMS);
 	}
-
-	public boolean isNoKeepAlive() {
-		return noKeepAlive;
-	}
-
-	public void setNoKeepAlive(boolean noKeepAlive) {
-		this.noKeepAlive = noKeepAlive;
-	}
-
 }

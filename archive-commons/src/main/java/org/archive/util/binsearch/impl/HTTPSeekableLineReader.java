@@ -1,6 +1,7 @@
 package org.archive.util.binsearch.impl;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,9 +16,11 @@ import org.apache.commons.httpclient.methods.HeadMethod;
 import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.zip.GZIPMembersInputStream;
 
+import com.google.common.io.ByteStreams;
+
 public class HTTPSeekableLineReader implements SeekableLineReader {
 	private final static String CONTENT_LENGTH = "Content-Length";
-	private int blockSize = 8 * 1024;
+	private int blockSize = 128 * 1024;
 	private HttpClient http;
 	private String url;
 	private long length = -1;
@@ -26,11 +29,11 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 	private HttpMethod activeMethod;
 	
 	protected boolean noKeepAlive = false;
+	protected boolean bufferFully = false;
 	
-	public HTTPSeekableLineReader(HttpClient http, String url, boolean noKeepAlive) {
+	public HTTPSeekableLineReader(HttpClient http, String url) {
 		this.http = http;
 		this.url = url;
-		this.noKeepAlive = noKeepAlive;
 	}
 	
 	private void acquireLength() throws URISyntaxException, HttpException, IOException {
@@ -77,8 +80,7 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
     	br = new BufferedReader(isr, blockSize);
 	}
 	
-	public void seekWithMaxRead(long offset, boolean gzip, int maxLength) throws IOException {
-		
+	protected InputStream seekReadInputStream(long offset, int maxLength) throws IOException {
 		if (activeMethod != null) {
 			activeMethod.abort();
 			close();
@@ -87,20 +89,75 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 		activeMethod = new GetMethod(url);
 		
 		long endOffset = (offset + maxLength) - 1;
-		activeMethod.setRequestHeader("Range", 
-				String.format("bytes=%d-%d", offset, endOffset));
+		
+		StringBuilder builder = new StringBuilder(24);
+		builder.append("bytes=");
+		builder.append(offset);
+		builder.append('-');
+		builder.append(endOffset);
+		activeMethod.setRequestHeader("Range", builder.toString()); 
+				//String.format("bytes=%d-%d", offset, endOffset));
 		
 		if (noKeepAlive) {
 			activeMethod.setRequestHeader("Connection", "close");
 		}
+		
 		int code = http.executeMethod(activeMethod);
+		
 		if((code != 206) && (code != 200)) {
 			throw new IOException("Non 200/6 response code for " + url + " " + offset + ":" + endOffset);
 		}
-		InputStream is = activeMethod.getResponseBodyAsStream();
-    	if (gzip) {
+		
+		return activeMethod.getResponseBodyAsStream();
+	}
+	
+//	public void seekReadBufferFully(long offset, boolean gzip, int maxLength) throws IOException
+//	{
+//		try {
+//			InputStream is = seekReadInputStream(offset, maxLength);
+//		
+//			byte[] buffer = new byte[maxLength];
+//		
+//			ByteStreams.readFully(is, buffer);
+//			
+//			is.close();			
+//			is = new ByteArrayInputStream(buffer);
+//			
+//			if (gzip) {
+//	    		is = new GZIPMembersInputStream(is, blockSize);
+//	    	}   
+//	    	
+//	    	isr = new InputStreamReader(is, UTF8);
+//	    	br = new BufferedReader(isr, blockSize);
+//			
+//		} finally {
+//			activeMethod.releaseConnection();
+//			activeMethod = null;
+//		}
+//	}
+	
+	public void seekWithMaxRead(long offset, boolean gzip, int maxLength) throws IOException {
+		
+		InputStream is = seekReadInputStream(offset, maxLength);
+		
+		if (bufferFully) {
+			try {
+				byte[] buffer = new byte[maxLength];
+				ByteStreams.readFully(is, buffer);
+				is.close();
+				
+				// Create new stream
+				is = new ByteArrayInputStream(buffer);
+			} finally {
+				activeMethod.releaseConnection();
+				activeMethod = null;				
+			}
+		}
+    	
+		if (gzip) {
     		is = new GZIPMembersInputStream(is, blockSize);
     	}   
+    	
     	isr = new InputStreamReader(is, UTF8);
     	br = new BufferedReader(isr, blockSize);
     }
@@ -142,6 +199,16 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 			}
 		}
 		return length;
+	}
+	
+	public void setBufferFully(boolean fully)
+	{
+		this.bufferFully = fully;
+	}
+	
+	public void setNoKeepAlive(boolean noKeepAlive)
+	{
+		this.noKeepAlive = noKeepAlive;
 	}
 
 }

@@ -277,8 +277,8 @@ public class ZipNumCluster extends CDXFile {
 		return getCDXLineIterator(key + "!", key);
 	}
 			
-	public CloseableIterator<String> getCDXLineIterator(String key, String prefix, ZipNumParams params) throws IOException {
-		return wrapStartIterator(getCDXIterator(super.getRecordIteratorLT(key)), prefix);
+	public CloseableIterator<String> getCDXIterator(String key, String prefix, ZipNumParams params) throws IOException {
+		return wrapStartIterator(getCDXIterator(super.getRecordIteratorLT(key), params), prefix);
 	}
 	
 	public CloseableIterator<String> getCDXIterator(CloseableIterator<String> summaryIterator, ZipNumParams params)

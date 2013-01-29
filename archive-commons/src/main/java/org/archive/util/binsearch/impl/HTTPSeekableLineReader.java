@@ -17,7 +17,7 @@ import org.archive.util.zip.GZIPMembersInputStream;
 
 public class HTTPSeekableLineReader implements SeekableLineReader {
 	private final static String CONTENT_LENGTH = "Content-Length";
-	private int blockSize = 128 * 1024;
+	private int blockSize = 8 * 1024;
 	private HttpClient http;
 	private String url;
 	private long length = -1;
@@ -65,7 +65,9 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 		activeMethod.setRequestHeader("Range", 
 				String.format("bytes=%d-", offset));
 		
-		activeMethod.setRequestHeader("Connection", "Close");
+		if (noKeepAlive) {
+			activeMethod.setRequestHeader("Connection", "close");
+		}
 		
 		int code = http.executeMethod(activeMethod);
 		if((code != 206) && (code != 200)) {
@@ -76,17 +78,21 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 	}
 	
 	public void seekWithMaxRead(long offset, boolean gzip, int maxLength) throws IOException {
-//		if (activeMethod != null) {
-//			activeMethod.abort();
-//			activeMethod.releaseConnection();
-//		}
 		
-		if (activeMethod == null) {
-			activeMethod = new GetMethod(url);
+		if (activeMethod != null) {
+			activeMethod.abort();
+			close();
 		}
+		
+		activeMethod = new GetMethod(url);
+		
 		long endOffset = (offset + maxLength) - 1;
 		activeMethod.setRequestHeader("Range", 
 				String.format("bytes=%d-%d", offset, endOffset));
+		
+		if (noKeepAlive) {
+			activeMethod.setRequestHeader("Connection", "close");
+		}
 		int code = http.executeMethod(activeMethod);
 		if((code != 206) && (code != 200)) {
 			throw new IOException("Non 200/6 response code for " + url + " " + offset + ":" + endOffset);
@@ -118,6 +124,7 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 		}
 		
 		if (br != null) {
+			br.close();
 			br = null;
 		}
 		

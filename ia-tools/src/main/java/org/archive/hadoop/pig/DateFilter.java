@@ -8,16 +8,15 @@ import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.PathFilter;
 import org.archive.util.ArchiveUtils;
 
-public class FileDateFilter extends Configured implements PathFilter
+public class DateFilter extends FirstPigJobOnlyFilter implements PathFilter
 {
-	protected final static Log LOGGER = LogFactory.getLog(FileDateFilter.class);
+	protected final static Log LOGGER = LogFactory.getLog(DateFilter.class);
 	
 	protected Date date1;
 	protected Date date2;
@@ -26,8 +25,8 @@ public class FileDateFilter extends Configured implements PathFilter
 	
 	protected FileSystem fs = null;
 	
-	protected FileDateFilter.CompareOp op1 = null;	
-	protected FileDateFilter.CompareOp op2 = null;
+	protected DateFilter.CompareOp op1 = null;	
+	protected DateFilter.CompareOp op2 = null;
 	
 	public final static String DATE_FILTER_PARAM = "org.archive.pig.filter.date";
 	
@@ -59,7 +58,7 @@ public class FileDateFilter extends Configured implements PathFilter
 		}
 	}
 	
-	protected FileDateFilter.CompareOp flipOp(CompareOp theOp)
+	protected DateFilter.CompareOp flipOp(CompareOp theOp)
 	{
 		switch (op1) {
 		case LT:
@@ -74,7 +73,7 @@ public class FileDateFilter extends Configured implements PathFilter
 		return CompareOp.EQ;
 	}
 	
-	protected FileDateFilter.CompareOp parseOp(String op)
+	protected DateFilter.CompareOp parseOp(String op)
 	{
 		if (op.equals("=")) {
 			return CompareOp.EQ;
@@ -100,7 +99,7 @@ public class FileDateFilter extends Configured implements PathFilter
 	}
 	
 	@Override
-	public void setConf(Configuration conf) {
+	public void setConfWhenEnabled(Configuration conf) {
 		
 		if (conf == null) {
 			return;
@@ -188,7 +187,7 @@ public class FileDateFilter extends Configured implements PathFilter
 		return new Date(status.getModificationTime());
 	}
 
-	public boolean accept(Path path) {
+	public boolean acceptWhenEnabled(Path path) {
 		
 		try {
 			FileStatus status = fs.getFileStatus(path);

@@ -73,12 +73,15 @@ public class LSRPigLoader extends PigStorage {
 		super.setLocation(location, job);
 		lsrRootLocation = location;
 	}
+	
+	public List<FileStatus> lsrFiltered(String location, JobContext job) throws IOException
+	{
+		return lsrFiltered(location, job, FileInputFormat.getInputPathFilter(job));
+	}
 		
-	protected List<FileStatus> lsrFiltered(String location, JobContext job) throws IOException
+	public List<FileStatus> lsrFiltered(String location, JobContext job, PathFilter customFilter) throws IOException
 	{		
 		ArrayList<PathFilter> filters = new ArrayList<PathFilter>();
-		
-		PathFilter customFilter = FileInputFormat.getInputPathFilter(job);
 		
 		if (customFilter != null) {
 			filters.add(customFilter);

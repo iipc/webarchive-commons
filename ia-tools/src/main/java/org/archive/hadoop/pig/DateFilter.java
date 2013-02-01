@@ -41,8 +41,8 @@ public class DateFilter extends FirstPigJobOnlyFilter implements PathFilter
 		LTEQ,
 	}
 	
-	private boolean compare(long A, long B) {
-		switch (op1) {
+	private boolean compare(DateFilter.CompareOp op, long A, long B) {
+		switch (op) {
 		case EQ:
 			return (A == B);
 		case LT:
@@ -58,9 +58,25 @@ public class DateFilter extends FirstPigJobOnlyFilter implements PathFilter
 		}
 	}
 	
+	private boolean dirSkipOp(DateFilter.CompareOp theOp, boolean second)
+	{
+		switch (theOp) {
+		case LT:
+			return (second ? false : true);
+		case GT:
+			return (second ? true : false);
+		case GTEQ:
+			return (second ? false : true);
+		case LTEQ:
+			return (second ? true : false);
+		}
+		
+		return false;
+	}
+	
 	protected DateFilter.CompareOp flipOp(CompareOp theOp)
 	{
-		switch (op1) {
+		switch (theOp) {
 		case LT:
 			return CompareOp.GT;
 		case GT:
@@ -105,7 +121,13 @@ public class DateFilter extends FirstPigJobOnlyFilter implements PathFilter
 			return;
 		}
 		
-		paramString = conf.get(DATE_FILTER_PARAM);
+		init(conf.get(DATE_FILTER_PARAM), conf);		
+	}
+	
+	public void init(String paramString, Configuration conf)
+	{
+		this.paramString = paramString;
+		
 		String[] params = paramString.split("\\s+");
 		
 		String dateStr1 = null;
@@ -192,18 +214,20 @@ public class DateFilter extends FirstPigJobOnlyFilter implements PathFilter
 		try {
 			FileStatus status = fs.getFileStatus(path);
 			
+			boolean isDir = false;
+			
 			long mtime = status.getModificationTime();
 						
 			// DATE2 > $mtype
 			if (date2 != null) {
-				if (!compare(date2.getTime(), mtime)) {
+				if (!(isDir && dirSkipOp(op2, true)) && !compare(op2, date2.getTime(), mtime)) {
 					return false;
 				}
 			}
 			
 			// $mtype < DATE1
 			if (date1 != null) {
-				if (!compare(mtime, date1.getTime())) {
+				if (!(isDir && dirSkipOp(op1,false)) && !compare(op1, mtime, date1.getTime())) {
 					return false;
 				}
 			}

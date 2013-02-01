@@ -207,7 +207,7 @@ public class SequenceFileStorage extends StoreFunc
           value = getWritable( tuple.get(1), this.nullValue );
         } else if ( size == 1 )
         {
-          key   = getWritable( emptyTextKey, this.nullKey   );        
+          key   = this.nullKey;
           value = getWritable( tuple.get(0), this.nullValue );          
         } else
         {

@@ -31,9 +31,22 @@ public class CDXMapper extends Mapper<Object, Text, Text, Text>
 	StringBuilder valSB = new StringBuilder();
 
 	private boolean omitNoArchive = false;
+	private boolean noRedirect = true;
+	private boolean skipOnCanonFail = false;
 	private URLKeyMaker keyMaker = new WaybackURLKeyMaker();
 	
-	public static String DEFAULT_GZ_LEN = "-";
+	public static String DEFAULT_BLANK = "-";
+	public static String DEFAULT_GZ_LEN = DEFAULT_BLANK;
+	
+	public String convertLine(String cdxLine) {
+		if (convert(cdxLine) == null) {
+			return null;
+		}
+		
+		keySB.append(delim);
+		keySB.append(valSB);
+		return keySB.toString();
+	}
 	
 	public StringPair convert(String cdxLine) {
 		if(cdxLine.startsWith(" CDX ")) {
@@ -41,7 +54,7 @@ public class CDXMapper extends Mapper<Object, Text, Text, Text>
 		}
 		String[] parts = cdxLine.split(delim);
 		int offsetIdx = 8;
-		String metaInstructions = "-";
+		String metaInstructions = DEFAULT_BLANK;
 		if(parts.length == 9) {
 			offsetIdx = 7;
 		} else if(parts.length == 10) {
@@ -63,7 +76,7 @@ public class CDXMapper extends Mapper<Object, Text, Text, Text>
 		String mime = parts[3];
 		String responseCode = parts[4];
 		String digest = parts[5];
-		String redirect = parts[6];
+		String redirect = (noRedirect ? DEFAULT_BLANK : parts[6]);
 		String offset = parts[offsetIdx];
 		String filename = parts[offsetIdx+1];
 		String urlKey;
@@ -72,6 +85,9 @@ public class CDXMapper extends Mapper<Object, Text, Text, Text>
 		} catch (URIException e) {
 			urlKey = origUrl;
 			e.printStackTrace();
+			if (skipOnCanonFail) {
+				return null;
+			}
 		}
 		
 		keySB.setLength(0);
@@ -116,5 +132,20 @@ public class CDXMapper extends Mapper<Object, Text, Text, Text>
 			this.first = first;
 			this.second = second;
 		}
+	}
+	public boolean isSkipOnCanonFail() {
+		return skipOnCanonFail;
+	}
+
+	public void setSkipOnCanonFail(boolean skipOnCanonFail) {
+		this.skipOnCanonFail = skipOnCanonFail;
+	}
+
+	public boolean isNoRedirect() {
+		return noRedirect;
+	}
+
+	public void setNoRedirect(boolean noRedirect) {
+		this.noRedirect = noRedirect;
 	}
 }

@@ -19,6 +19,10 @@ public class ZipNumAllOutputFormat extends FileOutputFormat<Text, Text> {
 	private static final int DEFAULT_ZIP_NUM_LINES = 5000;
 	private static final String ZIP_NUM_LINES_CONFIGURATION = "conf.zipnum.count";
 	private static final String ZIP_NUM_OVERCRAWL_CONFIGURATION = "conf.zipnum.overcrawl.daycount";
+	
+	private static final String ZIP_NUM_PART_MOD = "conf.zipnum.partmod";
+	private static final String DEFAULT_PART_MOD = "a-";
+	private String partMod = "";
 
 	public ZipNumAllOutputFormat() {
 		this(DEFAULT_ZIP_NUM_LINES);
@@ -43,10 +47,12 @@ public class ZipNumAllOutputFormat extends FileOutputFormat<Text, Text> {
 		Configuration conf = context.getConfiguration();
 		count = conf.getInt(ZIP_NUM_LINES_CONFIGURATION, DEFAULT_ZIP_NUM_LINES);
 		int dayLimit = conf.getInt(ZIP_NUM_OVERCRAWL_CONFIGURATION, -1);
+		
+		partMod = conf.get(ZIP_NUM_PART_MOD, DEFAULT_PART_MOD);
 
 		String partitionName = getPartitionName(context);
-		Path mainFile = getWorkFile(context, partitionName +".gz");
-		Path summaryFile = getWorkFile(context, partitionName + ".ALL.summary");
+		Path mainFile = getWorkFile(context, partitionName + ".gz");
+		Path summaryFile = getWorkFile(context, partitionName + "-idx");
 		
 
 		FileSystem mainFs = mainFile.getFileSystem(conf);
@@ -88,7 +94,7 @@ public class ZipNumAllOutputFormat extends FileOutputFormat<Text, Text> {
 				.getPartitionOutputName(context.getConfiguration(), partition);
 		if(basename == null) {
 			// use default name:
-			basename = String.format("part-%05d", partition);
+			basename = String.format("part-%s%05d", partMod, partition);
 		}
 		
 		return basename;

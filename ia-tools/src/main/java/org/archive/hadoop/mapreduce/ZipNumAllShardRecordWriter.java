@@ -76,6 +76,10 @@ public class ZipNumAllShardRecordWriter  extends RecordWriter<Text, Text>{
 	public void writeLine(String line) throws IOException {
 		if(count == 0) {
 			int spaceIndex = line.indexOf(delim);
+			// Include 2nd field (timestamp)
+			if (spaceIndex >= 0) {
+				spaceIndex = line.indexOf(delim, spaceIndex + 1);
+			}
 			String urlkey = ((spaceIndex >= 0) ? line.substring(0, spaceIndex) : line);
 			if (spaceIndex < 0) {
 				System.err.println("POSSIBLY INVALID CDX LINE: " + line);

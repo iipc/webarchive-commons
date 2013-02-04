@@ -18,14 +18,17 @@ import org.archive.util.binsearch.SeekableLineReaderFactory;
  *
  */
 public class NIOSeekableLineReaderFactory implements SeekableLineReaderFactory {
+	private File file;
 	private FileChannel fc;
 	private int blockSize = BINSEARCH_BLOCK_SIZE;
 	
 	public NIOSeekableLineReaderFactory(File file, int blockSize) throws IOException {
+		this.file = file;
 		this.blockSize = blockSize;
 		fc = new RandomAccessFile(file,"r").getChannel();
 	}
 	public NIOSeekableLineReaderFactory(File file) throws IOException {
+		this.file = file;
 		fc = new RandomAccessFile(file,"r").getChannel();
 	}
 	public SeekableLineReader get() throws IOException {
@@ -36,5 +39,10 @@ public class NIOSeekableLineReaderFactory implements SeekableLineReaderFactory {
 		if (fc != null) {
 			fc.close();
 		}
+	}
+	
+	public long getModTime()
+	{
+		return file.lastModified();
 	}
 }

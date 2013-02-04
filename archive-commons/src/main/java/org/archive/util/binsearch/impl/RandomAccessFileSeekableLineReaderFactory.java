@@ -25,4 +25,9 @@ public class RandomAccessFileSeekableLineReaderFactory implements SeekableLineRe
 	public void close() throws IOException {
 		this.file = null;
 	}
+	
+	public long getModTime()
+	{
+		return file.lastModified();
+	}
 }

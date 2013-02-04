@@ -209,7 +209,7 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 				currReader = null;
 			}
 			
-			if (cluster.locMap != null) {
+			if (cluster.locationUpdater != null) {
 				initLocationReader(partId);
 			}
 			
@@ -227,7 +227,7 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 	
 	protected void initLocationReader(String partId)
 	{
-		String[] locations = cluster.locMap.get(partId);
+		String[] locations = cluster.locationUpdater.getLocations(partId);
 		
 		if (locations == null) {
 			LOGGER.severe("No locations for block(" + partId +")");

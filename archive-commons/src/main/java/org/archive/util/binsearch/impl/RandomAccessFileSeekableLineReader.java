@@ -69,7 +69,7 @@ public class RandomAccessFileSeekableLineReader implements SeekableLineReader {
 	
 	public void close() throws IOException {
 		if(closed) {
-			LOGGER.info(String.format("Error already closed"));
+			//LOGGER.info(String.format("Error already closed"));
 			return;
 		}
 		closed = true;

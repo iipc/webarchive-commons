@@ -19,7 +19,8 @@ import org.archive.util.zip.GZIPMembersInputStream;
 import com.google.common.io.ByteStreams;
 
 public class HTTPSeekableLineReader implements SeekableLineReader {
-	private final static String CONTENT_LENGTH = "Content-Length";
+	public final static String CONTENT_LENGTH = "Content-Length";
+	public final static String LAST_MODIFIED = "Last-Modified";
 	private int blockSize = 128 * 1024;
 	private HttpClient http;
 	private String url;
@@ -53,6 +54,22 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 			throw new IOException("Bad Content-Length value " +url+ ": " + val);
 		}
 	}
+	
+	protected String getHeader(String header) throws URISyntaxException, HttpException, IOException {
+		HttpMethod head = new HeadMethod(url);
+		int code = http.executeMethod(head);
+		if(code != 200) {
+			throw new IOException("Unable to retrieve from " + url);
+		}
+		Header theHeader = head.getResponseHeader(header);
+		if(theHeader == null) {
+			throw new IOException("No " + header + " header for " + url);
+		}
+		String val = theHeader.getValue();
+		return val;
+	}
+	
+	
 	
 	public String getUrl()
 	{
@@ -110,32 +127,7 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 		
 		return activeMethod.getResponseBodyAsStream();
 	}
-	
-//	public void seekReadBufferFully(long offset, boolean gzip, int maxLength) throws IOException
-//	{
-//		try {
-//			InputStream is = seekReadInputStream(offset, maxLength);
-//		
-//			byte[] buffer = new byte[maxLength];
-//		
-//			ByteStreams.readFully(is, buffer);
-//			
-//			is.close();			
-//			is = new ByteArrayInputStream(buffer);
-//			
-//			if (gzip) {
-//	    		is = new GZIPMembersInputStream(is, blockSize);
-//	    	}   
-//	    	
-//	    	isr = new InputStreamReader(is, UTF8);
-//	    	br = new BufferedReader(isr, blockSize);
-//			
-//		} finally {
-//			activeMethod.releaseConnection();
-//			activeMethod = null;
-//		}
-//	}
-	
+		
 	public void seekWithMaxRead(long offset, boolean gzip, int maxLength) throws IOException {
 		
 		InputStream is = seekReadInputStream(offset, maxLength);
@@ -210,5 +202,4 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 	{
 		this.noKeepAlive = noKeepAlive;
 	}
-
 }

@@ -1,12 +1,13 @@
 package org.archive.util.binsearch.impl;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.params.HttpClientParams;
-import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.binsearch.SeekableLineReaderFactory;
 
 public class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory {
@@ -34,7 +35,7 @@ public class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory 
     	connectionManager.deleteClosedConnections();
     }
 
-	public SeekableLineReader get() throws IOException {
+	public HTTPSeekableLineReader get() throws IOException {
 		return new HTTPSeekableLineReader(http, uriString);
 	}
 	
@@ -110,5 +111,32 @@ public class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory 
 	 */
 	public void setSocketTimeoutMS(int socketTimeoutMS) {
     	connectionManager.getParams().setSoTimeout(socketTimeoutMS);
+	}
+	
+	// Experimental
+	public long getModTime()
+	{
+		HTTPSeekableLineReader reader = null;
+		SimpleDateFormat lastModFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+	
+		try {
+			reader = get();
+			String result = reader.getHeader(HTTPSeekableLineReader.LAST_MODIFIED);
+			Date date = lastModFormat.parse(result);
+			return date.getTime();
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+
+				}
+			}
+		}
+		
+		return 0;
 	}
 }

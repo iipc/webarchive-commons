@@ -1,7 +1,6 @@
 package org.archive.format.gzip.zipnum;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.archive.format.cdx.CDXFile;
@@ -9,7 +8,6 @@ import org.archive.format.gzip.zipnum.blockloader.BlockLoader;
 import org.archive.util.GeneralURIStreamFactory;
 import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.binsearch.SeekableLineReaderFactory;
-import org.archive.util.binsearch.SeekableLineReaderIterator;
 import org.archive.util.iterator.BoundedStringIterator;
 import org.archive.util.iterator.CloseableIterator;
 import org.archive.util.iterator.StartBoundedStringIterator;
@@ -23,9 +21,10 @@ public class ZipNumCluster extends CDXFile {
 	
 	protected BlockLoader blockLoader;
 	
-	protected HashMap<String, String[]> locMap = null;
+	//protected HashMap<String, String[]> locMap = null;
+	LocationUpdater locationUpdater = null;
 		
-	protected final static boolean USE_NIO = true;
+	protected final static boolean DEFAULT_USE_NIO = true;
 	
 	
 	public ZipNumCluster(String clusterUri) throws IOException
@@ -34,12 +33,10 @@ public class ZipNumCluster extends CDXFile {
 	}
 	
 	public ZipNumCluster(String clusterUri, String summaryFile, String locUri) throws IOException {
-		this(clusterUri, summaryFile);
-		
-		loadPartLocations(locUri);
+		this(clusterUri, summaryFile, locUri, null, DEFAULT_USE_NIO);
 	}
 		
-	protected static SeekableLineReaderFactory getStreamFactoryUri(String clusterUri, String summaryFile) throws IOException
+	protected static SeekableLineReaderFactory getStreamFactoryUri(String clusterUri, String summaryFile, boolean useNio) throws IOException
 	{
 		String fullPath;
 		
@@ -49,7 +46,7 @@ public class ZipNumCluster extends CDXFile {
 			fullPath = (clusterUri + "/" + summaryFile);
 		}
 		
-		return GeneralURIStreamFactory.createSeekableStreamFactory(fullPath, USE_NIO);
+		return GeneralURIStreamFactory.createSeekableStreamFactory(fullPath, useNio);
 	}
 	
 	public ZipNumCluster(String clusterUri, String summaryFile) throws IOException {
@@ -57,53 +54,27 @@ public class ZipNumCluster extends CDXFile {
 	}
 	
 	public ZipNumCluster(String clusterUri, String summaryFile, BlockLoader blockLoader) throws IOException {
+		this(clusterUri, summaryFile, (String)null, (BlockLoader)null, DEFAULT_USE_NIO);
+	}
+	
+	public ZipNumCluster(String clusterUri, String summaryFile, String locUri, BlockLoader blockLoader, boolean useNio) throws IOException {
 		
-		super(getStreamFactoryUri(clusterUri, summaryFile));
+		super(getStreamFactoryUri(clusterUri, summaryFile, useNio));
 		
 		this.clusterUri = clusterUri;
 		this.summaryFile = summaryFile;
 				
 		if (blockLoader == null) {
-			this.blockLoader = GeneralURIStreamFactory.createBlockLoader(clusterUri, USE_NIO);
+			this.blockLoader = GeneralURIStreamFactory.createBlockLoader(clusterUri, useNio);
 		} else {
 			this.blockLoader = blockLoader;
 		}
-	}
 		
-	protected void loadPartLocations(String locUri) throws IOException
-	{
-		locMap = new HashMap<String, String[]>();
-		SeekableLineReaderIterator lines = null;
-		SeekableLineReaderFactory readerFactory = null;
-		
-		try {
-			
-			readerFactory = GeneralURIStreamFactory.createSeekableStreamFactory(locUri, true);
-			
-			lines = new SeekableLineReaderIterator(readerFactory.get());
-			
-			while(lines.hasNext()) {
-				String line = lines.next();
-				String[] parts = line.split("\\s");
-				if (parts.length < 2) {
-					String msg = "Bad line(" + line +") in (" + locUri + ")";
-					throw new IOException(msg);
-				}
-				
-				String locations[] = new String[parts.length - 1];
-			
-				for (int i = 1; i < parts.length; i++) {
-					locations[i-1] = parts[i];
-				}
-				
-				locMap.put(parts[0], locations);
-			}
-		} finally {
-			lines.close();
-			readerFactory.close();
+		if (locUri != null) {
+			locationUpdater = new LocationUpdater(locUri);
 		}
 	}
-		
+				
 	protected static int extractLineCount(String line)
 	{
 		String[] parts = line.split("\t");

@@ -32,4 +32,13 @@ public class HDFSSeekableLineReaderFactory implements SeekableLineReaderFactory 
 			fs.close();
 		}
 	}
+	
+	public long getModTime()
+	{
+		try {
+			return fs.getFileStatus(path).getModificationTime();
+		} catch (IOException e) {
+			return 0;
+		}
+	}
 }

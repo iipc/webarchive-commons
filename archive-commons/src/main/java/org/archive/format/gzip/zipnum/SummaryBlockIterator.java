@@ -214,7 +214,7 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 			}
 			
 			if (currReader == null) {
-				String partUrl = cluster.clusterUri + "/" + partId + ".gz";
+				String partUrl = cluster.getClusterPart(partId);
 				currReader = cluster.blockLoader.createBlockReader(partUrl);	
 			}
 			

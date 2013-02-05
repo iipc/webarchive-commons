@@ -81,7 +81,9 @@ public class LocationUpdater implements Runnable {
 				destMap.put(parts[0], locations);
 			}
 		} finally {
-			lines.close();
+			if (lines != null) {
+				lines.close();
+			}
 		}
 	}
 

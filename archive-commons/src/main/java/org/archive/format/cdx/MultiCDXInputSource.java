@@ -28,11 +28,8 @@ public class MultiCDXInputSource implements CDXInputSource {
 		for (String uri : cdxUris) {
 			if (uri.endsWith(".cdx") || uri.endsWith(".cdx.gz")) {
 				cdx.add(new CDXFile(uri));
-			} else if (uri.endsWith("-idx") && uri.contains("/")) {
-				int filenameIndex = uri.lastIndexOf('/');
-				String clusterUri = uri.substring(0, filenameIndex);
-				String summaryFile = uri.substring(filenameIndex + 1);
-				cdx.add(new ZipNumCluster(clusterUri, summaryFile));
+			} else if (uri.endsWith("ALL.summary") && uri.contains("/")) {
+				cdx.add(new ZipNumCluster(uri));
 			} else {
 				//Skipping?
 			}

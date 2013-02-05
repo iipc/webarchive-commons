@@ -12,10 +12,17 @@ public class SortedTextFile {
 	
 	protected SeekableLineReaderFactory factory;
 	
-	/**
-	 * 
-	 */
 	public SortedTextFile(SeekableLineReaderFactory factory) {
+		setFactory(factory);
+	}
+	
+	protected SortedTextFile()
+	{
+		this.factory = null;
+	}
+	
+	protected void setFactory(SeekableLineReaderFactory factory)
+	{
 		this.factory = factory;
 	}
 

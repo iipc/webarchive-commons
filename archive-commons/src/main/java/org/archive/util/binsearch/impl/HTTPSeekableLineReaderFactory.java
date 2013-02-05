@@ -21,7 +21,7 @@ public class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory 
     	this.uriString = uriString;
     }
 
-    protected HTTPSeekableLineReaderFactory() {
+    public HTTPSeekableLineReaderFactory() {
     	connectionManager = new MultiThreadedHttpConnectionManager();
     	hostConfiguration = new HostConfiguration();
 		HttpClientParams params = new HttpClientParams();

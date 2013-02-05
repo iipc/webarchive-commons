@@ -10,9 +10,6 @@ import java.util.logging.Logger;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.archive.format.gzip.zipnum.blockloader.BlockLoader;
-import org.archive.format.gzip.zipnum.blockloader.FileSystemBlockLoader;
-import org.archive.format.gzip.zipnum.blockloader.HttpBlockLoader;
 import org.archive.streamcontext.HDFSStream;
 import org.archive.streamcontext.HTTP11Stream;
 import org.archive.streamcontext.RandomAccessFileStream;
@@ -107,15 +104,6 @@ public class GeneralURIStreamFactory {
 			return new NIOSeekableLineReaderFactory(new File(uri));
 		} else {
 			return new RandomAccessFileSeekableLineReaderFactory(new File(uri));
-		}
-	}
-	
-	public static BlockLoader createBlockLoader(String uri, boolean useNio) throws IOException
-	{
-		if (isHttp(uri)) {
-			return new HttpBlockLoader();
-		} else {
-			return new FileSystemBlockLoader(useNio);
 		}
 	}
 }

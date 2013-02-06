@@ -6,6 +6,14 @@ public class WaybackURLKeyMaker implements URLKeyMaker {
 //	URLCanonicalizer canonicalizer = new NonMassagingIAURLCanonicalizer();
 	URLCanonicalizer canonicalizer = new DefaultIAURLCanonicalizer();
 	
+	public URLCanonicalizer getCanonicalizer() {
+		return canonicalizer;
+	}
+
+	public void setCanonicalizer(URLCanonicalizer canonicalizer) {
+		this.canonicalizer = canonicalizer;
+	}
+
 	private boolean surtMode = true;
 	
 	public WaybackURLKeyMaker()

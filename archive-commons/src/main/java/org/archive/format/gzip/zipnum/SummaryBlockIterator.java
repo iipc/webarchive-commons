@@ -165,10 +165,13 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 					}
 				}
 	
-				if (initReader(currLine.partId) || (numBlocks == 0)) {
+				if ((currPartId == null) || !currPartId.equals(currLine.partId) || (numBlocks == 0)) {
 					startOffset = currLine.offset;
-					totalLength = 0;					
+					totalLength = 0;
+					currPartId = currLine.partId;
 				}
+				
+				initReader(currPartId);
 				
 				totalLength += currLine.length;
 				numBlocks++;
@@ -200,29 +203,26 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 		return currReader;
 	}
 		
-	protected boolean initReader(String partId) throws IOException
+	protected void initReader(String partId) throws IOException
 	{
-		if ((currReader == null) || (currPartId == null) || !currPartId.equals(partId)) {
+		//if ((currReader == null) || (currPartId == null) || !currPartId.equals(partId)) {
 			
-			if (currReader != null) {
-				currReader.close();
-				currReader = null;
-			}
-			
-			if (cluster.locationUpdater != null) {
-				initLocationReader(partId);
-			}
-			
-			if (currReader == null) {
-				String partUrl = cluster.getClusterPart(partId);
-				currReader = cluster.blockLoader.createBlockReader(partUrl);	
-			}
-			
-			currPartId = partId;			
-			return true;
+		if (currReader != null) {
+			currReader.close();
+			currReader = null;
 		}
 		
-		return false;
+		if (cluster.locationUpdater != null) {
+			initLocationReader(partId);
+		}
+		
+		if (currReader == null) {
+			String partUrl = cluster.getClusterPart(partId);
+			currReader = cluster.blockLoader.createBlockReader(partUrl);	
+		}
+			
+		//}
+		//return false;
 	}
 	
 	protected void initLocationReader(String partId)

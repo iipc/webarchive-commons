@@ -1,10 +1,14 @@
 package org.archive.format.gzip.zipnum;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.archive.util.ArchiveUtils;
 import org.archive.util.GeneralURIStreamFactory;
 import org.archive.util.binsearch.SeekableLineReaderFactory;
 import org.archive.util.binsearch.SeekableLineReaderIterator;
@@ -23,6 +27,14 @@ public class LocationUpdater implements Runnable {
 	
 	protected Thread updaterThread;
 	
+	
+	public final static String START_TIMESTAMP = "_START";
+	public final static String END_TIMESTAMP = "_END";	
+	protected SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	protected Date startDate, endDate;
+	
+	protected Date newStartDate, newEndDate;
+	
 	public LocationUpdater(String locUri) throws IOException
 	{
 		this.locUri = locUri;
@@ -30,6 +42,8 @@ public class LocationUpdater implements Runnable {
 		locReaderFactory = GeneralURIStreamFactory.createSeekableStreamFactory(locUri, false);
 		lastModTime = locReaderFactory.getModTime();
 		loadPartLocations(locMap);
+		startDate = newStartDate;
+		endDate = newEndDate;
 		
 		updaterThread = new Thread(this, "LocationUpdaterThread");
 		updaterThread.start();
@@ -38,6 +52,8 @@ public class LocationUpdater implements Runnable {
 	protected void syncLoad(long newModTime) throws IOException
 	{
 		HashMap<String, String[]> destMap = new HashMap<String, String[]>();
+		
+		newStartDate = newEndDate = null;
 		loadPartLocations(destMap);
 		
 		if (LOGGER.isLoggable(Level.INFO)) {
@@ -46,6 +62,8 @@ public class LocationUpdater implements Runnable {
 		
 		synchronized (this) {
 			locMap.putAll(destMap);
+			startDate = newStartDate;
+			endDate = newEndDate;			
 		}
 		
 		lastModTime = newModTime;
@@ -54,6 +72,46 @@ public class LocationUpdater implements Runnable {
 	public synchronized String[] getLocations(String key)
 	{
 		return locMap.get(key);
+	}
+	
+	protected Date parseDate(String date)
+	{
+		try {
+			return dateFormat.parse(date);
+		} catch (ParseException e) {
+			return null;
+		}
+	}
+	
+	public boolean dateRangeCheck(String key)
+	{
+		if ((startDate == null) && (endDate == null)) {
+			return true;
+		}
+		
+		int spaceIndex = key.indexOf(' ');
+		if (spaceIndex < 0) {
+			return true;
+		}
+		
+		String dateStr = key.substring(spaceIndex + 1);
+		Date reqDate = null;
+		
+		try {
+			reqDate = ArchiveUtils.getDate(dateStr);
+		} catch (ParseException e) {
+			return true;
+		}
+		
+		if ((startDate != null) && reqDate.before(startDate)) {
+			return false;
+		}
+		
+		if ((endDate != null) && reqDate.after(endDate)) {
+			return false;
+		}
+		
+		return true;
 	}
 	
 	protected void loadPartLocations(HashMap<String, String[]> destMap) throws IOException
@@ -66,10 +124,18 @@ public class LocationUpdater implements Runnable {
 			
 			while (lines.hasNext()) {
 				String line = lines.next();
-				String[] parts = line.split("\\s");
+				
+				
+				String[] parts = line.split("\\t");
 				if (parts.length < 2) {
 					String msg = "Bad line(" + line +") in (" + locUri + ")";
 					throw new IOException(msg);
+				}
+				
+				if (parts[0].equals(START_TIMESTAMP)) {
+					newStartDate = parseDate(parts[1]);
+				} else if (parts[0].equals(END_TIMESTAMP)) {
+					newEndDate = parseDate(parts[1]);
 				}
 				
 				String locations[] = new String[parts.length - 1];

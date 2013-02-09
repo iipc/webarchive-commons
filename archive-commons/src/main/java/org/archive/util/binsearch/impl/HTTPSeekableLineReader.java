@@ -77,6 +77,10 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 	}
 	
 	public void seek(long offset) throws IOException {
+		seek(offset, false);
+	}
+	
+	public void seek(long offset, boolean gzip) throws IOException {
 		if(activeMethod != null) {
 			activeMethod.abort();
 			activeMethod.releaseConnection();
@@ -93,13 +97,16 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 		if((code != 206) && (code != 200)) {
 			throw new IOException("Non 200/6 response code for " + url + ":" + offset);
 		}
-    	isr = new InputStreamReader(activeMethod.getResponseBodyAsStream(), UTF8);
+		InputStream is = activeMethod.getResponseBodyAsStream();
+		if (gzip) {
+    		is = new GZIPMembersInputStream(is, blockSize);
+    	} 
+    	isr = new InputStreamReader(is, UTF8);
     	br = new BufferedReader(isr, blockSize);
 	}
 	
 	protected InputStream seekReadInputStream(long offset, int maxLength) throws IOException {
 		if (activeMethod != null) {
-			activeMethod.abort();
 			close();
 		}
 		
@@ -168,6 +175,7 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 
 	public void close() throws IOException {
 		if (activeMethod != null) {
+			activeMethod.abort();
 			activeMethod.releaseConnection();
 			activeMethod = null;
 		}

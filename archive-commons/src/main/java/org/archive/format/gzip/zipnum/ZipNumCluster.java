@@ -28,6 +28,29 @@ public class ZipNumCluster extends SortedTextFile implements CDXInputSource {
 	
 	protected boolean useNio = DEFAULT_USE_NIO;
 	
+	protected final static CloseableIterator<String> EMPTY_ITERATOR = new CloseableIterator<String>()
+	{
+		@Override
+		public boolean hasNext() {
+			return false;
+		}
+
+		@Override
+		public String next() {
+			return null;
+		}
+
+		@Override
+		public void remove() {
+			
+		}
+
+		@Override
+		public void close() throws IOException {
+			
+		}	
+	};
+	
 	public ZipNumCluster()
 	{
 		
@@ -251,6 +274,10 @@ public class ZipNumCluster extends SortedTextFile implements CDXInputSource {
 	}
 			
 	public CloseableIterator<String> getCDXIterator(String key, String start, boolean exact, ZipNumParams params) throws IOException {
+		
+		if ((locationUpdater != null) && !locationUpdater.dateRangeCheck(key)) {
+			return EMPTY_ITERATOR;
+		}
 		
 		CloseableIterator<String> summaryIter = super.getRecordIteratorLT(key);
 		

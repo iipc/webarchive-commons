@@ -282,7 +282,7 @@ public class ZipNumCluster extends SortedTextFile implements CDXInputSource {
 		CloseableIterator<String> summaryIter = super.getRecordIteratorLT(key);
 		
 		if (blockLoader.isBufferFully() && (params != null) && (params.getMaxBlocks() > 0)) {
-			summaryIter = new LineBufferingIterator(summaryIter, params.getMaxBlocks());
+			summaryIter = new LineBufferingIterator(summaryIter, params.getMaxBlocks(), params.getTimestampDedupLength());
 		}
 		
 		if (exact) {

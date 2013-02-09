@@ -23,13 +23,13 @@ public class LocationUpdater implements Runnable {
 	
 	protected long lastModTime = 0;
 	
-	protected int checkInterval = 5000;
+	protected int checkInterval = 30000;
 	
 	protected Thread updaterThread;
 	
 	
-	public final static String START_TIMESTAMP = "_START";
-	public final static String END_TIMESTAMP = "_END";	
+	public final static String EARLIEST_TIMESTAMP = "_EARLIEST";
+	public final static String LATEST_TIMESTAMP = "_LATEST";	
 	protected SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	protected Date startDate, endDate;
 	
@@ -38,15 +38,20 @@ public class LocationUpdater implements Runnable {
 	public LocationUpdater(String locUri) throws IOException
 	{
 		this.locUri = locUri;
+		
 		locMap = new HashMap<String, String[]>();
 		locReaderFactory = GeneralURIStreamFactory.createSeekableStreamFactory(locUri, false);
 		lastModTime = locReaderFactory.getModTime();
+		
 		loadPartLocations(locMap);
+		
 		startDate = newStartDate;
 		endDate = newEndDate;
 		
-		updaterThread = new Thread(this, "LocationUpdaterThread");
-		updaterThread.start();
+		if (checkInterval > 0) {
+			updaterThread = new Thread(this, "LocationUpdaterThread");
+			updaterThread.start();
+		}
 	}
 	
 	protected void syncLoad(long newModTime) throws IOException
@@ -132,9 +137,9 @@ public class LocationUpdater implements Runnable {
 					throw new IOException(msg);
 				}
 				
-				if (parts[0].equals(START_TIMESTAMP)) {
+				if (parts[0].equals(EARLIEST_TIMESTAMP)) {
 					newStartDate = parseDate(parts[1]);
-				} else if (parts[0].equals(END_TIMESTAMP)) {
+				} else if (parts[0].equals(LATEST_TIMESTAMP)) {
 					newEndDate = parseDate(parts[1]);
 				}
 				
@@ -172,5 +177,13 @@ public class LocationUpdater implements Runnable {
 		} catch (InterruptedException ie) {
 			
 		}
+	}
+
+	public int getCheckInterval() {
+		return checkInterval;
+	}
+
+	public void setCheckInterval(int checkInterval) {
+		this.checkInterval = checkInterval;
 	}
 }

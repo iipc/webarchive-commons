@@ -4,19 +4,20 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.archive.format.cdx.CDXInputSource;
-import org.archive.util.GeneralURIStreamFactory;
 import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.binsearch.SortedTextFile;
 import org.archive.util.iterator.BoundedStringIterator;
 import org.archive.util.iterator.CloseableIterator;
 import org.archive.util.iterator.StartBoundedStringIterator;
 
-public class ZipNumCluster extends SortedTextFile implements CDXInputSource {
+public class ZipNumCluster implements CDXInputSource {
 	final static Logger LOGGER = Logger.getLogger(ZipNumCluster.class.getName());
 
 	private String clusterRoot;
 		
 	protected String summaryFile;
+	protected SortedTextFile summary;
+	
 	protected String locFile;
 	
 	protected ZipNumBlockLoader blockLoader;
@@ -56,15 +57,16 @@ public class ZipNumCluster extends SortedTextFile implements CDXInputSource {
 		
 	}
 	
-	public ZipNumCluster(String summaryFile) throws IOException
+	public ZipNumCluster(String clusterUri) throws IOException
 	{
-		this.setSummaryFile(summaryFile);
-		init();
+		this.clusterRoot = clusterUri;
 	}
 					
 	public void init() throws IOException {
 		
-		super.setFactory(GeneralURIStreamFactory.createSeekableStreamFactory(summaryFile, useNio));
+		if (summaryFile != null) {
+			this.summary = new SortedTextFile(summaryFile, useNio);
+		}
 				
 		if (locFile != null) {
 			this.locationUpdater = new LocationUpdater(locFile);
@@ -77,22 +79,28 @@ public class ZipNumCluster extends SortedTextFile implements CDXInputSource {
 				
 	protected static int extractLineCount(String line)
 	{
+		return (int)extractLongField(line, 4);
+	}
+	
+	protected static long extractLongField (String line, int index)
+	{
 		String[] parts = line.split("\t");
 		
-		if (parts.length < 5) {
+		if (parts.length <= index) {
 			return -1;
 		}
 		
-		int count = -1;
+		long count = -1;
 		
 		try {
-			count = Integer.parseInt(parts[4]);
+			count = Long.parseLong(parts[index]);
 		} catch (NumberFormatException n) {
 
 		}
 		
 		return count;
 	}
+
 	
 	public String getClusterPart(String partId)
 	{
@@ -127,6 +135,17 @@ public class ZipNumCluster extends SortedTextFile implements CDXInputSource {
 		return size;
 	}
 	
+	public long getTotalLength(String[] blocks)
+	{	
+		long size = 0;
+		
+		for (String block : blocks) {
+			size += extractLongField(block, 3);
+		}
+		
+		return size;
+	}
+	
 	public int getNumLines(String start, String end) throws IOException
 	{
 		SeekableLineReader slr = null;
@@ -137,9 +156,9 @@ public class ZipNumCluster extends SortedTextFile implements CDXInputSource {
 		int endCount = 0;
 		
 		try {
-			slr = factory.get();
+			slr = summary.getSLR();
 		
-			long[] offsets = getStartEndOffsets(slr, start, end);
+			long[] offsets = summary.getStartEndOffsets(slr, start, end);
 			
 			if (offsets[0] > 0) {
 				slr.seek(offsets[0]);
@@ -210,7 +229,7 @@ public class ZipNumCluster extends SortedTextFile implements CDXInputSource {
 	public CloseableIterator<String> getClusterRange(String start, String end, boolean inclusive, boolean includePrevLine) throws IOException
 	{
 		CloseableIterator<String> iter = null;
-		iter = super.getRecordIterator(start, includePrevLine);
+		iter = summary.getRecordIterator(start, includePrevLine);
 		return wrapEndIterator(iter, end, inclusive);
 		//return wrapStartEndIterator(iter, start, end, inclusive);
 	}
@@ -261,11 +280,10 @@ public class ZipNumCluster extends SortedTextFile implements CDXInputSource {
 	
 	public CloseableIterator<String> getLastBlockCDXLineIterator(String key) throws IOException {
 		// the next line after last key<space> is key! so this will return last key<space> block
-		CloseableIterator<String> summaryIter = super.getRecordIteratorLT(endKey(key));
+		CloseableIterator<String> summaryIter = summary.getRecordIteratorLT(endKey(key));
 		
 		return wrapStartIterator(getCDXIterator(summaryIter), key);
 	}
-	
 	
 	//TODO: for CDXInputSource... this interface needs rethinking
 	public CloseableIterator<String> getCDXLineIterator(String key, String prefix) throws IOException
@@ -279,7 +297,7 @@ public class ZipNumCluster extends SortedTextFile implements CDXInputSource {
 			return EMPTY_ITERATOR;
 		}
 		
-		CloseableIterator<String> summaryIter = super.getRecordIteratorLT(key);
+		CloseableIterator<String> summaryIter = summary.getRecordIteratorLT(key);
 		
 		if (blockLoader.isBufferFully() && (params != null) && (params.getMaxBlocks() > 0)) {
 			summaryIter = new LineBufferingIterator(summaryIter, params.getMaxBlocks(), params.getTimestampDedupLength());
@@ -292,6 +310,12 @@ public class ZipNumCluster extends SortedTextFile implements CDXInputSource {
 		}
 		
 		return wrapStartIterator(getCDXIterator(summaryIter, params), start);
+	}
+	
+	public CloseableIterator<String> getCDXIterator(String key, ZipNumParams params) throws IOException {
+		
+		CloseableIterator<String> summaryIter = summary.getRecordIteratorLT(key);		
+		return wrapStartIterator(getCDXIterator(summaryIter, params), key);
 	}
 	
 	public CloseableIterator<String> getCDXIterator(CloseableIterator<String> summaryIterator, ZipNumParams params)
@@ -312,6 +336,11 @@ public class ZipNumCluster extends SortedTextFile implements CDXInputSource {
 
 	public String getSummaryFile() {
 		return summaryFile;
+	}
+	
+	public SortedTextFile getSummary()
+	{
+		return summary;
 	}
 
 	public ZipNumBlockLoader getBlockLoader() {

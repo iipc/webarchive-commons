@@ -64,6 +64,10 @@ public class RandomAccessFileSeekableLineReader implements SeekableLineReader {
 	
 	public long getOffset() throws IOException
 	{
+		if (closed) {
+			return 0;
+		}
+		
 		return raf.getFilePointer();
 	}
 	

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.archive.util.GeneralURIStreamFactory;
 import org.archive.util.iterator.CloseableIterator;
 
 public class SortedTextFile {
@@ -14,6 +15,16 @@ public class SortedTextFile {
 	
 	public SortedTextFile(SeekableLineReaderFactory factory) {
 		setFactory(factory);
+	}
+	
+	public SortedTextFile(String summaryFile) throws IOException
+	{
+		this(summaryFile, true);
+	}
+	
+	public SortedTextFile(String summaryFile, boolean useNio) throws IOException
+	{
+		this.factory = GeneralURIStreamFactory.createSeekableStreamFactory(summaryFile, useNio);
 	}
 	
 	protected SortedTextFile()
@@ -34,6 +45,11 @@ public class SortedTextFile {
 	public CloseableIterator<String> getRecordIterator(final String prefix) 
 	throws IOException {
 		return getRecordIterator(prefix, false);
+	}
+	
+	public SeekableLineReader getSLR() throws IOException
+	{
+		return factory.get();
 	}
 	
 	public CloseableIterator<String> getRecordIterator(final long offset) throws IOException
@@ -85,7 +101,7 @@ public class SortedTextFile {
 	    return min;
 	}
 	
-	protected long[] getStartEndOffsets(SeekableLineReader slr, String start, String end) throws IOException
+	public long[] getStartEndOffsets(SeekableLineReader slr, String start, String end) throws IOException
 	{
 		long endOffset = 0;
 		

@@ -130,6 +130,9 @@ public class LocationUpdater implements Runnable {
 			while (lines.hasNext()) {
 				String line = lines.next();
 				
+				if (line.isEmpty()) {
+					continue;
+				}
 				
 				String[] parts = line.split("\\t");
 				if (parts.length < 2) {
@@ -139,8 +142,10 @@ public class LocationUpdater implements Runnable {
 				
 				if (parts[0].equals(EARLIEST_TIMESTAMP)) {
 					newStartDate = parseDate(parts[1]);
+					continue;
 				} else if (parts[0].equals(LATEST_TIMESTAMP)) {
 					newEndDate = parseDate(parts[1]);
+					continue;
 				}
 				
 				String locations[] = new String[parts.length - 1];

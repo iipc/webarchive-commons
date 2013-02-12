@@ -56,8 +56,15 @@ public class HDFSSeekableLineReader implements SeekableLineReader {
 	}
 
 	public void close() throws IOException {
-		fsdis.close();
-		br.close();
+		if (fsdis != null) {
+			fsdis.close();
+			fsdis = null;
+		}
+		
+		if (br != null) {
+			br.close();
+			br = null;
+		}
 	}
 
 	public long getSize() throws IOException {

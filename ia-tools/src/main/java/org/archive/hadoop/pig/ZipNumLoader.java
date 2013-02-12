@@ -1,27 +1,15 @@
 package org.archive.hadoop.pig;
 
 import java.io.IOException;
-import java.net.URLDecoder;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.LongWritable;
-import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.input.NLineInputFormat;
-import org.apache.pig.CollectableLoadFunc;
-import org.apache.pig.IndexableLoadFunc;
-import org.apache.pig.OrderedLoadFunc;
-import org.apache.pig.backend.hadoop.executionengine.mapReduceLayer.PigSplit;
 import org.apache.pig.builtin.TextLoader;
-import org.apache.pig.data.Tuple;
 import org.apache.pig.data.TupleFactory;
-import org.archive.util.GeneralURIStreamFactory;
 
 public class ZipNumLoader extends TextLoader {
 	

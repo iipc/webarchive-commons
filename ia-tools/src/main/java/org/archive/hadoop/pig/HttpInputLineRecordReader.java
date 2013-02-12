@@ -95,18 +95,16 @@ public class HttpInputLineRecordReader extends RecordReader<LongWritable, Text> 
 		}
 				
 		linesRead++;
-		
-		counterHelper.incrCounter(HTTP_INPUT_COUNTER_GROUP, LINE_COUNTER, 1);
-		//counterHelper.incrCounter(HTTP_INPUT_COUNTER_GROUP, splitInfo + LINE_COUNTER, 1);
-		
-		//if (cis != null) {
-		counterHelper.incrCounter(HTTP_INPUT_COUNTER_GROUP, BYTE_COUNTER, bytesRead);
-			//counterHelper.incrCounter(HTTP_INPUT_COUNTER_GROUP, splitInfo + BYTE_COUNTER, newByteCount - bytesRead);			
-		//}
+		incCounters(bytesRead);
 		
 		key.set(key.get() + bytesRead);
 		
 		return true;
+	}
+
+	public void incCounters(long bytesRead) {
+		counterHelper.incrCounter(HTTP_INPUT_COUNTER_GROUP, LINE_COUNTER, 1);
+		counterHelper.incrCounter(HTTP_INPUT_COUNTER_GROUP, BYTE_COUNTER, bytesRead);
 	}
 
 	@Override
@@ -157,5 +155,10 @@ public class HttpInputLineRecordReader extends RecordReader<LongWritable, Text> 
 		}
 		
 		reader = new LineReader(is);
+	}
+	
+	public String getUrl()
+	{
+		return urlString;
 	}
 }

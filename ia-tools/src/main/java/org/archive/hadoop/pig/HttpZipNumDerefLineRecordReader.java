@@ -2,14 +2,16 @@ package org.archive.hadoop.pig;
 
 import java.io.IOException;
 
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.archive.format.gzip.zipnum.ZipNumCluster;
 import org.archive.format.gzip.zipnum.ZipNumParams;
 import org.archive.util.iterator.CloseableIterator;
 
-public class HttpZipNumDerefLineRecordReader extends HttpInputLineRecordReader {
+public class HttpZipNumDerefLineRecordReader extends RecordReader<LongWritable, Text> {
 	
 	protected ZipNumCluster cluster;
 	protected ZipNumParams params;
@@ -19,13 +21,16 @@ public class HttpZipNumDerefLineRecordReader extends HttpInputLineRecordReader {
 	protected String start, end;
 	
 	protected Text nextCdxLine;
+	
+	protected HttpInputLineRecordReader inner;
 		
 	protected CloseableIterator<String> cdxReader;
 
 	public HttpZipNumDerefLineRecordReader(String clusterUri, String summaryQueryUrl, int split, int maxAggregateBlocks)
 			throws IOException {
 		
-		super(summaryQueryUrl, split);
+		this.inner = new HttpInputLineRecordReader(summaryQueryUrl, split);
+		
 		this.clusterUri = clusterUri;
 		
 		this.nextCdxLine = new Text("");
@@ -52,27 +57,27 @@ public class HttpZipNumDerefLineRecordReader extends HttpInputLineRecordReader {
 	@Override
 	public void initialize(InputSplit split, TaskAttemptContext context)
 			throws IOException, InterruptedException {
-		super.initialize(split, context);
+		
+		inner.initialize(split, context);
 		
 		cluster = new ZipNumCluster(clusterUri);
 		
-		String query = super.urlString.substring(super.urlString.indexOf('?') + 1);
+		String theUrl = inner.getUrl();
+		
+		String query = theUrl.substring(theUrl.indexOf('?') + 1);
 		start = getParam(query, "start=");
 		end = getParam(query, "end=");
 		
 		HttpClusterInputSplit hcis = (HttpClusterInputSplit)split;
 		
-		cdxReader = cluster.getCDXIterator(new TextLoaderDerefIterator(), start, end, hcis.getSplit(), hcis.getNumSplits());
+		cdxReader = cluster.getCDXIterator(new RecordReaderValueIterator(inner), start, end, hcis.getSplit(), hcis.getNumSplits());
 	}
 
 	@Override
 	public boolean nextKeyValue() throws IOException {
 		if (cdxReader != null && cdxReader.hasNext()) {
 			nextCdxLine.set(cdxReader.next());
-			
-			counterHelper.incrCounter(HTTP_INPUT_COUNTER_GROUP, LINE_COUNTER, 1);
-			counterHelper.incrCounter(HTTP_INPUT_COUNTER_GROUP, BYTE_COUNTER, nextCdxLine.getLength() + 2);
-			
+			inner.incCounters(nextCdxLine.getLength() + 2);
 			return true;
 		} else {
 			return false;
@@ -93,32 +98,19 @@ public class HttpZipNumDerefLineRecordReader extends HttpInputLineRecordReader {
 			cdxReader = null;
 		}
 		
-		super.close();
+		inner.close();
 	}
-	
-	private class TextLoaderDerefIterator implements CloseableIterator<String>
-	{	
-		public boolean hasNext() {
-			try {
-				return HttpZipNumDerefLineRecordReader.super.nextKeyValue();
-			}
-			catch (IOException io) {
-				io.printStackTrace();
-				return false;
-			}
-		}
-	
-		public String next() {
-			return HttpZipNumDerefLineRecordReader.super.getCurrentValue().toString();
-		}
-	
-		public void remove() {
-			
-		}
-		
-		public void close()
-		{
-						
-		}
+
+	@Override
+	public LongWritable getCurrentKey() throws IOException,
+			InterruptedException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public float getProgress() throws IOException, InterruptedException {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

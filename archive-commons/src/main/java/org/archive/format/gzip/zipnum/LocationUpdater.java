@@ -135,16 +135,18 @@ public class LocationUpdater implements Runnable {
 				}
 				
 				String[] parts = line.split("\\t");
-				if (parts.length < 2) {
-					String msg = "Bad line(" + line +") in (" + locUri + ")";
-					throw new IOException(msg);
-				}
 				
 				if (parts[0].equals(EARLIEST_TIMESTAMP)) {
 					newStartDate = parseDate(parts[1]);
 					continue;
 				} else if (parts[0].equals(LATEST_TIMESTAMP)) {
 					newEndDate = parseDate(parts[1]);
+					continue;
+				}
+				
+				if (parts.length < 2) {
+					String msg = "Bad line(" + line +") in (" + locUri + ")";
+					LOGGER.warning(msg);
 					continue;
 				}
 				

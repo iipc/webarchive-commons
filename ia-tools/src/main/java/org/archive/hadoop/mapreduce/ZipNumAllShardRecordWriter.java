@@ -115,7 +115,7 @@ public class ZipNumAllShardRecordWriter  extends RecordWriter<Text, Text>{
 
 		// deflate the main buffer into the temp gzBuffer:
 
-		Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, true);
+		Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION, true);
 		DeflaterOutputStream deflateOut = new DeflaterOutputStream(gzBuffer,deflater);
 		CRCOutputStream crcOut = new CRCOutputStream(deflateOut);
 		mainBuffer.writeTo(crcOut);

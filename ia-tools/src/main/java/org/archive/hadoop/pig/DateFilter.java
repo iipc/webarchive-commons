@@ -1,6 +1,8 @@
 package org.archive.hadoop.pig;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -23,12 +25,16 @@ public class DateFilter extends FirstPigJobOnlyFilter implements PathFilter
 	
 	protected String paramString = null;
 	
+	protected PrintWriter fileWriter = null;
+	
 	protected FileSystem fs = null;
 	
 	protected DateFilter.CompareOp op1 = null;	
 	protected DateFilter.CompareOp op2 = null;
 	
 	public final static String DATE_FILTER_PARAM = "org.archive.pig.filter.date";
+	
+	public final static String DATE_OUTPUT_LOG = "org.archive.pig.filter.date.logfile";
 	
 	public final static String MTIME_VAR = "mtime";
 	
@@ -63,11 +69,11 @@ public class DateFilter extends FirstPigJobOnlyFilter implements PathFilter
 		switch (theOp) {
 		case LT:
 			return (second ? false : true);
+		case LTEQ:
+			return (second ? false : true);			
 		case GT:
 			return (second ? true : false);
 		case GTEQ:
-			return (second ? false : true);
-		case LTEQ:
 			return (second ? true : false);
 		}
 		
@@ -173,16 +179,27 @@ public class DateFilter extends FirstPigJobOnlyFilter implements PathFilter
 			
 			if (dateStr1 != null) {
 				date1 = parseDateForParam(dateStr1);
-				LOGGER.info("Inited Date 1: " + date1.toString());
+				writeLog("Date 1: " + date1.toString());
 			}
 			
 			if (dateStr2 != null) {
 				date2 = parseDateForParam(dateStr2);
-				LOGGER.info("Inited Date 2: " + date2.toString());
+				writeLog("Date 2: " + date2.toString());
 			}
 		
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		
+		// Date Output Log
+		String fileLog = conf.get(DATE_OUTPUT_LOG);
+		
+		if (fileLog != null) {
+			try {
+				fileWriter = new PrintWriter(new File(fileLog));
+			} catch (IOException io) {
+				LOGGER.warn(io.toString());
+			}
 		}
 	}
 	
@@ -214,25 +231,31 @@ public class DateFilter extends FirstPigJobOnlyFilter implements PathFilter
 		try {
 			FileStatus status = fs.getFileStatus(path);
 			
-			boolean isDir = false;
+			boolean isDir = status.isDir();
+			
+//			if (isDir) {
+//				return true;
+//			}
 			
 			long mtime = status.getModificationTime();
 						
 			// DATE2 > $mtype
 			if (date2 != null) {
 				if (!(isDir && dirSkipOp(op2, true)) && !compare(op2, date2.getTime(), mtime)) {
+				//if (!compare(op2, date2.getTime(), mtime)) {		
 					return false;
 				}
 			}
 			
 			// $mtype < DATE1
 			if (date1 != null) {
-				if (!(isDir && dirSkipOp(op1,false)) && !compare(op1, mtime, date1.getTime())) {
+				if (!(isDir && dirSkipOp(op1, false)) && !compare(op1, mtime, date1.getTime())) {
+				//if (!compare(op1, mtime, date1.getTime())) {				
 					return false;
 				}
 			}
 			
-			LOGGER.info("ACCEPT: " + path.getName() + " (" + new Date(mtime).toString() + ")");
+			writeLog(path.getName() + " (" + new Date(mtime).toString() + ")");
 			return true;
 			
 		} catch (IOException e) {
@@ -242,8 +265,24 @@ public class DateFilter extends FirstPigJobOnlyFilter implements PathFilter
 		return false;
 	}
 	
+	private void writeLog(String string) {
+		LOGGER.info(string);
+		
+		if (fileWriter != null) {
+			fileWriter.println(string);
+			fileWriter.flush();
+		}
+	}
+
 	public String toString()
 	{
 		return paramString;
+	}
+	
+	public void close()
+	{
+		if (fileWriter != null) {
+			fileWriter.close();
+		}
 	}
 }

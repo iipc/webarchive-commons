@@ -20,7 +20,12 @@ public class DateFilterLSRLoader extends LSRPigLoader {
 	public List<FileStatus> lsrFiltered(String location, JobContext job) throws IOException
 	{
 		filter = new DateFilter();
-		filter.init(dateFilterParam, job.getConfiguration());
-		return lsrFiltered(location, job, filter);
+		
+		try {
+			filter.init(dateFilterParam, job.getConfiguration());
+			return lsrFiltered(location, job, filter);
+		} finally {
+			filter.close();
+		}
 	}
 }

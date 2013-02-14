@@ -15,9 +15,13 @@ public class HDFSTouch implements Tool {
 	
 	public final static String TOOL_NAME = "hdfs-touch";
 	
-	protected String DEFAULT_NAME_NODE_URI = "hdfs://ia400005.us.archive.org:6000";
+	public final String DEFAULT_NAME_NODE_URI = "hdfs://ia400005.us.archive.org:6000";
 	
-	protected SimpleDateFormat hadoopStatFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	public final static String TMP_FILENAME = ".tmp_touch_latest";
+	
+	public final static String FORMAT_STR = "yyyy-MM-dd HH:mm:ss";
+	
+	protected SimpleDateFormat hadoopStatFormat = new SimpleDateFormat(FORMAT_STR);
 	
 	
 	public static void main(String[] args) throws Exception {
@@ -34,7 +38,7 @@ public class HDFSTouch implements Tool {
 	}
 	
 	public static int USAGE(int code) {
-		System.err.println("Usage: " + TOOL_NAME + " HDFS_URL <yyyy-MM-dd HH:mm:ss>");
+		System.err.println("Usage: " + TOOL_NAME + "[ -d ] HDFS_URL <" + FORMAT_STR + ">");
 		System.err.println("Updated the mtime and atime on the specified hdfs path to current time, or optional timestamp");
 		return code;
 	}
@@ -45,7 +49,15 @@ public class HDFSTouch implements Tool {
 			USAGE(1);
 		}
 		
-		String filePath = args[0];
+		String filePath = null;
+		boolean updateDir = false;
+		
+		if (args.length == 1) {
+			filePath = args[0];
+		} else {
+			updateDir = (args[0].equals("-d"));
+			filePath = args[1];
+		}
 		
 		if (!filePath.startsWith("hdfs://")) {
 			filePath = DEFAULT_NAME_NODE_URI + filePath;
@@ -55,39 +67,32 @@ public class HDFSTouch implements Tool {
 		FileSystem fs = path.getFileSystem(conf);
 		
 		if (fs.getFileStatus(path).isDir()) {
-			System.err.println("Can't touch directories in this version: " + path);
+			System.err.println("Can't touch directories in this version\nThis is a directory: " + path);
 			return 1;
 		}
 		
 		long mtime = System.currentTimeMillis();
 		
-//		if (args.length >= 3) {
-//			try {
-//				mtime = hadoopStatFormat.parse(args[2]).getTime();
-//			} catch (ParseException exc) {
-//				
-//			}
-//		}
-		
-		if (args.length >= 2) {
-			if (args[1].equals("-d")) {
-				String tempFile = ".tmp_touch_latest";
-				
-				if (args.length >= 3) {
-					tempFile = args[2];
-				}
-				
-				Path tempFilePath = new Path(path.getParent(), tempFile);
-				
-				// Create empty output stream
-				FSDataOutputStream out = fs.create(tempFilePath);
-				out.close();
-				fs.delete(tempFilePath, false);
+		if (args.length >= 3) {
+			try {
+				mtime = hadoopStatFormat.parse(args[2]).getTime();
+			} catch (Exception exc) {
+				System.err.println("Error parsing timestamp: " + args[2] + "\nExpected format: " + FORMAT_STR);
 			}
 		}
 		
 		long atime = mtime;		
 		fs.setTimes(path, mtime, atime);
+		
+		if (updateDir) {			
+			Path tempFilePath = new Path(path.getParent(), TMP_FILENAME);
+			
+			// Create empty output stream
+			FSDataOutputStream out = fs.create(tempFilePath);
+			out.close();
+			// Delete tmp file
+			fs.delete(tempFilePath, false);
+		}
 						
 		return 0;
 	}

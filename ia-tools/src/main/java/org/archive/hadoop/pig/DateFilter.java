@@ -25,6 +25,8 @@ public class DateFilter extends FirstPigJobOnlyFilter implements PathFilter
 	
 	protected String paramString = null;
 	
+	protected String extFilter = null;
+	
 	protected PrintWriter fileWriter = null;
 	
 	protected FileSystem fs = null;
@@ -33,6 +35,7 @@ public class DateFilter extends FirstPigJobOnlyFilter implements PathFilter
 	protected DateFilter.CompareOp op2 = null;
 	
 	public final static String DATE_FILTER_PARAM = "org.archive.pig.filter.date";
+	public final static String EXT_FILTER_PARAM = "org.archive.pig.filter.ext";
 	
 	public final static String DATE_OUTPUT_LOG = "org.archive.pig.filter.date.logfile";
 	
@@ -127,7 +130,8 @@ public class DateFilter extends FirstPigJobOnlyFilter implements PathFilter
 			return;
 		}
 		
-		init(conf.get(DATE_FILTER_PARAM), conf);		
+		init(conf.get(DATE_FILTER_PARAM), conf);	
+		extFilter = conf.get(EXT_FILTER_PARAM, "");
 	}
 	
 	public void init(String paramString, Configuration conf)
@@ -236,6 +240,12 @@ public class DateFilter extends FirstPigJobOnlyFilter implements PathFilter
 //			if (isDir) {
 //				return true;
 //			}
+			
+			if (!extFilter.isEmpty() && !isDir) {
+				if (!path.getName().endsWith(extFilter)) {
+					return false;
+				}
+			}
 			
 			long mtime = status.getModificationTime();
 						

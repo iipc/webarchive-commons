@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.archive.format.gzip.zipnum.ZipNumCluster;
+import org.archive.format.gzip.zipnum.ZipNumParams;
 import org.archive.util.iterator.CloseableIterator;
 import org.archive.util.iterator.SortedCompositeIterator;
 
@@ -44,12 +45,12 @@ public class MultiCDXInputSource implements CDXInputSource {
 	};
 	
 	
-	public CloseableIterator<String> getCDXLineIterator(String key, String prefix) throws IOException {
+	public CloseableIterator<String> getCDXIterator(String key, String prefix, boolean exact, ZipNumParams params) throws IOException {
 		
 		SortedCompositeIterator<String> scitr = new SortedCompositeIterator<String>(cdx.size(), comparator);
 		
 		for (CDXInputSource cdxReader : cdx) {
-			scitr.addIterator(cdxReader.getCDXLineIterator(key, prefix));
+			scitr.addIterator(cdxReader.getCDXIterator(key, prefix, exact, params));
 		}
 		
 		return scitr;

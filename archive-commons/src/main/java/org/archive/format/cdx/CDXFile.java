@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.archive.format.gzip.zipnum.ZipNumParams;
 import org.archive.streamcontext.Stream;
 import org.archive.streamcontext.StreamWrappedInputStream;
 import org.archive.util.GeneralURIStreamFactory;
@@ -26,7 +27,8 @@ public class CDXFile extends SortedTextFile implements CDXInputSource {
 		super(factory);
 	}
 
-	public CloseableIterator<String> getCDXLineIterator(String key, String prefix) throws IOException {
+	//TODO:
+	public CloseableIterator<String> getCDXIterator(String key, String prefix, boolean exact, ZipNumParams params) throws IOException {
 		return getRecordIteratorLT(key);
 	}
 	

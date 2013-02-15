@@ -284,13 +284,7 @@ public class ZipNumCluster implements CDXInputSource {
 		
 		return wrapStartIterator(getCDXIterator(summaryIter), key);
 	}
-	
-	//TODO: for CDXInputSource... this interface needs rethinking
-	public CloseableIterator<String> getCDXLineIterator(String key, String prefix) throws IOException
-	{
-		return getCDXIterator(key, prefix, false, null);
-	}
-			
+				
 	public CloseableIterator<String> getCDXIterator(String key, String start, boolean exact, ZipNumParams params) throws IOException {
 		
 		if ((locationUpdater != null) && !locationUpdater.dateRangeCheck(key)) {

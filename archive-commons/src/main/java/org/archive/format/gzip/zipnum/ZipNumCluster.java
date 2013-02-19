@@ -302,8 +302,12 @@ public class ZipNumCluster implements CDXInputSource {
 		
 		CloseableIterator<String> summaryIter = summary.getRecordIteratorLT(key);
 		
+		if (params.getTimestampDedupLength() > 0) {
+			summaryIter = new TimestampDedupIterator(summaryIter, params.getTimestampDedupLength());
+		}
+		
 		if (blockLoader.isBufferFully() && (params != null) && (params.getMaxBlocks() > 0)) {
-			summaryIter = new LineBufferingIterator(summaryIter, params.getMaxBlocks(), params.getTimestampDedupLength());
+			summaryIter = new LineBufferingIterator(summaryIter, params.getMaxBlocks());
 		}
 		
 		summaryIter = wrapPrefix(summaryIter, start, exact);

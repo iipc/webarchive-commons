@@ -19,7 +19,7 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 		String partId;
 		String[] parts;
 		
-		String timestamp;
+		//String timestamp;
 		
 		long offset;
 		int length;
@@ -37,22 +37,22 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 			}
 			offset = Long.parseLong(parts[2]);
 			length = Integer.parseInt(parts[3]);
-			timestamp = makeTimestamp(parts[0]);
+			//timestamp = makeTimestamp(parts[0]);
 		}
 		
-		String makeTimestamp(String key)
-		{
-			if (params.getTimestampDedupLength() <= 0) {
-				return null;
-			}
-			
-			int space = key.indexOf(' ');
-			if (space >= 0) {
-				return key.substring(0, space + 1 + params.getTimestampDedupLength());
-			} else {
-				return null;
-			}
-		}
+//		String makeTimestamp(String key)
+//		{
+//			if (params.getTimestampDedupLength() <= 0) {
+//				return null;
+//			}
+//			
+//			int space = key.indexOf(' ');
+//			if (space >= 0) {
+//				return key.substring(0, space + 1 + params.getTimestampDedupLength());
+//			} else {
+//				return null;
+//			}
+//		}
 		
 		boolean isContinuous(SplitLine next)
 		{
@@ -72,18 +72,18 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 			return true;
 		}
 		
-		boolean sameTimestamp(SplitLine next)
-		{
-			if (next == null || next.timestamp == null) {
-				return false;
-			}
-			
-			if (timestamp == null) {
-				return false;
-			}
-			
-			return timestamp.equals(next.timestamp);
-		}
+//		boolean sameTimestamp(SplitLine next)
+//		{
+//			if (next == null || next.timestamp == null) {
+//				return false;
+//			}
+//			
+//			if (timestamp == null) {
+//				return false;
+//			}
+//			
+//			return timestamp.equals(next.timestamp);
+//		}
 	}
 	
 	protected CloseableIterator<String> summaryIterator;
@@ -159,13 +159,13 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 					return null;
 				}
 				
-				if (currLine.sameTimestamp(nextLine)) {
-					if (numBlocks == 0) {
-						continue;
-					} else {
-						break;
-					}
-				}
+//				if (currLine.sameTimestamp(nextLine)) {
+//					if (numBlocks == 0) {
+//						continue;
+//					} else {
+//						break;
+//					}
+//				}
 	
 				if ((currPartId == null) || !currPartId.equals(currLine.partId) || (numBlocks == 0)) {
 					startOffset = currLine.offset;

@@ -30,10 +30,14 @@ public class LocationUpdater implements Runnable {
 	
 	public final static String EARLIEST_TIMESTAMP = "_EARLIEST";
 	public final static String LATEST_TIMESTAMP = "_LATEST";	
+	public final static String OFF = "OFF";
+	
 	protected SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	protected Date startDate, endDate;
 	
 	protected Date newStartDate, newEndDate;
+	protected boolean newIsDisabled = false;
+	protected boolean isDisabled = false;
 	
 	public LocationUpdater(String locUri) throws IOException
 	{
@@ -45,6 +49,7 @@ public class LocationUpdater implements Runnable {
 		
 		loadPartLocations(locMap);
 		
+		isDisabled = newIsDisabled;
 		startDate = newStartDate;
 		endDate = newEndDate;
 		
@@ -58,7 +63,6 @@ public class LocationUpdater implements Runnable {
 	{
 		HashMap<String, String[]> destMap = new HashMap<String, String[]>();
 		
-		newStartDate = newEndDate = null;
 		loadPartLocations(destMap);
 		
 		if (LOGGER.isLoggable(Level.INFO)) {
@@ -67,8 +71,10 @@ public class LocationUpdater implements Runnable {
 		
 		synchronized (this) {
 			locMap.putAll(destMap);
+			
 			startDate = newStartDate;
-			endDate = newEndDate;			
+			endDate = newEndDate;
+			isDisabled = newIsDisabled;
 		}
 		
 		lastModTime = newModTime;
@@ -90,6 +96,11 @@ public class LocationUpdater implements Runnable {
 	
 	public boolean dateRangeCheck(String key)
 	{
+		// Allow a cluster to be "disabled" by specifying an empty ALL.loc
+		if (isDisabled) {
+			return false;
+		}
+		
 		if ((startDate == null) && (endDate == null)) {
 			return true;
 		}
@@ -123,6 +134,9 @@ public class LocationUpdater implements Runnable {
 	{
 		SeekableLineReaderIterator lines = null;
 		
+		newStartDate = newEndDate = null;
+		newIsDisabled = false;
+		
 		try {
 			
 			lines = new SeekableLineReaderIterator(locReaderFactory.get());
@@ -136,17 +150,22 @@ public class LocationUpdater implements Runnable {
 				
 				String[] parts = line.split("\\t");
 				
-				if (parts[0].equals(EARLIEST_TIMESTAMP)) {
-					newStartDate = parseDate(parts[1]);
-					continue;
-				} else if (parts[0].equals(LATEST_TIMESTAMP)) {
-					newEndDate = parseDate(parts[1]);
-					continue;
+				if (parts[0].equals(OFF)) {
+					newIsDisabled = true;
+					break;
 				}
 				
 				if (parts.length < 2) {
 					String msg = "Bad line(" + line +") in (" + locUri + ")";
 					LOGGER.warning(msg);
+					continue;
+				}
+				
+				if (parts[0].equals(EARLIEST_TIMESTAMP)) {
+					newStartDate = parseDate(parts[1]);
+					continue;
+				} else if (parts[0].equals(LATEST_TIMESTAMP)) {
+					newEndDate = parseDate(parts[1]);
 					continue;
 				}
 				

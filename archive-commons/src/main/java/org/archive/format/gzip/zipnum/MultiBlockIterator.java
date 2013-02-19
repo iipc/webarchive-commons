@@ -1,12 +1,11 @@
 package org.archive.format.gzip.zipnum;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.logging.Logger;
 
 import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.iterator.AbstractPeekableIterator;
-import org.archive.util.iterator.CloseableIteratorUtil;
+import org.archive.util.iterator.CloseableIterator;
 
 /**
  * @author brad, ilya
@@ -17,15 +16,12 @@ public class MultiBlockIterator extends AbstractPeekableIterator<String> {
 			MultiBlockIterator.class.getName());
 
 	private SeekableLineReader currLoader = null;
-	private Iterator<SeekableLineReader> blockItr = null;
+	private CloseableIterator<SeekableLineReader> blockItr = null;
 
 	/**
 	 * @param blocks which should be fetched and unzipped, one after another
 	 */
-	public MultiBlockIterator(Iterator<SeekableLineReader> blockItr) {
-//		if (LOGGER.isLoggable(Level.INFO)) {
-//			LOGGER.info("Iterating over " + blocks.size() + " blocks");
-//		}
+	public MultiBlockIterator(CloseableIterator<SeekableLineReader> blockItr) {
 		this.blockItr = blockItr;
 	}
 	
@@ -49,7 +45,7 @@ public class MultiBlockIterator extends AbstractPeekableIterator<String> {
 					return next;
 				}
 		
-				//currLoader.close();
+				currLoader.close();
 				currLoader = null;
 			}
 		} catch (IOException io) {
@@ -66,7 +62,7 @@ public class MultiBlockIterator extends AbstractPeekableIterator<String> {
 		}
 		
 		if (blockItr != null) {
-			CloseableIteratorUtil.attemptClose(blockItr);
+			blockItr.close();
 			blockItr = null;
 		}
 	}

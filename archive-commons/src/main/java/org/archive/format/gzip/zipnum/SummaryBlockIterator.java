@@ -19,7 +19,7 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 		String partId;
 		String[] parts;
 		
-		//String timestamp;
+		String timestamp;
 		
 		long offset;
 		int length;
@@ -37,22 +37,22 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 			}
 			offset = Long.parseLong(parts[2]);
 			length = Integer.parseInt(parts[3]);
-			//timestamp = makeTimestamp(parts[0]);
+			timestamp = makeTimestamp(parts[0]);
 		}
 		
-//		String makeTimestamp(String key)
-//		{
-//			if (params.getTimestampDedupLength() <= 0) {
-//				return null;
-//			}
-//			
-//			int space = key.indexOf(' ');
-//			if (space >= 0) {
-//				return key.substring(0, space + 1 + params.getTimestampDedupLength());
-//			} else {
-//				return null;
-//			}
-//		}
+		String makeTimestamp(String key)
+		{
+			if (params.getTimestampDedupLength() <= 0) {
+				return null;
+			}
+			
+			int space = key.indexOf(' ');
+			if (space >= 0) {
+				return key.substring(0, space + 1 + params.getTimestampDedupLength());
+			} else {
+				return null;
+			}
+		}
 		
 		boolean isContinuous(SplitLine next)
 		{
@@ -72,25 +72,25 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 			return true;
 		}
 		
-//		boolean sameTimestamp(SplitLine next)
-//		{
-//			if (next == null || next.timestamp == null) {
-//				return false;
-//			}
-//			
-//			if (timestamp == null) {
-//				return false;
-//			}
-//			
-//			return timestamp.equals(next.timestamp);
-//		}
+		boolean sameTimestamp(SplitLine next)
+		{
+			if (next == null || next.timestamp == null) {
+				return false;
+			}
+			
+			if (timestamp == null) {
+				return false;
+			}
+			
+			return timestamp.equals(next.timestamp);
+		}
 	}
 	
 	protected CloseableIterator<String> summaryIterator;
 	
 	protected ZipNumCluster cluster;
 	
-	protected SeekableLineReader currReader = null;
+	//protected SeekableLineReader currReader = null;
 	
 	protected SplitLine nextLine, currLine;
 	
@@ -130,6 +130,8 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 			return null;
 		}
 		
+		SeekableLineReader currReader = null;
+		
 		try {
 			
 			int numBlocks = 0;
@@ -157,13 +159,13 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 					return null;
 				}
 				
-//				if (currLine.sameTimestamp(nextLine)) {
-//					if (numBlocks == 0) {
-//						continue;
-//					} else {
-//						break;
-//					}
-//				}
+				if (currLine.sameTimestamp(nextLine)) {
+					if (numBlocks == 0) {
+						continue;
+					} else {
+						break;
+					}
+				}
 	
 				if ((currPartId == null) || !currPartId.equals(currLine.partId) || (numBlocks == 0)) {
 					startOffset = currLine.offset;
@@ -171,7 +173,7 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 					currPartId = currLine.partId;
 				}
 				
-				initReader(currPartId);
+				currReader = initReader(currPartId);
 				
 				totalLength += currLine.length;
 				numBlocks++;
@@ -203,29 +205,30 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 		return currReader;
 	}
 		
-	protected void initReader(String partId) throws IOException
+	protected SeekableLineReader initReader(String partId) throws IOException
 	{
 		//if ((currReader == null) || (currPartId == null) || !currPartId.equals(partId)) {
 			
-		if (currReader != null) {
-			currReader.close();
-			currReader = null;
-		}
+//		if (currReader != null) {
+//			currReader.close();
+//			currReader = null;
+//		}
+		
+		SeekableLineReader currReader = null;
 		
 		if (cluster.locationUpdater != null) {
-			initLocationReader(partId);
+			currReader = initLocationReader(partId);
 		}
 		
 		if (currReader == null) {
 			String partUrl = cluster.getClusterPart(partId);
 			currReader = cluster.blockLoader.createBlockReader(partUrl);	
 		}
-			
-		//}
-		//return false;
+		
+		return currReader;
 	}
 	
-	protected void initLocationReader(String partId)
+	protected SeekableLineReader initLocationReader(String partId)
 	{
 		String[] locations = cluster.locationUpdater.getLocations(partId);
 		
@@ -234,13 +237,14 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 		} else if (locations != null && locations.length > 0) {
 			for (String location : locations) {
 				try {
-					currReader = cluster.blockLoader.createBlockReader(location);
-					break;
+					return cluster.blockLoader.createBlockReader(location);
 				} catch (IOException io) {
 					continue;
 				}
 			}
 		}
+		
+		return null;
 	}
 	
 	@Override
@@ -251,9 +255,9 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 			summaryIterator = null;
 		}
 		
-		if (currReader != null) {
-			currReader.close();
-			currReader = null;
-		}
+//		if (currReader != null) {
+//			currReader.close();
+//			currReader = null;
+//		}
 	}
 }

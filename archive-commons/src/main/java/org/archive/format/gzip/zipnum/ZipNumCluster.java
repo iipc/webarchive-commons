@@ -284,6 +284,15 @@ public class ZipNumCluster implements CDXInputSource {
 		
 		return wrapStartIterator(getCDXIterator(summaryIter), key);
 	}
+	
+	public CloseableIterator<String> wrapPrefix(CloseableIterator<String> source, String prefix, boolean exact)
+	{
+		if (exact) {
+			return wrapEndIterator(source, endKey(prefix), false);
+		} else {
+			return wrapEndIterator(source, prefix, true);
+		}
+	}
 				
 	public CloseableIterator<String> getCDXIterator(String key, String start, boolean exact, ZipNumParams params) throws IOException {
 		
@@ -297,12 +306,8 @@ public class ZipNumCluster implements CDXInputSource {
 			summaryIter = new LineBufferingIterator(summaryIter, params.getMaxBlocks(), params.getTimestampDedupLength());
 		}
 		
-		if (exact) {
-			summaryIter = wrapEndIterator(summaryIter, endKey(start), false);
-		} else {
-			summaryIter = wrapEndIterator(summaryIter, start, true);
-		}
-		
+		summaryIter = wrapPrefix(summaryIter, start, exact);
+				
 		return wrapStartIterator(getCDXIterator(summaryIter, params), start);
 	}
 	

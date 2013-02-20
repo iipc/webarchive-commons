@@ -1,7 +1,9 @@
 package org.archive.format.gzip.zipnum;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.archive.util.GeneralURIStreamFactory;
 import org.archive.util.binsearch.SeekableLineReader;
@@ -11,7 +13,7 @@ import org.archive.util.binsearch.impl.HTTPSeekableLineReaderFactory;
 
 public class ZipNumBlockLoader {
 		
-	protected HashMap<String, SeekableLineReaderFactory> fileFactoryMap = null;
+	protected Map<String, SeekableLineReaderFactory> fileFactoryMap = null;
 	protected HTTPSeekableLineReaderFactory httpFactory = null;
 	
 	protected boolean useNio = false;
@@ -55,6 +57,7 @@ public class ZipNumBlockLoader {
 		
 		if (fileFactoryMap == null) {
 			fileFactoryMap = new HashMap<String, SeekableLineReaderFactory>();
+			fileFactoryMap = Collections.synchronizedMap(fileFactoryMap);
 		}
 		
 		SeekableLineReaderFactory factory = fileFactoryMap.get(filename);
@@ -65,6 +68,19 @@ public class ZipNumBlockLoader {
 		}
 		
 		return factory.get();
+	}
+	
+	public void closeFileFactory(String filename) throws IOException
+	{
+		if (fileFactoryMap == null) {
+			return;
+		}
+		
+		SeekableLineReaderFactory factory = fileFactoryMap.remove(filename);
+		
+		if (factory != null) {
+			factory.close();
+		}		
 	}
 
 	public boolean isUseNio() {

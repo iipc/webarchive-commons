@@ -3,8 +3,11 @@ package org.archive.format.gzip.zipnum;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,15 +38,19 @@ public class LocationUpdater implements Runnable {
 	protected SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	protected Date startDate, endDate;
 	
+	protected ZipNumBlockLoader blockLoader = null;
+	
 	protected Date newStartDate, newEndDate;
 	protected boolean newIsDisabled = false;
 	protected boolean isDisabled = false;
 	
-	public LocationUpdater(String locUri) throws IOException
+	public LocationUpdater(String locUri, ZipNumBlockLoader blockLoader) throws IOException
 	{
 		this.locUri = locUri;
+		this.blockLoader = blockLoader;
 		
 		locMap = new HashMap<String, String[]>();
+
 		locReaderFactory = GeneralURIStreamFactory.createSeekableStreamFactory(locUri, false);
 		lastModTime = locReaderFactory.getModTime();
 		
@@ -69,17 +76,37 @@ public class LocationUpdater implements Runnable {
 			LOGGER.info("*** Location Update: " + locUri);
 		}
 		
+		ArrayList<String[]> filesToClose = new ArrayList<String[]>();
+		
 		synchronized (this) {
-			locMap.putAll(destMap);
+			for (Entry<String, String[]> files : destMap.entrySet()) {
+				String[] existingFiles = locMap.get(files.getKey());
+				if ((existingFiles != null) && !Arrays.equals(existingFiles, files.getValue())) {					
+					filesToClose.add(existingFiles);
+				}
+				locMap.put(files.getKey(), files.getValue());
+			}
+			
+			//locMap.putAll(destMap);
 			
 			startDate = newStartDate;
 			endDate = newEndDate;
 			isDisabled = newIsDisabled;
 		}
 		
+		closeExistingFiles(filesToClose);
+		
 		lastModTime = newModTime;
 	}
 	
+	private void closeExistingFiles(ArrayList<String[]> filesToClose) throws IOException {
+		for (String[] files : filesToClose) {
+			for (String file : files) {
+				blockLoader.closeFileFactory(file);
+			}
+		}
+	}
+
 	public synchronized String[] getLocations(String key)
 	{
 		return locMap.get(key);
@@ -156,7 +183,7 @@ public class LocationUpdater implements Runnable {
 				}
 				
 				if (parts.length < 2) {
-					String msg = "Bad line(" + line +") in (" + locUri + ")";
+					String msg = "Bad line(" + line + ") in (" + locUri + ")";
 					LOGGER.warning(msg);
 					continue;
 				}

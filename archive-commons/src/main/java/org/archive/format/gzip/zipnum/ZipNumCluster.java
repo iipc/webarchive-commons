@@ -67,13 +67,13 @@ public class ZipNumCluster implements CDXInputSource {
 		if (summaryFile != null) {
 			this.summary = new SortedTextFile(summaryFile, useNio);
 		}
-				
-		if (locFile != null) {
-			this.locationUpdater = new LocationUpdater(locFile);
-		}
-		
+						
 		if (blockLoader == null) {
 			this.blockLoader = new ZipNumBlockLoader();
+		}
+		
+		if (locFile != null) {
+			this.locationUpdater = new LocationUpdater(locFile, this.blockLoader);
 		}
 	}
 				

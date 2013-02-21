@@ -239,12 +239,12 @@ public class ZipNumCluster implements CDXInputSource {
 		return wrapEndIterator(wrapStartIterator(iter, start), end, inclusive);
 	}
 	
-	public CloseableIterator<String> wrapStartIterator(CloseableIterator<String> iter, String start)
+	public static CloseableIterator<String> wrapStartIterator(CloseableIterator<String> iter, String start)
 	{
 		return new StartBoundedStringIterator(iter, start);
 	}
 	
-	public CloseableIterator<String> wrapEndIterator(CloseableIterator<String> iter, String end, boolean inclusive)
+	public static CloseableIterator<String> wrapEndIterator(CloseableIterator<String> iter, String end, boolean inclusive)
 	{		
 		if (end.isEmpty()) {
 			return iter;
@@ -263,11 +263,11 @@ public class ZipNumCluster implements CDXInputSource {
 		CloseableIterator<String> blocklines = this.getCDXIterator(summaryIterator, params);
 		
 		if (split == 0) {
-			blocklines = this.wrapStartIterator(blocklines, start);
+			blocklines = wrapStartIterator(blocklines, start);
 		}
 		
 		if (split >= (numSplits - 1)) {
-			blocklines = this.wrapEndIterator(blocklines, end, false);
+			blocklines = wrapEndIterator(blocklines, end, false);
 		}
 		
 		return blocklines;
@@ -285,7 +285,7 @@ public class ZipNumCluster implements CDXInputSource {
 		return wrapStartIterator(getCDXIterator(summaryIter), key);
 	}
 	
-	public CloseableIterator<String> wrapPrefix(CloseableIterator<String> source, String prefix, boolean exact)
+	public static CloseableIterator<String> wrapPrefix(CloseableIterator<String> source, String prefix, boolean exact)
 	{
 		if (exact) {
 			return wrapEndIterator(source, endKey(prefix), false);
@@ -307,7 +307,9 @@ public class ZipNumCluster implements CDXInputSource {
 		}
 		
 		if (blockLoader.isBufferFully() && (params != null) && (params.getMaxBlocks() > 0)) {
-			summaryIter = new LineBufferingIterator(summaryIter, params.getMaxBlocks());
+			LineBufferingIterator lineBufferIter = new LineBufferingIterator(summaryIter, params.getMaxBlocks());
+			lineBufferIter.bufferInput();
+			summaryIter = lineBufferIter;
 		}
 		
 		summaryIter = wrapPrefix(summaryIter, start, exact);

@@ -20,24 +20,25 @@ import org.archive.util.binsearch.SeekableLineReaderFactory;
 public class NIOSeekableLineReaderFactory implements SeekableLineReaderFactory {
 	private File file;
 	private FileChannel fc;
-	private int blockSize = BINSEARCH_BLOCK_SIZE;
+	private RandomAccessFile raf;
+	private int blockSize;
 	
 	public NIOSeekableLineReaderFactory(File file, int blockSize) throws IOException {
 		this.file = file;
 		this.blockSize = blockSize;
-		fc = new RandomAccessFile(file,"r").getChannel();
+		this.raf = new RandomAccessFile(file,"r");
+		this.fc = raf.getChannel();
 	}
 	public NIOSeekableLineReaderFactory(File file) throws IOException {
-		this.file = file;
-		fc = new RandomAccessFile(file,"r").getChannel();
+		this(file, BINSEARCH_BLOCK_SIZE);
 	}
 	public SeekableLineReader get() throws IOException {
 		return new NIOSeekableLineReader(fc, blockSize);
 	}
 	public void close() throws IOException
 	{
-		if (fc != null) {
-			fc.close();
+		if (raf != null) {
+			raf.close();
 		}
 	}
 	

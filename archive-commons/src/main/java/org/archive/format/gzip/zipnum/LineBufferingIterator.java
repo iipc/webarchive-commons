@@ -19,8 +19,12 @@ public class LineBufferingIterator implements CloseableIterator<String> {
 		this.maxLines = maxLines;
 	}
 		
-	protected void bufferInput()
+	public void bufferInput()
 	{
+		if (currIter != null) {
+			return;
+		}
+		
 		LinkedList<String> lineBuffer = new LinkedList<String>();
 		
 		while (inner.hasNext() && (lineBuffer.size() < maxLines)) {
@@ -31,6 +35,7 @@ public class LineBufferingIterator implements CloseableIterator<String> {
 		
 		try {
 			inner.close();
+			inner = null;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

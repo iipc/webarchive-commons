@@ -17,14 +17,14 @@ public class SortedTextFile {
 		setFactory(factory);
 	}
 	
-	public SortedTextFile(String summaryFile) throws IOException
+	public SortedTextFile(String filename) throws IOException
 	{
-		this(summaryFile, true);
+		this(filename, true);
 	}
 	
-	public SortedTextFile(String summaryFile, boolean useNio) throws IOException
+	public SortedTextFile(String filename, boolean useNio) throws IOException
 	{
-		this.factory = GeneralURIStreamFactory.createSeekableStreamFactory(summaryFile, useNio);
+		this.factory = GeneralURIStreamFactory.createSeekableStreamFactory(filename, useNio);
 	}
 	
 	protected SortedTextFile()

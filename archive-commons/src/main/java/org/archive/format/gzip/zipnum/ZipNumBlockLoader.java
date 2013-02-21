@@ -23,6 +23,9 @@ public class ZipNumBlockLoader {
 	
 	protected int maxHostConnections = 400;
 	protected int maxTotalConnections = 500;
+	
+	protected int connectTimeoutMS = 10000;
+	protected int readTimeoutMS = 10000;
 
 	
 	public ZipNumBlockLoader()
@@ -39,12 +42,14 @@ public class ZipNumBlockLoader {
 		}
 	}
 	
-	protected SeekableLineReader getHttpReader(String url) throws IOException {
+	public HTTPSeekableLineReader getHttpReader(String url) throws IOException {
 		
 		if (httpFactory == null) {
 			httpFactory = new HTTPSeekableLineReaderFactory();
 			httpFactory.setMaxHostConnections(maxHostConnections);
 			httpFactory.setMaxHostConnections(maxTotalConnections);
+			httpFactory.setConnectionTimeoutMS(connectTimeoutMS);
+			httpFactory.setSocketTimeoutMS(readTimeoutMS);			
 		}
 		
 		HTTPSeekableLineReader reader = httpFactory.get(url);
@@ -53,7 +58,7 @@ public class ZipNumBlockLoader {
 		return reader;
 	}
 	
-	protected SeekableLineReader getFileReader(String filename) throws IOException {
+	public SeekableLineReader getFileReader(String filename) throws IOException {
 		
 		if (fileFactoryMap == null) {
 			fileFactoryMap = new HashMap<String, SeekableLineReaderFactory>();
@@ -80,7 +85,22 @@ public class ZipNumBlockLoader {
 		
 		if (factory != null) {
 			factory.close();
-		}		
+		}
+	}
+	
+	public void close() throws IOException
+	{
+		if (fileFactoryMap != null) {
+			for (SeekableLineReaderFactory factory : fileFactoryMap.values()) {
+				factory.close();
+			}
+			fileFactoryMap = null;
+		}
+		
+		if (httpFactory != null) {
+			httpFactory.close();
+			httpFactory = null;
+		}
 	}
 
 	public boolean isUseNio() {
@@ -123,11 +143,19 @@ public class ZipNumBlockLoader {
 		this.maxTotalConnections = maxTotalConnections;
 	}
 
-	public HTTPSeekableLineReaderFactory getHttpFactory() {
-		return httpFactory;
+	public int getConnectTimeoutMS() {
+		return connectTimeoutMS;
 	}
 
-	public void setHttpFactory(HTTPSeekableLineReaderFactory httpFactory) {
-		this.httpFactory = httpFactory;
+	public void setConnectTimeoutMS(int connectTimeoutMS) {
+		this.connectTimeoutMS = connectTimeoutMS;
+	}
+
+	public int getReadTimeoutMS() {
+		return readTimeoutMS;
+	}
+
+	public void setReadTimeoutMS(int readTimeoutMS) {
+		this.readTimeoutMS = readTimeoutMS;
 	}
 }

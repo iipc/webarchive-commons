@@ -1,10 +1,8 @@
 package org.archive.util.binsearch.impl;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 
 import org.apache.commons.httpclient.Header;
@@ -18,15 +16,14 @@ import org.archive.util.zip.GZIPMembersInputStream;
 
 import com.google.common.io.ByteStreams;
 
-public class HTTPSeekableLineReader implements SeekableLineReader {
+public class HTTPSeekableLineReader extends SeekableLineReader {
 	public final static String CONTENT_LENGTH = "Content-Length";
 	public final static String LAST_MODIFIED = "Last-Modified";
-	private int blockSize = 128 * 1024;
+
 	private HttpClient http;
 	private String url;
 	private long length = -1;
-	private BufferedReader br;
-	private InputStreamReader isr;
+		
 	private HttpMethod activeMethod;
 	
 	protected boolean noKeepAlive = false;
@@ -67,79 +64,27 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
 		}
 		String val = theHeader.getValue();
 		return val;
-	}
-	
-	
+	}	
 	
 	public String getUrl()
 	{
 		return url;
 	}
-	
-	public void seek(long offset) throws IOException {
-		seek(offset, false);
-	}
-	
-	public void seek(long offset, boolean gzip) throws IOException {
-		if(activeMethod != null) {
-			activeMethod.abort();
-			activeMethod.releaseConnection();
-		}
-		activeMethod = new GetMethod(url);
-		activeMethod.setRequestHeader("Range", 
-				String.format("bytes=%d-", offset));
 		
-		if (noKeepAlive) {
-			activeMethod.setRequestHeader("Connection", "close");
-		}
+	public InputStream seek(long offset, boolean gzip) throws IOException {		
+		is = doSeekLoad(offset, -1);
 		
-		int code = http.executeMethod(activeMethod);
-		if((code != 206) && (code != 200)) {
-			throw new IOException("Non 200/6 response code for " + url + ":" + offset);
-		}
-		InputStream is = activeMethod.getResponseBodyAsStream();
 		if (gzip) {
     		is = new GZIPMembersInputStream(is, blockSize);
-    	} 
-    	isr = new InputStreamReader(is, UTF8);
-    	br = new BufferedReader(isr, blockSize);
+    	}
+		
+		return is;
 	}
 	
-	protected InputStream seekReadInputStream(long offset, int maxLength) throws IOException {
-		if (activeMethod != null) {
-			close();
-		}
+	public InputStream seekWithMaxRead(long offset, boolean gzip, int maxLength) throws IOException {
+		is = doSeekLoad(offset, maxLength);
 		
-		activeMethod = new GetMethod(url);
-		
-		long endOffset = (offset + maxLength) - 1;
-		
-		StringBuilder builder = new StringBuilder(24);
-		builder.append("bytes=");
-		builder.append(offset);
-		builder.append('-');
-		builder.append(endOffset);
-		activeMethod.setRequestHeader("Range", builder.toString()); 
-				//String.format("bytes=%d-%d", offset, endOffset));
-		
-		if (noKeepAlive) {
-			activeMethod.setRequestHeader("Connection", "close");
-		}
-		
-		int code = http.executeMethod(activeMethod);
-		
-		if((code != 206) && (code != 200)) {
-			throw new IOException("Non 200/6 response code for " + url + " " + offset + ":" + endOffset);
-		}
-		
-		return activeMethod.getResponseBodyAsStream();
-	}
-		
-	public void seekWithMaxRead(long offset, boolean gzip, int maxLength) throws IOException {
-		
-		InputStream is = seekReadInputStream(offset, maxLength);
-		
-		if (bufferFully) {
+		if (bufferFully && (maxLength > 0)) {
 			try {
 				byte[] buffer = new byte[maxLength];
 				ByteStreams.readFully(is, buffer);
@@ -155,38 +100,52 @@ public class HTTPSeekableLineReader implements SeekableLineReader {
     	
 		if (gzip) {
     		is = new GZIPMembersInputStream(is, blockSize);
-    	}   
-    	
-    	isr = new InputStreamReader(is, UTF8);
-    	br = new BufferedReader(isr, blockSize);
+    	} 
+		
+		return is;
     }
-
-	public String readLine() throws IOException {
-		if(br == null) {
-			seek(0);
-		}
-		return br.readLine();
-	}
 	
-	public long getOffset() throws IOException {
-		//Unsupported for now
-		return -1;
+	protected InputStream doSeekLoad(long offset, int maxLength) throws IOException {
+		if (activeMethod != null) {
+			doClose();
+		}
+		br = null;
+		
+		activeMethod = new GetMethod(url);
+		
+		StringBuilder builder = new StringBuilder(24);
+		builder.append("bytes=");
+		builder.append(offset);
+		builder.append('-');
+		
+		long endOffset = -1;
+		
+		if (maxLength > 0) {
+			endOffset = (offset + maxLength) - 1;
+			builder.append(endOffset);
+		}
+		
+		activeMethod.setRequestHeader("Range", builder.toString()); 
+				//String.format("bytes=%d-%d", offset, endOffset));
+		
+		if (noKeepAlive) {
+			activeMethod.setRequestHeader("Connection", "close");
+		}
+		
+		int code = http.executeMethod(activeMethod);
+		
+		if((code != 206) && (code != 200)) {
+			throw new IOException("Non 200/6 response code for " + url + " " + offset + ":" + endOffset);
+		}
+		
+		return activeMethod.getResponseBodyAsStream();
 	}
 
-	public void close() throws IOException {
+	public void doClose() throws IOException {
 		if (activeMethod != null) {
 			activeMethod.abort();
 			activeMethod.releaseConnection();
 			activeMethod = null;
-		}
-		
-		if (br != null) {
-			br.close();
-			br = null;
-		}
-		
-		if (isr != null) {
-			isr = null;
 		}
 	}
 

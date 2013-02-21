@@ -1,61 +1,42 @@
 package org.archive.util.binsearch.impl;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 
 import org.archive.util.binsearch.SeekableLineReader;
-import org.archive.util.zip.GZIPMembersInputStream;
 
 import com.google.common.io.LimitInputStream;
 
-public class NIOSeekableLineReader implements SeekableLineReader {
+public class NIOSeekableLineReader extends SeekableLineReader {
 	private FileChannel fc;
 	private long size;
 	
 	private FileChannelInputStream fcis;
 	private ByteBufferBackedInputStream bbis;
 	
-	private InputStreamReader isr;
-	private BufferedReader br;
-
-	private int blockSize;
-	
-	protected boolean useMMap;
-	
 	public NIOSeekableLineReader(FileChannel fc, int blockSize) throws IOException {
+		super(blockSize);
+		
 		this.fc = fc;
 		size = fc.size();
 		fcis = null;
 		bbis = null;
-		this.blockSize = blockSize;
 	}
 	
-	public void seek(long offset) throws IOException {
-		fcis = new FileChannelInputStream(fc, offset);
-		bbis = null;
-    	isr = new InputStreamReader(fcis, UTF8);
-    	br = new BufferedReader(isr, blockSize);
-	}
-	
-	public void seekWithMaxRead(long offset, boolean gzip, int maxLength) throws IOException {
+	public InputStream doSeekLoad(long offset, int maxLength) throws IOException {
 		
-		ByteBuffer mapBuff = fc.map(MapMode.READ_ONLY, offset, maxLength);
-		
-		bbis = new ByteBufferBackedInputStream(mapBuff, offset);
-		
-		//fcis = new FileChannelInputStream(fc, offset);
-    	
-    	InputStream is = new LimitInputStream(bbis, maxLength);
-    	if (gzip) {
-    		is = new GZIPMembersInputStream(is, blockSize);
-    	}    	
-    	isr = new InputStreamReader(is, UTF8);
-    	br = new BufferedReader(isr, blockSize);
+		if (maxLength >= 0) {
+			ByteBuffer mapBuff = fc.map(MapMode.READ_ONLY, offset, maxLength);
+			bbis = new ByteBufferBackedInputStream(mapBuff, offset);	
+			return new LimitInputStream(bbis, maxLength);
+			
+		} else {
+			fcis = new FileChannelInputStream(fc, offset);
+			return fcis;
+		}
     }
 	
 	public long getOffset() throws IOException
@@ -69,18 +50,8 @@ public class NIOSeekableLineReader implements SeekableLineReader {
 		}
 	}
 
-	public String readLine() throws IOException {
-		if(br == null) {
-			seek(0);
-		}
-		return br.readLine();
-	}
-
-	public void close() throws IOException {
-		if (br != null) {
-			br.close();
-			br = null;
-		}
+	public void doClose() throws IOException {
+		// Not closing the channel, shared with factory
 	}
 
 	public long getSize() throws IOException {

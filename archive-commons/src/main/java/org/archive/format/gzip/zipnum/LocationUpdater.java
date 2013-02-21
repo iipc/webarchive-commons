@@ -66,11 +66,16 @@ public class LocationUpdater implements Runnable {
 		}
 	}
 	
-	protected void syncLoad(long newModTime) throws IOException
+	protected void syncLoad(long newModTime)
 	{
 		HashMap<String, String[]> destMap = new HashMap<String, String[]>();
 		
-		loadPartLocations(destMap);
+		try {
+			loadPartLocations(destMap);
+		} catch (IOException e) {
+			LOGGER.warning(e.toString());
+			return;
+		}			
 		
 		if (LOGGER.isLoggable(Level.INFO)) {
 			LOGGER.info("*** Location Update: " + locUri);
@@ -99,10 +104,14 @@ public class LocationUpdater implements Runnable {
 		lastModTime = newModTime;
 	}
 	
-	private void closeExistingFiles(ArrayList<String[]> filesToClose) throws IOException {
+	private void closeExistingFiles(ArrayList<String[]> filesToClose) {
 		for (String[] files : filesToClose) {
 			for (String file : files) {
-				blockLoader.closeFileFactory(file);
+				try {
+					blockLoader.closeFileFactory(file);
+				} catch (IOException e) {
+					LOGGER.warning(e.toString());
+				}
 			}
 		}
 	}
@@ -218,11 +227,7 @@ public class LocationUpdater implements Runnable {
 				long currModTime = locReaderFactory.getModTime();
 				
 				if (currModTime != lastModTime) {
-					try {
-						syncLoad(currModTime);
-					} catch (IOException e) {
-						LOGGER.warning(e.toString());
-					}
+					syncLoad(currModTime);
 				}
 				
 				Thread.sleep(checkInterval);

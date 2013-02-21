@@ -29,7 +29,6 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 	private GetMethod activeMethod;
 	
 	protected boolean noKeepAlive = false;
-	protected boolean bufferFully = false;
 	
 	public static class AbortableInputStream extends FilterInputStream
 	{
@@ -198,12 +197,7 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 		}
 		return length;
 	}
-	
-	public void setBufferFully(boolean fully)
-	{
-		this.bufferFully = fully;
-	}
-	
+		
 	public void setNoKeepAlive(boolean noKeepAlive)
 	{
 		this.noKeepAlive = noKeepAlive;

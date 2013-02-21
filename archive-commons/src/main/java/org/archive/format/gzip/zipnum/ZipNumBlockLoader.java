@@ -72,7 +72,9 @@ public class ZipNumBlockLoader {
 			fileFactoryMap.put(filename, factory);
 		}
 		
-		return factory.get();
+		SeekableLineReader reader = factory.get();
+		reader.setBufferFully(bufferFully);
+		return reader;
 	}
 	
 	public void closeFileFactory(String filename) throws IOException

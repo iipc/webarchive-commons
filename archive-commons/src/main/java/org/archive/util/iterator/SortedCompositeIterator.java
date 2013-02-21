@@ -6,9 +6,12 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.PriorityQueue;
+import java.util.logging.Logger;
 
 
 public class SortedCompositeIterator<E> implements CloseableIterator<E> {
+	
+	private final static Logger LOGGER = Logger.getLogger(SortedCompositeIterator.class.getName());
 	private static final int DEFAULT_CAPACITY = 10;
 	PriorityQueue<PeekableIterator<E>> q = null;
 
@@ -74,7 +77,11 @@ public class SortedCompositeIterator<E> implements CloseableIterator<E> {
 
 	public void close() throws IOException {
 		for(PeekableIterator<E> i : q) {
-			i.close();
+			try {
+				i.close();
+			} catch (IOException io) {
+				LOGGER.warning(io.toString());
+			}
 		}
 	}	
 }

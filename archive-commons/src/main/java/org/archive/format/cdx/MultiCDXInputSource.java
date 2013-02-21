@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.archive.format.gzip.zipnum.ZipNumCluster;
 import org.archive.format.gzip.zipnum.ZipNumParams;
@@ -12,6 +13,7 @@ import org.archive.util.iterator.SortedCompositeIterator;
 
 public class MultiCDXInputSource implements CDXInputSource {
 
+	private final static Logger LOGGER = Logger.getLogger(MultiCDXInputSource.class.getName());
 	
 	protected List<CDXInputSource> cdx;
 	
@@ -49,8 +51,15 @@ public class MultiCDXInputSource implements CDXInputSource {
 		
 		SortedCompositeIterator<String> scitr = new SortedCompositeIterator<String>(cdx.size(), comparator);
 		
+		CloseableIterator<String> iter = null;
+		
 		for (CDXInputSource cdxReader : cdx) {
-			scitr.addIterator(cdxReader.getCDXIterator(key, prefix, exact, params));
+			try {
+				iter = cdxReader.getCDXIterator(key, prefix, exact, params);
+				scitr.addIterator(iter);
+			} catch (IOException io) {
+				LOGGER.warning(io.toString());
+			}
 		}
 		
 		return scitr;

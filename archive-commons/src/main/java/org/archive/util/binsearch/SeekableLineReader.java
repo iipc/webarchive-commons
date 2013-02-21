@@ -83,6 +83,7 @@ public abstract class SeekableLineReader {
 		
 		br = null;
 		is = null;
+		closed = true;
 	}
 	
 	public long getSize() throws IOException

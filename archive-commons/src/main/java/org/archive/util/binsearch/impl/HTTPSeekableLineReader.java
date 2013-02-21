@@ -1,6 +1,7 @@
 package org.archive.util.binsearch.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -11,6 +12,7 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
+import org.apache.commons.io.input.CountingInputStream;
 import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.zip.GZIPMembersInputStream;
 
@@ -24,10 +26,43 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 	private String url;
 	private long length = -1;
 		
-	private HttpMethod activeMethod;
+	private GetMethod activeMethod;
 	
 	protected boolean noKeepAlive = false;
 	protected boolean bufferFully = false;
+	
+	public static class AbortableInputStream extends FilterInputStream
+	{
+		protected GetMethod method;
+		protected CountingInputStream cin;
+		
+		public AbortableInputStream(GetMethod method, InputStream input)
+		{
+			super(new CountingInputStream(input));
+			cin = (CountingInputStream)super.in;
+			this.method = method;
+		}
+		
+		@Override
+		public void close()
+		{
+			long contentLength = method.getResponseContentLength();
+			long bytesRead = cin.getByteCount();
+			
+			// If fully read, close gracefully, otherwise abort
+			if ((contentLength > 0) && (contentLength == bytesRead)) {
+				try {
+					this.in.close();
+				} catch (IOException e) {
+					method.abort();
+				}
+			} else {
+				method.abort();
+			}
+			
+			method.releaseConnection();
+		}
+	}
 	
 	public HTTPSeekableLineReader(HttpClient http, String url) {
 		this.http = http;
@@ -74,6 +109,8 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 	public InputStream seek(long offset, boolean gzip) throws IOException {		
 		is = doSeekLoad(offset, -1);
 		
+		is = new AbortableInputStream(activeMethod, is);
+		
 		if (gzip) {
     		is = new GZIPMembersInputStream(is, blockSize);
     	}
@@ -96,6 +133,8 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 				activeMethod.releaseConnection();
 				activeMethod = null;				
 			}
+		} else {
+			is = new AbortableInputStream(activeMethod, is);
 		}
     	
 		if (gzip) {

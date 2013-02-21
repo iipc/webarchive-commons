@@ -120,7 +120,7 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 	public InputStream seekWithMaxRead(long offset, boolean gzip, int maxLength) throws IOException {
 		is = doSeekLoad(offset, maxLength);
 		
-		if (bufferFully && (maxLength > 0)) {
+		if (bufferFully && (maxLength > 0) && (maxLength < 1e10)) {
 			try {
 				byte[] buffer = new byte[maxLength];
 				ByteStreams.readFully(is, buffer);
@@ -172,11 +172,16 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 		
 		int code = http.executeMethod(activeMethod);
 		
-		if((code != 206) && (code != 200)) {
+		if ((code != 206) && (code != 200)) {
 			throw new IOException("Non 200/6 response code for " + url + " " + offset + ":" + endOffset);
 		}
 		
 		return activeMethod.getResponseBodyAsStream();
+	}
+	
+	public GetMethod getHttpMethod()
+	{
+		return activeMethod;
 	}
 
 	public void doClose() throws IOException {
@@ -190,7 +195,11 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 	public long getSize() throws IOException {
 		if (length < 0) {
 			try {
-				acquireLength();
+				if (activeMethod != null) {
+					length = activeMethod.getResponseContentLength();
+				} else {
+					acquireLength();
+				}
 			} catch (URISyntaxException e) {
 				throw new IOException(e);
 			}

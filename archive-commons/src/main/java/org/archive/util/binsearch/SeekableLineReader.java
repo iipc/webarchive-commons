@@ -56,7 +56,7 @@ public abstract class SeekableLineReader {
 				// Create new stream
 				is = new ByteArrayInputStream(buffer);
 			} finally {
-				close();
+				doClose();
 			}
 		}	
 		

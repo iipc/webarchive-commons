@@ -63,7 +63,7 @@ public class MultiBlockIterator extends AbstractPeekableIterator<String> {
 	public void close() throws IOException {
 		if (currLoader != null) {
 			try {
-				close();
+				currLoader.close();
 			} catch (IOException exc) {
 				LOGGER.warning(exc.toString());				
 			}

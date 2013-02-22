@@ -149,34 +149,39 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 		}
 		br = null;
 		
-		activeMethod = new GetMethod(url);
+		try {
 		
-		StringBuilder builder = new StringBuilder(24);
-		builder.append("bytes=");
-		builder.append(offset);
-		builder.append('-');
-		
-		long endOffset = -1;
-		
-		if (maxLength > 0) {
-			endOffset = (offset + maxLength) - 1;
-			builder.append(endOffset);
+			activeMethod = new GetMethod(url);
+			
+			StringBuilder builder = new StringBuilder(24);
+			builder.append("bytes=");
+			builder.append(offset);
+			builder.append('-');
+			
+			long endOffset = -1;
+			
+			if (maxLength > 0) {
+				endOffset = (offset + maxLength) - 1;
+				builder.append(endOffset);
+			}
+			
+			activeMethod.setRequestHeader("Range", builder.toString()); 
+			
+			if (noKeepAlive) {
+				activeMethod.setRequestHeader("Connection", "close");
+			}
+			
+			int code = http.executeMethod(activeMethod);
+			
+			if ((code != 206) && (code != 200)) {
+				throw new IOException("Non 200/6 response code for " + url + " " + offset + ":" + endOffset);
+			}
+			
+			return activeMethod.getResponseBodyAsStream();
+		} catch (IOException io) {
+			doClose();
+			throw io;
 		}
-		
-		activeMethod.setRequestHeader("Range", builder.toString()); 
-				//String.format("bytes=%d-%d", offset, endOffset));
-		
-		if (noKeepAlive) {
-			activeMethod.setRequestHeader("Connection", "close");
-		}
-		
-		int code = http.executeMethod(activeMethod);
-		
-		if ((code != 206) && (code != 200)) {
-			throw new IOException("Non 200/6 response code for " + url + " " + offset + ":" + endOffset);
-		}
-		
-		return activeMethod.getResponseBodyAsStream();
 	}
 	
 	public GetMethod getHttpMethod()

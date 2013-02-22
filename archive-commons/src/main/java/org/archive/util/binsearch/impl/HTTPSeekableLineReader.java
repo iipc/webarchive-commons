@@ -211,4 +211,18 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 	{
 		this.noKeepAlive = noKeepAlive;
 	}
+
+	public String getHeaderValue(String headerName) {
+		if (activeMethod == null) {
+			return null;
+		}
+		
+		Header header = activeMethod.getResponseHeader(headerName);
+		
+		if (header == null) {
+			return null;
+		}
+		
+		return header.getValue();
+	}
 }

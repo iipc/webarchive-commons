@@ -61,7 +61,17 @@ public class SortedTextFile {
 
 	public CloseableIterator<String> getRecordIterator(final String prefix, 
 			boolean lessThan) throws IOException {
-		return search(factory.get(),prefix,lessThan);
+		
+		SeekableLineReader slr = factory.get();
+		
+		try {
+			return search(slr,prefix,lessThan);
+		} catch (IOException io) {
+			if (slr != null) {
+				slr.close();
+			}
+			throw io;
+		}
 	}
 	
 	protected long findOffset(SeekableLineReader slr, final String key) throws IOException

@@ -28,7 +28,7 @@ public class MultiBlockIterator extends AbstractPeekableIterator<String> {
 	@Override
 	public String getNextInner() {
 				
-		try {		
+		try {
 			while (true) {
 				if (currLoader == null) {
 					if (blockItr.hasNext()) {
@@ -50,6 +50,11 @@ public class MultiBlockIterator extends AbstractPeekableIterator<String> {
 			}
 		} catch (IOException io) {
 			LOGGER.warning(io.toString());
+			try {
+				close();
+			} catch (IOException exc) {
+				LOGGER.warning(exc.toString());				
+			}
 			return null;
 		}
 	}
@@ -57,7 +62,11 @@ public class MultiBlockIterator extends AbstractPeekableIterator<String> {
 	@Override
 	public void close() throws IOException {
 		if (currLoader != null) {
-			currLoader.close();
+			try {
+				close();
+			} catch (IOException exc) {
+				LOGGER.warning(exc.toString());				
+			}
 			currLoader = null;
 		}
 		

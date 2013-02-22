@@ -45,24 +45,30 @@ public abstract class SeekableLineReader {
 		}
 		
 		br = null;
-		is = doSeekLoad(offset, maxLength);
 		
-		if (bufferFully && (maxLength > 0)) {
-			try {
-				byte[] buffer = new byte[maxLength];
-				ByteStreams.readFully(is, buffer);
-				is.close();
-				
-				// Create new stream
-				is = new ByteArrayInputStream(buffer);
-			} finally {
-				doClose();
+		try {
+			is = doSeekLoad(offset, maxLength);
+		
+			if (bufferFully && (maxLength > 0)) {
+				try {
+					byte[] buffer = new byte[maxLength];
+					ByteStreams.readFully(is, buffer);
+					is.close();
+					
+					// Create new stream
+					is = new ByteArrayInputStream(buffer);
+				} finally {
+					doClose();
+				}
 			}
-		}	
 		
-    	if (gzip) {
-    		is = new GZIPMembersInputStream(is, blockSize);
-    	}
+	    	if (gzip) {
+	    		is = new GZIPMembersInputStream(is, blockSize);
+	    	}
+		} catch (IOException io) {
+			doClose();
+			throw io;
+		}
     	
     	return is;
 	}

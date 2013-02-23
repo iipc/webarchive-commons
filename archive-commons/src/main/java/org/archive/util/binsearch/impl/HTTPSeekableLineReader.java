@@ -26,39 +26,7 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 	private GetMethod activeMethod;
 	
 	protected boolean noKeepAlive = false;
-	
-//	public static class AbortableInputStream extends FilterInputStream
-//	{
-//		protected GetMethod method;
-//		
-//		public AbortableInputStream(GetMethod method, InputStream input)
-//		{
-//			super(new CountingInputStream(input));
-//			cin = (CountingInputStream)super.in;
-//			this.method = method;
-//		}
-//		
-//		@Override
-//		public void close()
-//		{
-//			long contentLength = method.getResponseContentLength();
-//			long bytesRead = cin.getByteCount();
-//			
-//			// If fully read, close gracefully, otherwise abort
-//			if ((contentLength > 0) && (contentLength == bytesRead)) {
-//				try {
-//					this.in.close();
-//				} catch (IOException e) {
-//					method.abort();
-//				}
-//			} else {
-//				method.abort();
-//			}
-//			
-//			method.releaseConnection();
-//		}
-//	}
-	
+		
 	public HTTPSeekableLineReader(HttpClient http, String url) {
 		this.http = http;
 		this.url = url;
@@ -194,17 +162,18 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 			
 			// If fully read, close gracefully, otherwise abort
 			if ((contentLength > 0) && (contentLength == bytesRead)) {
-				try {
-					cin.close();
-				} catch (IOException e) {
-					activeMethod.abort();
-				}
+//				try {
+//					cin.close();
+//				} catch (IOException e) {
+//					activeMethod.abort();
+//				}
 			} else {
 				activeMethod.abort();
 			}
 			
 			activeMethod.releaseConnection();
 			activeMethod = null;
+			cin = null;
 			
 		} finally {
 			if (activeMethod != null) {

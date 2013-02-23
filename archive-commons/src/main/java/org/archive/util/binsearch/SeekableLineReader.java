@@ -34,7 +34,7 @@ public abstract class SeekableLineReader {
 		public void close() throws IOException
 		{
 			SeekableLineReader.this.close();
-			in.close();
+			//in.close();
 		}
 	}
 	

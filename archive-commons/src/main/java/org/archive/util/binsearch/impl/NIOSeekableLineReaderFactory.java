@@ -23,6 +23,8 @@ public class NIOSeekableLineReaderFactory implements SeekableLineReaderFactory {
 	private RandomAccessFile raf;
 	private int blockSize;
 	
+	//protected int lastModified;
+	
 	public NIOSeekableLineReaderFactory(File file, int blockSize) throws IOException {
 		this.file = file;
 		this.blockSize = blockSize;
@@ -33,6 +35,15 @@ public class NIOSeekableLineReaderFactory implements SeekableLineReaderFactory {
 		this(file, BINSEARCH_BLOCK_SIZE);
 	}
 	public SeekableLineReader get() throws IOException {
+		
+//		synchronized (this) {
+//			if (file.lastModified() != lastModified) {
+//				close();
+//				this.raf = new RandomAccessFile(file, "r");
+//				this.fc = raf.getChannel();
+//			}
+//		}
+		
 		return new NIOSeekableLineReader(fc, blockSize);
 	}
 	public void close() throws IOException

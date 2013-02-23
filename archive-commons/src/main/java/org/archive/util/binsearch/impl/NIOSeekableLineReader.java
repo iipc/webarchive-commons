@@ -14,6 +14,8 @@ public class NIOSeekableLineReader extends SeekableLineReader {
 	private FileChannel fc;
 	private long size;
 	
+	private boolean isMMap = false;
+	
 	private FileChannelInputStream fcis;
 	private ByteBufferBackedInputStream bbis;
 	
@@ -28,14 +30,18 @@ public class NIOSeekableLineReader extends SeekableLineReader {
 	
 	public InputStream doSeekLoad(long offset, int maxLength) throws IOException {
 		
-		if (maxLength >= 0) {
+		if (isMMap && (maxLength >= 0)) {
 			ByteBuffer mapBuff = fc.map(MapMode.READ_ONLY, offset, maxLength);
 			bbis = new ByteBufferBackedInputStream(mapBuff, offset);	
 			return new LimitInputStream(bbis, maxLength);
 			
 		} else {
 			fcis = new FileChannelInputStream(fc, offset);
-			return fcis;
+			if (maxLength > 0) {
+				return new LimitInputStream(fcis, maxLength);
+			} else {
+				return fcis;
+			}
 		}
     }
 	

@@ -39,8 +39,9 @@ public class RandomAccessFileSeekableLineReader extends SeekableLineReader {
 		return raf.getFilePointer();
 	}
 	
-	public void doClose() throws IOException {	
+	public void doClose() throws IOException {
 		raf.close();
+		raf = null;
 	}
 	
 	public long getSize() throws IOException {

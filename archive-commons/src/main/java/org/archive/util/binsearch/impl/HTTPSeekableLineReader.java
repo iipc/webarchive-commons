@@ -1,7 +1,5 @@
 package org.archive.util.binsearch.impl;
 
-import java.io.ByteArrayInputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -14,9 +12,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.io.input.CountingInputStream;
 import org.archive.util.binsearch.SeekableLineReader;
-import org.archive.util.zip.GZIPMembersInputStream;
-
-import com.google.common.io.ByteStreams;
 
 public class HTTPSeekableLineReader extends SeekableLineReader {
 	public final static String CONTENT_LENGTH = "Content-Length";
@@ -25,43 +20,44 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 	private HttpClient http;
 	private String url;
 	private long length = -1;
+	
+	protected CountingInputStream cin;
 		
 	private GetMethod activeMethod;
 	
 	protected boolean noKeepAlive = false;
 	
-	public static class AbortableInputStream extends FilterInputStream
-	{
-		protected GetMethod method;
-		protected CountingInputStream cin;
-		
-		public AbortableInputStream(GetMethod method, InputStream input)
-		{
-			super(new CountingInputStream(input));
-			cin = (CountingInputStream)super.in;
-			this.method = method;
-		}
-		
-		@Override
-		public void close()
-		{
-			long contentLength = method.getResponseContentLength();
-			long bytesRead = cin.getByteCount();
-			
-			// If fully read, close gracefully, otherwise abort
-			if ((contentLength > 0) && (contentLength == bytesRead)) {
-				try {
-					this.in.close();
-				} catch (IOException e) {
-					method.abort();
-				}
-			} else {
-				method.abort();
-			}
-			
-			method.releaseConnection();
-		}
-	}
+//	public static class AbortableInputStream extends FilterInputStream
+//	{
+//		protected GetMethod method;
+//		
+//		public AbortableInputStream(GetMethod method, InputStream input)
+//		{
+//			super(new CountingInputStream(input));
+//			cin = (CountingInputStream)super.in;
+//			this.method = method;
+//		}
+//		
+//		@Override
+//		public void close()
+//		{
+//			long contentLength = method.getResponseContentLength();
+//			long bytesRead = cin.getByteCount();
+//			
+//			// If fully read, close gracefully, otherwise abort
+//			if ((contentLength > 0) && (contentLength == bytesRead)) {
+//				try {
+//					this.in.close();
+//				} catch (IOException e) {
+//					method.abort();
+//				}
+//			} else {
+//				method.abort();
+//			}
+//			
+//			method.releaseConnection();
+//		}
+//	}
 	
 	public HTTPSeekableLineReader(HttpClient http, String url) {
 		this.http = http;
@@ -105,48 +101,41 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 		return url;
 	}
 		
-	public InputStream seek(long offset, boolean gzip) throws IOException {		
-		is = doSeekLoad(offset, -1);
-		
-		is = new AbortableInputStream(activeMethod, is);
-		
-		if (gzip) {
-    		is = new GZIPMembersInputStream(is, blockSize);
-    	}
-		
-		return is;
-	}
+//	public void seek(long offset, boolean gzip) throws IOException {		
+//		is = doSeekLoad(offset, -1);
+//				
+//		if (gzip) {
+//    		is = new GZIPMembersInputStream(is, blockSize);
+//    	}
+//	}
 	
-	public InputStream seekWithMaxRead(long offset, boolean gzip, int maxLength) throws IOException {
-		is = doSeekLoad(offset, maxLength);
-		
-		if (bufferFully && (maxLength > 0) && (maxLength < 1e10)) {
-			try {
-				byte[] buffer = new byte[maxLength];
-				ByteStreams.readFully(is, buffer);
-				is.close();
-				
-				// Create new stream
-				is = new ByteArrayInputStream(buffer);
-			} finally {
-				activeMethod.releaseConnection();
-				activeMethod = null;				
-			}
-		} else {
-			is = new AbortableInputStream(activeMethod, is);
-		}
-    	
-		if (gzip) {
-    		is = new GZIPMembersInputStream(is, blockSize);
-    	} 
-		
-		return is;
-    }
+//	public void seekWithMaxRead(long offset, boolean gzip, int maxLength) throws IOException {
+//		is = doSeekLoad(offset, maxLength);
+//		
+//		if (bufferFully && (maxLength > 0) && (maxLength < 1e10)) {
+//			try {
+//				byte[] buffer = new byte[maxLength];
+//				ByteStreams.readFully(is, buffer);
+//				is.close();
+//				
+//				// Create new stream
+//				is = new ByteArrayInputStream(buffer);
+//			} finally {
+//				activeMethod.releaseConnection();
+//				activeMethod = null;				
+//			}
+//		}
+//    	
+//		if (gzip) {
+//    		is = new GZIPMembersInputStream(is, blockSize);
+//    	} 
+//    }
 	
 	protected InputStream doSeekLoad(long offset, int maxLength) throws IOException {
 		if (activeMethod != null) {
 			doClose();
 		}
+		
 		br = null;
 		
 		try {
@@ -177,7 +166,10 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 				throw new IOException("Non 200/6 response code for " + url + " " + offset + ":" + endOffset);
 			}
 			
-			return activeMethod.getResponseBodyAsStream();
+			InputStream is = activeMethod.getResponseBodyAsStream();
+			cin = new CountingInputStream(is);
+			return cin;
+			
 		} catch (IOException io) {
 			doClose();
 			throw io;
@@ -190,10 +182,36 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 	}
 
 	public void doClose() throws IOException {
-		if (activeMethod != null) {
-			activeMethod.abort();
+		
+		if (activeMethod == null) {
+			return;
+		}
+		
+		try {
+			long contentLength = activeMethod.getResponseContentLength();
+			
+			long bytesRead = (cin != null ? cin.getByteCount() : 0);
+			
+			// If fully read, close gracefully, otherwise abort
+			if ((contentLength > 0) && (contentLength == bytesRead)) {
+				try {
+					cin.close();
+				} catch (IOException e) {
+					activeMethod.abort();
+				}
+			} else {
+				activeMethod.abort();
+			}
+			
 			activeMethod.releaseConnection();
 			activeMethod = null;
+			
+		} finally {
+			if (activeMethod != null) {
+				activeMethod.abort();
+				activeMethod.releaseConnection();
+				activeMethod = null;
+			}
 		}
 	}
 

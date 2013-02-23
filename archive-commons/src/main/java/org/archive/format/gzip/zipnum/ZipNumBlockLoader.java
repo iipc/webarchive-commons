@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import org.archive.util.GeneralURIStreamFactory;
 import org.archive.util.binsearch.SeekableLineReader;
@@ -13,6 +15,8 @@ import org.archive.util.binsearch.impl.HTTPSeekableLineReaderFactory;
 
 public class ZipNumBlockLoader {
 		
+	private final static Logger LOGGER = Logger.getLogger(ZipNumBlockLoader.class.getName());
+	
 	protected Map<String, SeekableLineReaderFactory> fileFactoryMap = null;
 	protected HTTPSeekableLineReaderFactory httpFactory = null;
 	
@@ -30,19 +34,50 @@ public class ZipNumBlockLoader {
 	
 	public ZipNumBlockLoader()
 	{
+
+	}
+	
+	private static ThreadLocal<Map<String, SeekableLineReader> > slrMap = new ThreadLocal<Map<String, SeekableLineReader> >()
+	{
+		@Override
+		protected Map<String, SeekableLineReader> initialValue() {
+			return new HashMap<String, SeekableLineReader>();
+		}
+	};
+	
+	public static void closeAllReaders()
+	{
+		for (Entry<String, SeekableLineReader> entry : slrMap.get().entrySet()) {
+			try {
+				SeekableLineReader reader = entry.getValue();
+				if (!reader.isClosed()) {
+					LOGGER.warning("Unclosed reader for: " + entry.getKey());
+					reader.close();
+				}
+			} catch (IOException io) {
+				
+			}
+		}
 		
+		slrMap.get().clear();
 	}
 	
 	public SeekableLineReader createBlockReader(String uri) throws IOException
-	{		
+	{
+		SeekableLineReader reader = null;
+		
 		if (GeneralURIStreamFactory.isHttp(uri)) {
-			return getHttpReader(uri);
+			reader = getHttpReader(uri);
 		} else {
-			return getFileReader(uri);
+			reader = getFileReader(uri);
 		}
+		
+		slrMap.get().put(uri, reader);
+				
+		return reader;
 	}
 	
-	public HTTPSeekableLineReader getHttpReader(String url) throws IOException {
+	protected HTTPSeekableLineReader getHttpReader(String url) throws IOException {
 		
 		if (httpFactory == null) {
 			httpFactory = new HTTPSeekableLineReaderFactory();
@@ -58,7 +93,7 @@ public class ZipNumBlockLoader {
 		return reader;
 	}
 	
-	public SeekableLineReader getFileReader(String filename) throws IOException {
+	protected SeekableLineReader getFileReader(String filename) throws IOException {
 		
 		if (fileFactoryMap == null) {
 			fileFactoryMap = new HashMap<String, SeekableLineReaderFactory>();

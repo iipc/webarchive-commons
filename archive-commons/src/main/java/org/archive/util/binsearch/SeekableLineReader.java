@@ -2,6 +2,7 @@ package org.archive.util.binsearch;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,6 +24,20 @@ public abstract class SeekableLineReader {
 	protected BufferedReader br;
 	protected InputStream is;
 	
+	class SLRClosingInputStream extends FilterInputStream
+	{
+		protected SLRClosingInputStream(InputStream in) {
+			super(in);
+		}
+		
+		@Override
+		public void close() throws IOException
+		{
+			SeekableLineReader.this.close();
+			in.close();
+		}
+	}
+	
 	public SeekableLineReader()
 	{
 		
@@ -33,12 +48,12 @@ public abstract class SeekableLineReader {
 		this.blockSize = blockSize;
 	}
 	
-	public InputStream seek(long offset) throws IOException
+	public void seek(long offset) throws IOException
 	{
-		return seekWithMaxRead(offset, false, -1);
+		seekWithMaxRead(offset, false, -1);
 	}
 	
-	public InputStream seekWithMaxRead(long offset, boolean gzip, int maxLength) throws IOException
+	public void seekWithMaxRead(long offset, boolean gzip, int maxLength) throws IOException
 	{
 		if (closed) {
 			throw new IOException("Seek after close()");
@@ -69,15 +84,20 @@ public abstract class SeekableLineReader {
 			doClose();
 			throw io;
 		}
-    	
-    	return is;
 	}
 	
-	abstract protected InputStream doSeekLoad(long offset, int maxLength) throws IOException; 
-
+	abstract protected InputStream doSeekLoad(long offset, int maxLength) throws IOException; 	
+	
+	abstract protected void doClose() throws IOException;
+	
+	public InputStream getInputStream()
+	{		
+		return new SLRClosingInputStream(is);
+	}
+	
 	public String readLine() throws IOException {		
 		if (is == null) {
-			is = seek(0);
+			seek(0);
 		}
 		
 		if (br == null) {
@@ -87,8 +107,6 @@ public abstract class SeekableLineReader {
 		
 		return br.readLine();
 	}
-	
-	public abstract void doClose() throws IOException;
 	
 	public final void close() throws IOException
 	{
@@ -108,6 +126,11 @@ public abstract class SeekableLineReader {
 		br = null;
 		is = null;
 		closed = true;
+	}
+	
+	public boolean isClosed()
+	{
+		return closed;
 	}
 	
 	public long getSize() throws IOException

@@ -25,11 +25,13 @@ public class ZipNumBlockLoader {
 	protected boolean bufferFully = true;
 	protected boolean noKeepAlive = true;
 	
-	protected int maxHostConnections = 400;
-	protected int maxTotalConnections = 500;
+	protected int maxHostConnections = 100000;
+	protected int maxTotalConnections = 100000;
 	
 	protected int connectTimeoutMS = 10000;
 	protected int readTimeoutMS = 10000;
+	
+	protected boolean staleChecking;
 
 	
 	public ZipNumBlockLoader()
@@ -84,7 +86,8 @@ public class ZipNumBlockLoader {
 			httpFactory.setMaxHostConnections(maxHostConnections);
 			httpFactory.setMaxHostConnections(maxTotalConnections);
 			httpFactory.setConnectionTimeoutMS(connectTimeoutMS);
-			httpFactory.setSocketTimeoutMS(readTimeoutMS);			
+			httpFactory.setSocketTimeoutMS(readTimeoutMS);
+			httpFactory.setStaleChecking(staleChecking);
 		}
 		
 		HTTPSeekableLineReader reader = httpFactory.get(url);
@@ -194,5 +197,15 @@ public class ZipNumBlockLoader {
 
 	public void setReadTimeoutMS(int readTimeoutMS) {
 		this.readTimeoutMS = readTimeoutMS;
+	}
+	
+	public void setStaleChecking(boolean staleChecking)
+	{
+		this.staleChecking = staleChecking;
+	}
+	
+	public boolean isStaleChecking()
+	{
+		return this.staleChecking;
 	}
 }

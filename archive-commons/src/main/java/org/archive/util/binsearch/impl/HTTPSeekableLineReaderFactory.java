@@ -113,6 +113,16 @@ public class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory 
     	connectionManager.getParams().setSoTimeout(socketTimeoutMS);
 	}
 	
+	public void setStaleChecking(boolean enabled)
+	{
+		connectionManager.getParams().setStaleCheckingEnabled(enabled);
+	}
+	
+	public boolean isStaleChecking()
+	{
+		return connectionManager.getParams().isStaleCheckingEnabled();
+	}
+	
 	// Experimental
 	public long getModTime()
 	{

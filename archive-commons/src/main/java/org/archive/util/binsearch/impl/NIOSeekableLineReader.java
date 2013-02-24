@@ -36,12 +36,13 @@ public class NIOSeekableLineReader extends SeekableLineReader {
 			return new LimitInputStream(bbis, maxLength);
 			
 		} else {
-			fcis = new FileChannelInputStream(fc, offset);
-			if (maxLength > 0) {
-				return new LimitInputStream(fcis, maxLength);
-			} else {
-				return fcis;
-			}
+			fcis = new FileChannelInputStream(fc, offset, maxLength);
+			return fcis;
+//			if (maxLength > 0) {
+//				return new LimitInputStream(fcis, maxLength);
+//			} else {
+//				return fcis;
+//			}
 		}
     }
 	
@@ -58,6 +59,8 @@ public class NIOSeekableLineReader extends SeekableLineReader {
 
 	public void doClose() throws IOException {
 		// Not closing the channel, shared with factory
+		fcis = null;
+		bbis = null;
 	}
 
 	public long getSize() throws IOException {
@@ -104,9 +107,14 @@ public class NIOSeekableLineReader extends SeekableLineReader {
 	public class FileChannelInputStream extends InputStream {
 		FileChannel fc;
 		long fcOffset;
-		public FileChannelInputStream(FileChannel fc, long offset) {
+		int remaining;
+		boolean bounded;
+		
+		public FileChannelInputStream(FileChannel fc, long offset, int maxLength) {
 			this.fc = fc;
 			this.fcOffset = offset;
+			this.remaining = maxLength;
+			this.bounded = (remaining > 0);
 		}
 		@Override
 		public int read() throws IOException {
@@ -124,6 +132,9 @@ public class NIOSeekableLineReader extends SeekableLineReader {
 		}
 		
 		public int read(byte[] buffer, int offset, int length) throws IOException {
+			if (bounded) {
+				remaining = Math.min(length, remaining);
+			}
 			ByteBuffer bb = ByteBuffer.wrap(buffer,offset,length);
 			int totalRead = 0;
 			while(length > 0) {
@@ -136,7 +147,16 @@ public class NIOSeekableLineReader extends SeekableLineReader {
 				fcOffset += amtRead;
 				length -= amtRead;
 			}
+			if (bounded) {
+				remaining -= totalRead;
+			}
 			return totalRead == 0 ? -1 : totalRead;
+		}
+		
+		@Override
+		public int available()
+		{
+			return remaining;
 		}
 	}
 }

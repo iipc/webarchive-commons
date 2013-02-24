@@ -65,16 +65,11 @@ public abstract class SeekableLineReader {
 			is = doSeekLoad(offset, maxLength);
 		
 			if (bufferFully && (maxLength > 0)) {
-				try {
-					byte[] buffer = new byte[maxLength];
-					ByteStreams.readFully(is, buffer);
-					is.close();
-					
-					// Create new stream
-					is = new ByteArrayInputStream(buffer);
-				} finally {
-					doClose();
-				}
+				byte[] buffer = new byte[maxLength];
+				ByteStreams.readFully(is, buffer);
+				doClose();
+				
+				is = new ByteArrayInputStream(buffer);
 			}
 		
 	    	if (gzip) {
@@ -141,5 +136,15 @@ public abstract class SeekableLineReader {
 	public void setBufferFully(boolean fully)
 	{
 		this.bufferFully = fully;
+	}
+	
+	@Override
+	public void finalize()
+	{
+		try {
+			close();
+		} catch (IOException e) {
+
+		}
 	}
 }

@@ -16,6 +16,26 @@ import org.archive.util.binsearch.SeekableLineReader;
 public class HTTPSeekableLineReader extends SeekableLineReader {
 	public final static String CONTENT_LENGTH = "Content-Length";
 	public final static String LAST_MODIFIED = "Last-Modified";
+	
+	public static class BadHttpStatusException extends IOException
+	{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		int status;
+		
+		public BadHttpStatusException(int status, String details)
+		{
+			super("Http Status " + status + " returned: " + details);
+			this.status = status;
+		}
+		
+		public int getStatus()
+		{
+			return status;
+		}
+	}
 
 	private HttpClient http;
 	private String url;
@@ -131,7 +151,7 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 			int code = http.executeMethod(activeMethod);
 			
 			if ((code != 206) && (code != 200)) {
-				throw new IOException("Non 200/6 response code for " + url + " " + offset + ":" + endOffset);
+				throw new BadHttpStatusException(code, url + " " + offset + ":" + endOffset);
 			}
 			
 			InputStream is = activeMethod.getResponseBodyAsStream();
@@ -173,7 +193,6 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 			
 			activeMethod.releaseConnection();
 			activeMethod = null;
-			cin = null;
 			
 		} finally {
 			if (activeMethod != null) {
@@ -182,6 +201,8 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 				activeMethod = null;
 			}
 		}
+		
+		cin = null;
 	}
 
 	public long getSize() throws IOException {

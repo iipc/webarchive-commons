@@ -203,6 +203,8 @@ public class HTTPSeekableLineReader extends SeekableLineReader {
 		}
 		
 		cin = null;
+		is = null;
+		br = null;
 	}
 
 	public long getSize() throws IOException {

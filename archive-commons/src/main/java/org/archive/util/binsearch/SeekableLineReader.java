@@ -141,10 +141,12 @@ public abstract class SeekableLineReader {
 	@Override
 	public void finalize()
 	{
-		try {
-			close();
-		} catch (IOException e) {
-
+		if (!closed) {
+			try {
+				close();
+			} catch (IOException e) {
+	
+			}
 		}
 	}
 }

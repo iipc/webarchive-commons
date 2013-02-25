@@ -40,7 +40,9 @@ public class RandomAccessFileSeekableLineReader extends SeekableLineReader {
 	}
 	
 	public void doClose() throws IOException {
-		raf.close();
+		if (raf != null) {
+			raf.close();
+		}
 		raf = null;
 	}
 	

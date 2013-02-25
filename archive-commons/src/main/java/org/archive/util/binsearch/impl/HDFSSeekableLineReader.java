@@ -35,6 +35,7 @@ public class HDFSSeekableLineReader extends SeekableLineReader {
 
 	public void doClose() throws IOException {
 		//Superclass closes the input stream
+		fsdis = null;
 	}
 
 	public long getSize() throws IOException {

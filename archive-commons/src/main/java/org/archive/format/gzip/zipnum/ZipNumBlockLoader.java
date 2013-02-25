@@ -84,7 +84,7 @@ public class ZipNumBlockLoader {
 		if (httpFactory == null) {
 			httpFactory = new HTTPSeekableLineReaderFactory();
 			httpFactory.setMaxHostConnections(maxHostConnections);
-			httpFactory.setMaxHostConnections(maxTotalConnections);
+			httpFactory.setMaxTotalConnections(maxTotalConnections);
 			httpFactory.setConnectionTimeoutMS(connectTimeoutMS);
 			httpFactory.setSocketTimeoutMS(readTimeoutMS);
 			httpFactory.setStaleChecking(staleChecking);

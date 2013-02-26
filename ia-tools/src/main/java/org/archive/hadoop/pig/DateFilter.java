@@ -138,6 +138,10 @@ public class DateFilter extends FirstPigJobOnlyFilter implements PathFilter
 	{
 		this.paramString = paramString;
 		
+		if (this.paramString == null || this.paramString.isEmpty()) {
+			return;
+		}
+		
 		String[] params = paramString.split("\\s+");
 		
 		String dateStr1 = null;
@@ -241,7 +245,7 @@ public class DateFilter extends FirstPigJobOnlyFilter implements PathFilter
 //				return true;
 //			}
 			
-			if (!extFilter.isEmpty() && !isDir) {
+			if ((extFilter != null) && !extFilter.isEmpty() && !isDir) {
 				if (!path.getName().endsWith(extFilter)) {
 					return false;
 				}
@@ -260,12 +264,19 @@ public class DateFilter extends FirstPigJobOnlyFilter implements PathFilter
 			// $mtype < DATE1
 			if (date1 != null) {
 				if (!(isDir && dirSkipOp(op1, false)) && !compare(op1, mtime, date1.getTime())) {
-				//if (!compare(op1, mtime, date1.getTime())) {				
+				//if (!compare(op1, mtime, date1.getTime())) {
 					return false;
 				}
 			}
 			
-			writeLog(path.getName() + " (" + new Date(mtime).toString() + ")");
+			String msg = path.getName() + " (" + new Date(mtime).toString() + ")";
+			
+			if (isDir) {
+				LOGGER.info(msg);
+			} else {
+				writeLog(msg);
+			}
+			
 			return true;
 			
 		} catch (IOException e) {

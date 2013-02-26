@@ -3,6 +3,8 @@ package org.archive.util.binsearch.impl;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
@@ -11,7 +13,9 @@ import org.apache.commons.httpclient.params.HttpClientParams;
 import org.archive.util.binsearch.SeekableLineReaderFactory;
 
 public class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory {
-    private MultiThreadedHttpConnectionManager connectionManager = null;
+	private final static Logger LOGGER = Logger.getLogger(HTTPSeekableLineReaderFactory.class.getName());
+	
+	private MultiThreadedHttpConnectionManager connectionManager = null;
     private HostConfiguration hostConfiguration = null;
     private HttpClient http = null;
     private String uriString;
@@ -36,10 +40,15 @@ public class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory 
     }
 
 	public HTTPSeekableLineReader get() throws IOException {
-		return new HTTPSeekableLineReader(http, uriString);
+		return get(uriString);
 	}
 	
 	public HTTPSeekableLineReader get(String url) throws IOException {
+		
+		if (LOGGER.isLoggable(Level.FINEST)) {
+			LOGGER.finest("Connections: " + connectionManager.getConnectionsInPool(hostConfiguration));
+		}
+		
 		return new HTTPSeekableLineReader(http, url);
 	}
     /**
@@ -73,8 +82,8 @@ public class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory 
      * @param maxHostConnections the HttpConnectionManagerParams config 
      */
     public void setMaxHostConnections(int maxHostConnections) {
-    	connectionManager.getParams().
-    		setMaxConnectionsPerHost(hostConfiguration, maxHostConnections);
+    	connectionManager.getParams().setDefaultMaxConnectionsPerHost(maxHostConnections);
+    	connectionManager.getParams().setMaxConnectionsPerHost(hostConfiguration, maxHostConnections);
     }
 
     /**
@@ -97,6 +106,7 @@ public class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory 
 	 */
 	public void setConnectionTimeoutMS(int connectionTimeoutMS) {
     	connectionManager.getParams().setConnectionTimeout(connectionTimeoutMS);
+    	http.getParams().setConnectionManagerTimeout(connectionTimeoutMS);
 	}
 
 	/**

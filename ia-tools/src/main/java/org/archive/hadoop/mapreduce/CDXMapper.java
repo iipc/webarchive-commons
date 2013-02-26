@@ -9,6 +9,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.archive.url.URLKeyMaker;
+import org.archive.url.URLParser;
 import org.archive.url.WaybackURLKeyMaker;
 
 public class CDXMapper extends Mapper<Object, Text, Text, Text>
@@ -69,8 +70,7 @@ public class CDXMapper extends Mapper<Object, Text, Text, Text>
 			return null;
 		}
 	
-		// don't care about the old key:
-//		String urlKey = parts[0];
+		String origKey = parts[0];
 		String timestamp = parts[1];
 		String origUrl = parts[2];
 		String mime = parts[3];
@@ -80,6 +80,14 @@ public class CDXMapper extends Mapper<Object, Text, Text, Text>
 		String offset = parts[offsetIdx];
 		String filename = parts[offsetIdx+1];
 		String urlKey;
+		
+		// Original url doesn't have a valid scheme, than its
+		// probably invalid (hostname only field), so use 
+		// the original key instead
+		if (URLParser.urlToScheme(origUrl) == null) {
+			origUrl = URLParser.HTTP_SCHEME + origKey;
+		}
+		
 		try {
 			urlKey = keyMaker.makeKey(origUrl);
 		} catch (URIException e) {

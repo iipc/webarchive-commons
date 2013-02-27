@@ -12,6 +12,7 @@ import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.binsearch.SeekableLineReaderFactory;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReader;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReaderFactory;
+import org.archive.util.binsearch.impl.HTTPSeekableLineReaderFactory.HttpLibs;
 
 public class ZipNumBlockLoader {
 		
@@ -21,6 +22,7 @@ public class ZipNumBlockLoader {
 	protected HTTPSeekableLineReaderFactory httpFactory = null;
 	
 	protected boolean useNio = false;
+	protected String httpLib = HttpLibs.APACHE_31.name();
 	
 	protected boolean bufferFully = true;
 	protected boolean noKeepAlive = true;
@@ -31,7 +33,7 @@ public class ZipNumBlockLoader {
 	protected int connectTimeoutMS = 10000;
 	protected int readTimeoutMS = 10000;
 	
-	protected boolean staleChecking;
+	protected boolean staleChecking = false;
 
 	
 	public ZipNumBlockLoader()
@@ -82,7 +84,7 @@ public class ZipNumBlockLoader {
 	protected HTTPSeekableLineReader getHttpReader(String url) throws IOException {
 		
 		if (httpFactory == null) {
-			httpFactory = new HTTPSeekableLineReaderFactory();
+			httpFactory = HTTPSeekableLineReaderFactory.getHttpFactory(HttpLibs.valueOf(httpLib), null);
 			httpFactory.setMaxHostConnections(maxHostConnections);
 			httpFactory.setMaxTotalConnections(maxTotalConnections);
 			httpFactory.setConnectionTimeoutMS(connectTimeoutMS);
@@ -207,5 +209,13 @@ public class ZipNumBlockLoader {
 	public boolean isStaleChecking()
 	{
 		return this.staleChecking;
+	}
+
+	public String getHttpLib() {
+		return httpLib;
+	}
+
+	public void setHttpLib(String httpLib) {
+		this.httpLib = httpLib;
 	}
 }

@@ -1,162 +1,127 @@
 package org.archive.util.binsearch.impl;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.commons.httpclient.HostConfiguration;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.apache.commons.httpclient.params.HttpClientParams;
 import org.archive.util.binsearch.SeekableLineReaderFactory;
+import org.archive.util.binsearch.impl.http.ApacheHttp31SLRFactory;
+import org.archive.util.binsearch.impl.http.HTTPURLConnSLRFactory;
 
-public class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory {
-	private final static Logger LOGGER = Logger.getLogger(HTTPSeekableLineReaderFactory.class.getName());
+public abstract class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory {
+
+	public abstract HTTPSeekableLineReader get(String url) throws IOException;
 	
-	private MultiThreadedHttpConnectionManager connectionManager = null;
-    private HostConfiguration hostConfiguration = null;
-    private HttpClient http = null;
-    private String uriString;
-    
-    public HTTPSeekableLineReaderFactory(String uriString) {
-    	this();
-    	this.uriString = uriString;
-    }
-
-    public HTTPSeekableLineReaderFactory() {
-    	connectionManager = new MultiThreadedHttpConnectionManager();
-    	hostConfiguration = new HostConfiguration();
-		HttpClientParams params = new HttpClientParams();
-//        params.setParameter(HttpClientParams.RETRY_HANDLER, new NoRetryHandler());
-    	http = new HttpClient(params,connectionManager);
-    	http.setHostConfiguration(hostConfiguration);
-    }
-    
-    public void close() throws IOException
-    {
-    	connectionManager.deleteClosedConnections();
-    }
-
-	public HTTPSeekableLineReader get() throws IOException {
-		return get(uriString);
+	protected String defaultURL;
+	
+	protected HTTPSeekableLineReaderFactory()
+	{
+		
 	}
 	
-	public HTTPSeekableLineReader get(String url) throws IOException {
+	public enum HttpLibs
+	{
+		APACHE_31,
+		URLCONN,
+	}
 		
-		if (LOGGER.isLoggable(Level.FINEST)) {
-			LOGGER.finest("Connections: " + connectionManager.getConnectionsInPool(hostConfiguration));
+	public static HTTPSeekableLineReaderFactory getHttpFactory()
+	{
+		return getHttpFactory(HttpLibs.APACHE_31);
+	}
+	
+	public static HTTPSeekableLineReaderFactory getHttpFactory(HttpLibs type)
+	{
+		return getHttpFactory(type, null);
+	}
+	
+	public static HTTPSeekableLineReaderFactory getHttpFactory(String defaultURL)
+	{
+		return getHttpFactory(HttpLibs.APACHE_31, defaultURL);
+	}
+	
+	public static HTTPSeekableLineReaderFactory getHttpFactory(HttpLibs type, String defaultURL)
+	{
+		HTTPSeekableLineReaderFactory factory = null;
+		
+		switch (type) {
+		case APACHE_31:
+			factory = new ApacheHttp31SLRFactory();
+			break;
+			
+		case URLCONN:
+			factory = new HTTPURLConnSLRFactory();
+			break;
 		}
 		
-		return new HTTPSeekableLineReader(http, url);
+		if (factory == null) {
+			factory = new ApacheHttp31SLRFactory();
+		}
+		
+		factory.defaultURL = defaultURL;
+		
+		return factory;
 	}
-    /**
-     * @param hostPort to proxy requests through - ex. "localhost:3128"
-     */
-    public void setProxyHostPort(String hostPort) {
-    	int colonIdx = hostPort.indexOf(':');
-    	if(colonIdx > 0) {
-    		String host = hostPort.substring(0,colonIdx);
-    		int port = Integer.valueOf(hostPort.substring(colonIdx+1));
-    		
-//            http.getHostConfiguration().setProxy(host, port);
-    		hostConfiguration.setProxy(host, port);
-    	}
-    }
-    /**
-     * @param maxTotalConnections the HttpConnectionManagerParams config
-     */
-    public void setMaxTotalConnections(int maxTotalConnections) {
-    	connectionManager.getParams().
-    		setMaxTotalConnections(maxTotalConnections);
-    }
-    /**
-     * @return the HttpConnectionManagerParams maxTotalConnections config
-     */
-    public int getMaxTotalConnections() {
-    	return connectionManager.getParams().getMaxTotalConnections();
-    }
- 
-    /**
-     * @param maxHostConnections the HttpConnectionManagerParams config 
-     */
-    public void setMaxHostConnections(int maxHostConnections) {
-    	connectionManager.getParams().setDefaultMaxConnectionsPerHost(maxHostConnections);
-    	connectionManager.getParams().setMaxConnectionsPerHost(hostConfiguration, maxHostConnections);
-    }
+	
+	@Override
+	public HTTPSeekableLineReader get() throws IOException {
+		//TODO: improve interface
+		return get(defaultURL);
+	}
+	
+	/**
+	 * 
+	 */
+	public abstract void close() throws IOException;
 
-    /**
-     * @return the HttpConnectionManagerParams maxHostConnections config 
-     */
-    public int getMaxHostConnections() {
-    	return connectionManager.getParams().
-    		getMaxConnectionsPerHost(hostConfiguration);
-    }
+	/**
+	 * @param hostPort to proxy requests through - ex. "localhost:3128"
+	 */
+	public abstract void setProxyHostPort(String hostPort);
 
-    /**
+	/**
+	 * @param maxTotalConnections the HttpConnectionManagerParams config
+	 */
+	public abstract void setMaxTotalConnections(int maxTotalConnections);
+
+	/**
+	 * @return the HttpConnectionManagerParams maxTotalConnections config
+	 */
+	public abstract int getMaxTotalConnections();
+
+	/**
+	 * @param maxHostConnections the HttpConnectionManagerParams config 
+	 */
+	public abstract void setMaxHostConnections(int maxHostConnections);
+
+	/**
+	 * @return the HttpConnectionManagerParams maxHostConnections config 
+	 */
+	public abstract int getMaxHostConnections();
+
+	/**
 	 * @return the connectionTimeoutMS
 	 */
-	public int getConnectionTimeoutMS() {
-		return connectionManager.getParams().getConnectionTimeout();
-	}
+	public abstract int getConnectionTimeoutMS();
 
 	/**
 	 * @param connectionTimeoutMS the connectionTimeoutMS to set
 	 */
-	public void setConnectionTimeoutMS(int connectionTimeoutMS) {
-    	connectionManager.getParams().setConnectionTimeout(connectionTimeoutMS);
-    	http.getParams().setConnectionManagerTimeout(connectionTimeoutMS);
-	}
+	public abstract void setConnectionTimeoutMS(int connectionTimeoutMS);
 
 	/**
 	 * @return the socketTimeoutMS
 	 */
-	public int getSocketTimeoutMS() {
-		return connectionManager.getParams().getSoTimeout();
-	}
+	public abstract int getSocketTimeoutMS();
 
 	/**
 	 * @param socketTimeoutMS the socketTimeoutMS to set
 	 */
-	public void setSocketTimeoutMS(int socketTimeoutMS) {
-    	connectionManager.getParams().setSoTimeout(socketTimeoutMS);
-	}
-	
-	public void setStaleChecking(boolean enabled)
-	{
-		connectionManager.getParams().setStaleCheckingEnabled(enabled);
-	}
-	
-	public boolean isStaleChecking()
-	{
-		return connectionManager.getParams().isStaleCheckingEnabled();
-	}
-	
-	// Experimental
-	public long getModTime()
-	{
-		HTTPSeekableLineReader reader = null;
-		SimpleDateFormat lastModFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
-	
-		try {
-			reader = get();
-			String result = reader.getHeader(HTTPSeekableLineReader.LAST_MODIFIED);
-			Date date = lastModFormat.parse(result);
-			return date.getTime();
-		
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (reader != null) {
-				try {
-					reader.close();
-				} catch (IOException e) {
+	public abstract void setSocketTimeoutMS(int socketTimeoutMS);
 
-				}
-			}
-		}
-		
-		return 0;
-	}
+	public abstract void setStaleChecking(boolean enabled);
+
+	public abstract boolean isStaleChecking();
+
+	// Experimental
+	public abstract long getModTime();
+
 }

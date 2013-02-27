@@ -97,7 +97,7 @@ public class GeneralURIStreamFactory {
 	public static SeekableLineReaderFactory createSeekableStreamFactory(String uri, boolean useNio) throws IOException
 	{
 		if (isHttp(uri)) {
-			return new HTTPSeekableLineReaderFactory(uri);
+			return HTTPSeekableLineReaderFactory.getHttpFactory(uri);
 		} else if (isHdfs(uri)) {
 			return new HDFSSeekableLineReaderFactory(initHdfs(), new Path(uri));			
 		} else if (useNio) {

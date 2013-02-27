@@ -79,7 +79,7 @@ public class FileSearchTool implements Tool {
 				factory = new HDFSSeekableLineReaderFactory(fs, path);
 				LOGGER.warning("Added HDFS file: " + spec);
 			} else if(spec.startsWith("http://")) {
-				factory = new HTTPSeekableLineReaderFactory(spec);
+				factory = HTTPSeekableLineReaderFactory.getHttpFactory(spec);
 				LOGGER.warning("Added HTTP file: " + spec);
 			} else {
 				File file = new File(spec);

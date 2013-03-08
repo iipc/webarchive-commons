@@ -136,8 +136,10 @@ public class GoogleURLCanonicalizerTest extends TestCase {
 		System.out.println();
 	}
 	
-	
-	public void testAll() throws URIException {
+	/*
+	 * Tests copied from https://code.google.com/p/google-safe-browsing/wiki/Protocolv2Spec#6._Performing_Lookups
+	 */
+	public void testGoogleExamples() throws URIException {
 		checkCanonicalization("http://host/%25%32%35","http://host/%25");
 		checkCanonicalization("http://host/%25%32%35%25%32%35","http://host/%25%25");
 		checkCanonicalization("http://host/%2525252525252525","http://host/%25");
@@ -172,11 +174,14 @@ public class GoogleURLCanonicalizerTest extends TestCase {
 		checkCanonicalization("https://www.securesite.com/","https://www.securesite.com/");
 		checkCanonicalization("http://host.com/ab%23cd","http://host.com/ab%23cd");
 		checkCanonicalization("http://host.com//twoslashes?more//slashes","http://host.com/twoslashes?more//slashes");
-
-
-		
-		
 	}
+
+	public void testSchemeCapitals() throws URIException {
+		checkCanonicalization("Http://example.com", "http://example.com/");
+		checkCanonicalization("HTTP://example.com", "http://example.com/");
+		checkCanonicalization("ftP://example.com", "ftp://example.com/");
+	}
+	
 	private void checkCanonicalization(String in, String want) throws URIException {
 		HandyURL h = URLParser.parse(in);
 		guc.canonicalize(h);

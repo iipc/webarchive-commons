@@ -8,6 +8,10 @@ import java.util.regex.Pattern;
 
 import com.google.common.net.InetAddresses;
 
+/**
+ * Implementation of spec at
+ * https://code.google.com/p/google-safe-browsing/wiki/Protocolv2Spec#6._Performing_Lookups
+ */
 public class GoogleURLCanonicalizer implements URLCanonicalizer {
 //	Pattern OCTAL_IP = Pattern.compile("^(0[0-7]*)(\\.[0-7]+)*$");
 //	Pattern DECIMAL_IP = Pattern.compile("^([0-9]+)(\\.[0-9]+)*$");
@@ -15,6 +19,9 @@ public class GoogleURLCanonicalizer implements URLCanonicalizer {
 	Pattern DECIMAL_IP = Pattern.compile("^([1-9][0-9]*)(\\.[0-9]+)?(\\.[0-9]+)?(\\.[0-9]+)?$");
 
 	public void canonicalize(HandyURL url) {
+
+		// not mentioned in google spec, but obviously needed
+		url.setScheme(url.getScheme().toLowerCase());
 
 		url.setHash(null);
 		url.setAuthUser(minimalEscape(url.getAuthUser()));

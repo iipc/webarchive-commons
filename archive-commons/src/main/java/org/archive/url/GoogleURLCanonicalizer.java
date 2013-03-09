@@ -21,7 +21,9 @@ public class GoogleURLCanonicalizer implements URLCanonicalizer {
 	public void canonicalize(HandyURL url) {
 
 		// not mentioned in google spec, but obviously needed
-		url.setScheme(url.getScheme().toLowerCase());
+		if (url.getScheme() != null) {
+			url.setScheme(url.getScheme().toLowerCase());
+		}
 
 		url.setHash(null);
 		url.setAuthUser(minimalEscape(url.getAuthUser()));

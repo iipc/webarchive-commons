@@ -1,10 +1,14 @@
 package org.archive.url;
 
 import java.net.IDN;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CoderResult;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 import com.google.common.net.InetAddresses;
 
@@ -193,38 +197,45 @@ public class GoogleURLCanonicalizer implements URLCanonicalizer {
 		return escapeOnce(unescapeRepeatedly(input));
 	}
 	
+	protected static Charset _UTF8 = null;
+	protected static Charset UTF8() {
+		if (_UTF8 == null) {
+			_UTF8 = Charset.forName("UTF-8");
+		}
+		return _UTF8;
+	}
+	
 	public String escapeOnce(String input) {
 		if(input == null) {
 			return null;
 		}
+		
+		byte[] utf8bytes = input.getBytes(UTF8());
 		StringBuilder sb = null;
-		int len = input.length();
-		boolean ok = false;;
-		for(int i = 0; i < len; i++) {
-			char c = input.charAt(i);
+		boolean ok = false;
+		
+		for(int i = 0; i < utf8bytes.length; i++) {
+			int b = utf8bytes[i] & 0xff;
 			ok = false;
-			if(c > 32) {
-				if(c < 128) {
-					if(c != '#') {
-						ok = (c != '%');
+			if(b > 32) {
+				if(b < 128) {
+					if(b != '#') {
+						ok = (b != '%');
 					}
 				}
 			}
 			if(ok) {
 				if(sb != null) {
-					sb.append(c);
+					sb.append((char) b);
 				}
 			} else {
 				if(sb == null) {
+					/* everything up to this point has been an ascii character
+					 * not needing escaping */
 					sb = new StringBuilder(input.substring(0,i));
-//				} else {
-//					// BUGBUG: What about chars > 255?!
-//					sb.append('%').append(Integer.toHexString(c).toUpperCase());
-//				}
 				}
-				// BUGBUG: What about chars > 255?!
 				sb.append("%");
-				String hex = Integer.toHexString(c).toUpperCase();
+				String hex = Integer.toHexString(b).toUpperCase();
 				if(hex.length() == 1) {
 					sb.append('0');
 				}
@@ -251,67 +262,124 @@ public class GoogleURLCanonicalizer implements URLCanonicalizer {
 	}
 	
 	public String decode(String input) {
-		int len = input.length();
-		int i = 0;
 		StringBuilder sb = null;
-		boolean foundHex = false;
-		while(i < len-2) {
+		int pctUtf8SeqStart = -1;
+		ByteBuffer bbuf = null;
+		CharsetDecoder utf8decoder = null;
+		int i = 0;
+		int h1, h2;
+		while (i < input.length()) {
 			char c = input.charAt(i);
-			foundHex = false;
-			if(c == '%') {
-				// are next two hex chars?
-				int h1 = getHex(input.charAt(i+1));
-				if(h1 > -1) {
-					int h2 = getHex(input.charAt(i+2));
-					if(h2 > -1) {
-						if(sb == null) {
-							sb = new StringBuilder(len);
-							if(i > 0) {
-								sb.append(input.substring(0,i));
-							}
-						}
-						foundHex = true;
-						i += 2;
-						char f = (char) ((h1 << 4) + h2);
-						sb.append(f);
+			if (i <= input.length() - 3 && c == '%' 
+					&& (h1 = getHex(input.charAt(i+1))) >= 0 
+					&& (h2 = getHex(input.charAt(i+2))) >= 0) {
+				if (sb == null) {
+					sb = new StringBuilder(input.length());
+					if (i > 0) {
+						sb.append(input.substring(0, i));
 					}
 				}
-			}
-			if(!foundHex) {
-				if(sb != null) {
+				int b = ((h1 << 4) + h2) & 0xff;
+				if (pctUtf8SeqStart < 0 && b < 0x80) { // plain ascii
+					sb.append((char) b);
+				} else {
+					if (pctUtf8SeqStart < 0) {
+						pctUtf8SeqStart = i;
+						if (bbuf == null) {
+							bbuf = ByteBuffer.allocate((input.length() - i)/3);
+						}
+					}
+					bbuf.put((byte) b);
+				}
+				i += 3;
+			} else {
+				if (pctUtf8SeqStart >= 0) {
+					if (utf8decoder == null) {
+						utf8decoder = UTF8().newDecoder();
+					}
+					appendDecodedPctUtf8(sb, bbuf, input, pctUtf8SeqStart, i, utf8decoder);
+					pctUtf8SeqStart = -1;
+					bbuf.clear();
+				}
+				if (sb != null) {
 					sb.append(c);
 				}
+				i++;
 			}
-			i++;
 		}
-		if(sb == null) {
+		if (pctUtf8SeqStart >= 0) {
+			if (utf8decoder == null) {
+				utf8decoder = UTF8().newDecoder();
+			}
+			appendDecodedPctUtf8(sb, bbuf, input, pctUtf8SeqStart, i, utf8decoder);
+		}
+
+		if (sb != null) {
+			return sb.toString();
+		} else {
 			return input;
 		}
-		// append the last chars if missed:
-		for(int i2 = i; i2 < len; i2++) {
-			sb.append(input.charAt(i2));
+	}
+	
+	/**
+	 * Decodes bytes in bbuf as utf-8 and appends decoded characters to sb. If
+	 * decoding of any portion fails, appends the un-decodable %xx%xx sequence
+	 * extracted from inputStr instead of decoded characters. See "bad unicode"
+	 * tests in GoogleCanonicalizerTest#testDecode(). Variables only make sense
+	 * within context of {@link #decode(String)}.
+	 * 
+	 * @param sb
+	 *            StringBuilder to append to
+	 * @param bbuf
+	 *            raw bytes decoded from %-encoded input
+	 * @param inputStr
+	 *            full input string
+	 * @param seqStart
+	 *            start index inclusive within inputStr of %-encoded sequence
+	 * @param seqEnd
+	 *            end index exclusive within inputStr of %-encoded sequence
+	 * @param utf8decoder
+	 */
+	private void appendDecodedPctUtf8(StringBuilder sb, ByteBuffer bbuf, String inputStr,
+			int seqStart, int seqEnd, CharsetDecoder utf8decoder) {
+		// assert bbuf.position() * 3 == seqEnd - seqStart;
+		utf8decoder.reset();
+		CharBuffer cbuf = CharBuffer.allocate(bbuf.position());
+		bbuf.flip();
+		while (bbuf.position() < bbuf.limit()) {
+			CoderResult coderResult = utf8decoder.decode(bbuf, cbuf, true);
+			sb.append(cbuf.flip());
+			if (coderResult.isMalformed()) {
+				// put the malformed %xx%xx into the result un-decoded
+				CharSequence undecodablePctHex = inputStr.subSequence(seqStart + 3 * bbuf.position(), 
+						seqStart + 3 * bbuf.position() + 3 * coderResult.length());
+				sb.append(undecodablePctHex);
+				
+				// there could be more good stuff after the bad
+				bbuf.position(bbuf.position() + coderResult.length());
+			}
+			cbuf.clear();
 		}
-		return sb.toString();
 	}
 
-	public int getHex(final char c) {
-		if(c < '0') {
+	public int getHex(final int b) {
+		if(b < '0') {
 			return -1;
 		}
-		if(c <= '9') {
-			return c - '0';
+		if(b <= '9') {
+			return b - '0';
 		}
-		if(c < 'A') {
+		if(b < 'A') {
 			return -1;
 		}
-		if(c <= 'F') {
-			return 10 + (c - 'A');
+		if(b <= 'F') {
+			return 10 + (b - 'A');
 		}
-		if(c < 'a') {
+		if(b < 'a') {
 			return -1;
 		}
-		if(c <= 'f') {
-			return 10 + (c - 'a');
+		if(b <= 'f') {
+			return 10 + (b - 'a');
 		}
 		return -1;
 	}

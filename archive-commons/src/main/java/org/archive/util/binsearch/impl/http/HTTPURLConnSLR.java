@@ -35,7 +35,6 @@ public class HTTPURLConnSLR extends HTTPSeekableLineReader {
 
 	@Override
 	public long getSize() throws IOException {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

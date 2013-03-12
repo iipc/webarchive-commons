@@ -96,7 +96,7 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 	
 	protected boolean isFirst = true;
 	
-	protected String currPartId = null;
+	//protected String currPartId = null;
 	
 	protected int totalBlocks = 0;
 	
@@ -126,6 +126,10 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 			isFirst = false;
 		}
 		
+		if (nextLine == null) {
+			return null;
+		}
+		
 		if ((params.getMaxBlocks() > 0) && (totalBlocks >= params.getMaxBlocks())) {
 			return null;
 		}
@@ -137,14 +141,15 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 			int numBlocks = 0;
 			int maxAggregateBlocks = params.getMaxAggregateBlocks();
 			
-			long startOffset = 0;
+			long startOffset = nextLine.offset;
+			String currPartId = nextLine.partId;
+			
 			int totalLength = 0;
 		
 			do {					
 				currLine = nextLine;
 				
 				if (currLine == null) {
-					isFirst = false;
 					return null;
 				}
 				
@@ -167,13 +172,11 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 //					}
 //				}
 	
-				if ((currPartId == null) || !currPartId.equals(currLine.partId) || (numBlocks == 0)) {
-					startOffset = currLine.offset;
-					totalLength = 0;
-					currPartId = currLine.partId;
-				}
-				
-				currReader = initReader(currPartId);
+//				if ((currPartId == null) || !currPartId.equals(currLine.partId) || (numBlocks == 0)) {
+//					startOffset = currLine.offset;
+//					totalLength = 0;
+//					currPartId = currLine.partId;
+//				}
 				
 				totalLength += currLine.length;
 				numBlocks++;
@@ -186,6 +189,7 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 				LOGGER.info("Loading " + numBlocks + " blocks - " + startOffset + ":" + totalLength + " from " + currPartId);
 			}
 			
+			currReader = initReader(currPartId);			
 			currReader.seekWithMaxRead(startOffset, true, totalLength);
 			
 			totalBlocks += numBlocks;

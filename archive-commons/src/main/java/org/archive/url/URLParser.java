@@ -148,7 +148,7 @@ public class URLParser {
 	};
 	
 	public final static Pattern ALL_SCHEMES_PATTERN =
-		Pattern.compile("^(http|https|ftp|mms|rtsp|wais)://.*");
+		Pattern.compile("(?i)^(http|https|ftp|mms|rtsp|wais)://.*");
 	
 	/**
 	 * Attempt to find the scheme (http://, https://, etc) from a given URL.

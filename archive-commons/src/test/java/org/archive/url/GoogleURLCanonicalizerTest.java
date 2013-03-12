@@ -58,6 +58,75 @@ public class GoogleURLCanonicalizerTest extends TestCase {
 		assertEquals("%!A!!%5",guc.decode("%!A%21%21%5"));
 		assertEquals("%!A!!%",guc.decode("%!A%21%21%25"));
 
+		// unicode
+		assertEquals("\u2691", guc.decode("%E2%9A%91"));
+		assertEquals("\u2691x", guc.decode("%E2%9A%91x"));
+		assertEquals("\u2691xx", guc.decode("%E2%9A%91xx"));
+		assertEquals("\u2691xxx", guc.decode("%E2%9A%91xxx"));
+		assertEquals("x\u2691", guc.decode("x%E2%9A%91"));
+		assertEquals("xx\u2691", guc.decode("xx%E2%9A%91"));
+		assertEquals("xxx\u2691", guc.decode("xxx%E2%9A%91"));
+		assertEquals("\u2691\u2691", guc.decode("%E2%9A%91%E2%9A%91"));
+		assertEquals("\u2691x\u2691", guc.decode("%E2%9A%91x%E2%9A%91"));
+		assertEquals("\u2691xx\u2691", guc.decode("%E2%9A%91xx%E2%9A%91"));
+		assertEquals("\u2691xxx\u2691", guc.decode("%E2%9A%91xxx%E2%9A%91"));
+		assertEquals("\u2691x\u2691x", guc.decode("%E2%9A%91x%E2%9A%91x"));
+		assertEquals("\u2691x\u2691xx", guc.decode("%E2%9A%91x%E2%9A%91xx"));
+		assertEquals("\u2691x\u2691xxx", guc.decode("%E2%9A%91x%E2%9A%91xxx"));
+		assertEquals("\u2691xx\u2691x", guc.decode("%E2%9A%91xx%E2%9A%91x"));
+		assertEquals("\u2691xx\u2691xx", guc.decode("%E2%9A%91xx%E2%9A%91xx"));
+		assertEquals("\u2691xx\u2691xxx", guc.decode("%E2%9A%91xx%E2%9A%91xxx"));
+		assertEquals("\u2691xxx\u2691%", guc.decode("%E2%9A%91xxx%E2%9A%91%"));
+		assertEquals("\u2691xxx\u2691%a", guc.decode("%E2%9A%91xxx%E2%9A%91%a"));
+		assertEquals("\u2691xxx\u2691%a%", guc.decode("%E2%9A%91xxx%E2%9A%91%a%"));
+		// character above u+ffff represented in java with surrogate pair
+		assertEquals("\ud83c\udca1", guc.decode("%F0%9F%82%A1"));
+		assertEquals("\ud83c\udca1x", guc.decode("%F0%9F%82%A1x"));
+		assertEquals("x\ud83c\udca1", guc.decode("x%F0%9F%82%A1"));
+		assertEquals("x\ud83c\udca1x", guc.decode("x%F0%9F%82%A1x"));
+		assertEquals("x\ud83c\udca1xx", guc.decode("x%F0%9F%82%A1xx"));
+		assertEquals("x\ud83c\udca1xxx", guc.decode("x%F0%9F%82%A1xxx"));
+		
+		// mixing unicode and non-unicode
+		assertEquals("!\u2691",guc.decode("%21%E2%9A%91"));
+		assertEquals("!\u2691x",guc.decode("%21%E2%9A%91x"));
+		assertEquals("!\u2691xx",guc.decode("%21%E2%9A%91xx"));
+		assertEquals("!\u2691xxx",guc.decode("%21%E2%9A%91xxx"));
+		assertEquals("\u2691!",guc.decode("%E2%9A%91%21"));
+		assertEquals("\u2691!x",guc.decode("%E2%9A%91%21x"));
+		assertEquals("\u2691!xx",guc.decode("%E2%9A%91%21xx"));
+		assertEquals("\u2691!xxx",guc.decode("%E2%9A%91%21xxx"));
+		
+		// bad unicode and mixtures
+		assertEquals("%E2%9A", guc.decode("%E2%9A"));
+		assertEquals("%E2%9Ax", guc.decode("%E2%9Ax"));
+		assertEquals("%E2%9Axx", guc.decode("%E2%9Axx"));
+		assertEquals("%E2%9Axxx", guc.decode("%E2%9Axxx"));
+		assertEquals("x%E2%9A", guc.decode("x%E2%9A"));
+		assertEquals("xx%E2%9A", guc.decode("xx%E2%9A"));
+		assertEquals("xxx%E2%9A", guc.decode("xxx%E2%9A"));
+		assertEquals("%E2x%9A", guc.decode("%E2x%9A"));
+		assertEquals("%E2!%9A", guc.decode("%E2%21%9A"));
+		assertEquals("\u2691%E2%9A", guc.decode("%E2%9A%91%E2%9A"));
+		assertEquals("\u2691%E2%9Ax", guc.decode("%E2%9A%91%E2%9Ax"));
+		assertEquals("\u2691%E2%9Axx", guc.decode("%E2%9A%91%E2%9Axx"));
+		assertEquals("\u2691%E2%9Axxx", guc.decode("%E2%9A%91%E2%9Axxx"));
+		assertEquals("x\u2691%E2%9A", guc.decode("x%E2%9A%91%E2%9A"));
+		assertEquals("xx\u2691%E2%9A", guc.decode("xx%E2%9A%91%E2%9A"));
+		assertEquals("xxx\u2691%E2%9A", guc.decode("xxx%E2%9A%91%E2%9A"));
+		assertEquals("%E2%9A\u2691", guc.decode("%E2%9A%E2%9A%91"));
+		assertEquals("%E2%9A\u2691x", guc.decode("%E2%9A%E2%9A%91x"));
+		assertEquals("%E2%9A\u2691xx", guc.decode("%E2%9A%E2%9A%91xx"));
+		assertEquals("%E2%9A\u2691xxx", guc.decode("%E2%9A%E2%9A%91xxx"));
+		assertEquals("\u2691%E2%9A\u2691%E2%9A", guc.decode("%E2%9A%91%E2%9A%E2%9A%91%E2%9A"));
+		assertEquals("\u2691%E2%9A\u2691%E2%9Ax", guc.decode("%E2%9A%91%E2%9A%E2%9A%91%E2%9Ax"));
+		assertEquals("\u2691%E2%9A\u2691%E2%9Axx", guc.decode("%E2%9A%91%E2%9A%E2%9A%91%E2%9Axx"));
+		assertEquals("\u2691%E2%9A\u2691%E2%9Axxx", guc.decode("%E2%9A%91%E2%9A%E2%9A%91%E2%9Axxx"));
+		assertEquals("%E2%9A!\u2691", guc.decode("%E2%9A%21%E2%9A%91"));
+		assertEquals("%E2%9A\u2691!x", guc.decode("%E2%9A%E2%9A%91%21x"));
+		assertEquals("%E2!%9A\u2691xx", guc.decode("%E2%21%9A%E2%9A%91xx"));
+		assertEquals("%E2%9A\u2691xxx", guc.decode("%E2%9A%E2%9A%91xxx"));
+		assertEquals("\u2691%E2%9A!\u2691%E2%9A", guc.decode("%E2%9A%91%E2%9A%21%E2%9A%91%E2%9A"));
 	}
 	
 
@@ -72,7 +141,6 @@ public class GoogleURLCanonicalizerTest extends TestCase {
 		assertEquals("%",guc.unescapeRepeatedly("%25%32%35"));
 		
 		assertEquals("168.188.99.26",guc.unescapeRepeatedly("%31%36%38%2e%31%38%38%2e%39%39%2e%32%36"));
-		
 	}
 	
 	public void testAttemptIPFormats() throws URIException {
@@ -136,8 +204,10 @@ public class GoogleURLCanonicalizerTest extends TestCase {
 		System.out.println();
 	}
 	
-	
-	public void testAll() throws URIException {
+	/*
+	 * Tests copied from https://code.google.com/p/google-safe-browsing/wiki/Protocolv2Spec#6._Performing_Lookups
+	 */
+	public void testGoogleExamples() throws URIException {
 		checkCanonicalization("http://host/%25%32%35","http://host/%25");
 		checkCanonicalization("http://host/%25%32%35%25%32%35","http://host/%25%25");
 		checkCanonicalization("http://host/%2525252525252525","http://host/%25");
@@ -162,7 +232,8 @@ public class GoogleURLCanonicalizerTest extends TestCase {
 		checkCanonicalization("http://evil.com/foo#bar#baz","http://evil.com/foo");
 		checkCanonicalization("http://evil.com/foo;","http://evil.com/foo;");
 		checkCanonicalization("http://evil.com/foo?bar;","http://evil.com/foo?bar;");
-		checkCanonicalization("http://\u0001\u0080.com/","http://%01%80.com/");
+		// XXX this test not possible with java string, wants raw byte 0x80
+		// checkCanonicalization("http://\x01\x80.com/","http://%01%80.com/");
 		checkCanonicalization("http://notrailingslash.com","http://notrailingslash.com/");
 		checkCanonicalization("http://www.gotaport.com:1234/","http://www.gotaport.com:1234/");
 		checkCanonicalization("  http://www.google.com/  ","http://www.google.com/");
@@ -172,11 +243,29 @@ public class GoogleURLCanonicalizerTest extends TestCase {
 		checkCanonicalization("https://www.securesite.com/","https://www.securesite.com/");
 		checkCanonicalization("http://host.com/ab%23cd","http://host.com/ab%23cd");
 		checkCanonicalization("http://host.com//twoslashes?more//slashes","http://host.com/twoslashes?more//slashes");
-
-
-		
-		
 	}
+
+	public void testSchemeCapitals() throws URIException {
+		checkCanonicalization("Http://example.com", "http://example.com/");
+		checkCanonicalization("HTTP://example.com", "http://example.com/");
+		checkCanonicalization("ftP://example.com", "ftp://example.com/");
+	}
+	
+	public void testUnicodeEscaping() throws URIException {
+		checkCanonicalization("http://example.org/\u2691", "http://example.org/%E2%9A%91");
+		checkCanonicalization("http://example.org/%e2%9a%91", "http://example.org/%E2%9A%91");
+		checkCanonicalization("http://example.org/blah?x=\u268b", "http://example.org/blah?x=%E2%9A%8B");
+		checkCanonicalization("http://example.org/blah?x=%e2%9a%8b", "http://example.org/blah?x=%E2%9A%8B");
+		checkCanonicalization("http://example.org/blah?z\u265fz=z\u4e00z", "http://example.org/blah?z%E2%99%9Fz=z%E4%B8%80z");
+		checkCanonicalization("http://example.org/blah?z%e2%99%9Fz=z%e4%b8%80z", "http://example.org/blah?z%E2%99%9Fz=z%E4%B8%80z");
+		checkCanonicalization("http://example.org/bl\u2691ah?z\u265fz=z\u4e00z", "http://example.org/bl%E2%9A%91ah?z%E2%99%9Fz=z%E4%B8%80z");
+		checkCanonicalization("http://example.org/bl%E2%9A%91ah?z%e2%99%9Fz=z%E4%b8%80z", "http://example.org/bl%E2%9A%91ah?z%E2%99%9Fz=z%E4%B8%80z");
+		// character above u+ffff represented in java with surrogate pair
+		checkCanonicalization("http://example.org/\ud83c\udca1", "http://example.org/%F0%9F%82%A1");
+		// make sure character above u+ffff survives unescaping and re-escaping
+		checkCanonicalization("http://example.org/%F0%9F%82%A1", "http://example.org/%F0%9F%82%A1");
+	}
+	
 	private void checkCanonicalization(String in, String want) throws URIException {
 		HandyURL h = URLParser.parse(in);
 		guc.canonicalize(h);

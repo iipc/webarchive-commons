@@ -83,7 +83,7 @@ public class URLParser {
     public static final String COMMERCIAL_AT = "@";
     public static final char PERCENT_SIGN = '%';
     public static final char COLON = ':';
-    public static final String STRAY_SPACING = "[\n\r\t]+";
+    public static final String STRAY_SPACING = "[\n\r\t\\p{Zl}\\p{Zp}\u0085]+";
     /**
      * Pattern that looks for case of three or more slashes after the 
      * scheme.  If found, we replace them with two only as mozilla does.

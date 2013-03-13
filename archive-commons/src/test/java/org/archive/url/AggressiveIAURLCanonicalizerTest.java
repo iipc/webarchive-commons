@@ -4,8 +4,8 @@ import org.apache.commons.httpclient.URIException;
 
 import junit.framework.TestCase;
 
-public class DefaultIAURLCanonicalizerTest extends TestCase {
-	static DefaultIAURLCanonicalizer ia = new DefaultIAURLCanonicalizer();
+public class AggressiveIAURLCanonicalizerTest extends TestCase {
+	static AggressiveIAURLCanonicalizer ia = new AggressiveIAURLCanonicalizer();
 	public void testCanonicalize() throws URIException {
 		// FULL end-to-end tests:
 		check("http://www.alexa.com/","http://alexa.com/");

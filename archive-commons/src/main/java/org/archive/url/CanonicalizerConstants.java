@@ -44,7 +44,12 @@ public interface CanonicalizerConstants {
 	public static final int AUTH_STRIP_USER = 1;
 	public static final int AUTH_STRIP_PASS = 2;
 	
+	public static final int SCHEME_SETTINGS = 6;
+
+	public static final int SCHEME_ORIGINAL = 0;
+	public static final int SCHEME_LOWERCASE = 1;
 	
-	public static final int NUM_SETTINGS = 6;
+	
+	public static final int NUM_SETTINGS = 7;
 
 }

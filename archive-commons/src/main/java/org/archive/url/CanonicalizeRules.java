@@ -1,5 +1,6 @@
 package org.archive.url;
 
+// XXX it's "Canonicalizer" everywhere else but here
 public class CanonicalizeRules implements CanonicalizerConstants {
 	private int[] settings = new int[NUM_SETTINGS];
 

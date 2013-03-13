@@ -18,6 +18,11 @@ public class IAURLCanonicalizer implements URLCanonicalizer, CanonicalizerConsta
 		if(url.getOpaque() != null) {
 			return;
 		}
+		if (rules.isSet(SCHEME_SETTINGS, SCHEME_LOWERCASE)) {
+			if (url.getScheme() != null) {
+				url.setScheme(url.getScheme().toLowerCase());
+			}
+		}
 		if(rules.isSet(HOST_SETTINGS, HOST_LOWERCASE)) {
 			url.setHost(url.getHost().toLowerCase());
 		}

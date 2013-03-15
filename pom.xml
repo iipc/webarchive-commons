@@ -12,7 +12,6 @@
 	<modules>
 		<module>archive-commons</module>
 		<module>ia-tools</module>
-		<module>archive-surt</module>
 	</modules>
 
 	<distributionManagement>

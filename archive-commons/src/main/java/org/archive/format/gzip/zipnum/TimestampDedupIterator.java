@@ -23,7 +23,7 @@ public class TimestampDedupIterator extends AbstractPeekableIterator<String> {
 		this.timestampDedupLength = timestampDedupLength;
 	}
 	
-	protected String makeTimestamp(String line)
+	protected String extractMatchKey(String line)
 	{
 		if (line == null) {
 			return null;
@@ -41,7 +41,7 @@ public class TimestampDedupIterator extends AbstractPeekableIterator<String> {
 		}
 	}
 	
-	protected boolean sameTimestamp(String currStamp, String nextStamp)
+	protected boolean isSame(String currStamp, String nextStamp, String currLine, String nextLine)
 	{		
 		if (currStamp == null || nextStamp == null) {
 			return false;
@@ -68,9 +68,9 @@ public class TimestampDedupIterator extends AbstractPeekableIterator<String> {
 			currStamp = nextStamp;
 			
 			nextLine = (inner.hasNext() ? inner.next() : null);
-			nextStamp = makeTimestamp(nextLine);
+			nextStamp = extractMatchKey(nextLine);
 			
-		} while ((nextLine != null) && sameTimestamp(currStamp, nextStamp));
+		} while ((nextLine != null) && isSame(currStamp, nextStamp, currLine, nextLine));
 		
 				
 		return currLine;

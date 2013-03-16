@@ -61,6 +61,7 @@ public class HttpZipNumDerefLineRecordReader extends RecordReader<LongWritable, 
 		inner.initialize(split, context);
 		
 		cluster = new ZipNumCluster(clusterUri);
+		cluster.init();
 		
 		String theUrl = inner.getUrl();
 		

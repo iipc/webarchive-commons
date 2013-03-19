@@ -38,7 +38,7 @@ public class IAUtils {
 
     public static String loadCommonsVersion() {
         InputStream input = IAUtils.class.getResourceAsStream(
-        	"/org/archive/archive-commons-version.txt");
+        	"/org/archive/ia-web-commons-version.txt");
 		if (input == null) {
 		    return "UNKNOWN";
 		}

@@ -250,7 +250,8 @@ public class RealCDXExtractorOutput implements ExtractorOutput {
 			}
 //			out.println(filename + " "+resource.getMetaData().getTopMetaData().toString(1));
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
+			throw new IOException(e);
+		} catch (URISyntaxException e) {
 			throw new IOException(e);
 		}
 		out.flush();

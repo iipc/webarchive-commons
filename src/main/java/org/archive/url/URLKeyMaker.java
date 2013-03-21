@@ -1,7 +1,7 @@
 package org.archive.url;
 
-import org.apache.commons.httpclient.URIException;
+import java.net.URISyntaxException;
 
 public interface URLKeyMaker {
-	public String makeKey(String url) throws URIException;
+	public String makeKey(String url) throws URISyntaxException;
 }

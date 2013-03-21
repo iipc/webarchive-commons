@@ -1,12 +1,12 @@
 package org.archive.url;
 
-import org.apache.commons.httpclient.URIException;
+import java.net.URISyntaxException;
 
 import junit.framework.TestCase;
 
 public class IAURLCanonicalizerTest extends TestCase {
 
-	public void testFull() throws URIException {
+	public void testFull() throws URISyntaxException {
 		IAURLCanonicalizer iaC = new IAURLCanonicalizer(new DefaultIACanonicalizerRules());
 		compCan(iaC,"http://www.archive.org:80/","http://archive.org/");
 		compCan(iaC,"https://www.archive.org:80/","https://archive.org:80/");
@@ -18,7 +18,7 @@ public class IAURLCanonicalizerTest extends TestCase {
 		//assertEquals("http")
 	}	
 	
-	private void compCan(URLCanonicalizer c, String orig, String want) throws URIException {
+	private void compCan(URLCanonicalizer c, String orig, String want) throws URISyntaxException {
 		HandyURL u = URLParser.parse(orig);
 		c.canonicalize(u);
 		String got = u.getURLString();

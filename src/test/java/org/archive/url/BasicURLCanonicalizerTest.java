@@ -1,5 +1,7 @@
 package org.archive.url;
 
+import java.net.URISyntaxException;
+
 import org.apache.commons.httpclient.URIException;
 
 import junit.framework.TestCase;
@@ -207,7 +209,7 @@ public class BasicURLCanonicalizerTest extends TestCase {
 	/*
 	 * Tests copied from https://developers.google.com/safe-browsing/developers_guide_v2#Canonicalization
 	 */
-	public void testGoogleExamples() throws URIException {
+	public void testGoogleExamples() throws URISyntaxException  {
 		checkCanonicalization("http://host/%25%32%35", "http://host/%25");
 		checkCanonicalization("http://host/%25%32%35%25%32%35", "http://host/%25%25");
 		checkCanonicalization("http://host/%2525252525252525", "http://host/%25");
@@ -245,19 +247,19 @@ public class BasicURLCanonicalizerTest extends TestCase {
 		checkCanonicalization("http://host.com//twoslashes?more//slashes", "http://host.com/twoslashes?more//slashes");
 	}
 	
-	public void testStraySpacing() throws URIException {
+	public void testStraySpacing() throws URISyntaxException {
 		checkCanonicalization("http://example.org/\u2028", "http://example.org/");
 		checkCanonicalization("\nhttp://examp\rle.org/", "http://example.org/");
 		checkCanonicalization("\nhttp://examp\u2029\t\rle.org/         ", "http://example.org/");
 	}
 	
-	public void testSchemeCapitalsPreserved() throws URIException {
+	public void testSchemeCapitalsPreserved() throws URISyntaxException {
 		checkCanonicalization("Http://example.com", "Http://example.com/");
 		checkCanonicalization("HTTP://example.com", "HTTP://example.com/");
 		checkCanonicalization("ftP://example.com", "ftP://example.com/");
 	}
 	
-	public void testUnicodeEscaping() throws URIException {
+	public void testUnicodeEscaping() throws URISyntaxException {
 		checkCanonicalization("http://example.org/\u2691", "http://example.org/%E2%9A%91");
 		checkCanonicalization("http://example.org/%e2%9a%91", "http://example.org/%E2%9A%91");
 		checkCanonicalization("http://example.org/blah?x=\u268b", "http://example.org/blah?x=%E2%9A%8B");
@@ -272,7 +274,7 @@ public class BasicURLCanonicalizerTest extends TestCase {
 		checkCanonicalization("http://example.org/%F0%9F%82%A1", "http://example.org/%F0%9F%82%A1");
 	}
 	
-	private void checkCanonicalization(String in, String want) throws URIException {
+	private void checkCanonicalization(String in, String want) throws URISyntaxException {
 		HandyURL h = URLParser.parse(in);
 		guc.canonicalize(h);
 		String got = h.getURLString();

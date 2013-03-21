@@ -1,5 +1,7 @@
 package org.archive.url;
 
+import java.net.URISyntaxException;
+
 import org.apache.commons.httpclient.URIException;
 
 public class WaybackURLKeyMaker implements URLKeyMaker {
@@ -31,7 +33,7 @@ public class WaybackURLKeyMaker implements URLKeyMaker {
 		this.surtMode = surtMode;
 	}
 
-	public String makeKey(String url) throws URIException {
+	public String makeKey(String url) throws URISyntaxException {
 		if(url == null) {
 			return "-";
 		}

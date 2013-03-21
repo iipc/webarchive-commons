@@ -1,6 +1,7 @@
 package org.archive.url;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 
 import org.apache.commons.httpclient.URIException;
@@ -29,7 +30,7 @@ public class URLParserTest extends TestCase {
 	}
 
 	
-	public void testParse() throws URIException, UnsupportedEncodingException {
+	public void testParse() throws UnsupportedEncodingException, URISyntaxException {
 		System.out.format("O(%s) E(%s)\n","%66",URLDecoder.decode("%66","UTF-8"));
 		dumpParse("http://www.archive.org/index.html#foo");
 		dumpParse("http://www.archive.org/");
@@ -44,7 +45,7 @@ public class URLParserTest extends TestCase {
 
 	}
 	
-	private void dumpParse(String s) throws URIException {
+	private void dumpParse(String s) throws URISyntaxException {
 		HandyURL h = URLParser.parse(s);
 		System.out.format("Input:(%s)\nHandyURL\t%s\n",s,h.toDebugString());
 	}

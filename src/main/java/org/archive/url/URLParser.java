@@ -1,11 +1,8 @@
 package org.archive.url;
 
+import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.httpclient.URIException;
-//import org.apache.http.client.utils.Punycode;
-
 
 public class URLParser {
     /**
@@ -176,7 +173,7 @@ public class URLParser {
 		return DEFAULT_SCHEME + urlString;
 	}
 	
-    public static HandyURL parse(String urlString) throws URIException {
+    public static HandyURL parse(String urlString) throws URISyntaxException {
 
     	// first strip leading or trailing spaces:
     	// TODO: this strips too much - stripping non-printables
@@ -207,10 +204,10 @@ public class URLParser {
         // cross fingers, toes, eyes...
     	Matcher matcher = RFC2396REGEX.matcher(urlString);
     	if(!matcher.matches()) {
-    		throw new URIException("No Regex URI Match:" + urlString);
+			throw new URISyntaxException(urlString,
+					"string does not match RFC 2396 regex");
     	}
         String uriScheme = matcher.group(2);
-//        String uriSchemeSpecificPart = matcher.group(3);
         String uriAuthority = matcher.group(5);
         String uriPath = matcher.group(6);
         String uriQuery = matcher.group(7);
@@ -232,34 +229,30 @@ public class URLParser {
         if(atIndex<0 && portColonIndex<0) {
             // most common case: neither userinfo nor port
         	hostname = uriAuthority;
-//            return fixupDomainlabel(uriAuthority);
         } else if (atIndex<0 && portColonIndex>-1) {
             // next most common: port but no userinfo
             hostname = uriAuthority.substring(0,portColonIndex);
             colonPort = uriAuthority.substring(portColonIndex);
-//            return domain + port;
         } else if (atIndex>-1 && portColonIndex<0) {
             // uncommon: userinfo, no port
             userInfo = uriAuthority.substring(0,atIndex+1);
             hostname = uriAuthority.substring(atIndex+1);
-//            return userinfo + domain;
         } else {
             // uncommon: userinfo, port
             userInfo = uriAuthority.substring(0,atIndex+1);
             hostname = uriAuthority.substring(atIndex+1,portColonIndex);
             colonPort = uriAuthority.substring(portColonIndex);
-//            return userinfo + domain + port;
         }
         if(colonPort != null) {
         	if(colonPort.startsWith(":")) {
         		try {
         			port = Integer.parseInt(colonPort.substring(1));
         		} catch(NumberFormatException e) {
-        			throw new URIException(String.format("Bad port(%s) in (%s)",
-        					colonPort.substring(1),urlString));
-        		}
+					throw new URISyntaxException(urlString, "bad port "
+							+ colonPort.substring(1));
+				}
         	} else {
-        		// BUGBUG: what's happened?!
+        		// XXX: what's happened?!
         	}
         }
         if(userInfo != null) {

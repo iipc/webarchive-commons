@@ -1,1 +1,1 @@
-archive-commons.${pom.version}-${build.time}
+ia-web-commons.${pom.version}-${build.time}

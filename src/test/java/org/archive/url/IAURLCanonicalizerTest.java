@@ -14,33 +14,30 @@ public class IAURLCanonicalizerTest extends TestCase {
 		compCan(iaC,"https://www.archive.org:443/","https://archive.org/");
 		compCan(iaC,"http://www.archive.org/big/","http://archive.org/big");
 		compCan(iaC,"dns:www.archive.org","dns:www.archive.org");
-		
+
 		//assertEquals("http")
 	}	
-	
+
 	private void compCan(URLCanonicalizer c, String orig, String want) throws URISyntaxException {
 		HandyURL u = URLParser.parse(orig);
 		c.canonicalize(u);
 		String got = u.getURLString();
 		assertEquals(want,got);
 	}
-	
+
 	public void testAlphaReorderQuery() {
 		assertEquals(null,IAURLCanonicalizer.alphaReorderQuery(null));
 		assertEquals("",IAURLCanonicalizer.alphaReorderQuery(""));
-		assertEquals("?",IAURLCanonicalizer.alphaReorderQuery("?"));
-		assertEquals("?a",IAURLCanonicalizer.alphaReorderQuery("?a"));
-		assertEquals("?ab",IAURLCanonicalizer.alphaReorderQuery("?ab"));
-		assertEquals("?a=1",IAURLCanonicalizer.alphaReorderQuery("?a=1"));
-		assertEquals("?ab=1",IAURLCanonicalizer.alphaReorderQuery("?ab=1"));
-		assertEquals("?&a=1",IAURLCanonicalizer.alphaReorderQuery("?a=1&"));
-		assertEquals("?a=1&b=1",IAURLCanonicalizer.alphaReorderQuery("?a=1&b=1"));
-		assertEquals("?a=1&b=1",IAURLCanonicalizer.alphaReorderQuery("?b=1&a=1"));
-		assertEquals("?a=a&a=a",IAURLCanonicalizer.alphaReorderQuery("?a=a&a=a"));
-		assertEquals("?a=a&a=b",IAURLCanonicalizer.alphaReorderQuery("?a=b&a=a"));
-		assertEquals("?a=a&a=b&b=a&b=b",IAURLCanonicalizer.alphaReorderQuery("?b=b&a=b&b=a&a=a"));
-		
-		
+		assertEquals("a",IAURLCanonicalizer.alphaReorderQuery("a"));
+		assertEquals("ab",IAURLCanonicalizer.alphaReorderQuery("ab"));
+		assertEquals("a=1",IAURLCanonicalizer.alphaReorderQuery("a=1"));
+		assertEquals("ab=1",IAURLCanonicalizer.alphaReorderQuery("ab=1"));
+		assertEquals("&a=1",IAURLCanonicalizer.alphaReorderQuery("a=1&"));
+		assertEquals("a=1&b=1",IAURLCanonicalizer.alphaReorderQuery("a=1&b=1"));
+		assertEquals("a=1&b=1",IAURLCanonicalizer.alphaReorderQuery("b=1&a=1"));
+		assertEquals("a=a&a=a",IAURLCanonicalizer.alphaReorderQuery("a=a&a=a"));
+		assertEquals("a=a&a=b",IAURLCanonicalizer.alphaReorderQuery("a=b&a=a"));
+		assertEquals("a=a&a=b&b=a&b=b",IAURLCanonicalizer.alphaReorderQuery("b=b&a=b&b=a&a=a"));
 	}
 
 	public void testMassageHost() {

@@ -5,7 +5,7 @@ import java.net.URL;
 
 public class HandyURL {
 	public final static int DEFAULT_PORT = -1;
-	
+
 	private String scheme;
 	private String authUser;
 	private String authPass;
@@ -15,11 +15,11 @@ public class HandyURL {
 	private String query;
 	private String hash;
 	private String opaque;
-	
+
 	// cached values:
 	private String cachedPubSuffix;
 	private String cachedPubPrefix;
-	
+
 	public HandyURL() {
 		this.scheme = null;
 		this.authUser = null;
@@ -31,7 +31,7 @@ public class HandyURL {
 		this.hash = null;
 		this.opaque = null;
 	}
-	
+
 	public HandyURL(String scheme,
 			String authUser,
 			String authPass,
@@ -53,7 +53,7 @@ public class HandyURL {
 	public String getSURTString(boolean includeScheme) {
 		return getURLString(true, includeScheme, false);
 	}
-	
+
 	public String getURLString(boolean surt, boolean includeScheme, boolean publicSuffix) {
 		if(opaque != null) {
 			return opaque;
@@ -92,55 +92,24 @@ public class HandyURL {
 			sb.append(path);
 		} else {
 			if((query != null) || (hash != null)) {
-				// must have '/' with query or hash:
+				// must have '/' with query or hash: (XXX says what?)
 				sb.append("/");
 			}
 		}
 		if(query != null) {
-			sb.append(query);
+			sb.append('?').append(query);
 		}
 		if(hash != null) {
-			sb.append(hash);
+			sb.append('#').append(hash);
 		}
 		return sb.toString();
-		
+
 	}
 
 	public String getURLString() {
 		return getURLString(false, true, false);
 	}
 
-	public String getURLStringOld() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(scheme).append("://");
-		if(authUser != null) {
-			sb.append(authUser);
-			if(authPass != null) {
-				sb.append(":").append(authPass);
-			}
-			sb.append("@");
-		}
-		sb.append(host);
-		if(port != DEFAULT_PORT) {
-			sb.append(":").append(port);
-		}
-		boolean hasPath = (path != null) && (path.length() > 0);
-		if(hasPath) {
-			sb.append(path);
-		} else {
-			if((query != null) || (hash != null)) {
-				// must have '/' with query or hash:
-				sb.append("/");
-			}
-		}
-		if(query != null) {
-			sb.append(query);
-		}
-		if(hash != null) {
-			sb.append(hash);
-		}
-		return sb.toString();
-	}
 	public String getPathQuery() {
 		StringBuilder sb = new StringBuilder();
 		boolean hasPath = (path != null) && (path.length() > 0);
@@ -148,20 +117,20 @@ public class HandyURL {
 			sb.append(path);
 		} else {
 			if((query != null) || (hash != null)) {
-				// must have '/' with query or hash:
+				// must have '/' with query or hash: (XXX says what?)
 				sb.append("/");
 			}
 		}
 		if(query != null) {
-			sb.append(query);
+			sb.append('?').append(query);
 		}
 		return sb.toString();
 	}
-	
+
 	public URL toURL() throws MalformedURLException {
 		return new URL(getURLString());
 	}
-	
+
 	public String getPublicSuffix() {
 		if(cachedPubSuffix != null) {
 			return cachedPubSuffix;

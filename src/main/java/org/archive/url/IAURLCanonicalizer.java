@@ -63,11 +63,11 @@ public class IAURLCanonicalizer implements URLCanonicalizer, CanonicalizerConsta
 		
 		String query = url.getQuery();
 		if(query != null) {
-			if(query.equals("?")) {
+			if(query.equals("")) {
 				if(rules.isSet(QUERY_SETTINGS, QUERY_STRIP_EMPTY)) {
 					query = null;
 				}
-			} else if(query.length() > 0) {
+			} else {
 				// we have a query... what to do with it?
 				
 				// first remove uneeded:
@@ -94,7 +94,6 @@ public class IAURLCanonicalizer implements URLCanonicalizer, CanonicalizerConsta
 		if(orig.length() <= 1) {
 			return orig;
 		}
-		orig = orig.substring(1); // remove leading '?'
 		String args[] = orig.split("&",-1);
 		StringTuple qas[] = new StringTuple[args.length];
 		StringFieldExtractor sfe = new StringFieldExtractor('=', 1);
@@ -123,8 +122,7 @@ public class IAURLCanonicalizer implements URLCanonicalizer, CanonicalizerConsta
 				return o1.second.compareTo(o2.second);
 			}
 		});
-		StringBuilder sb = new StringBuilder(orig.length()+1);
-		sb.append('?');
+		StringBuilder sb = new StringBuilder(orig.length());
 		int max = qas.length - 1;
 		for(int i = 0; i < max; i++) {
 			if(qas[i].second == null) {

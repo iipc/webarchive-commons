@@ -25,7 +25,7 @@ public class URLParser {
      * reference into its components.
      *
      * ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?
-     * 12            3  4          5       6  7        8 9
+     *  12            3  4          5       6  7        8 9
      *
      * The numbers in the second line above are only to assist readability;
      * they indicate the reference points for each subexpression (i.e., each
@@ -65,9 +65,10 @@ public class URLParser {
      * (3) scheme is limited to legal scheme characters 
      */
     final public static Pattern RFC2396REGEX = Pattern.compile(
-        "^(([a-zA-Z][a-zA-Z0-9\\+\\-\\.]*):)?((//([^/?#]*))?([^?#]*)(\\?([^#]*))?)?(#(.*))?");
-    //    12                             34  5          6       7   8          9 A
-    //                                2 1             54        6          87 3      A9    // 1: scheme
+            "^(([a-zA-Z][a-zA-Z0-9\\+\\-\\.]*):)?((//([^/?#]*))?([^?#]*)(\\?([^#]*))?)?(#(.*))?");
+    //        12                                 34  5          6       7   8          9 A
+    //                                       2 1             54        6          87 3      A9
+    // 1: scheme
     // 2: scheme:
     // 3: //authority/path
     // 4: //authority
@@ -77,10 +78,12 @@ public class URLParser {
     // 8: query 
     // 9: #fragment
     // A: fragment
+    
     public static final String COMMERCIAL_AT = "@";
     public static final char PERCENT_SIGN = '%';
     public static final char COLON = ':';
     public static final String STRAY_SPACING = "[\n\r\t\\p{Zl}\\p{Zp}\u0085]+";
+    
     /**
      * Pattern that looks for case of three or more slashes after the 
      * scheme.  If found, we replace them with two only as mozilla does.
@@ -210,7 +213,7 @@ public class URLParser {
         String uriScheme = matcher.group(2);
         String uriAuthority = matcher.group(5);
         String uriPath = matcher.group(6);
-        String uriQuery = matcher.group(7);
+        String uriQuery = matcher.group(8);
         String uriFragment = matcher.group(10);
 
         // Split Authority into USER:PASS@HOST:PORT
@@ -218,7 +221,6 @@ public class URLParser {
         String userPass = null;
         String hostname = null;
         int port = HandyURL.DEFAULT_PORT;
-        
         
         String userInfo = null;
         String colonPort = null;
@@ -235,11 +237,11 @@ public class URLParser {
             colonPort = uriAuthority.substring(portColonIndex);
         } else if (atIndex>-1 && portColonIndex<0) {
             // uncommon: userinfo, no port
-            userInfo = uriAuthority.substring(0,atIndex+1);
+            userInfo = uriAuthority.substring(0,atIndex);
             hostname = uriAuthority.substring(atIndex+1);
         } else {
             // uncommon: userinfo, port
-            userInfo = uriAuthority.substring(0,atIndex+1);
+            userInfo = uriAuthority.substring(0,atIndex);
             hostname = uriAuthority.substring(atIndex+1,portColonIndex);
             colonPort = uriAuthority.substring(portColonIndex);
         }
@@ -261,8 +263,8 @@ public class URLParser {
         		// no password:
         		userName = userInfo;
         	} else {
-        		userName = userInfo.substring(0,passColonIndex+1);
-        		userPass = userInfo.substring(passColonIndex+1);
+                userName = userInfo.substring(0, passColonIndex);
+                userPass = userInfo.substring(passColonIndex + 1);
         	}
         }
         return new HandyURL(uriScheme,userName,userPass,hostname,

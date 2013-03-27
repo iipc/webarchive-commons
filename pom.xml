@@ -103,8 +103,8 @@
     </dependency>
 
     <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
+      <groupId>org.archive.overlays</groupId>
+      <artifactId>archive-overlay-commons-httpclient</artifactId>
       <version>3.1</version>
     </dependency>
     <dependency>

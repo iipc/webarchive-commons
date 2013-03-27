@@ -34,22 +34,4 @@ public class TimestampCustomDedupIterator extends TimestampDedupIterator {
 		
 		return currStatus.equals(nextStatus);
 	}
-	
-	private String getNthField(String source, int start, int num, int ch)
-	{
-		int lastIndex = -1;
-		int index = start;
-		
-		for (int i = 0; i <= num; i++) {
-			
-			lastIndex = index;
-			index = source.indexOf(' ', index) + 1;
-			
-			if (index < 0) {
-				return null;
-			}
-		}
-		
-		return source.substring(lastIndex, index - 1);
-	}
 }

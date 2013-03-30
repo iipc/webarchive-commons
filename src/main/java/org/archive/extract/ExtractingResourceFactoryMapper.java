@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 
 import org.archive.format.arc.ARCConstants;
 import org.archive.format.warc.WARCConstants;
+import org.archive.format.warc.WARCConstants.WARCRecordType;
 import org.archive.resource.MetaData;
 import org.archive.resource.Resource;
 import org.archive.resource.ResourceFactory;
@@ -130,24 +131,24 @@ public class ExtractingResourceFactoryMapper implements ResourceFactoryMapper {
 		return type == null ? false : type.toLowerCase().contains("html");
 	}
 
-	private boolean isWARCType(MetaData envelope, String type) {
+	private boolean isWARCType(MetaData envelope, WARCRecordType type) {
 		return childFieldEquals(envelope,WARC_HEADER_METADATA, 
-				WARCConstants.HEADER_KEY_TYPE,type);
+				WARCConstants.HEADER_KEY_TYPE,type.toString());
 	}
 	private boolean isWARCRevisitResource(MetaData envelope) {
-		return isWARCType(envelope, WARCConstants.REVISIT);
+		return isWARCType(envelope, WARCRecordType.revisit);
 	}
 	private boolean isWARCResponseResource(MetaData envelope) {
-		return isWARCType(envelope, WARCConstants.RESPONSE);
+		return isWARCType(envelope, WARCRecordType.response);
 	}
 	private boolean isWARCRequestResource(MetaData envelope) {
-		return isWARCType(envelope, WARCConstants.REQUEST);
+		return isWARCType(envelope, WARCRecordType.request);
 	}
 	private boolean isWARCMetaDataResource(MetaData envelope) {
-		return isWARCType(envelope, WARCConstants.METADATA);
+		return isWARCType(envelope, WARCRecordType.metadata);
 	}
 	private boolean isWARCInfoResource(MetaData envelope) {
-		return isWARCType(envelope, WARCConstants.WARCINFO);
+		return isWARCType(envelope, WARCRecordType.warcinfo);
 	}
 	private boolean isHTTPResponseWARCResource(MetaData envelope) {
 		return childFieldEquals(envelope,WARC_HEADER_METADATA,

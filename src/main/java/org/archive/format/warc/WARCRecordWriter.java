@@ -1,7 +1,6 @@
 package org.archive.format.warc;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.UUID;
@@ -9,7 +8,6 @@ import java.util.UUID;
 import org.archive.format.http.HttpConstants;
 import org.archive.format.http.HttpHeaders;
 import org.archive.util.DateUtils;
-import org.archive.util.StreamCopy;
 
 public class WARCRecordWriter implements WARCConstants, HttpConstants 
 {
@@ -74,7 +72,7 @@ public class WARCRecordWriter implements WARCConstants, HttpConstants
     // Content-Length: 600
 
     HttpHeaders headers = new HttpHeaders();
-    headers.add(HEADER_KEY_TYPE, WARCINFO);
+    headers.add(HEADER_KEY_TYPE, WARCRecordType.warcinfo.name());
     headers.add(HEADER_KEY_DATE, DateUtils.getLog14Date());
     headers.add(HEADER_KEY_FILENAME, filename);
     headers.add(HEADER_KEY_ID, makeRecordId());
@@ -89,7 +87,7 @@ public class WARCRecordWriter implements WARCConstants, HttpConstants
                                        String origRecordId ) throws IOException
   {
     HttpHeaders headers = new HttpHeaders();
-    headers.add(HEADER_KEY_TYPE, METADATA);
+    headers.add(HEADER_KEY_TYPE, WARCRecordType.metadata.name());
     headers.add(HEADER_KEY_URI, targetURI);
     headers.add(HEADER_KEY_DATE, DateUtils.getLog14Date(originalDate));
     headers.add(HEADER_KEY_ID, makeRecordId());

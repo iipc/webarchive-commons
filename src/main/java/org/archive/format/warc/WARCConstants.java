@@ -19,17 +19,14 @@
 
 package org.archive.format.warc;
 
-import java.util.Arrays;
-import java.util.List;
+import org.archive.format.ArchiveFileConstants;
 
 /**
  * WARC Constants used by WARC readers and writers.
  * 
  * @contributor stack
  */
-public interface WARCConstants {
-    public static final String DEFAULT_DIGEST_METHOD = "SHA-1";
-
+public interface WARCConstants extends ArchiveFileConstants {
     /**
      * Default maximum WARC file size.
      * 1Gig.
@@ -70,11 +67,6 @@ public interface WARCConstants {
      */
     public static final String DOT_WARC_FILE_EXTENSION =
         "." + WARC_FILE_EXTENSION;
-
-    /**
-     * Dot plus compressed file extention.
-     */
-    public static final String DOT_COMPRESSED_FILE_EXTENSION = ".gz";
     
     /**
      * Compressed WARC file extension.
@@ -107,86 +99,22 @@ public interface WARCConstants {
     // TODO: Revisit. 8859 isn't correct, especially if we settle on RFC822
     // headers
     public static final String WARC_HEADER_ENCODING = HEADER_LINE_ENCODING;
-
     
     /**
-     * Key for the Archive File version field.
+     * WARC Record Types. These names need to match the literal string values.
      */
-    public static final String VERSION_FIELD_KEY = "version";
-    
-    /**
-     * Key for the Archive File length field.
-     */
-    public static final String LENGTH_FIELD_KEY = "length";
-    
-    /**
-     * Key for the Archive File type field.
-     */
-    public static final String TYPE_FIELD_KEY = "type";
-    
-    /**
-     * Key for the Archive File URL field.
-     */
-    public static final String URL_FIELD_KEY = "subject-uri";
-    
-    /**
-     * Key for the Archive File Creation Date field.
-     */
-    public static final String DATE_FIELD_KEY = "creation-date";
-
-    /**
-     * Key for the Archive File mimetype field.
-     */
-    public static final String MIMETYPE_FIELD_KEY = "content-type";
-    
-    /**
-     * Key for the Archive File record field.
-     */
-    public static final String RECORD_IDENTIFIER_FIELD_KEY =
-    	"record-identifier";
-    
- 
-    
-    public static final String [] HEADER_FIELD_KEYS = {
-        VERSION_FIELD_KEY,
-        LENGTH_FIELD_KEY,
-        TYPE_FIELD_KEY,
-        URL_FIELD_KEY,
-        DATE_FIELD_KEY,
-        RECORD_IDENTIFIER_FIELD_KEY,
-        MIMETYPE_FIELD_KEY
-    };
-    
-    /**
-     * WARC Record Types.
-     */
-    public static final String WARCINFO = "warcinfo";
-    public static final String RESPONSE = "response";
-    public static final String RESOURCE = "resource";
-    public static final String REQUEST = "request";
-    public static final String METADATA = "metadata";
-    public static final String REVISIT = "revisit";
-    public static final String CONVERSION = "conversion";
-    public static final String CONTINUATION = "continuation";
+    enum WARCRecordType {
+        warcinfo,
+        response,
+        resource,
+        request,
+        metadata,
+        revisit,
+        conversion,
+        continuation
+    }
     
     public static final String TYPE = "type";
-    
-    // List of all WARC Record TYPES
-    public static final String [] TYPES = {WARCINFO, RESPONSE, RESOURCE,
-    	REQUEST, METADATA, REVISIT, CONVERSION, CONTINUATION};
-    
-    // Indices into TYPES array.
-    public static final int WARCINFO_INDEX = 0;
-    public static final int RESPONSE_INDEX = 1;
-    public static final int RESOURCE_INDEX = 2;
-    public static final int REQUEST_INDEX = 3;
-    public static final int METADATA_INDEX = 4;
-    public static final int REVISIT_INDEX = 5;
-    public static final int CONVERSION_INDEX = 6;
-    public static final int CONTINUATION_INDEX = 7;
-    
-    // TYPES as List.
-    public static final List<String> TYPES_LIST = Arrays.asList(TYPES);
     
     /**
      * WARC-ID
@@ -237,14 +165,26 @@ public interface WARCConstants {
     public static final String HEADER_KEY_PAYLOAD_DIGEST = "WARC-Payload-Digest";
     public static final String HEADER_KEY_CONCURRENT_TO =
         "WARC-Concurrent-To";
-    public static final String HEADER_KEY_REFERS_TO =
-        "WARC-Refers-To";
     public static final String HEADER_KEY_TRUNCATED = "WARC-Truncated";
     public static final String HEADER_KEY_PROFILE = "WARC-Profile";
     public static final String HEADER_KEY_FILENAME = "WARC-Filename";
     public static final String HEADER_KEY_ETAG = "WARC-Etag";
     public static final String HEADER_KEY_LAST_MODIFIED = "WARC-Last-Modified";
+    public static final String HEADER_KEY_REFERS_TO = "WARC-Refers-To";
     
+    /**
+     * These fields help a consumer of the warc to locate the warc record that
+     * {@value #HEADER_KEY_REFERS_TO} refers to.
+     * 
+     * @see WARCWriterProcessor
+     */
+    public static final String HEADER_KEY_REFERS_TO_TARGET_URI = "WARC-Refers-To-Target-URI";
+    public static final String HEADER_KEY_REFERS_TO_DATE = "WARC-Refers-To-Date";
+    public static final String HEADER_KEY_REFERS_TO_FILENAME = "WARC-Refers-To-Filename";
+    public static final String HEADER_KEY_REFERS_TO_FILE_OFFSET = "WARC-Refers-To-File-Offset";
+    
+    public static final String PROFILE_REVISIT_URI_AGNOSTIC_IDENTICAL_DIGEST = 
+            "http://netpreserve.org/warc/1.0/revisit/uri-agnostic-identical-payload-digest";
     public static final String PROFILE_REVISIT_IDENTICAL_DIGEST = 
         "http://netpreserve.org/warc/1.0/revisit/identical-payload-digest";
     public static final String PROFILE_REVISIT_NOT_MODIFIED = 
@@ -257,7 +197,7 @@ public interface WARCConstants {
     public static final String COLON_SPACE = ": ";
     
     public static final String TRUNCATED_VALUE_UNSPECIFIED = "unspecified";
-    public static final String WARC_FIELDS_TYPE = "application/warc-fields";
+    
     
     /**
      * To be safe, lets use application type rather than message. Regards 
@@ -274,4 +214,6 @@ public interface WARCConstants {
     
     public static final String FTP_CONTROL_CONVERSATION_MIMETYPE =
         "text/x-ftp-control-conversation";
+    
+    public static final String WARC_FIELDS_TYPE = "application/warc-fields";
 }

@@ -307,6 +307,27 @@ public class ArchiveUtils {
     }
     
     /**
+     * A version of getDate which returns the default instead of throwing an exception if parsing fails
+     * 
+     * @param d
+     * @param defaultDate
+     * @return
+     * @throws ParseException
+     */
+    public static Date getDate(String d, Date defaultDate)
+    {
+        if (d == null) {
+        	return defaultDate;
+        }
+        
+    	try {
+    		return getDate(d);
+    	} catch (ParseException pe) {
+    		return defaultDate;
+    	}
+    }
+    
+    /**
      * Parses an ARC-style date.  If passed String is < 12 characters in length,
      * we pad.  At a minimum, String should contain a year (>=4 characters).
      * Parse will also fail if day or month are incompletely specified.  Depends

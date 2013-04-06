@@ -174,14 +174,13 @@ public class ZipNumCluster implements CDXInputSource {
 				endLine = slr.readLine();
 			}
 			
+			// Get the last line
+			if (endLine == null) {
+				endLine = summary.getLastLine(slr);
+			}
+			
 			if (endLine != null) {
 				endCount = extractLineCount(endLine);
-			} else {
-				//TODO: A bit hacky, try to get last field of last line
-				slr.seek(slr.getSize() - 100);
-				endLine = slr.readLine();
-				int lastSp = endLine.lastIndexOf(' ');
-				endCount = Integer.parseInt(endLine.substring(lastSp + 1));
 			}
 			
 			if (startLine != null) {

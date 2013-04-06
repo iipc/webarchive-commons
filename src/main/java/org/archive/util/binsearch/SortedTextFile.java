@@ -147,6 +147,38 @@ public class SortedTextFile {
 		return new StepSeekingIterator(slr, offsets[0], offsets[1], numSplits);
 	}
 	
+	public String[] getRange(String start, String end) throws IOException
+	{
+		SeekableLineReader slr = null;
+		String startLine = null;
+		String endLine = null;		
+		
+		try {
+			slr = factory.get();
+			
+			if (start.isEmpty()) {
+				slr.seek(0);
+				startLine = slr.readLine();
+			} else {
+				startLine = search(slr, start, true).next();
+			}
+			
+			if (end.isEmpty()) {
+				endLine = getLastLine(slr);
+			} else {
+				endLine = search(slr, end, true).next();
+			}
+			
+		} finally {
+			if (slr != null) {
+				slr.close();
+			}
+		}
+		
+		return new String[]{startLine, endLine};		
+	}
+	
+	// end exclusive
 	public String[] getNthSplit(String start, String end, int split, int numSplits) throws IOException
 	{
 		SeekableLineReader slr = null;
@@ -179,6 +211,12 @@ public class SortedTextFile {
 			} else {
 				endLine = end;
 			}
+
+			// Last line
+			if (endLine == null) {
+				endLine = getLastLine(slr);
+			}
+			
 		} finally {
 			if (slr != null) {
 				slr.close();
@@ -186,6 +224,18 @@ public class SortedTextFile {
 		}
 		
 		return new String[]{startLine, endLine};
+	}
+	
+	public String getLastLine(SeekableLineReader slr) throws IOException
+	{
+		slr.seek(slr.getSize() - 120); // TODO: assume larger buffer
+		slr.readLine(); // skip partial line
+		String nextLine = null;
+		String endLine = null;
+		while ((nextLine = slr.readLine()) != null) {
+			endLine = nextLine;
+		}
+		return endLine;
 	}
 	
 	class StepSeekingIterator implements CloseableIterator<String>
@@ -306,23 +356,36 @@ public class SortedTextFile {
     	return new CachedStringIterator(slr, prev, line);
 	}
 	
-	public class CachedStringIterator implements CloseableIterator<String> {
+	public static class CachedStringIterator implements CloseableIterator<String> {
 		private String first;
 		private String second;
 		private SeekableLineReader slr;
 		private SeekableLineReaderIterator it;
+		
+		public CachedStringIterator(String first, String second) {
+			this.slr = null;
+			this.first = first;
+			this.second = second;
+		}
+		
 		public CachedStringIterator(SeekableLineReader slr, String first, String second) {
 			this.slr = slr;
 			this.first = first;
 			this.second = second;
-			it = new SeekableLineReaderIterator(slr);
+			if (slr != null) {
+				it = new SeekableLineReaderIterator(slr);
+			}
 		}
+		
 		public boolean hasNext() {
 			if(first != null) {
 				return true;
 			}
 			if(second != null) {
 				return true;
+			}
+			if (it == null) {
+				return false;
 			}
 			return it.hasNext();
 		}
@@ -338,7 +401,9 @@ public class SortedTextFile {
 				second = null;
 				return tmp;
 			}
-			
+			if (it == null) {
+				return null;
+			}			
 			return it.next();
 		}
 
@@ -347,7 +412,9 @@ public class SortedTextFile {
 		}
 
 		public void close() throws IOException {
-			slr.close();
+			if (slr != null) {
+				slr.close();
+			}
 		}
 	}
 	

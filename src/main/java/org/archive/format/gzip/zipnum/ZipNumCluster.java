@@ -261,11 +261,11 @@ public class ZipNumCluster implements CDXInputSource {
 	{
 		CloseableIterator<String> blocklines = this.getCDXIterator(summaryIterator, params);
 		
-		if (split == 0) {
+		if ((split == 0) && (start != null) && !start.isEmpty()) {
 			blocklines = wrapStartIterator(blocklines, start);
 		}
 		
-		if (split >= (numSplits - 1)) {
+		if ((split >= (numSplits - 1)) && (end != null) && !end.isEmpty()) {
 			blocklines = wrapEndIterator(blocklines, end, false);
 		}
 		

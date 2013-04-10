@@ -25,7 +25,7 @@ public class GeneralURIStreamFactory {
 	private static final Logger LOGGER = Logger.getLogger(
 			GeneralURIStreamFactory.class.getName());
 	
-	public class HDFSDefaultUri
+	public static class HDFSDefaultUri
 	{
 		public HDFSDefaultUri(String defaultUri)
 		{
@@ -52,7 +52,7 @@ public class GeneralURIStreamFactory {
 			fs = FileSystem.get(c);
 		} else {
 			Configuration c = new Configuration();
-			c.set("fs.default.name",defaultFSURI);
+			c.set("fs.default.name", defaultFSURI);
 			try {
 				fs = FileSystem.get(new URI(defaultFSURI),c);
 			} catch (URISyntaxException e) {

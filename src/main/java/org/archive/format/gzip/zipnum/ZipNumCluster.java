@@ -109,7 +109,11 @@ public class ZipNumCluster implements CDXInputSource {
 			clusterRoot = this.summaryFile.substring(0, lastSlash + 1);
 		}
 		
-		return clusterRoot + partId + ".gz";
+		if (!partId.endsWith(".gz")) {
+			partId += ".gz";
+		}
+		
+		return clusterRoot + partId;
 	}
 	
 	public int getNumLines(String[] blocks)

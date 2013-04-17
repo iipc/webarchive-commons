@@ -44,17 +44,23 @@ public class LocationUpdater implements Runnable {
 	protected boolean newIsDisabled = false;
 	protected boolean isDisabled = false;
 	
-	public LocationUpdater(String locUri, ZipNumBlockLoader blockLoader) throws IOException
+	public LocationUpdater(String locUri, ZipNumBlockLoader blockLoader)
 	{
 		this.locUri = locUri;
 		this.blockLoader = blockLoader;
 		
 		locMap = new HashMap<String, String[]>();
-
-		locReaderFactory = GeneralURIStreamFactory.createSeekableStreamFactory(locUri, false);
-		lastModTime = locReaderFactory.getModTime();
 		
-		loadPartLocations(locMap);
+		try {
+			locReaderFactory = GeneralURIStreamFactory.createSeekableStreamFactory(locUri, false);
+			lastModTime = locReaderFactory.getModTime();
+		
+			loadPartLocations(locMap);
+		} catch (IOException io) {
+			LOGGER.warning("Exception on Load -- Disabling Cluster! " + io.toString());
+			isDisabled = true;
+			return;
+		}
 		
 		isDisabled = newIsDisabled;
 		startDate = newStartDate;

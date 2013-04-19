@@ -12,7 +12,6 @@ import org.archive.util.binsearch.impl.HTTPSeekableLineReader;
 public class HTTPURLConnSLR extends HTTPSeekableLineReader {
 	
 	protected String url;
-	protected boolean noKeepAlive = false;
 	protected int connTimeout;
 	protected int readTimeout;
 	
@@ -36,11 +35,6 @@ public class HTTPURLConnSLR extends HTTPSeekableLineReader {
 	@Override
 	public long getSize() throws IOException {
 		return 0;
-	}
-
-	@Override
-	public void setNoKeepAlive(boolean noKeepAlive) {
-		this.noKeepAlive = noKeepAlive;
 	}
 
 	@Override
@@ -71,8 +65,12 @@ public class HTTPURLConnSLR extends HTTPSeekableLineReader {
         	httpUrlConn.addRequestProperty("Range", rangeHeader);
         }
         
-		if (noKeepAlive) {
+		if (this.isNoKeepAlive()) {
 			httpUrlConn.addRequestProperty("Connection", "close");
+		}
+		
+		if (this.getCookie() != null) {
+			httpUrlConn.addRequestProperty("Cookie", cookie);
 		}
 		
 		httpUrlConn.connect();

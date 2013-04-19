@@ -26,6 +26,7 @@ public class ZipNumBlockLoader {
 	
 	protected boolean bufferFully = true;
 	protected boolean noKeepAlive = true;
+	protected String cookie = null;
 	
 	protected int maxHostConnections = 100000;
 	protected int maxTotalConnections = 100000;
@@ -95,6 +96,7 @@ public class ZipNumBlockLoader {
 		HTTPSeekableLineReader reader = httpFactory.get(url);
 		reader.setBufferFully(bufferFully);
 		reader.setNoKeepAlive(noKeepAlive);
+		reader.setCookie(cookie);
 		return reader;
 	}
 	
@@ -217,5 +219,13 @@ public class ZipNumBlockLoader {
 
 	public void setHttpLib(String httpLib) {
 		this.httpLib = httpLib;
+	}
+
+	public String getCookie() {
+		return cookie;
+	}
+
+	public void setCookie(String cookie) {
+		this.cookie = cookie;
 	}
 }

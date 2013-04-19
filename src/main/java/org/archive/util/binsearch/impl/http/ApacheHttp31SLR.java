@@ -22,8 +22,6 @@ public class ApacheHttp31SLR extends HTTPSeekableLineReader {
 	protected CountingInputStream cin;
 		
 	private GetMethod activeMethod;
-	
-	protected boolean noKeepAlive = false;
 		
 	public ApacheHttp31SLR(HttpClient http, String url) {
 		this.http = http;
@@ -118,8 +116,12 @@ public class ApacheHttp31SLR extends HTTPSeekableLineReader {
 				activeMethod.setRequestHeader("Range", rangeHeader);
 			}
 			
-			if (noKeepAlive) {
+			if (this.isNoKeepAlive()) {
 				activeMethod.setRequestHeader("Connection", "close");
+			}
+			
+			if (this.getCookie() != null) {
+				activeMethod.setRequestHeader("Cookie", this.getCookie());
 			}
 			
 			int code = http.executeMethod(activeMethod);
@@ -198,15 +200,6 @@ public class ApacheHttp31SLR extends HTTPSeekableLineReader {
 			}
 		}
 		return length;
-	}
-		
-	/* (non-Javadoc)
-	 * @see org.archive.util.binsearch.impl.HTTPSeekableLineReader#setNoKeepAlive(boolean)
-	 */
-	@Override
-	public void setNoKeepAlive(boolean noKeepAlive)
-	{
-		this.noKeepAlive = noKeepAlive;
 	}
 
 	/* (non-Javadoc)

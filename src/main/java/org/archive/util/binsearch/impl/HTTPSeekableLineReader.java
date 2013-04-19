@@ -28,12 +28,13 @@ public abstract class HTTPSeekableLineReader extends SeekableLineReader {
 
 	public final static String CONTENT_LENGTH = "Content-Length";
 	public final static String LAST_MODIFIED = "Last-Modified";
+	
+	protected boolean noKeepAlive;
+	protected String cookie;
 
 	public abstract String getUrl();
 
 	public abstract long getSize() throws IOException;
-
-	public abstract void setNoKeepAlive(boolean noKeepAlive);
 
 	public abstract String getHeaderValue(String headerName);
 	
@@ -52,6 +53,22 @@ public abstract class HTTPSeekableLineReader extends SeekableLineReader {
 		}
 		
 		return builder.toString();
+	}
+
+	public String getCookie() {
+		return cookie;
+	}
+
+	public void setCookie(String cookie) {
+		this.cookie = cookie;
+	}
+
+	public boolean isNoKeepAlive() {
+		return noKeepAlive;
+	}
+
+	public void setNoKeepAlive(boolean noKeepAlive) {
+		this.noKeepAlive = noKeepAlive;
 	}
 
 }

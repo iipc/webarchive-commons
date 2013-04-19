@@ -1,5 +1,7 @@
 package org.archive.format.gzip.zipnum;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -7,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,6 +41,17 @@ public class LocationUpdater implements Runnable {
 	protected SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	protected Date startDate, endDate;
 	
+	class BlockSize
+	{
+		String urltimestamp;
+		long count;
+	}
+	
+	protected BlockSize[] lastBlockSizes = new BlockSize[0];
+	protected String blockSizesFile;
+	
+	protected long totalAdjustment = 0;
+	
 	protected ZipNumBlockLoader blockLoader = null;
 	
 	protected Date newStartDate, newEndDate;
@@ -47,6 +61,7 @@ public class LocationUpdater implements Runnable {
 	public LocationUpdater(String locUri, ZipNumBlockLoader blockLoader)
 	{
 		this.locUri = locUri;
+		this.blockSizesFile = locUri.replaceAll(".loc", ".lastblocks");
 		this.blockLoader = blockLoader;
 		
 		locMap = new HashMap<String, String[]>();
@@ -56,6 +71,7 @@ public class LocationUpdater implements Runnable {
 			lastModTime = locReaderFactory.getModTime();
 		
 			loadPartLocations(locMap);
+
 		} catch (IOException io) {
 			LOGGER.warning("Exception on Load -- Disabling Cluster! " + io.toString());
 			isDisabled = true;
@@ -65,6 +81,10 @@ public class LocationUpdater implements Runnable {
 		isDisabled = newIsDisabled;
 		startDate = newStartDate;
 		endDate = newEndDate;
+		
+		if (!isDisabled) {
+			this.loadLastBlockSizes(blockSizesFile);
+		}
 		
 		if (checkInterval > 0) {
 			updaterThread = new Thread(this, "LocationUpdaterThread");
@@ -81,7 +101,11 @@ public class LocationUpdater implements Runnable {
 		} catch (IOException e) {
 			LOGGER.warning(e.toString());
 			return;
-		}			
+		}
+		
+		if (!isDisabled) {
+			this.loadLastBlockSizes(blockSizesFile);
+		}
 		
 		if (LOGGER.isLoggable(Level.INFO)) {
 			LOGGER.info("*** Location Update: " + locUri);
@@ -172,6 +196,43 @@ public class LocationUpdater implements Runnable {
 		return true;
 	}
 	
+	protected void loadLastBlockSizes(String filename)
+	{
+		BufferedReader reader = null;
+		
+		String line = null;
+		
+		List<BlockSize> list = new ArrayList<BlockSize>();
+		totalAdjustment = 0;
+		
+		try {
+			reader = new BufferedReader(new FileReader(filename));
+			
+			while ((line = reader.readLine()) != null) {
+				String[] splits = line.split("\t");
+				
+				BlockSize block = new BlockSize();
+				block.count = Long.parseLong(splits[1]);
+				block.urltimestamp = splits[2];
+				list.add(block);
+				totalAdjustment += block.count;
+			}
+		} catch (Exception e) {
+			LOGGER.warning(e.toString());
+
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					LOGGER.warning(e.toString());
+				}
+			}
+		}
+		
+		lastBlockSizes = list.toArray(new BlockSize[list.size()]);
+	}
+	
 	protected void loadPartLocations(HashMap<String, String[]> destMap) throws IOException
 	{
 		SeekableLineReaderIterator lines = null;
@@ -249,5 +310,33 @@ public class LocationUpdater implements Runnable {
 
 	public void setCheckInterval(int checkInterval) {
 		this.checkInterval = checkInterval;
+	}
+
+	public long getTotalAdjustment() {
+		return totalAdjustment;
+	}
+
+	public int getNumBlocks() {
+		return lastBlockSizes.length;
+	}
+	
+	protected long computeLastBlockDiff(String startKey, int startPart, int endPart, int cdxPerBlock) {
+		
+		if (startPart >= lastBlockSizes.length || endPart >= lastBlockSizes.length) {
+			return 0;
+		}
+		
+		if (startKey.equals(lastBlockSizes[startPart].urltimestamp)) {
+			startPart++;
+		}
+		
+		long diff = 0;
+		
+		for (int i = startPart; i < endPart; i++) {
+			diff += lastBlockSizes[i].count;
+			diff -= cdxPerBlock;
+		}
+		
+		return diff;
 	}
 }

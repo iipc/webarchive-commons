@@ -228,13 +228,25 @@ public class SortedTextFile {
 	
 	public String getLastLine(SeekableLineReader slr) throws IOException
 	{
-		slr.seek(slr.getSize() - 120); // TODO: assume larger buffer
-		slr.readLine(); // skip partial line
-		String nextLine = null;
+		int lastLineLenTest = 0;
+		int lastLineLenInc = 400;
 		String endLine = null;
-		while ((nextLine = slr.readLine()) != null) {
-			endLine = nextLine;
-		}
+		
+		do {
+			
+			lastLineLenTest += lastLineLenInc;
+			
+			slr.seek(slr.getSize() - lastLineLenTest); // TODO: assume larger buffer
+			slr.readLine(); // skip partial line
+			String nextLine = null;
+			endLine = null;
+			
+			while ((nextLine = slr.readLine()) != null) {
+				endLine = nextLine;
+			}
+			
+		} while (endLine == null);
+		
 		return endLine;
 	}
 	

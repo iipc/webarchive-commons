@@ -150,6 +150,38 @@ public class ZipNumCluster implements CDXInputSource {
 		return size;
 	}
 	
+	// Adjust from shorter blocks, if loaded
+	public long getTotalLines(int cdxPerBlock)
+	{
+		if (locationUpdater == null) {
+			return 0;
+		}
+		
+		long numLines = 0;
+		
+		try {
+			numLines = this.getNumLines(summary.getRange("", ""));
+		} catch (IOException e) {
+			LOGGER.warning(e.toString());
+			return 0;
+		}
+		
+		long adjustment = locationUpdater.getTotalAdjustment();
+		numLines -= (locationUpdater.getNumBlocks() - 1);
+		numLines *= cdxPerBlock;
+		numLines += adjustment;
+		return numLines;
+	}
+	
+	public long getLastBlockDiff(String startKey, int startPart, int endPart, int cdxPerBlock)
+	{
+		if (locationUpdater == null) {
+			return 0;
+		}
+		
+		return locationUpdater.computeLastBlockDiff(startKey, startPart, endPart, cdxPerBlock);
+	}
+	
 	public int getNumLines(String start, String end) throws IOException
 	{
 		SeekableLineReader slr = null;
@@ -373,5 +405,13 @@ public class ZipNumCluster implements CDXInputSource {
 
 	public void setLocFile(String locFile) {
 		this.locFile = locFile;
+	}
+
+	public boolean isDisabled() {
+		if (locationUpdater != null) {
+			return locationUpdater.isDisabled;
+		}
+		
+		return false;
 	}
 }

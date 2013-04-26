@@ -570,7 +570,7 @@ public class ArchiveUtils {
         return doubleToString(val, maxFractionDigits, 0);
     }
 
-    private static String doubleToString(double val, int maxFractionDigits, int minFractionDigits) {
+    public static String doubleToString(double val, int maxFractionDigits, int minFractionDigits) {
         // NumberFormat returns U+FFFD REPLACEMENT CHARACTER for NaN which looks
         // like a bug in the UI
         if (Double.isNaN(val)) {

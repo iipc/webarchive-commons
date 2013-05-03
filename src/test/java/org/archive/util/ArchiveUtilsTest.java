@@ -247,6 +247,9 @@ public class ArchiveUtilsTest extends TestCase {
                 .formatBytesForDisplay(-1)); 
         assertEquals("0 bytes", "0 B", ArchiveUtils
                 .formatBytesForDisplay(0));
+        assertEquals("1 B", ArchiveUtils.formatBytesForDisplay(1));
+        assertEquals("9 B", ArchiveUtils.formatBytesForDisplay(9));
+        assertEquals("512 B", ArchiveUtils.formatBytesForDisplay(512));
         assertEquals("1023 bytes", "1,023 B", ArchiveUtils
                 .formatBytesForDisplay(1023));
         assertEquals("1025 bytes", "1.0 KiB", ArchiveUtils

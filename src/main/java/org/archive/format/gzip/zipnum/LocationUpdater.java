@@ -50,6 +50,8 @@ public class LocationUpdater implements Runnable {
 	protected BlockSize[] lastBlockSizes = new BlockSize[0];
 	protected String blockSizesFile;
 	
+	protected String locRoot = null, newLocRoot = null;
+	
 	protected long totalAdjustment = 0;
 	
 	protected ZipNumBlockLoader blockLoader = null;
@@ -81,6 +83,7 @@ public class LocationUpdater implements Runnable {
 		isDisabled = newIsDisabled;
 		startDate = newStartDate;
 		endDate = newEndDate;
+		locRoot = newLocRoot;
 		
 		if (!isDisabled) {
 			this.loadLastBlockSizes(blockSizesFile);
@@ -116,10 +119,14 @@ public class LocationUpdater implements Runnable {
 		synchronized (this) {
 			for (Entry<String, String[]> files : destMap.entrySet()) {
 				String[] existingFiles = locMap.get(files.getKey());
-				if ((existingFiles != null) && !Arrays.equals(existingFiles, files.getValue())) {					
+				
+				String[] newFiles = files.getValue();
+				
+				if ((existingFiles != null) && !Arrays.equals(existingFiles, newFiles)) {					
 					filesToClose.add(existingFiles);
 				}
-				locMap.put(files.getKey(), files.getValue());
+				
+				locMap.put(files.getKey(), newFiles);
 			}
 			
 			//locMap.putAll(destMap);
@@ -127,6 +134,7 @@ public class LocationUpdater implements Runnable {
 			startDate = newStartDate;
 			endDate = newEndDate;
 			isDisabled = newIsDisabled;
+			locRoot = newLocRoot;
 		}
 		
 		closeExistingFiles(filesToClose);
@@ -149,6 +157,11 @@ public class LocationUpdater implements Runnable {
 	public synchronized String[] getLocations(String key)
 	{
 		return locMap.get(key);
+	}
+	
+	public String getFirstLocRoot()
+	{
+		return locRoot;
 	}
 	
 	protected Date parseDate(String date)
@@ -273,6 +286,11 @@ public class LocationUpdater implements Runnable {
 				}
 				
 				String locations[] = new String[parts.length - 1];
+				
+				if (newLocRoot == null) {
+					int lastSlash = parts[1].lastIndexOf('/');
+					newLocRoot = parts[1].substring(0, lastSlash + 1);
+				}
 			
 				for (int i = 1; i < parts.length; i++) {
 					locations[i-1] = parts[i];

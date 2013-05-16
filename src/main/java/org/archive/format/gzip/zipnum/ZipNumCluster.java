@@ -100,6 +100,15 @@ public class ZipNumCluster implements CDXInputSource {
 		
 		return count;
 	}
+	
+	public String getLocRoot()
+	{
+		if (this.locationUpdater != null) {
+			return this.locationUpdater.getFirstLocRoot();
+		}
+		
+		return null;
+	}
 
 	
 	public String getClusterPart(String partId)

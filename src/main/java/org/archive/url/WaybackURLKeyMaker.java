@@ -21,7 +21,7 @@ public class WaybackURLKeyMaker implements URLKeyMaker {
 	
 	protected List<RewriteRule> customRules;
 	
-	public class RewriteRule
+	public static class RewriteRule
 	{
 		String startsWith;
 		String regex;

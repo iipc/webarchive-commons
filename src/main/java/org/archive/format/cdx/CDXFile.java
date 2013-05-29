@@ -29,7 +29,7 @@ public class CDXFile extends SortedTextFile implements CDXInputSource {
 
 	//TODO:
 	public CloseableIterator<String> getCDXIterator(String key, String prefix, boolean exact, ZipNumParams params) throws IOException {
-		return getRecordIteratorLT(key);
+		return getRecordIterator(key);
 	}
 	
 	public static SeekableLineReaderFactory getUriFactory(String uri, boolean decodeToTemp) throws IOException

@@ -22,6 +22,9 @@ public class ZipNumCluster implements CDXInputSource {
 	
 	protected ZipNumBlockLoader blockLoader;
 	
+	// Used only for reference / user info
+	protected int cdxLinesPerBlock = 3000;
+	
 	//protected HashMap<String, String[]> locMap = null;
 	protected LocationUpdater locationUpdater = null;
 		
@@ -160,7 +163,7 @@ public class ZipNumCluster implements CDXInputSource {
 	}
 	
 	// Adjust from shorter blocks, if loaded
-	public long getTotalLines(int cdxPerBlock)
+	public long getTotalLines()
 	{
 		if (locationUpdater == null) {
 			return 0;
@@ -177,18 +180,18 @@ public class ZipNumCluster implements CDXInputSource {
 		
 		long adjustment = locationUpdater.getTotalAdjustment();
 		numLines -= (locationUpdater.getNumBlocks() - 1);
-		numLines *= cdxPerBlock;
+		numLines *= this.getCdxLinesPerBlock();
 		numLines += adjustment;
 		return numLines;
 	}
 	
-	public long getLastBlockDiff(String startKey, int startPart, int endPart, int cdxPerBlock)
+	public long getLastBlockDiff(String startKey, int startPart, int endPart)
 	{
 		if (locationUpdater == null) {
 			return 0;
 		}
 		
-		return locationUpdater.computeLastBlockDiff(startKey, startPart, endPart, cdxPerBlock);
+		return locationUpdater.computeLastBlockDiff(startKey, startPart, endPart, this.getCdxLinesPerBlock());
 	}
 	
 	public int getNumLines(String start, String end) throws IOException
@@ -422,5 +425,13 @@ public class ZipNumCluster implements CDXInputSource {
 		}
 		
 		return false;
+	}
+
+	public int getCdxLinesPerBlock() {
+		return cdxLinesPerBlock;
+	}
+
+	public void setCdxLinesPerBlock(int cdxLinesPerBlock) {
+		this.cdxLinesPerBlock = cdxLinesPerBlock;
 	}
 }

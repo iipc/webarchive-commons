@@ -13,86 +13,13 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 	final static Logger LOGGER = 
 		Logger.getLogger(SummaryBlockIterator.class.getName());
 		
-	class SplitLine
-	{
-		String line;
-		String partId;
-		String[] parts;
-		
-		//String timestamp;
-		
-		long offset;
-		int length;
-		
-		SplitLine(String line)
-		{
-			this.line = line;
-			if (this.line == null) {
-				return;
-			}
-			parts = this.line.split("\t");
-			partId = parts[1];
-			if (parts.length < 3) {
-				return;
-			}
-			offset = Long.parseLong(parts[2]);
-			length = Integer.parseInt(parts[3]);
-			//timestamp = makeTimestamp(parts[0]);
-		}
-		
-//		String makeTimestamp(String key)
-//		{
-//			if (params.getTimestampDedupLength() <= 0) {
-//				return null;
-//			}
-//			
-//			int space = key.indexOf(' ');
-//			if (space >= 0) {
-//				return key.substring(0, space + 1 + params.getTimestampDedupLength());
-//			} else {
-//				return null;
-//			}
-//		}
-		
-		boolean isContinuous(SplitLine next)
-		{
-			if (next == null || next.line == null) {
-				return false;
-			}
-			
-			// Must be same part
-			if (!partId.equals(next.partId)) {
-				return false;
-			}
-			
-			if ((offset + length) != next.offset) {
-				return false;
-			}
-			
-			return true;
-		}
-		
-//		boolean sameTimestamp(SplitLine next)
-//		{
-//			if (next == null || next.timestamp == null) {
-//				return false;
-//			}
-//			
-//			if (timestamp == null) {
-//				return false;
-//			}
-//			
-//			return timestamp.equals(next.timestamp);
-//		}
-	}
-	
 	protected CloseableIterator<String> summaryIterator;
 	
 	protected ZipNumCluster cluster;
 	
 	//protected SeekableLineReader currReader = null;
 	
-	protected SplitLine nextLine, currLine;
+	protected SummaryLine nextLine, currLine;
 	
 	protected boolean isFirst = true;
 	
@@ -121,7 +48,7 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 					
 		if (isFirst) {
 			if (summaryIterator.hasNext()) {
-				nextLine = new SplitLine(summaryIterator.next());
+				nextLine = new SummaryLine(summaryIterator.next());
 			}
 			isFirst = false;
 		}
@@ -154,13 +81,13 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 				}
 				
 				if (summaryIterator.hasNext()) {
-					nextLine = new SplitLine(summaryIterator.next());
+					nextLine = new SummaryLine(summaryIterator.next());
 				} else {
 					nextLine = null;
 				}
 			
-				if (currLine.parts.length < 3) {
-					LOGGER.severe("Bad line(" + currLine.line +") ");
+				if (currLine.fields.length < 3) {
+					LOGGER.severe("Bad line(" + currLine.fullLine +") ");
 					return null;
 				}
 				

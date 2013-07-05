@@ -15,7 +15,7 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 		
 	protected CloseableIterator<String> summaryIterator;
 	
-	protected ZipNumCluster cluster;
+	protected ZipNumIndex zipnumIndex;
 	
 	//protected SeekableLineReader currReader = null;
 	
@@ -29,9 +29,9 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 	
 	protected final ZipNumParams params;	
 
-	public SummaryBlockIterator(CloseableIterator<String> summaryIterator, ZipNumCluster cluster, ZipNumParams params)
+	public SummaryBlockIterator(CloseableIterator<String> summaryIterator, ZipNumIndex zipnumIndex, ZipNumParams params)
 	{
-		this.cluster = cluster;
+		this.zipnumIndex = zipnumIndex;
 		
 		this.summaryIterator = summaryIterator;
 		this.isFirst = true;
@@ -112,11 +112,12 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 					  ((params.getMaxBlocks() <= 0) || (totalBlocks + numBlocks) < params.getMaxBlocks()) 
 					  && currLine.isContinuous(nextLine));
 			
-			if (LOGGER.isLoggable(Level.INFO)) {
-				LOGGER.info("Loading " + numBlocks + " blocks - " + startOffset + ":" + totalLength + " from " + currPartId);
+			if (LOGGER.isLoggable(Level.FINE)) {
+				LOGGER.fine("Loading " + numBlocks + " blocks - " + startOffset + ":" + totalLength + " from " + currPartId);
 			}
 			
-			currReader = initReader(currPartId);			
+			//currReader = initReader(currPartId);
+			currReader = zipnumIndex.createReader(currPartId);
 			currReader.seekWithMaxRead(startOffset, true, totalLength);
 			
 			totalBlocks += numBlocks;
@@ -136,47 +137,47 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 		return currReader;
 	}
 		
-	protected SeekableLineReader initReader(String partId) throws IOException
-	{
-		//if ((currReader == null) || (currPartId == null) || !currPartId.equals(partId)) {
-			
-//		if (currReader != null) {
-//			currReader.close();
-//			currReader = null;
+//	protected SeekableLineReader initReader(String partId) throws IOException
+//	{
+//		//if ((currReader == null) || (currPartId == null) || !currPartId.equals(partId)) {
+//			
+////		if (currReader != null) {
+////			currReader.close();
+////			currReader = null;
+////		}
+//		
+//		SeekableLineReader currReader = null;
+//		
+//		if (cluster.locationUpdater != null) {
+//			currReader = initLocationReader(partId);
 //		}
-		
-		SeekableLineReader currReader = null;
-		
-		if (cluster.locationUpdater != null) {
-			currReader = initLocationReader(partId);
-		}
-		
-		if (currReader == null) {
-			String partUrl = cluster.getClusterPart(partId);
-			currReader = cluster.blockLoader.createBlockReader(partUrl);	
-		}
-		
-		return currReader;
-	}
-	
-	protected SeekableLineReader initLocationReader(String partId)
-	{
-		String[] locations = cluster.locationUpdater.getLocations(partId);
-		
-		if (locations == null) {
-			LOGGER.severe("No locations for block(" + partId +")");
-		} else if (locations != null && locations.length > 0) {
-			for (String location : locations) {
-				try {
-					return cluster.blockLoader.createBlockReader(location);
-				} catch (IOException io) {
-					continue;
-				}
-			}
-		}
-		
-		return null;
-	}
+//		
+//		if (currReader == null) {
+//			String partUrl = cluster.getClusterPart(partId);
+//			currReader = cluster.blockLoader.createBlockReader(partUrl);
+//		}
+//		
+//		return currReader;
+//	}
+//	
+//	protected SeekableLineReader initLocationReader(String partId)
+//	{
+//		String[] locations = cluster.locationUpdater.getLocations(partId);
+//		
+//		if (locations == null) {
+//			LOGGER.severe("No locations for block(" + partId +")");
+//		} else if (locations != null && locations.length > 0) {
+//			for (String location : locations) {
+//				try {
+//					return cluster.blockLoader.createBlockReader(location);
+//				} catch (IOException io) {
+//					continue;
+//				}
+//			}
+//		}
+//		
+//		return null;
+//	}
 	
 	@Override
 	public void close() throws IOException

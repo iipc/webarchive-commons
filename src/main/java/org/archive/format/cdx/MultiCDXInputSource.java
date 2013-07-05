@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.archive.format.gzip.zipnum.ZipNumCluster;
+import org.archive.format.gzip.zipnum.ZipNumIndex;
 import org.archive.format.gzip.zipnum.ZipNumParams;
 import org.archive.util.iterator.CloseableIterator;
 import org.archive.util.iterator.SortedCompositeIterator;
@@ -32,7 +32,7 @@ public class MultiCDXInputSource implements CDXInputSource {
 			if (uri.endsWith(".cdx") || uri.endsWith(".cdx.gz")) {
 				cdx.add(new CDXFile(uri));
 			} else if (uri.endsWith("ALL.summary") && uri.contains("/")) {
-				cdx.add(new ZipNumCluster(uri));
+				cdx.add(ZipNumIndex.createIndexWithSummaryPath(uri));
 			} else {
 				//Skipping?
 			}

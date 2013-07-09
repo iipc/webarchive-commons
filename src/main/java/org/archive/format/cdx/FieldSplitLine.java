@@ -16,13 +16,8 @@ public class FieldSplitLine {
 	{
 		this(line, "\t");
 	}
-	
+		
 	public FieldSplitLine(String line, String splitstr)
-	{
-		this(line, splitstr, null);
-	}
-	
-	public FieldSplitLine(String line, String splitstr, String[] names)
 	{
 		this.fullLine = line;
 		if (line != null) {
@@ -30,7 +25,18 @@ public class FieldSplitLine {
 		} else {
 			this.fields = null;
 		}
-		this.names = names;
+		this.names = selectNames(this.fields);
+	}
+	
+	/**
+	 * Select the names
+	 * 
+	 * @param fields
+	 * @return
+	 */
+	protected String[] selectNames(String[] fields)
+	{
+		return null;
 	}
 	
 	/**

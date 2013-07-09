@@ -10,7 +10,7 @@ public class CDXLine extends FieldSplitLine {
 												 "statuscode", 
 												 "digest",
 												 "redirect",
-												 "meta", 
+												 "metaflags", 
 												 "length", 
 												 "offset", 
 												 "filename"}; 
@@ -24,10 +24,21 @@ public class CDXLine extends FieldSplitLine {
 												 "statuscode", 
 												 "digest",
 												 "redirect", 
-												 "offset", 
-												 "filename"}; 
+												 "offset",
+												 "filename"};
 
 	public CDXLine(String line) {
-		super(line, " ", CDX_11_NAMES);
+		super(line, " ");
+	}
+	
+	protected String[] selectNames(String[] fields)
+	{
+		if (fields.length == CDX_11_NAMES.length) {
+			return CDX_11_NAMES;
+		} else if (fields.length == CDX_09_NAMES.length) {
+			return CDX_09_NAMES;			
+		} else {
+			return null;
+		}
 	}
 }

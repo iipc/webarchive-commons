@@ -2,9 +2,9 @@ package org.archive.util.binsearch.impl;
 
 import java.io.IOException;
 
-import org.archive.util.binsearch.SeekableLineReader;
+import org.archive.util.binsearch.AbstractSeekableLineReader;
 
-public abstract class HTTPSeekableLineReader extends SeekableLineReader {
+public abstract class HTTPSeekableLineReader extends AbstractSeekableLineReader {
 	
 	public static class BadHttpStatusException extends IOException
 	{

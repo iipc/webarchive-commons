@@ -46,7 +46,6 @@ public class MultiCDXInputSource implements CDXInputSource {
 		}
 	};
 	
-	
 	public CloseableIterator<String> getCDXIterator(String key, String prefix, boolean exact, ZipNumParams params) throws IOException {
 		
 		SortedCompositeIterator<String> scitr = new SortedCompositeIterator<String>(cdx.size(), comparator);
@@ -56,6 +55,25 @@ public class MultiCDXInputSource implements CDXInputSource {
 		for (CDXInputSource cdxReader : cdx) {
 			try {
 				iter = cdxReader.getCDXIterator(key, prefix, exact, params);
+				scitr.addIterator(iter);
+			} catch (IOException io) {
+				LOGGER.warning(io.toString());
+			}
+		}
+		
+		return scitr;
+	}
+	
+	
+	public CloseableIterator<String> getCDXIterator(String key, String start, String end, ZipNumParams params) throws IOException {
+		
+		SortedCompositeIterator<String> scitr = new SortedCompositeIterator<String>(cdx.size(), comparator);
+		
+		CloseableIterator<String> iter = null;
+		
+		for (CDXInputSource cdxReader : cdx) {
+			try {
+				iter = cdxReader.getCDXIterator(key, start, end, params);
 				scitr.addIterator(iter);
 			} catch (IOException io) {
 				LOGGER.warning(io.toString());

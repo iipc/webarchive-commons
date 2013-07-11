@@ -1,6 +1,7 @@
 package org.archive.util.binsearch;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -8,6 +9,35 @@ import org.archive.util.GeneralURIStreamFactory;
 import org.archive.util.iterator.CloseableIterator;
 
 public class SortedTextFile {
+	
+	public static class NumericComparator implements Comparator<String>
+	{
+		@Override
+		public int compare(String arg0, String arg1) {
+			int int0 = Integer.parseInt(arg0);
+			int int1 = Integer.parseInt(arg1);
+			
+			if (int0 < int1) {
+				return -1;
+			} else if (int0 == int1) {
+				return 0;
+			} else {
+				return 1;
+			}
+		}
+	};
+	
+	public static class DefaultComparator implements Comparator<String>
+	{
+		@Override
+		public int compare(String arg0, String arg1) {
+			return arg0.compareTo(arg1);
+		}
+	};
+	
+	public final static Comparator<String> numericComparator = new NumericComparator();
+	public final static Comparator<String> defaultComparator = new DefaultComparator();
+	
 	private final static Logger LOGGER =
 		Logger.getLogger(SortedTextFile.class.getName());
 	
@@ -65,7 +95,7 @@ public class SortedTextFile {
 		SeekableLineReader slr = factory.get();
 		
 		try {
-			return search(slr,prefix,lessThan);
+			return search(slr, prefix, lessThan, defaultComparator);
 		} catch (IOException io) {
 			if (slr != null) {
 				slr.close();
@@ -74,7 +104,7 @@ public class SortedTextFile {
 		}
 	}
 	
-	protected long findOffset(SeekableLineReader slr, final String key) throws IOException
+	public long binaryFindOffset(SeekableLineReader slr, final String key, Comparator<String> comparator) throws IOException
 	{
 		int blockSize = SeekableLineReaderFactory.BINSEARCH_BLOCK_SIZE;
 		long fileSize = slr.getSize();
@@ -82,15 +112,16 @@ public class SortedTextFile {
 		long max = (long) fileSize / blockSize;
 		long mid;
 		String line;
-
+		
 		// TODO: implement a cache of midpoints - will make a HUGE difference
 		//       on both HTTP and HDFS
 	    while (max - min > 1) {
 	    	mid = min + (long)((max - min) / 2);
 	    	slr.seek(mid * blockSize);
-	    	if(mid > 0) line = slr.readLine(); // probably a partial line
+	    	if(mid > 0) slr.skipLine(); // probably a partial line
 	    	line = slr.readLine();
-	    	if (key.compareTo(line) > 0) {
+	    	
+	    	if (comparator.compare(key, line) > 0) {
 
 	    		if(LOGGER.isLoggable(Level.FINE)) {
 	    			LOGGER.fine(String.format("Search(%d) (%s)/(%s) : After",
@@ -117,7 +148,7 @@ public class SortedTextFile {
 		
 		if ((end != null) && !end.isEmpty()) {
 			//endOffset = this.findOffset(slr, end);
-			endOffset = this.searchOffset(slr, end, false);
+			endOffset = this.searchOffset(slr, end, false, defaultComparator);
 		} else {
 			endOffset = slr.getSize();
 		}
@@ -125,7 +156,7 @@ public class SortedTextFile {
 		long startOffset = 0;
 		
 		if ((start != null) && !start.isEmpty()) {
-			startOffset = this.searchOffset(slr, start, true);
+			startOffset = this.searchOffset(slr, start, true, defaultComparator);
 		}
 		
 		return new long[]{startOffset, endOffset};
@@ -160,13 +191,13 @@ public class SortedTextFile {
 				slr.seek(0);
 				startLine = slr.readLine();
 			} else {
-				startLine = search(slr, start, true).next();
+				startLine = search(slr, start, true, defaultComparator).next();
 			}
 			
 			if (end.isEmpty()) {
 				endLine = getLastLine(slr);
 			} else {
-				endLine = search(slr, end, true).next();
+				endLine = search(slr, end, true, defaultComparator).next();
 			}
 			
 		} finally {
@@ -197,7 +228,7 @@ public class SortedTextFile {
 			slr.seek(startOffset + seekDiff);
 			
 			if ((startOffset + seekDiff) > 0) {
-				slr.readLine();
+				slr.skipLine();
 			}
 			
 			startLine = slr.readLine();
@@ -206,7 +237,7 @@ public class SortedTextFile {
 			if (split <= (numSplits - 1)) {
 				seekDiff = (diff * (split + 1)) / numSplits;
 				slr.seek(startOffset + seekDiff);
-				slr.readLine();
+				slr.skipLine();
 				endLine = slr.readLine();
 			} else {
 				endLine = end;
@@ -279,7 +310,7 @@ public class SortedTextFile {
 			
 			try {				
 				if (startOffset + currSplit != 0) {
-					slr.readLine();
+					slr.skipLine();
 				}
 				
 				line = slr.readLine();
@@ -306,16 +337,16 @@ public class SortedTextFile {
 	}
 	
 	private long searchOffset(SeekableLineReader slr, 
-			final String key, boolean lessThan) throws IOException {
+			final String key, boolean lessThan, Comparator<String> comparator) throws IOException {
 
-		long offset = findOffset(slr, key);
+		long offset = binaryFindOffset(slr, key, comparator);
 
 	    slr.seek(offset);
 	    
 	    String line = null;
 	    
 	    if (offset > 0) {
-	    	line = slr.readLine();
+	    	slr.skipLine();
 	    }
 	    
 	    String prev = null;
@@ -325,7 +356,7 @@ public class SortedTextFile {
 	    	}
 	    	line = slr.readLine();
 	    	if(line == null) break;
-	    	if(line.compareTo(key) >= 0) break;
+	    	if(comparator.compare(line, key) >= 0) break;
 	    	prev = line;
 	    }
 	    
@@ -340,9 +371,9 @@ public class SortedTextFile {
 	}
 	
 	private CloseableIterator<String> search(SeekableLineReader slr, 
-			final String key, boolean lessThan) throws IOException {
+			final String key, boolean lessThan, Comparator<String> comparator) throws IOException {
 
-		long min = findOffset(slr, key);
+		long min = binaryFindOffset(slr, key, comparator);
 
 		if (LOGGER.isLoggable(Level.FINE)) {
 			LOGGER.fine(String.format("Aligning(%d)",min));
@@ -352,12 +383,14 @@ public class SortedTextFile {
 	    
 	    String line;
 	    
-	    if(min > 0) line = slr.readLine();
+	    if (min > 0) {
+	    	slr.skipLine();
+	    }
 	    String prev = null;
 	    while(true) {
 	    	line = slr.readLine();
-	    	if(line == null) break;
-	    	if(line.compareTo(key) >= 0) break;
+	    	if (line == null) break;
+	    	if (comparator.compare(line, key) >= 0) break;
 	    	prev = line;
 	    }
 	    if (!lessThan) {

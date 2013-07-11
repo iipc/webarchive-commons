@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.archive.format.cdx.CDXInputSource;
+import org.archive.util.binsearch.FieldExtractingSLR;
 import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.binsearch.SortedTextFile;
 import org.archive.util.iterator.BoundedStringIterator;
@@ -26,16 +27,16 @@ public class ZipNumIndex implements CDXInputSource {
 	//protected HashMap<String, String[]> locMap = null;
 		
 	protected final static boolean DEFAULT_USE_NIO = true;
+
+	private static final int LINE_COUNT_FIELD = 0;
 	
 	protected boolean useNio = DEFAULT_USE_NIO;
 	
-	// Empty constructor to support Spring config creation
 	public ZipNumIndex()
 	{
 		
 	}
 					
-	// Spring config should call this on initialization
 	public void init() throws IOException {
 		
 		if (summaryFile != null) {
@@ -63,9 +64,9 @@ public class ZipNumIndex implements CDXInputSource {
 		return zipIndex;
 	}
 				
-	protected static int extractLineCount(String line)
+	public static int extractLineCount(String line)
 	{
-		return (int)extractLongField(line, 4);
+		return (int)extractLongField(line, LINE_COUNT_FIELD);
 	}
 	
 	protected static long extractLongField (String line, int index)
@@ -171,6 +172,98 @@ public class ZipNumIndex implements CDXInputSource {
 		return endCount - startCount;
 	}
 	
+	public static class PageResult
+	{
+		final public CloseableIterator<String> iter;
+		final public int numPages;
+		
+		PageResult(CloseableIterator<String> iter, int numPages)
+		{
+			this.iter = iter;
+			this.numPages = numPages;
+		}
+	}
+	
+	public PageResult getNthPage(String[] startEnd, int page, int pageSize, boolean numPagesOnly) throws IOException
+	{
+		String startEndIdx[] = getSummary().getRange(startEnd[0], startEnd[1]);
+		
+		int firstLineNumber = extractLineCount(startEndIdx[0]);
+		int endLineNumber = extractLineCount(startEndIdx[1]) + 1;
+		int totalLines = endLineNumber - firstLineNumber;
+		
+		int numPages = (totalLines / pageSize) + 1;
+		
+		if (numPagesOnly) {
+			return new PageResult(null, numPages);
+		}
+		
+		if (page >= numPages) {
+			return new PageResult(null, numPages);
+		}
+		
+		int firstPageLineNumber = (page * pageSize) + firstLineNumber;
+		int lastPageLineNumber = Math.min(firstPageLineNumber + pageSize, endLineNumber);
+		
+		if (page > 0) {
+			startEndIdx[0] = getNthLine("" + firstPageLineNumber, LINE_COUNT_FIELD);
+		}
+		
+		boolean endInclusive = false;
+		
+		if (page < (numPages - 1)) {
+			startEndIdx[1] = getNthLine("" + lastPageLineNumber, LINE_COUNT_FIELD);
+		} else {
+			endInclusive = true;
+		}
+	
+    	CloseableIterator<String> blocklines = getClusterRange(startEndIdx[0], startEndIdx[1], endInclusive, false);
+    	return new PageResult(blocklines, numPages);
+	}
+	
+	public String getNthLine(String lineNumber, int lineField) throws IOException
+	{
+		SeekableLineReader slr = null;
+		
+		try {
+			slr = summary.getSLR();
+			FieldExtractingSLR lineCountReader = new FieldExtractingSLR(slr, lineField, "\t");
+			
+			long offset = summary.binaryFindOffset(lineCountReader, lineNumber, SortedTextFile.numericComparator);
+			slr.seek(offset);
+			
+			if (offset > 0) {
+				slr.skipLine();
+			}
+			
+			String fullLine = null;
+			String prevLine = null;
+			
+		    while (true) {
+		    	prevLine = fullLine;
+		    	fullLine = slr.readLine();
+		    	
+		    	if (fullLine == null) {
+		    		fullLine = prevLine;
+		    		break;
+		    	}
+		    	
+		    	String currLineNumber = fullLine.split("\t")[lineField];
+		    	
+		    	if (SortedTextFile.numericComparator.compare(lineNumber, currLineNumber) <= 0) {
+		    		break;
+		    	}
+		    }
+		    
+			return fullLine;
+			
+		} finally {
+			if (slr != null) {
+				slr.close();
+			}
+		}
+	}
+	
 	//TODO: Experimental?
 	public long getEstimateSplitSize(String[] blocks)
 	{
@@ -267,7 +360,29 @@ public class ZipNumIndex implements CDXInputSource {
 			return wrapEndIterator(source, prefix, true);
 		}
 	}
+	
+	public CloseableIterator<String> getCDXIterator(String key, String start, String end, ZipNumParams params) throws IOException {	
+		CloseableIterator<String> summaryIter = summary.getRecordIteratorLT(key);
+		
+		if (params.getTimestampDedupLength() > 0) {
+			summaryIter = new TimestampDedupIterator(summaryIter, params.getTimestampDedupLength());
+		}
+		
+		if (end != null && !end.isEmpty()) {
+			summaryIter = wrapEndIterator(summaryIter, end, false);
+		}
+		
+		if (blockLoader.isBufferFully() && (params != null) && (params.getMaxBlocks() > 0)) {
+			LineBufferingIterator lineBufferIter = new LineBufferingIterator(summaryIter, params.getMaxBlocks());
+			lineBufferIter.bufferInput();
+			summaryIter = lineBufferIter;
+		}
 				
+		return wrapStartEndIterator(getCDXIterator(summaryIter, params), start, end, false);
+	}
+	
+	
+	//TODO: replace with matchType version
 	public CloseableIterator<String> getCDXIterator(String key, String start, boolean exact, ZipNumParams params) throws IOException {
 		
 		CloseableIterator<String> summaryIter = summary.getRecordIteratorLT(key);
@@ -276,13 +391,13 @@ public class ZipNumIndex implements CDXInputSource {
 			summaryIter = new TimestampDedupIterator(summaryIter, params.getTimestampDedupLength());
 		}
 		
+		summaryIter = wrapPrefix(summaryIter, start, exact);
+		
 		if (blockLoader.isBufferFully() && (params != null) && (params.getMaxBlocks() > 0)) {
 			LineBufferingIterator lineBufferIter = new LineBufferingIterator(summaryIter, params.getMaxBlocks());
 			lineBufferIter.bufferInput();
 			summaryIter = lineBufferIter;
 		}
-		
-		summaryIter = wrapPrefix(summaryIter, start, exact);
 				
 		return wrapStartIterator(getCDXIterator(summaryIter, params), start);
 	}

@@ -12,6 +12,13 @@ public class FieldSplitLine {
 	final public String fullLine;
 	final public String fields[];
 	
+	protected FieldSplitLine(String line, String[] fields)
+	{
+		this.fullLine = line;
+		this.fields = fields;
+		this.names = selectNames(this.fields);
+	}
+	
 	public FieldSplitLine(String line)
 	{
 		this(line, "\t");
@@ -40,21 +47,32 @@ public class FieldSplitLine {
 	}
 	
 	/**
-	 * Return field for given name
-	 * Note: no bounds checking performed here
+	 * Return field index for given name
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public int getFieldIndex(String name)
+	{
+		for (int i = 0; i < names.length; i++) {
+			if (names[i].equals(name)) {
+				return i;
+			}
+		}
+		
+		return -1;
+	}
+	
+	/**
+	 * Return field for given name, or null if not found
 	 * 
 	 * @param name
 	 * @return
 	 */
 	public String getField(String name)
 	{
-		for (int i = 0; i < names.length; i++) {
-			if (names[i].equals(name)) {
-				return fields[i];
-			}
-		}
-		
-		return null;
+		int index = getFieldIndex(name);
+		return ((index >= 0) && (index < fields.length) ? this.fields[index] : null);
 	}
 	
 	public String getNamesAsJson()

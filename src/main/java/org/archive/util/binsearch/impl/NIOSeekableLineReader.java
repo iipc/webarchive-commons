@@ -6,11 +6,11 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 
-import org.archive.util.binsearch.SeekableLineReader;
+import org.archive.util.binsearch.AbstractSeekableLineReader;
 
 import com.google.common.io.LimitInputStream;
 
-public class NIOSeekableLineReader extends SeekableLineReader {
+public class NIOSeekableLineReader extends AbstractSeekableLineReader {
 	private FileChannel fc;
 	private long size;
 	

@@ -423,13 +423,22 @@ public class ZipNumCluster extends ZipNumIndex {
 		return numLines;
 	}
 	
-	public CloseableIterator<String> getCDXIterator(String key, String start, boolean exact, ZipNumParams params) throws IOException {
+	public CloseableIterator<String> getCDXIterator(String key, String start, String end, ZipNumParams params) throws IOException {
 		
 		if (!dateRangeCheck(key)) {
 			return EMPTY_ITERATOR;
 		}
 		
-		return super.getCDXIterator(key, start, exact, params);
+		return super.getCDXIterator(key, start, end, params);
+	}
+	
+	public CloseableIterator<String> getCDXIterator(String key, String prefix, boolean exact, ZipNumParams params) throws IOException {
+		
+		if (!dateRangeCheck(key)) {
+			return EMPTY_ITERATOR;
+		}
+		
+		return super.getCDXIterator(key, prefix, exact, params);
 	}
 	
 	public boolean isDisabled() {

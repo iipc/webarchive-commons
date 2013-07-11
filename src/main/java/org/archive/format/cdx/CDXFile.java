@@ -28,6 +28,10 @@ public class CDXFile extends SortedTextFile implements CDXInputSource {
 	}
 
 	//TODO:
+	public CloseableIterator<String> getCDXIterator(String key, String start, String end, ZipNumParams params) throws IOException {
+		return getRecordIterator(key);
+	}
+	
 	public CloseableIterator<String> getCDXIterator(String key, String prefix, boolean exact, ZipNumParams params) throws IOException {
 		return getRecordIterator(key);
 	}

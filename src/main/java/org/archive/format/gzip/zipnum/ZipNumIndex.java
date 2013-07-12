@@ -28,7 +28,7 @@ public class ZipNumIndex implements CDXInputSource {
 		
 	protected final static boolean DEFAULT_USE_NIO = true;
 
-	private static final int LINE_COUNT_FIELD = 0;
+	private static final int LINE_COUNT_FIELD = 4;
 	
 	protected boolean useNio = DEFAULT_USE_NIO;
 	

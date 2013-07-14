@@ -382,6 +382,39 @@ public class ArchiveUtils {
 
         return date;
     }
+    
+    final static SimpleDateFormat dateToTimestampFormats[] = 
+          {new SimpleDateFormat("MM/dd/yyyy"), 
+		   new SimpleDateFormat("MM/yyyy"), 
+		   new SimpleDateFormat("yyyy")};
+
+    /**
+     * Convert a user-entered date into a timestamp
+     * @param input
+     * @return
+     */
+    public static String dateToTimestamp(String input) {
+        Date date = null;
+
+        if (input.isEmpty()) {
+            return null;
+        }
+
+        for (SimpleDateFormat format : dateToTimestampFormats) {
+            try {
+                date = format.parse(input);
+                break;
+            } catch (ParseException e) {
+                continue;
+            }
+        }
+
+        if (date == null) {
+            return null;
+        }
+
+        return get14DigitDate(date);
+    }
 
     /**
      * Utility function for parsing arc-style date stamps

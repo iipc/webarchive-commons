@@ -79,9 +79,9 @@ public class UrlSurtRangeComputer {
 			
 		case host:
 		    if (returnSurt) {
-		        host = URLRegexTransformer.hostToSURT(host);	
-		        startKey = host + ")/";
-		        endKey = host + "*";
+		        String hostSURT = URLRegexTransformer.hostToSURT(host);	
+		        startKey = hostSURT + ")/";
+		        endKey = hostSURT + "*";
 		    } else {
 		        startKey = host + "/";
 		        endKey = host + "0";
@@ -90,9 +90,9 @@ public class UrlSurtRangeComputer {
 			
 		case domain:
 		    if (returnSurt) {
-                host = URLRegexTransformer.hostToSURT(host);    
-                startKey = host + ")/";
-                endKey = host + "-";
+                String hostSURT = URLRegexTransformer.hostToSURT(host);    
+                startKey = hostSURT + ")/";
+                endKey = hostSURT + "-";
 		    } else {
 		        // Unsupported in non-surt mode!
 		        return null;

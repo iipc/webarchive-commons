@@ -110,7 +110,9 @@ public class RegexFieldMatcher {
 		this.regexMatchers = new ArrayList<RegexMatch>(regexs.length);
 		
 		for (String regex : regexs) {
-			regexMatchers.add(new RegexMatch(regex));
+		    if (!regex.isEmpty()) {
+		        regexMatchers.add(new RegexMatch(regex));
+		    }
 		}
 	}
 	

@@ -86,8 +86,8 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 					nextLine = null;
 				}
 			
-				if (currLine.fields.length < 3) {
-					LOGGER.severe("Bad line(" + currLine.fullLine +") ");
+				if (currLine.getNumFields() < 3) {
+					LOGGER.severe("Bad line(" + currLine.toString() +") ");
 					return null;
 				}
 				

@@ -10,13 +10,13 @@ class SummaryLine extends FieldSplitLine
 	
 	public SummaryLine(String line)
 	{
-		super(line, "\t");
-		partId = fields[1];
-		if (fields.length < 3) {
+		super(line, '\t', null);
+		partId = super.getField(1);
+		if (super.getNumFields() < 3) {
 			return;
 		}
-		offset = Long.parseLong(fields[2]);
-		length = Integer.parseInt(fields[3]);
+		offset = Long.parseLong(super.getField(2));
+		length = Integer.parseInt(super.getField(3));
 		//timestamp = makeTimestamp(parts[0]);
 	}
 	

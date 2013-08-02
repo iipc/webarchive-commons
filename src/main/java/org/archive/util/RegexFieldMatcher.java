@@ -3,11 +3,11 @@ package org.archive.util;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.archive.format.cdx.FieldSplitLine;
+import org.archive.format.cdx.FieldSplitFormat;
 
 /**
  * Matches a FieldSplitLine against a string of regex
@@ -27,7 +27,7 @@ public class RegexFieldMatcher {
 	final static String INVERT_CHAR = "!";
 	final static String FIELD_SEP_CHAR = ":";
 	
-	final protected List<String> names;
+	final protected FieldSplitFormat names;
 	final protected List<RegexMatch> regexMatchers;
 	
 	class RegexMatch {
@@ -73,7 +73,7 @@ public class RegexFieldMatcher {
 			
 			// Then try names if available
 			if ((index < 0) && (names != null)) {
-				index = names.indexOf(field);
+				index = names.getFieldIndex(field);
 			}
 			
 			fieldIndex = index;			
@@ -85,9 +85,9 @@ public class RegexFieldMatcher {
 			boolean matched;
 			
 			if (fieldIndex < 0) {
-				matched = regex.matcher(line.fullLine).matches();
+				matched = regex.matcher(line.toString()).matches();
 			} else {
-				matched = regex.matcher(line.fields[fieldIndex]).matches();
+				matched = regex.matcher(line.getField(fieldIndex)).matches();
 			}
 			
 			if (inverted) {
@@ -99,14 +99,9 @@ public class RegexFieldMatcher {
 	}
 	
 	
-	public RegexFieldMatcher(String[] regexs, String[] namesArr)
+	public RegexFieldMatcher(String[] regexs, FieldSplitFormat names)
 	{
-		if (namesArr != null) {
-			this.names = Arrays.asList(namesArr);
-		} else {
-			this.names = null;
-		}
-		
+	  this.names = names;
 		this.regexMatchers = new ArrayList<RegexMatch>(regexs.length);
 		
 		for (String regex : regexs) {

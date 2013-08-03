@@ -52,9 +52,17 @@ public class FieldSplitLine {
 				this.fields.add(line.substring(lastIndex, currIndex));
 			} else {
 				this.fields.add(line.substring(lastIndex));
+				break;
 			}
 			lastIndex = currIndex + 1;
 		} while (lastIndex > 0);
+		
+		
+		if (names != null) {
+			while (fields.size() < initSize) {
+				fields.add("-");
+			}
+		}
 	}
 
 	/**

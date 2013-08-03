@@ -15,7 +15,7 @@ public class StandardCDXLineFactory implements CDXLineFactory, CDXFieldConstants
 	
 	// Matches cdx format: CDX N b a m s k r V g
 	public final static FieldSplitFormat cdx09 = new FieldSplitFormat(timestamp, original, mimetype, statuscode, digest, redirect, offset, filename);
-	
+
 	protected final FieldSplitFormat parseFormat;
 	
 	public StandardCDXLineFactory(String formatName)
@@ -29,7 +29,7 @@ public class StandardCDXLineFactory implements CDXLineFactory, CDXFieldConstants
 		}
 	}
 	
-	public StandardCDXLineFactory(FieldSplitFormat parseFormat)
+	protected StandardCDXLineFactory(FieldSplitFormat parseFormat)
 	{
 		this.parseFormat = parseFormat;
 	}
@@ -37,15 +37,5 @@ public class StandardCDXLineFactory implements CDXLineFactory, CDXFieldConstants
 	public FieldSplitFormat getParseFormat()
 	{
 		return parseFormat;
-	}
-	
-	public CDXLine createCdxLine(String line)
-	{
-		return new CDXLine(line, parseFormat);
-	}
-	
-	public CDXLine createCdxLine(String line, FieldSplitFormat format)
-	{
-		return new CDXLine(line, format);
 	}
 }

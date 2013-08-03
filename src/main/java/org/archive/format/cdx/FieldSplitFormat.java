@@ -35,12 +35,28 @@ public class FieldSplitFormat {
 		}
 	}
 	
-	public FieldSplitFormat addFieldNames(String newName)
+	public FieldSplitFormat addFieldNames(String... newNameArray)
 	{
 		List<String> newNames = new ArrayList<String>();
 		newNames.addAll(this.names);
-		newNames.add(newName);
+		for (String name : newNameArray) {
+			newNames.add(name);
+		}
 		return new FieldSplitFormat(newNames);
+	}
+	
+	public FieldSplitFormat createSubset(FieldSplitFormat input)
+	{
+		List<String> newFields = new ArrayList<String>();
+		
+		for (int i = 0; i < input.getLength(); i++) {
+			String field = input.getName(i);
+			if (this.nameToIndex.containsKey(field)) {
+				newFields.add(field);
+			}
+		}
+		
+		return new FieldSplitFormat(newFields);
 	}
 	
 	public FieldSplitFormat createSubset(String commaSepList)

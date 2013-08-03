@@ -13,19 +13,19 @@ public class CDXLine extends FieldSplitLine implements CDXFieldConstants {
 	}
 
 	public String getUrlKey() {
-		return super.getField(0);
+		return super.getField(CDXLine.urlkey);
 	}
 
 	public String getTimestamp() {
-		return super.getField(1);
+		return super.getField(CDXLine.timestamp);
 	}
 
 	public String getOriginalUrl() {
-		return super.getField(2);
+		return super.getField(CDXLine.original);
 	}
 
 	public String getMimeType() {
-		return super.getField(3);
+		return super.getField(CDXLine.mimetype);
 	}
 	
 	public void setMimeType(String newMime) {
@@ -33,22 +33,22 @@ public class CDXLine extends FieldSplitLine implements CDXFieldConstants {
 	}
 
 	public String getStatusCode() {
-		return super.getField(4);
+		return super.getField(CDXLine.statuscode);
 	}
 
 	public String getDigest() {
-		return super.getField(5);
+		return super.getField(CDXLine.digest);
 	}
 
 	public String getLength() {
-		return super.getField(CDXLine.length, "-");
+		return super.getField(CDXLine.length);
 	}
 
 	protected String getOffset() {
-		return super.getField(CDXLine.length, "-");
+		return super.getField(CDXLine.length);
 	}
 
 	protected String getFilename() {
-		return super.getField(CDXLine.filename, "-");
+		return super.getField(CDXLine.filename);
 	}
 }

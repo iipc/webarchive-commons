@@ -17,6 +17,8 @@ public class FieldSplitLine {
 	protected FieldSplitFormat names;
 	protected String fullLine;
 	protected List<String> fields;
+	
+	public static final String EMPTY_VALUE = "-";
 
 	protected FieldSplitLine(String line, List<String> fields, FieldSplitFormat names) {
 		this.fullLine = line;
@@ -92,6 +94,10 @@ public class FieldSplitLine {
 	public String getField(String name, String defaultVal) {
 		int index = getFieldIndex(name);
 		return (isInRange(index) ? this.fields.get(index) : defaultVal);
+	}
+	
+	public String getField(String name) {
+		return getField(name, EMPTY_VALUE);
 	}
 
 	@Override

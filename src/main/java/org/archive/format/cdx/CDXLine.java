@@ -44,11 +44,11 @@ public class CDXLine extends FieldSplitLine implements CDXFieldConstants {
 		return super.getField(CDXLine.length);
 	}
 
-	protected String getOffset() {
+	public String getOffset() {
 		return super.getField(CDXLine.length);
 	}
 
-	protected String getFilename() {
+	public String getFilename() {
 		return super.getField(CDXLine.filename);
 	}
 }

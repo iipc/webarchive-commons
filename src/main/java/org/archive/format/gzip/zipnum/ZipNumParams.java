@@ -6,6 +6,18 @@ public class ZipNumParams
 	protected int timestampDedupLength = 0;
 	protected int maxBlocks = 0;
 	
+	public ZipNumParams()
+	{
+	    
+	}
+	
+	public ZipNumParams(int maxAggregateBlocks, int maxBlocks, int timestampDedupLength)
+	{
+	    this.maxAggregateBlocks = maxAggregateBlocks;
+	    this.maxBlocks = maxBlocks;
+	    this.timestampDedupLength = timestampDedupLength;
+	}
+	
 	public int getMaxAggregateBlocks() {
 		return maxAggregateBlocks;
 	}

@@ -301,7 +301,7 @@ public class ZipNumIndex implements CDXInputSource {
 		//return wrapStartEndIterator(iter, start, end, inclusive);
 	}
 	
-	public CloseableIterator<String> wrapStartEndIterator(CloseableIterator<String> iter, String start, String end, boolean inclusive)
+	public static CloseableIterator<String> wrapStartEndIterator(CloseableIterator<String> iter, String start, String end, boolean inclusive)
 	{
 		return wrapEndIterator(wrapStartIterator(iter, start), end, inclusive);
 	}

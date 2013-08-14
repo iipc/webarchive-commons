@@ -28,9 +28,12 @@ public class CDXFile extends SortedTextFile implements CDXInputSource {
 		super(factory);
 	}
 
-	//TODO:
 	public CloseableIterator<String> getCDXIterator(String key, String start, String end, ZipNumParams params) throws IOException {
-		return ZipNumIndex.wrapEndIterator(getRecordIterator(key), end, false);
+	    if (start.equals(key)) {
+	        return ZipNumIndex.wrapEndIterator(getRecordIterator(key), end, false);
+	    } else {
+	        return ZipNumIndex.wrapStartEndIterator(getRecordIterator(key), start, end, false);
+	    }
 	}
 	
 	public CloseableIterator<String> getCDXIterator(String key, String prefix, boolean exact, ZipNumParams params) throws IOException {

@@ -7,22 +7,23 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 
 import org.archive.util.binsearch.AbstractSeekableLineReader;
+import org.archive.util.binsearch.impl.NIOSeekableLineReaderFactory.NIOType;
 
-import com.google.common.io.LimitInputStream;
+import com.google.common.io.ByteStreams;
 
 public class NIOSeekableLineReader extends AbstractSeekableLineReader {
 	private FileChannel fc;
 	private long size;
-	
-	private boolean isMMap = false;
-	
+		
 	private FileChannelInputStream fcis;
 	private ByteBufferBackedInputStream bbis;
+	private NIOType type;
 	
-	public NIOSeekableLineReader(FileChannel fc, int blockSize) throws IOException {
+	public NIOSeekableLineReader(FileChannel fc, int blockSize, NIOType type) throws IOException {
 		super(blockSize);
 		
 		this.fc = fc;
+		this.type = type;
 		size = fc.size();
 		fcis = null;
 		bbis = null;
@@ -30,10 +31,10 @@ public class NIOSeekableLineReader extends AbstractSeekableLineReader {
 	
 	public InputStream doSeekLoad(long offset, int maxLength) throws IOException {
 		
-		if (isMMap && (maxLength >= 0)) {
+		if ((type == NIOType.MMAP) && (maxLength >= 0)) {
 			ByteBuffer mapBuff = fc.map(MapMode.READ_ONLY, offset, maxLength);
 			bbis = new ByteBufferBackedInputStream(mapBuff, offset);	
-			return new LimitInputStream(bbis, maxLength);
+			return ByteStreams.limit(bbis, maxLength);
 			
 		} else {
 			fcis = new FileChannelInputStream(fc, offset, maxLength);

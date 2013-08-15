@@ -17,6 +17,7 @@ public class ZipNumIndex implements CDXInputSource {
 	protected String pathRoot;
 		
 	protected String summaryFile;
+	protected int binsearchBlockSize = 512;
 	protected SortedTextFile summary;
 	
 	protected ZipNumBlockLoader blockLoader;
@@ -40,7 +41,7 @@ public class ZipNumIndex implements CDXInputSource {
 	public void init() throws IOException {
 		
 		if (summaryFile != null) {
-			this.summary = new SortedTextFile(summaryFile, useNio);
+			this.summary = new SortedTextFile(summaryFile, binsearchBlockSize, useNio);
 		}
 						
 		if (blockLoader == null) {
@@ -437,7 +438,15 @@ public class ZipNumIndex implements CDXInputSource {
 		return blockLoader;
 	}
 
-	public void setBlockLoader(ZipNumBlockLoader blockLoader) {
+	public int getBinsearchBlockSize() {
+        return binsearchBlockSize;
+    }
+
+    public void setBinsearchBlockSize(int binsearchBlockSize) {
+        this.binsearchBlockSize = binsearchBlockSize;
+    }
+
+    public void setBlockLoader(ZipNumBlockLoader blockLoader) {
 		this.blockLoader = blockLoader;
 	}
 

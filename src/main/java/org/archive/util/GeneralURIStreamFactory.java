@@ -17,7 +17,7 @@ import org.archive.streamcontext.Stream;
 import org.archive.util.binsearch.SeekableLineReaderFactory;
 import org.archive.util.binsearch.impl.HDFSSeekableLineReaderFactory;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReaderFactory;
-import org.archive.util.binsearch.impl.NIOSeekableLineReaderFactory;
+import org.archive.util.binsearch.impl.MappedSeekableLineReaderFactory;
 import org.archive.util.binsearch.impl.RandomAccessFileSeekableLineReaderFactory;
 
 public class GeneralURIStreamFactory {
@@ -120,7 +120,8 @@ public class GeneralURIStreamFactory {
 			}
 			
 			if (useNio) {
-				return new NIOSeekableLineReaderFactory(file);
+				//return new NIOSeekableLineReaderFactory(file);
+			    return new MappedSeekableLineReaderFactory(file);
 			} else {
 				return new RandomAccessFileSeekableLineReaderFactory(file);
 			}

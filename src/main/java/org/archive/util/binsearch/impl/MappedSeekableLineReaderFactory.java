@@ -13,7 +13,7 @@ import org.archive.util.binsearch.SeekableLineReaderFactory;
 public class MappedSeekableLineReaderFactory implements
         SeekableLineReaderFactory {
     
-    final static int DEFAULT_BLOCK_SIZE = 1024;
+    final static int DEFAULT_BLOCK_SIZE = 512;
 
     private File file;
     private FileChannel fc;

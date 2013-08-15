@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.archive.format.cdx.CDXInputSource;
+import org.archive.util.GeneralURIStreamFactory;
 import org.archive.util.binsearch.FieldExtractingSLR;
 import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.binsearch.SortedTextFile;
@@ -17,7 +18,8 @@ public class ZipNumIndex implements CDXInputSource {
 	protected String pathRoot;
 		
 	protected String summaryFile;
-	protected int binsearchBlockSize = 1024;
+	protected int binsearchBlockSize = 8192;
+	protected int readaheadSize = 512;
 	protected SortedTextFile summary;
 	
 	protected ZipNumBlockLoader blockLoader;
@@ -41,7 +43,8 @@ public class ZipNumIndex implements CDXInputSource {
 	public void init() throws IOException {
 		
 		if (summaryFile != null) {
-			this.summary = new SortedTextFile(summaryFile, binsearchBlockSize, useNio);
+			this.summary = new SortedTextFile(GeneralURIStreamFactory.createSeekableStreamFactory(summaryFile, readaheadSize, useNio));
+			this.summary.setBinsearchBlockSize(binsearchBlockSize);
 		}
 						
 		if (blockLoader == null) {
@@ -446,7 +449,15 @@ public class ZipNumIndex implements CDXInputSource {
         this.binsearchBlockSize = binsearchBlockSize;
     }
 
-    public void setBlockLoader(ZipNumBlockLoader blockLoader) {
+    public int getReadaheadSize() {
+		return readaheadSize;
+	}
+
+	public void setReadaheadSize(int readaheadSize) {
+		this.readaheadSize = readaheadSize;
+	}
+
+	public void setBlockLoader(ZipNumBlockLoader blockLoader) {
 		this.blockLoader = blockLoader;
 	}
 

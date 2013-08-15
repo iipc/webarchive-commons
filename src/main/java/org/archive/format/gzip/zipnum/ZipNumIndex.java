@@ -41,7 +41,8 @@ public class ZipNumIndex implements CDXInputSource {
 	public void init() throws IOException {
 		
 		if (summaryFile != null) {
-			this.summary = new SortedTextFile(summaryFile, binsearchBlockSize, useNio);
+			this.summary = new SortedTextFile(summaryFile, useNio);
+			this.summary.setBinsearchBlockSize(binsearchBlockSize);
 		}
 						
 		if (blockLoader == null) {

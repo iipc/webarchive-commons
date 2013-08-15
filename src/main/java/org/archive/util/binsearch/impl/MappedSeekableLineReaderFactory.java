@@ -12,13 +12,21 @@ import org.archive.util.binsearch.SeekableLineReaderFactory;
 
 public class MappedSeekableLineReaderFactory implements
         SeekableLineReaderFactory {
+    
+    final static int DEFAULT_BLOCK_SIZE = 1024;
 
     private File file;
     private FileChannel fc;
     private RandomAccessFile raf;
     private ByteBufferInputStream bbis;
-        
+    
+    private int blockSize;
+    
     public MappedSeekableLineReaderFactory(File file) throws IOException {
+        this(file, DEFAULT_BLOCK_SIZE);
+    }
+    
+    public MappedSeekableLineReaderFactory(File file, int blockSize) throws IOException {
         this.file = file;
         this.raf = new RandomAccessFile(file,"r");
         this.fc = raf.getChannel();
@@ -26,7 +34,7 @@ public class MappedSeekableLineReaderFactory implements
     }
 
     public SeekableLineReader get() throws IOException {
-        return new MappedSeekableLineReader(bbis.copy());
+        return new MappedSeekableLineReader(bbis.copy(), blockSize);
     }
     
     public void close() throws IOException

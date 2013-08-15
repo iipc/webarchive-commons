@@ -13,7 +13,8 @@ public class MappedSeekableLineReader extends AbstractSeekableLineReader {
 
     private ByteBufferInputStream bbis;
 
-    public MappedSeekableLineReader(ByteBufferInputStream bbis) throws IOException {
+    public MappedSeekableLineReader(ByteBufferInputStream bbis, int blockSize) throws IOException {
+        super(blockSize);
         this.bbis = bbis;
     }
     

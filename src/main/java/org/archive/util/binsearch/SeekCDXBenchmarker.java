@@ -46,7 +46,7 @@ public class SeekCDXBenchmarker {
             } else if (type.equals("mmap")) {
                 factory = new NIOSeekableLineReaderFactory(new File(uri), blocksize, NIOType.MMAP);
             } else if (type.equals("bigmap")) {
-                factory = new MappedSeekableLineReaderFactory(new File(uri));
+                factory = new MappedSeekableLineReaderFactory(new File(uri), blocksize);
             }
             
             SortedTextFile sorted = new SortedTextFile(factory);

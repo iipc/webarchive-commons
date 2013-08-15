@@ -53,6 +53,11 @@ public class SortedTextFile {
 		this(filename, true);
 	}
 	
+	public SortedTextFile(String filename, int binsearchBlockSize, boolean useNio) throws IOException {
+		this.factory = GeneralURIStreamFactory.createSeekableStreamFactory(filename, binsearchBlockSize, useNio);
+		this.binsearchBlockSize = binsearchBlockSize;
+	}
+	
 	public SortedTextFile(String filename, boolean useNio) throws IOException
 	{
 		this.factory = GeneralURIStreamFactory.createSeekableStreamFactory(filename, useNio);

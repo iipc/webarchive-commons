@@ -99,7 +99,12 @@ public class GeneralURIStreamFactory {
 		}
 	}
 	
-	public static SeekableLineReaderFactory createSeekableStreamFactory(String uri, boolean useNio) throws IOException
+    public static SeekableLineReaderFactory createSeekableStreamFactory(String uri, boolean useNio) throws IOException
+	{
+        return createSeekableStreamFactory(uri, SeekableLineReaderFactory.BINSEARCH_BLOCK_SIZE, useNio);
+	}	
+	
+	public static SeekableLineReaderFactory createSeekableStreamFactory(String uri, int blockSize, boolean useNio) throws IOException
 	{
 		if (isHttp(uri)) {
 			return HTTPSeekableLineReaderFactory.getHttpFactory(uri);
@@ -121,9 +126,9 @@ public class GeneralURIStreamFactory {
 			
 			if (useNio) {
 				//return new NIOSeekableLineReaderFactory(file);
-			    return new MappedSeekableLineReaderFactory(file);
+			    return new MappedSeekableLineReaderFactory(file, blockSize);
 			} else {
-				return new RandomAccessFileSeekableLineReaderFactory(file);
+				return new RandomAccessFileSeekableLineReaderFactory(file, blockSize);
 			}
 		}
 	}

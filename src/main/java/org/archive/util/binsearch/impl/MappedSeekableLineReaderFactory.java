@@ -28,6 +28,7 @@ public class MappedSeekableLineReaderFactory implements
     
     public MappedSeekableLineReaderFactory(File file, int blockSize) throws IOException {
         this.file = file;
+        this.blockSize = blockSize;
         this.raf = new RandomAccessFile(file,"r");
         this.fc = raf.getChannel();
         this.bbis = ByteBufferInputStream.map(fc);

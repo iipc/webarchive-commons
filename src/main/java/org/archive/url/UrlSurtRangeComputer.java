@@ -90,8 +90,17 @@ public class UrlSurtRangeComputer {
 			
 		case domain:
 		    if (returnSurt) {
-                String hostSURT = URLRegexTransformer.hostToSURT(host);    
-                startKey = hostSURT + ")/";
+                String hostSURT = URLRegexTransformer.hostToSURT(host); 
+                startKey = hostSURT;
+                
+                // If not a tld use )/ -- example,com)/
+                // otherwise start with , -- com,
+                
+                if (hostSURT.contains(",")) {
+                	startKey += ")/";
+                } else {
+                	startKey += ",";
+                }
                 endKey = hostSURT + "-";
 		    } else {
 		        // Unsupported in non-surt mode!

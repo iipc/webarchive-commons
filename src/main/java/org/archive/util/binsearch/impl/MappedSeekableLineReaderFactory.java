@@ -1,12 +1,11 @@
 package org.archive.util.binsearch.impl;
 
-import it.unimi.dsi.io.ByteBufferInputStream;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 
+import org.archive.util.binsearch.ByteBufferInputStream;
 import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.binsearch.SeekableLineReaderFactory;
 

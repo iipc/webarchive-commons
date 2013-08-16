@@ -1,11 +1,10 @@
 package org.archive.util.binsearch.impl;
 
-import it.unimi.dsi.io.ByteBufferInputStream;
-
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.archive.util.binsearch.AbstractSeekableLineReader;
+import org.archive.util.binsearch.ByteBufferInputStream;
 
 import com.google.common.io.ByteStreams;
 

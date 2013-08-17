@@ -123,5 +123,9 @@ public abstract class HTTPSeekableLineReaderFactory implements SeekableLineReade
 
 	// Experimental
 	public abstract long getModTime();
-
+	
+	public void reload()
+	{
+		
+	}
 }

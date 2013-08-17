@@ -10,13 +10,15 @@ public class LineBufferingIterator implements CloseableIterator<String> {
 	
 	protected CloseableIterator<String> inner;
 	protected int maxLines;
+	protected boolean reverse;
 	
 	protected Iterator<String> currIter;
 	
-	public LineBufferingIterator(CloseableIterator<String> inner, int maxLines)
+	public LineBufferingIterator(CloseableIterator<String> inner, int maxLines, boolean reverse)
 	{
 		this.inner = inner;
 		this.maxLines = maxLines;
+		this.reverse = reverse;
 	}
 		
 	public void bufferInput()
@@ -31,7 +33,7 @@ public class LineBufferingIterator implements CloseableIterator<String> {
 			lineBuffer.add(inner.next());
 		}
 		
-		currIter = lineBuffer.iterator();
+		currIter = (reverse ? lineBuffer.descendingIterator() : lineBuffer.iterator());
 		
 		try {
 			inner.close();

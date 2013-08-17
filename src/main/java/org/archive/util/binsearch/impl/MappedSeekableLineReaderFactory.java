@@ -15,7 +15,7 @@ public class MappedSeekableLineReaderFactory implements
     final static int DEFAULT_BLOCK_SIZE = 512;
 
     private File file;
-    private FileChannel fc;
+    //private FileChannel fc;
     private RandomAccessFile raf;
     private ByteBufferInputStream bbis;
     
@@ -29,12 +29,32 @@ public class MappedSeekableLineReaderFactory implements
         this.file = file;
         this.blockSize = blockSize;
         this.raf = new RandomAccessFile(file,"r");
-        this.fc = raf.getChannel();
+        
+        FileChannel fc = raf.getChannel();
         this.bbis = ByteBufferInputStream.map(fc);
     }
 
     public SeekableLineReader get() throws IOException {
         return new MappedSeekableLineReader(bbis.copy(), blockSize);
+    }
+    
+    public void reload() throws IOException
+    {
+        RandomAccessFile newRAF = new RandomAccessFile(file, "r");
+       
+        FileChannel newFc = raf.getChannel();
+        ByteBufferInputStream newBbis = ByteBufferInputStream.map(newFc);
+        
+        RandomAccessFile oldRaf = raf;
+     
+        synchronized(this) {
+        	this.bbis = newBbis;
+        	this.raf = newRAF;
+        }
+        
+       	if (oldRaf != null) {
+       		oldRaf.close();
+       	}
     }
     
     public void close() throws IOException

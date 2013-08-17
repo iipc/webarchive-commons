@@ -9,12 +9,18 @@ public class StartBoundedStringIterator extends AbstractPeekableIterator<String>
 	private String boundary;
 	private boolean done = false;
 	private boolean started = false;
-
+	private int flip = 1;
+	
 	public StartBoundedStringIterator(Iterator<String> inner, String boundary) {
+		this(inner, boundary, false);
+	}
+
+	public StartBoundedStringIterator(Iterator<String> inner, String boundary, boolean reverse) {
 		this.inner = inner;
 		this.boundary = boundary;
-		done = false;
-		started = false;
+		this.done = false;
+		this.started = false;
+		this.flip = (reverse ? -1 : 1);
 	}
 
 	@Override
@@ -35,10 +41,10 @@ public class StartBoundedStringIterator extends AbstractPeekableIterator<String>
 		while(inner.hasNext()) {
 			String tmp = inner.next();
 			int cmp = boundary.compareTo(tmp);
-			if(cmp > 0) {
+			if ((flip * cmp) > 0) {
 //				System.out.format("Skipping: %s\n", tmp);
 			}
-			if (boundary.compareTo(tmp) <= 0) {
+			if ((boundary.compareTo(tmp) * flip) <= 0) {
 				started = true;
 				return tmp;
 			}

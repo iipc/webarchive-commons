@@ -67,6 +67,15 @@ public class SortedTextFile {
 	{
 		this.factory = factory;
 	}
+	
+	public void reloadFactory()
+	{
+		try {
+	        this.factory.reload();
+        } catch (IOException e) {
+        	LOGGER.warning(e.toString());
+        }
+	}
 
 	public int getBinsearchBlockSize() {
         return binsearchBlockSize;

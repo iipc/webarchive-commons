@@ -68,6 +68,14 @@ public class ApacheHttp31SLR extends HTTPSeekableLineReader {
 	{
 		return url;
 	}
+	
+	public String getConnectedUrl() {
+		if (activeMethod != null) {
+			return activeMethod.getPath();
+		} else {
+			return null;
+		}
+	}
 		
 //	public void seek(long offset, boolean gzip) throws IOException {		
 //		is = doSeekLoad(offset, -1);

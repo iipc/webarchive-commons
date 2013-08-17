@@ -30,4 +30,9 @@ public class RandomAccessFileSeekableLineReaderFactory implements SeekableLineRe
 	{
 		return file.lastModified();
 	}
+	
+	@Override
+    public void reload() throws IOException {
+		//RAF created each time, nothing to reload
+    }
 }

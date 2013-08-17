@@ -7,4 +7,5 @@ public interface SeekableLineReaderFactory {
 	public SeekableLineReader get() throws IOException;
     public void close() throws IOException;
 	public long getModTime();
+	public void reload() throws IOException;
 }

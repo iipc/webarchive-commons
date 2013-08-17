@@ -33,6 +33,7 @@ public abstract class HTTPSeekableLineReader extends AbstractSeekableLineReader 
 	protected String cookie;
 
 	public abstract String getUrl();
+	public abstract String getConnectedUrl();
 
 	public abstract long getSize() throws IOException;
 

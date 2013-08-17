@@ -5,10 +5,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.archive.util.binsearch.SeekableLineReader;
+import org.archive.util.binsearch.SeekableLineReaderIterator;
 import org.archive.util.iterator.AbstractPeekableIterator;
 import org.archive.util.iterator.CloseableIterator;
 
-public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineReader>
+public class SummaryBlockIterator extends AbstractPeekableIterator<CloseableIterator<String>>
 {
 	final static Logger LOGGER = 
 		Logger.getLogger(SummaryBlockIterator.class.getName());
@@ -44,7 +45,7 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 	}
 	
 	@Override
-	public SeekableLineReader getNextInner() {
+	public CloseableIterator<String> getNextInner() {
 					
 		if (isFirst) {
 			if (summaryIterator.hasNext()) {
@@ -60,37 +61,33 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 		if ((params.getMaxBlocks() > 0) && (totalBlocks >= params.getMaxBlocks())) {
 			return null;
 		}
+			
+		int numBlocks = 0;
+		int maxAggregateBlocks = params.getMaxAggregateBlocks();
 		
-		SeekableLineReader currReader = null;
+		long startOffset = nextLine.offset;
+		String currPartId = nextLine.partId;
 		
-		try {
+		int totalLength = 0;
+	
+		do {					
+			currLine = nextLine;
 			
-			int numBlocks = 0;
-			int maxAggregateBlocks = params.getMaxAggregateBlocks();
+			if (currLine == null) {
+				return null;
+			}
 			
-			long startOffset = nextLine.offset;
-			String currPartId = nextLine.partId;
-			
-			int totalLength = 0;
+			if (summaryIterator.hasNext()) {
+				nextLine = new SummaryLine(summaryIterator.next());
+			} else {
+				nextLine = null;
+			}
 		
-			do {					
-				currLine = nextLine;
-				
-				if (currLine == null) {
-					return null;
-				}
-				
-				if (summaryIterator.hasNext()) {
-					nextLine = new SummaryLine(summaryIterator.next());
-				} else {
-					nextLine = null;
-				}
+			if (currLine.getNumFields() < 3) {
+				LOGGER.severe("Bad line(" + currLine.toString() +") ");
+				return null;
+			}
 			
-				if (currLine.getNumFields() < 3) {
-					LOGGER.severe("Bad line(" + currLine.toString() +") ");
-					return null;
-				}
-				
 //				if (currLine.sameTimestamp(nextLine)) {
 //					if (numBlocks == 0) {
 //						continue;
@@ -98,43 +95,40 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<SeekableLineR
 //						break;
 //					}
 //				}
-	
+
 //				if ((currPartId == null) || !currPartId.equals(currLine.partId) || (numBlocks == 0)) {
 //					startOffset = currLine.offset;
 //					totalLength = 0;
 //					currPartId = currLine.partId;
 //				}
-				
-				totalLength += currLine.length;
-				numBlocks++;
-				
-			} while (((maxAggregateBlocks <= 0) || (numBlocks < maxAggregateBlocks)) && 
-					  ((params.getMaxBlocks() <= 0) || (totalBlocks + numBlocks) < params.getMaxBlocks()) 
-					  && currLine.isContinuous(nextLine));
 			
-			if (LOGGER.isLoggable(Level.FINE)) {
-				LOGGER.fine("Loading " + numBlocks + " blocks - " + startOffset + ":" + totalLength + " from " + currPartId);
-			}
+			totalLength += currLine.length;
+			numBlocks++;
 			
-			//currReader = initReader(currPartId);
-			currReader = zipnumIndex.createReader(currPartId);
-			currReader.seekWithMaxRead(startOffset, true, totalLength);
-			
-			totalBlocks += numBlocks;
-				
-		} catch (IOException io) {
-			LOGGER.severe(io.toString());
-			if (currReader != null) {
-				try {
-					currReader.close();
-				} catch (IOException e) {
-	
-				}
-				currReader = null;
-			}
+		} while (((maxAggregateBlocks <= 0) || (numBlocks < maxAggregateBlocks)) && 
+				  ((params.getMaxBlocks() <= 0) || (totalBlocks + numBlocks) < params.getMaxBlocks()) 
+				  && currLine.isContinuous(nextLine));
+		
+		if (LOGGER.isLoggable(Level.FINE)) {
+			LOGGER.fine("Loading " + numBlocks + " blocks - " + startOffset + ":" + totalLength + " from " + currPartId);
 		}
 		
-		return currReader;
+		//currReader = initReader(currPartId);
+		//currReader = zipnumIndex.createReader(currPartId);
+		//currReader.seekWithMaxRead(startOffset, true, totalLength);
+		SeekableLineReader currReader = zipnumIndex.doBlockLoad(currPartId, startOffset, totalLength);
+		
+		if (currReader != null) {
+			totalBlocks += numBlocks;
+		}		
+		
+		CloseableIterator<String> slrIter = new SeekableLineReaderIterator(currReader);
+		
+		if (params.isReverse()) {
+			slrIter = new LineBufferingIterator(slrIter, zipnumIndex.getCdxLinesPerBlock(), true);
+		}
+		
+		return slrIter;
 	}
 		
 //	protected SeekableLineReader initReader(String partId) throws IOException

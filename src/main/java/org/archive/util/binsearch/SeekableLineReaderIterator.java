@@ -14,7 +14,7 @@ public class SeekableLineReaderIterator extends AbstractPeekableIterator<String>
 	@Override
 	public String getNextInner() {
 		String next = null;
-		if(slr != null) {
+		if (slr != null) {
 			try {
 				next = slr.readLine();
 			} catch (IOException e) {

@@ -3,7 +3,6 @@ package org.archive.format.gzip.zipnum;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.iterator.AbstractPeekableIterator;
 import org.archive.util.iterator.CloseableIterator;
 
@@ -15,13 +14,13 @@ public class MultiBlockIterator extends AbstractPeekableIterator<String> {
 	private static final Logger LOGGER = Logger.getLogger(
 			MultiBlockIterator.class.getName());
 
-	private SeekableLineReader currLoader = null;
-	private CloseableIterator<SeekableLineReader> blockItr = null;
+	private CloseableIterator<String> currLoader = null;
+	private CloseableIterator<CloseableIterator<String>> blockItr = null;
 
 	/**
 	 * @param blocks which should be fetched and unzipped, one after another
 	 */
-	public MultiBlockIterator(CloseableIterator<SeekableLineReader> blockItr) {
+	public MultiBlockIterator(CloseableIterator<CloseableIterator<String>> blockItr) {
 		this.blockItr = blockItr;
 	}
 	
@@ -38,12 +37,17 @@ public class MultiBlockIterator extends AbstractPeekableIterator<String> {
 					}
 				}
 				
-				// attempt to read the next line from this:
-				String next = currLoader.readLine();
-				
-				if (next != null) {
+				if (currLoader.hasNext()) {
+					String next = currLoader.next();
 					return next;
 				}
+				
+				// attempt to read the next line from this:
+//				String next = currLoader.readLine();
+//				
+//				if (next != null) {
+//					return next;
+//				}
 		
 				currLoader.close();
 				currLoader = null;

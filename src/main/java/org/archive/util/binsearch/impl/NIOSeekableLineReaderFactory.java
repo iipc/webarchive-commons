@@ -60,4 +60,21 @@ public class NIOSeekableLineReaderFactory implements SeekableLineReaderFactory {
 	{
 		return file.lastModified();
 	}
+
+	@Override
+    public void reload() throws IOException {
+        RandomAccessFile newRAF = new RandomAccessFile(file, "r");
+        FileChannel newFc = raf.getChannel();
+        
+        RandomAccessFile oldRaf = raf;
+        
+        synchronized(this) {
+        	this.raf = newRAF;
+        	this.fc= newFc;
+        }
+        
+       	if (oldRaf != null) {
+       		oldRaf.close();
+       	}
+    }
 }

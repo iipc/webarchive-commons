@@ -31,6 +31,15 @@ public class HTTPURLConnSLR extends HTTPSeekableLineReader {
 	public String getUrl() {
 		return this.url;
 	}
+	
+	@Override
+	public String getConnectedUrl() {
+		if (httpUrlConn != null) {
+			return httpUrlConn.getURL().toString();
+		} else {
+			return null;
+		}
+	}
 
 	@Override
 	public long getSize() throws IOException {

@@ -17,10 +17,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,6 +31,7 @@ import org.archive.util.GeneralURIStreamFactory;
 import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.binsearch.SeekableLineReaderFactory;
 import org.archive.util.binsearch.SeekableLineReaderIterator;
+import org.archive.util.binsearch.impl.HTTPSeekableLineReader;
 import org.archive.util.iterator.CloseableIterator;
 
 public class ZipNumCluster extends ZipNumIndex {
@@ -68,6 +71,12 @@ public class ZipNumCluster extends ZipNumIndex {
 					
 					if (currModTime != lastModTime) {
 						syncLoad(currModTime);
+						
+						Thread.sleep(checkInterval);
+						
+						if (summary != null) {
+							summary.reloadFactory();	
+						}
 					}
 					
 					Thread.sleep(checkInterval);
@@ -113,6 +122,22 @@ public class ZipNumCluster extends ZipNumIndex {
 	protected boolean newIsDisabled = false;
 	protected boolean disabled = false;
 	
+	final static int LOC_CACHE_EXPIRE_MILLIS = 5000;
+	
+	class LocCacheEntry
+	{
+		String loc;
+		long expire;
+		
+		LocCacheEntry(String loc, long expire) { this.loc = loc; this.expire = expire; }
+	}
+	
+	protected ConcurrentHashMap<String, LocCacheEntry> locCacheMap;
+	
+	protected String locPrefix;
+	protected boolean cacheRemoteLoc = false;
+	
+	
 	@Override
 	public void init() throws IOException
 	{
@@ -121,6 +146,10 @@ public class ZipNumCluster extends ZipNumIndex {
 		this.blockSizesFile = locFile.replaceAll(".loc", ".lastblocks");
 		
 		locMap = new HashMap<String, String[]>();
+		
+		if (cacheRemoteLoc) {
+			locCacheMap = new ConcurrentHashMap<String, LocCacheEntry>();
+		}
 		
 		try {
 			locReaderFactory = GeneralURIStreamFactory.createSeekableStreamFactory(locFile, false);
@@ -228,6 +257,22 @@ public class ZipNumCluster extends ZipNumIndex {
 		this.locFile = locFile;
 	}
 	
+	public String getLocPrefix() {
+		return locPrefix;
+	}
+
+	public void setLocPrefix(String locPrefix) {
+		this.locPrefix = locPrefix;
+	}
+
+	public boolean isCacheRemoteLoc() {
+		return cacheRemoteLoc;
+	}
+
+	public void setCacheRemoteLoc(boolean cacheRemoteLoc) {
+		this.cacheRemoteLoc = cacheRemoteLoc;
+	}
+
 	protected Date parseDate(String date)
 	{
 		try {
@@ -452,16 +497,127 @@ public class ZipNumCluster extends ZipNumIndex {
 		
 		if (locations == null) {
 			LOGGER.severe("No locations for block(" + partId +")");
-		} else if (locations != null && locations.length > 0) {
-			for (String location : locations) {
-				try {
-					return blockLoader.createBlockReader(location);
-				} catch (IOException io) {
-					continue;
-				}
+			return null;
+		} 
+		
+		for (String location : locations) {
+			try {
+				return blockLoader.createBlockReader(location);
+			} catch (IOException io) {
+				continue;
 			}
 		}
 		
 		return null;
-	}	
+	}
+	
+	@Override
+	SeekableLineReader doBlockLoad(String partId, long startOffset, int totalLength) {
+		if (cacheRemoteLoc && (locCacheMap != null)) {
+			return loadCachedBalancedReader(partId, startOffset, totalLength);
+		}
+		
+		return super.doBlockLoad(partId, startOffset, totalLength);
+	}
+	
+	protected HTTPSeekableLineReader loadBlockFromUrl(String url, long startOffset, int totalLength) {
+		HTTPSeekableLineReader newReader = null;		
+		
+		try {
+			newReader = blockLoader.getHttpReader(url);
+			newReader.seekWithMaxRead(startOffset, true, totalLength);
+			return newReader;
+		
+		} catch (IOException io) {
+			if (newReader != null) {
+				try {
+					newReader.close();
+				} catch (IOException e) {
+	
+				}
+			}
+			return null;
+		}
+	}
+	
+	protected String locCacheGet(String key)
+	{
+		LocCacheEntry entry = locCacheMap.get(key);
+		
+		if (entry == null) {
+			return null;
+		}
+		
+		if (System.currentTimeMillis() > entry.expire) {
+			locCacheMap.remove(key);
+			return null;
+		}
+		
+		return entry.loc;
+	}
+	
+	protected void locCachePut(String key, String loc)
+	{
+		locCacheMap.put(key, new LocCacheEntry(loc, System.currentTimeMillis() + LOC_CACHE_EXPIRE_MILLIS));
+	}
+	
+	SeekableLineReader loadCachedBalancedReader(String partId, long offset, int length)
+	{
+		HTTPSeekableLineReader reader = null;
+		
+		String cachedUrl = locCacheGet(partId);
+		
+		if (cachedUrl != null) {
+			reader = loadBlockFromUrl(cachedUrl, offset, length);
+		
+			if (reader != null) {
+				return reader;
+			} else {
+				locCacheMap.remove(partId);
+			}
+		}
+		
+		String[] locations = getLocations(partId);
+		
+		if (locations == null) {
+			LOGGER.severe("No locations for block(" + partId +")");
+			return null;
+		}
+		
+		// TODO: better differentiate between http and local.. check if we're actually an http request, otherwise redirect to standard load path
+		if (locations.length > 0 && (locations[0].startsWith("~") || GeneralURIStreamFactory.isHttp(locations[0]))) {
+			return super.doBlockLoad(partId, offset, length);
+		}
+		
+		ArrayList<Integer> indexs = new ArrayList<Integer>();
+		
+		for (int i = 0; i < indexs.size(); i++) {
+			indexs.add(i);
+		}
+		Collections.shuffle(indexs);
+		
+		for (int index : indexs) {
+			String location;
+			
+			if ((locPrefix != null) && (locations[index].startsWith("~"))) {
+				location = locPrefix + locations[index].substring(1);
+			} else {
+				location = locations[index];
+			}
+			
+			reader = loadBlockFromUrl(location, offset, length);
+			
+			if (reader != null) {
+				String connectedUrl = reader.getConnectedUrl();
+				
+				if (connectedUrl != null) {
+					locCachePut(partId, connectedUrl);
+				}
+				
+				return reader;
+			}
+		}
+
+		return reader;
+	}
 }

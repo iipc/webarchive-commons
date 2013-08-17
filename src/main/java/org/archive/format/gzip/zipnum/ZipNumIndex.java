@@ -310,6 +310,13 @@ public class ZipNumIndex implements CDXInputSource {
 		return wrapEndIterator(wrapStartIterator(iter, start), end, inclusive);
 	}
 	
+	public static CloseableIterator<String> wrapReverseIterator(CloseableIterator<String> iter, String start, String end)
+	{
+		iter = new StartBoundedStringIterator(iter, end, true);
+		iter = new BoundedStringIterator(iter, start, false, true);
+		return iter;
+	}
+	
 	public static CloseableIterator<String> wrapStartIterator(CloseableIterator<String> iter, String start)
 	{
 		return new StartBoundedStringIterator(iter, start);
@@ -377,12 +384,16 @@ public class ZipNumIndex implements CDXInputSource {
 		}
 		
 		if (blockLoader.isBufferFully() && (params != null) && (params.getMaxBlocks() > 0)) {
-			LineBufferingIterator lineBufferIter = new LineBufferingIterator(summaryIter, params.getMaxBlocks());
+			LineBufferingIterator lineBufferIter = new LineBufferingIterator(summaryIter, params.getMaxBlocks(), params.isReverse());
 			lineBufferIter.bufferInput();
 			summaryIter = lineBufferIter;
 		}
-				
-		return wrapStartEndIterator(getCDXIterator(summaryIter, params), start, end, false);
+		
+		if (params.isReverse()) {
+			return wrapReverseIterator(getCDXIterator(summaryIter, params), start, end);
+		} else {
+			return wrapStartEndIterator(getCDXIterator(summaryIter, params), start, end, false);
+		}
 	}
 	
 	
@@ -398,11 +409,11 @@ public class ZipNumIndex implements CDXInputSource {
 		summaryIter = wrapPrefix(summaryIter, start, exact);
 		
 		if (blockLoader.isBufferFully() && (params != null) && (params.getMaxBlocks() > 0)) {
-			LineBufferingIterator lineBufferIter = new LineBufferingIterator(summaryIter, params.getMaxBlocks());
+			LineBufferingIterator lineBufferIter = new LineBufferingIterator(summaryIter, params.getMaxBlocks(), params.isReverse());
 			lineBufferIter.bufferInput();
 			summaryIter = lineBufferIter;
 		}
-				
+		
 		return wrapStartIterator(getCDXIterator(summaryIter, params), start);
 	}
 	
@@ -490,6 +501,28 @@ public class ZipNumIndex implements CDXInputSource {
 		String gzFile = pathRoot + partId;
 		
 		return blockLoader.createBlockReader(gzFile);
+	}
+	
+	SeekableLineReader doBlockLoad(String partId, long startOffset, int totalLength) {
+		SeekableLineReader currReader = null;
+		
+		try {
+			currReader = createReader(partId);
+	        currReader.seekWithMaxRead(startOffset, true, totalLength);
+		
+		} catch (IOException io) {
+			LOGGER.severe(io.toString());
+			if (currReader != null) {
+				try {
+					currReader.close();
+				} catch (IOException e) {
+	
+				}
+				currReader = null;
+			}
+		}
+		
+		return currReader;
 	}
 
 	public String getPathRoot() {

@@ -14,12 +14,12 @@ public class SortedTextFile {
 	{
 		@Override
 		public int compare(String arg0, String arg1) {
-			int int0 = Integer.parseInt(arg0);
-			int int1 = Integer.parseInt(arg1);
+			long val0 = Long.parseLong(arg0);
+			long val1 = Long.parseLong(arg1);
 			
-			if (int0 < int1) {
+			if (val0 < val1) {
 				return -1;
-			} else if (int0 == int1) {
+			} else if (val0 == val1) {
 				return 0;
 			} else {
 				return 1;

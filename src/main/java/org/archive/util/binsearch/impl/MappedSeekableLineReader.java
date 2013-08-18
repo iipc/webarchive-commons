@@ -46,7 +46,6 @@ public class MappedSeekableLineReader extends AbstractSeekableLineReader {
 
     @Override
     protected void doClose() throws IOException {
-        //bbis = null;
-        //bbis.close();
+        bbis = null;
     }
 }

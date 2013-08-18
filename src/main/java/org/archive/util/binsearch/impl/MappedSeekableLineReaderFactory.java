@@ -16,7 +16,7 @@ public class MappedSeekableLineReaderFactory implements
 
     private File file;
     //private FileChannel fc;
-    private RandomAccessFile raf;
+    //private RandomAccessFile raf;
     private ByteBufferInputStream bbis;
     
     private int blockSize;
@@ -28,46 +28,39 @@ public class MappedSeekableLineReaderFactory implements
     public MappedSeekableLineReaderFactory(File file, int blockSize) throws IOException {
         this.file = file;
         this.blockSize = blockSize;
-        this.raf = new RandomAccessFile(file,"r");
-        
-        FileChannel fc = raf.getChannel();
-        this.bbis = ByteBufferInputStream.map(fc);
+        reload();
+    }
+    
+    protected synchronized ByteBufferInputStream getBbis()
+    {
+    	return bbis;
+    }
+    
+    protected synchronized void setBbis(ByteBufferInputStream newBbis)
+    {
+    	bbis = newBbis;
     }
 
-    public SeekableLineReader get() throws IOException {
-        return new MappedSeekableLineReader(bbis.copy(), blockSize);
+    public SeekableLineReader get() throws IOException {    	
+        return new MappedSeekableLineReader(getBbis(), blockSize);
     }
     
     public void reload() throws IOException
     {
         RandomAccessFile newRAF = new RandomAccessFile(file, "r");
        
-        FileChannel newFc = raf.getChannel();
-        ByteBufferInputStream newBbis = ByteBufferInputStream.map(newFc);
-        
-        RandomAccessFile oldRaf = raf;
-     
-        synchronized(this) {
-        	this.bbis = newBbis;
-        	this.raf = newRAF;
-        }
-        
-       	if (oldRaf != null) {
-       		oldRaf.close();
-       	}
+        FileChannel newFc = newRAF.getChannel();
+        setBbis(ByteBufferInputStream.map(newFc));
+        newRAF.close();
     }
     
     public void close() throws IOException
     {
-        if (raf != null) {
-            raf.close();
-        }
+    	this.bbis = null;
     }
     
     public long getModTime()
     {
         return file.lastModified();
     }
-
-
 }

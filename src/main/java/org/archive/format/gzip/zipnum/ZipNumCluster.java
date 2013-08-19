@@ -585,13 +585,13 @@ public class ZipNumCluster extends ZipNumIndex {
 		}
 		
 		// TODO: better differentiate between http and local.. check if we're actually an http request, otherwise redirect to standard load path
-		if (locations.length > 0 && !(locations[0].startsWith("~") || GeneralURIStreamFactory.isHttp(locations[0]))) {
+		if ((locations.length > 0) && !locations[0].startsWith("~") && !GeneralURIStreamFactory.isHttp(locations[0])) {
 			return super.doBlockLoad(partId, offset, length);
 		}
 		
 		ArrayList<Integer> indexs = new ArrayList<Integer>();
 		
-		for (int i = 0; i < indexs.size(); i++) {
+		for (int i = 0; i < locations.length; i++) {
 			indexs.add(i);
 		}
 		Collections.shuffle(indexs);

@@ -31,10 +31,10 @@ public abstract class HTTPSeekableLineReader extends AbstractSeekableLineReader 
 	
 	protected boolean noKeepAlive;
 	protected String cookie;
+	protected String connectedUrl;
 
 	public abstract String getUrl();
-	public abstract String getConnectedUrl();
-
+	
 	public abstract long getSize() throws IOException;
 
 	public abstract String getHeaderValue(String headerName);
@@ -71,5 +71,9 @@ public abstract class HTTPSeekableLineReader extends AbstractSeekableLineReader 
 	public void setNoKeepAlive(boolean noKeepAlive) {
 		this.noKeepAlive = noKeepAlive;
 	}
-
+	
+	public String getConnectedUrl()
+	{
+		return connectedUrl;
+	}
 }

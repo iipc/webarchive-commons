@@ -378,14 +378,11 @@ public class SortedTextFile {
 	    	prev = line;
 	    }
 	    
-	    if (!lessThan) {
-	    	prev = null;
-	    } else {
+	    if (lessThan && prev != null) {
 	    	offset -= prev.getBytes().length + 1;
-	 	}
+	    }
 	    
-	    // To allow for skipping the line, in case we're not on the boundary
-	    return (offset - 2);
+	    return offset;
 	}
 	
 	private CloseableIterator<String> search(SeekableLineReader slr, 

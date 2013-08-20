@@ -122,20 +122,42 @@ public class ZipNumCluster extends ZipNumIndex {
 	protected boolean newIsDisabled = false;
 	protected boolean disabled = false;
 	
-	final static int LOC_CACHE_EXPIRE_MILLIS = 5000;
+	final static int DEFAULT_LOC_CACHE_EXPIRE_MILLIS = 5000;
 	
 	class LocCacheEntry
 	{
 		String loc;
 		long expire;
 		
-		LocCacheEntry(String loc, long expire) { this.loc = loc; this.expire = expire; }
+		LocCacheEntry(String loc, long expire) 
+		{ 
+			this.loc = loc;
+			this.expire = expire; 
+		}
+		
+		public boolean equals(Object obj)
+		{
+			if (obj == null) {
+				return false;
+			}
+			
+			if (obj instanceof String) {
+				return loc.equals(obj);
+			}
+			
+			if (obj instanceof LocCacheEntry) {
+				return loc.equals(((LocCacheEntry)obj).loc);
+			}
+			
+			return false;
+		}
 	}
 	
 	protected ConcurrentHashMap<String, LocCacheEntry> locCacheMap;
 	
-	protected String locPrefix;
 	protected boolean cacheRemoteLoc = false;
+
+	protected int locCacheExpireMillis = DEFAULT_LOC_CACHE_EXPIRE_MILLIS;
 	
 	
 	@Override
@@ -257,12 +279,12 @@ public class ZipNumCluster extends ZipNumIndex {
 		this.locFile = locFile;
 	}
 	
-	public String getLocPrefix() {
-		return locPrefix;
+	public int getLocCacheExpireMillis() {
+		return locCacheExpireMillis;
 	}
 
-	public void setLocPrefix(String locPrefix) {
-		this.locPrefix = locPrefix;
+	public void setLocCacheExpireMillis(int locCacheExpireMillis) {
+		this.locCacheExpireMillis = locCacheExpireMillis;
 	}
 
 	public boolean isCacheRemoteLoc() {
@@ -558,7 +580,7 @@ public class ZipNumCluster extends ZipNumIndex {
 	
 	protected void locCachePut(String key, String loc)
 	{
-		locCacheMap.put(key, new LocCacheEntry(loc, System.currentTimeMillis() + LOC_CACHE_EXPIRE_MILLIS));
+		locCacheMap.putIfAbsent(key, new LocCacheEntry(loc, System.currentTimeMillis() + locCacheExpireMillis));
 	}
 	
 	SeekableLineReader loadCachedBalancedReader(String partId, long offset, int length)
@@ -573,7 +595,7 @@ public class ZipNumCluster extends ZipNumIndex {
 			if (reader != null) {
 				return reader;
 			} else {
-				locCacheMap.remove(partId);
+				locCacheMap.remove(partId, cachedUrl);
 			}
 		}
 		
@@ -584,8 +606,8 @@ public class ZipNumCluster extends ZipNumIndex {
 			return null;
 		}
 		
-		// TODO: better differentiate between http and local.. check if we're actually an http request, otherwise redirect to standard load path
-		if ((locations.length > 0) && !locations[0].startsWith("~") && !GeneralURIStreamFactory.isHttp(locations[0])) {
+		// Non-http requests follow standard load path
+		if ((locations.length > 0) && !GeneralURIStreamFactory.isHttp(locations[0])) {
 			return super.doBlockLoad(partId, offset, length);
 		}
 		
@@ -594,18 +616,12 @@ public class ZipNumCluster extends ZipNumIndex {
 		for (int i = 0; i < locations.length; i++) {
 			indexs.add(i);
 		}
-		Collections.shuffle(indexs);
+		if (locations.length > 1) {
+			Collections.shuffle(indexs);
+		}
 		
-		for (int index : indexs) {
-			String location;
-			
-			if ((locPrefix != null) && (locations[index].startsWith("~"))) {
-				location = locPrefix + locations[index].substring(1);
-			} else {
-				location = locations[index];
-			}
-			
-			reader = loadBlockFromUrl(location, offset, length);
+		for (int index : indexs) {			
+			reader = loadBlockFromUrl(locations[index], offset, length);
 			
 			if (reader != null) {
 				String connectedUrl = reader.getConnectedUrl();

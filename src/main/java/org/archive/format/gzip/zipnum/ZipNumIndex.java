@@ -8,6 +8,7 @@ import org.archive.util.GeneralURIStreamFactory;
 import org.archive.util.binsearch.FieldExtractingSLR;
 import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.binsearch.SortedTextFile;
+import org.archive.util.io.RuntimeIOException;
 import org.archive.util.iterator.BoundedStringIterator;
 import org.archive.util.iterator.CloseableIterator;
 import org.archive.util.iterator.StartBoundedStringIterator;
@@ -21,6 +22,8 @@ public class ZipNumIndex implements CDXInputSource {
 	protected int binsearchBlockSize = 8192;
 	protected int readaheadSize = 512;
 	protected SortedTextFile summary;
+	
+	protected boolean required = true;
 	
 	protected ZipNumBlockLoader blockLoader;
 	
@@ -512,6 +515,7 @@ public class ZipNumIndex implements CDXInputSource {
 		
 		} catch (IOException io) {
 			LOGGER.severe(io.toString());
+			
 			if (currReader != null) {
 				try {
 					currReader.close();
@@ -519,6 +523,10 @@ public class ZipNumIndex implements CDXInputSource {
 	
 				}
 				currReader = null;
+			}
+			
+			if (isRequired()) {
+				throw new RuntimeIOException(io);
 			}
 		}
 		
@@ -531,5 +539,13 @@ public class ZipNumIndex implements CDXInputSource {
 
 	public void setPathRoot(String pathRoot) {
 		this.pathRoot = pathRoot;
+	}
+
+	public boolean isRequired() {
+		return required;
+	}
+
+	public void setRequired(boolean required) {
+		this.required = required;
 	}
 }

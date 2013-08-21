@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.binsearch.SeekableLineReaderIterator;
+import org.archive.util.io.RuntimeIOException;
 import org.archive.util.iterator.AbstractPeekableIterator;
 import org.archive.util.iterator.CloseableIterator;
 
@@ -118,11 +119,15 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<CloseableIter
 		//currReader.seekWithMaxRead(startOffset, true, totalLength);
 		SeekableLineReader currReader = zipnumIndex.doBlockLoad(currPartId, startOffset, totalLength);
 		
+		if ((currReader == null) && zipnumIndex.isRequired()) {
+			throw new RuntimeIOException();
+		}
+		
 		if (currReader != null) {
 			totalBlocks += numBlocks;
-		}		
+		}	
 		
-		CloseableIterator<String> slrIter = new SeekableLineReaderIterator(currReader);
+		CloseableIterator<String> slrIter = new SeekableLineReaderIterator(currReader, zipnumIndex.isRequired());
 		
 		if (params.isReverse()) {
 			slrIter = new LineBufferingIterator(slrIter, zipnumIndex.getCdxLinesPerBlock(), true);

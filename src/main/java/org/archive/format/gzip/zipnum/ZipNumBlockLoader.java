@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.archive.util.GeneralURIStreamFactory;
+import org.archive.util.HMACSigner;
 import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.binsearch.SeekableLineReaderFactory;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReader;
@@ -20,6 +21,12 @@ public class ZipNumBlockLoader {
 	
 	protected Map<String, SeekableLineReaderFactory> fileFactoryMap = null;
 	protected HTTPSeekableLineReaderFactory httpFactory = null;
+	
+	// Request signing
+	final static int DEFAULT_SIG_DURATION_SECS = 10;
+	
+	protected HMACSigner signer;
+	protected int signDurationSecs = DEFAULT_SIG_DURATION_SECS;
 	
 	protected boolean useNio = false;
 	protected String httpLib = HttpLibs.APACHE_31.name();
@@ -96,7 +103,17 @@ public class ZipNumBlockLoader {
 		HTTPSeekableLineReader reader = httpFactory.get(url);
 		reader.setBufferFully(bufferFully);
 		reader.setNoKeepAlive(noKeepAlive);
-		reader.setCookie(cookie);
+		
+		String reqCookie = cookie;
+		
+		if (signer != null) {
+			reqCookie = signer.getHMacCookieStr(null, signDurationSecs);
+		}
+		
+		if (reqCookie != null) {
+			reader.setCookie(reqCookie);
+		}
+		
 		return reader;
 	}
 	
@@ -227,5 +244,21 @@ public class ZipNumBlockLoader {
 
 	public void setCookie(String cookie) {
 		this.cookie = cookie;
+	}
+
+	public HMACSigner getSigner() {
+		return signer;
+	}
+
+	public void setSigner(HMACSigner signer) {
+		this.signer = signer;
+	}
+
+	public int getSignDurationSecs() {
+		return signDurationSecs;
+	}
+
+	public void setSignDurationSecs(int signDurationSecs) {
+		this.signDurationSecs = signDurationSecs;
 	}
 }

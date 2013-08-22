@@ -87,6 +87,11 @@ public class HMACSigner {
 		return digest;
 	}
 	
+	public String getHMacCookieStr(long durationSecs)
+	{
+		return getHMacCookieStr(null, durationSecs);
+	}
+	
 	public String getHMacCookieStr(String id, long durationSecs)
 	{
 		boolean includeId = (id != null && !id.isEmpty());

@@ -511,57 +511,41 @@ public class ZipNumCluster extends ZipNumIndex {
 	public boolean isDisabled() {
 		return this.disabled;
 	}
-	
+		
 	@Override
-	SeekableLineReader createReader(String partId) throws IOException
-	{		
+	SeekableLineReader doBlockLoad(String partId, long startOffset, int totalLength) {
+		
+		SeekableLineReader reader = null;
+		
 		String[] locations = getLocations(partId);
 		
 		if (locations == null) {
 			LOGGER.severe("No locations for block(" + partId +")");
 			return null;
-		} 
+		}
+		
+		// Attempt cached load for http
+		if (cacheRemoteLoc && (locCacheMap != null)) {
+			// Non-http requests follow standard load path
+			if ((locations.length > 0) && !GeneralURIStreamFactory.isHttp(locations[0])) {
+				reader = loadCachedBalancedReader(partId, locations, startOffset, totalLength);
+			}
+		}
+		
+		if (reader != null) {
+			return reader;
+		}
 		
 		for (String location : locations) {
-			try {
-				return blockLoader.createBlockReader(location);
-			} catch (IOException io) {
-				continue;
+			reader = attemptLoadReader(location, startOffset, totalLength);
+			if (reader != null) {
+				return reader;
 			}
 		}
 		
 		return null;
 	}
-	
-	@Override
-	SeekableLineReader doBlockLoad(String partId, long startOffset, int totalLength) {
-		if (cacheRemoteLoc && (locCacheMap != null)) {
-			return loadCachedBalancedReader(partId, startOffset, totalLength);
-		}
 		
-		return super.doBlockLoad(partId, startOffset, totalLength);
-	}
-	
-	protected HTTPSeekableLineReader loadBlockFromUrl(String url, long startOffset, int totalLength) {
-		HTTPSeekableLineReader newReader = null;		
-		
-		try {
-			newReader = blockLoader.getHttpReader(url);
-			newReader.seekWithMaxRead(startOffset, true, totalLength);
-			return newReader;
-		
-		} catch (IOException io) {
-			if (newReader != null) {
-				try {
-					newReader.close();
-				} catch (IOException e) {
-	
-				}
-			}
-			return null;
-		}
-	}
-	
 	protected String locCacheGet(String key)
 	{
 		LocCacheEntry entry = locCacheMap.get(key);
@@ -583,32 +567,20 @@ public class ZipNumCluster extends ZipNumIndex {
 		locCacheMap.putIfAbsent(key, new LocCacheEntry(loc, System.currentTimeMillis() + locCacheExpireMillis));
 	}
 	
-	SeekableLineReader loadCachedBalancedReader(String partId, long offset, int length)
+	SeekableLineReader loadCachedBalancedReader(String partId, String[] locations, long offset, int length)
 	{
-		HTTPSeekableLineReader reader = null;
+		SeekableLineReader reader = null;
 		
 		String cachedUrl = locCacheGet(partId);
 		
 		if (cachedUrl != null) {
-			reader = loadBlockFromUrl(cachedUrl, offset, length);
+			reader = super.attemptLoadReader(cachedUrl, offset, length);
 		
 			if (reader != null) {
 				return reader;
 			} else {
 				locCacheMap.remove(partId, cachedUrl);
 			}
-		}
-		
-		String[] locations = getLocations(partId);
-		
-		if (locations == null) {
-			LOGGER.severe("No locations for block(" + partId +")");
-			return null;
-		}
-		
-		// Non-http requests follow standard load path
-		if ((locations.length > 0) && !GeneralURIStreamFactory.isHttp(locations[0])) {
-			return super.doBlockLoad(partId, offset, length);
 		}
 		
 		ArrayList<Integer> indexs = new ArrayList<Integer>();
@@ -620,11 +592,11 @@ public class ZipNumCluster extends ZipNumIndex {
 			Collections.shuffle(indexs);
 		}
 		
-		for (int index : indexs) {			
-			reader = loadBlockFromUrl(locations[index], offset, length);
+		for (int index : indexs) {
+			reader = super.attemptLoadReader(locations[index], offset, length);
 			
 			if (reader != null) {
-				String connectedUrl = reader.getConnectedUrl();
+				String connectedUrl = ((HTTPSeekableLineReader)reader).getConnectedUrl();
 				
 				if (connectedUrl != null) {
 					locCachePut(partId, connectedUrl);

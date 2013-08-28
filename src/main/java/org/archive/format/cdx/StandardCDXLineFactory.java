@@ -14,7 +14,7 @@ public class StandardCDXLineFactory implements CDXLineFactory, CDXFieldConstants
 	public final static FieldSplitFormat cdx11 = new FieldSplitFormat(urlkey, timestamp, original, mimetype, statuscode, digest, redirect, robotflags, length, offset, filename);
 	
 	// Matches cdx format: CDX N b a m s k r V g
-	public final static FieldSplitFormat cdx09 = new FieldSplitFormat(timestamp, original, mimetype, statuscode, digest, redirect, offset, filename);
+	public final static FieldSplitFormat cdx09 = new FieldSplitFormat(urlkey, timestamp, original, mimetype, statuscode, digest, redirect, offset, filename);
 
 	protected final FieldSplitFormat parseFormat;
 	

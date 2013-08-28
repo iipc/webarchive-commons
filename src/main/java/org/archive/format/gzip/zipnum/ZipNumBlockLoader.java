@@ -107,7 +107,7 @@ public class ZipNumBlockLoader {
 		String reqCookie = cookie;
 		
 		if (signer != null) {
-			reqCookie = signer.getHMacCookieStr(null, signDurationSecs);
+			reqCookie = signer.getHMacCookieStr(signDurationSecs);
 		}
 		
 		if (reqCookie != null) {

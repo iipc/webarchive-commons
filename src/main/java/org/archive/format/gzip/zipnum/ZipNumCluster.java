@@ -537,7 +537,7 @@ public class ZipNumCluster extends ZipNumIndex {
 		}
 		
 		for (String location : locations) {
-			reader = attemptLoadReader(location, startOffset, totalLength);
+			reader = blockLoader.attemptLoadBlock(location, startOffset, totalLength, true, isRequired());
 			if (reader != null) {
 				return reader;
 			}
@@ -574,7 +574,7 @@ public class ZipNumCluster extends ZipNumIndex {
 		String cachedUrl = locCacheGet(partId);
 		
 		if (cachedUrl != null) {
-			reader = super.attemptLoadReader(cachedUrl, offset, length);
+			reader = blockLoader.attemptLoadBlock(cachedUrl, offset, length, true, isRequired());
 		
 			if (reader != null) {
 				return reader;
@@ -593,7 +593,7 @@ public class ZipNumCluster extends ZipNumIndex {
 		}
 		
 		for (int index : indexs) {
-			reader = super.attemptLoadReader(locations[index], offset, length);
+			reader = blockLoader.attemptLoadBlock(locations[index], offset, length, true, isRequired());
 			
 			if (reader != null) {
 				String connectedUrl = ((HTTPSeekableLineReader)reader).getConnectedUrl();

@@ -1,7 +1,6 @@
 package org.archive.format.gzip.zipnum;
 
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.archive.format.cdx.CDXInputSource;
@@ -9,7 +8,6 @@ import org.archive.util.GeneralURIStreamFactory;
 import org.archive.util.binsearch.FieldExtractingSLR;
 import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.binsearch.SortedTextFile;
-import org.archive.util.io.RuntimeIOException;
 import org.archive.util.iterator.BoundedStringIterator;
 import org.archive.util.iterator.CloseableIterator;
 import org.archive.util.iterator.StartBoundedStringIterator;
@@ -506,40 +504,9 @@ public class ZipNumIndex implements CDXInputSource {
 		return gzFile;
 	}
 	
-	SeekableLineReader attemptLoadReader(String location, long startOffset, int totalLength)
-	{
-		SeekableLineReader currReader = null;
-		
-		try {
-			currReader = blockLoader.createBlockReader(location);
-			
-	        currReader.seekWithMaxRead(startOffset, true, totalLength);
-		
-		} catch (IOException io) {
-			if (LOGGER.isLoggable(Level.SEVERE)) {
-				LOGGER.log(Level.SEVERE, io.toString() + " -- " + location + " " + startOffset + ":" + totalLength + " req? " + isRequired());
-			}
-			
-			if (currReader != null) {
-				try {
-					currReader.close();
-				} catch (IOException e) {
-	
-				}
-				currReader = null;
-			}
-			
-			if (isRequired()) {
-				throw new RuntimeIOException(io);
-			}
-		}
-		
-		return currReader;		
-	}
-	
 	SeekableLineReader doBlockLoad(String partId, long startOffset, int totalLength) {
 		String path = getReaderPath(partId);
-		return attemptLoadReader(path, startOffset, totalLength);
+		return blockLoader.attemptLoadBlock(path, startOffset, totalLength, true, this.isRequired());
 	}
 
 	public String getPathRoot() {

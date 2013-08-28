@@ -516,7 +516,9 @@ public class ZipNumIndex implements CDXInputSource {
 	        currReader.seekWithMaxRead(startOffset, true, totalLength);
 		
 		} catch (IOException io) {
-			LOGGER.log(Level.SEVERE, location + " " + ":" + totalLength + " req? " + isRequired(), io);
+			if (LOGGER.isLoggable(Level.SEVERE)) {
+				LOGGER.log(Level.SEVERE, io.toString() + " -- " + location + " " + startOffset + ":" + totalLength + " req? " + isRequired());
+			}
 			
 			if (currReader != null) {
 				try {

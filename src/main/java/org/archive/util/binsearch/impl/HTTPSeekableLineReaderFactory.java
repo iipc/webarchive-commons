@@ -128,4 +128,6 @@ public abstract class HTTPSeekableLineReaderFactory implements SeekableLineReade
 	{
 		
 	}
+
+	public abstract void setNumRetries(int numRetries);
 }

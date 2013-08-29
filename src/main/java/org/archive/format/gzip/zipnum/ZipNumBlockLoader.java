@@ -154,7 +154,7 @@ public class ZipNumBlockLoader {
 			Level level = (isRequired ? Level.SEVERE : Level.WARNING);
 			
 			if (LOGGER.isLoggable(level)) {
-				LOGGER.log(level, io.toString() + " -- -r " + startOffset + ":" + (startOffset + totalLength - 1) + " " + location + " req? " + isRequired);
+				LOGGER.log(level, io.toString() + " -- -r " + startOffset + "-" + (startOffset + totalLength - 1) + " " + location + " req? " + isRequired);
 			}
 			
 			if (currReader != null) {

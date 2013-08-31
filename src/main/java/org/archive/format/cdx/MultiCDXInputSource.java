@@ -46,9 +46,15 @@ public class MultiCDXInputSource implements CDXInputSource {
 		}
 	};
 	
+	Comparator<String> reverseComparator = new Comparator<String>() {
+		public int compare(String s1, String s2) {
+			return -s1.compareTo(s2);
+		}
+	};
+	
 	public CloseableIterator<String> getCDXIterator(String key, String prefix, boolean exact, ZipNumParams params) throws IOException {
 		
-		SortedCompositeIterator<String> scitr = new SortedCompositeIterator<String>(cdx.size(), comparator);
+		SortedCompositeIterator<String> scitr = new SortedCompositeIterator<String>(cdx.size(), params.isReverse() ? reverseComparator : comparator);
 		
 		CloseableIterator<String> iter = null;
 		
@@ -67,7 +73,7 @@ public class MultiCDXInputSource implements CDXInputSource {
 	
 	public CloseableIterator<String> getCDXIterator(String key, String start, String end, ZipNumParams params) throws IOException {
 		
-		SortedCompositeIterator<String> scitr = new SortedCompositeIterator<String>(cdx.size(), comparator);
+		SortedCompositeIterator<String> scitr = new SortedCompositeIterator<String>(cdx.size(), params.isReverse() ? reverseComparator : comparator);
 		
 		CloseableIterator<String> iter = null;
 		

@@ -12,6 +12,11 @@ public class ZipNumParams
 	    
 	}
 	
+	public ZipNumParams(ZipNumParams defaults)
+	{
+		this(defaults.maxAggregateBlocks, defaults.maxBlocks, defaults.timestampDedupLength, defaults.reverse);
+	}
+	
 	public ZipNumParams(int maxAggregateBlocks, int maxBlocks, int timestampDedupLength, boolean reverse)
 	{
 	    this.maxAggregateBlocks = maxAggregateBlocks;

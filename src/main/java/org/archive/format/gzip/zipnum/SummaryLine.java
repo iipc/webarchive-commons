@@ -2,7 +2,7 @@ package org.archive.format.gzip.zipnum;
 
 import org.archive.format.cdx.FieldSplitLine;
 
-class SummaryLine extends FieldSplitLine
+public class SummaryLine extends FieldSplitLine
 {
 	String partId;		
 	long offset;

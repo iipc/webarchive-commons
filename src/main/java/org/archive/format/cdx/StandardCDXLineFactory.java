@@ -38,4 +38,15 @@ public class StandardCDXLineFactory implements CDXLineFactory, CDXFieldConstants
 	{
 		return parseFormat;
 	}
+	
+	public CDXLine createStandardCDXLine(String input, FieldSplitFormat exFormat)
+	{
+		if (parseFormat == cdx11) {
+			return new CDX11Line(input, exFormat);
+		} else if (parseFormat == cdx09) {
+			return new CDX09Line(input, exFormat);
+		} else {
+			return new CDXLine(input, exFormat);
+		}
+	}
 }

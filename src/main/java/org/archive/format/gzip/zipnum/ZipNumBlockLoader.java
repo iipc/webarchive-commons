@@ -43,7 +43,7 @@ public class ZipNumBlockLoader {
 	protected int connectTimeoutMS = 10000;
 	protected int readTimeoutMS = 10000;
 	
-	protected int numRetries = 0;
+	protected int numRetries = -1;
 	
 	protected boolean staleChecking = false;
 
@@ -102,7 +102,10 @@ public class ZipNumBlockLoader {
 			httpFactory.setConnectionTimeoutMS(connectTimeoutMS);
 			httpFactory.setSocketTimeoutMS(readTimeoutMS);
 			httpFactory.setStaleChecking(staleChecking);
-			httpFactory.setNumRetries(numRetries);
+			
+			if (numRetries >= 0) {
+				httpFactory.setNumRetries(numRetries);
+			}
 		}
 		
 		HTTPSeekableLineReader reader = httpFactory.get(url);

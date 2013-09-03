@@ -111,6 +111,10 @@ public class FieldSplitLine {
 	public String getField(int index) {
 		return fields.get(index);
 	}
+	
+	public String setField(int index, String value) {
+		return fields.set(index, value);
+	}	
 
 	public int getNumFields() {
 		return fields.size();

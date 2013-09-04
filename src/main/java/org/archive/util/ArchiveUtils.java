@@ -258,6 +258,15 @@ public class ArchiveUtils {
         return TIMESTAMP14ISO8601Z.get().format(date);
     }
     
+    public static Date parse14DigitISODate(String datetime, Date defaultVal)
+    {
+    	try {
+	        return TIMESTAMP14ISO8601Z.get().parse(datetime);
+        } catch (ParseException e) {
+        	return defaultVal;
+        }
+    }
+    
     /**
      * Utility function for creating arc-style date stamps
      * in the format yyyyMMddHHmmssSSS.

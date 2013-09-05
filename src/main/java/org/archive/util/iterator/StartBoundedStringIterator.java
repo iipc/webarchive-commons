@@ -41,16 +41,9 @@ public class StartBoundedStringIterator extends AbstractPeekableIterator<String>
 		while(inner.hasNext()) {
 			String tmp = inner.next();
 			
-			boolean cond;
-			int cmp = boundary.compareTo(tmp);
+			int cmp = boundary.compareTo(tmp) * flip;
 			
-			if (flip > 0) {
-				cond = (cmp <= 0);
-			} else {
-				cond = ((cmp >= 0) || tmp.startsWith(boundary));
-			}
-			
-			if (cond) {
+			if ((cmp <= 0)) {
 				started = true;
 				return tmp;
 			}

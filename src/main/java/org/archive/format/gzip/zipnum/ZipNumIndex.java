@@ -392,7 +392,7 @@ public class ZipNumIndex implements CDXInputSource {
 		}
 		
 		if (params.isReverse()) {
-			return wrapReverseIterator(getCDXIterator(summaryIter, params), start, end);
+			return wrapReverseIterator(getCDXIterator(summaryIter, params), start, endKey(key));
 		} else {
 			return wrapStartEndIterator(getCDXIterator(summaryIter, params), start, end, false);
 		}

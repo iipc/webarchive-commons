@@ -35,6 +35,10 @@ public class CDXLine extends FieldSplitLine implements CDXFieldConstants {
 	public String getStatusCode() {
 		return super.getField(CDXLine.statuscode);
 	}
+	
+	public void setStatusCode(String newStatus) {
+		setField(CDXLine.statuscode, newStatus);
+	}
 
 	public String getDigest() {
 		return super.getField(CDXLine.digest);

@@ -198,7 +198,11 @@ public class ZipNumIndex implements CDXInputSource {
 		int endLineNumber = extractLineCount(startEndIdx[1]) + 1;
 		int totalLines = endLineNumber - firstLineNumber;
 		
-		int numPages = (totalLines / pageSize) + 1;
+		int numPages = ((totalLines - 1) / pageSize) + 1;
+		
+		if (numPages < 1) {
+			numPages = 1;
+		}
 		
 		if (numPagesOnly) {
 			return new PageResult(null, numPages);

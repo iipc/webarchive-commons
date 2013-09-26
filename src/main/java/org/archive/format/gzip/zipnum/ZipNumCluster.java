@@ -527,7 +527,7 @@ public class ZipNumCluster extends ZipNumIndex {
 		// Attempt cached load for http
 		if (cacheRemoteLoc && (locCacheMap != null)) {
 			// Non-http requests follow standard load path
-			if ((locations.length > 0) && !GeneralURIStreamFactory.isHttp(locations[0])) {
+			if ((locations.length > 0) && GeneralURIStreamFactory.isHttp(locations[0])) {
 				reader = loadCachedBalancedReader(partId, locations, startOffset, totalLength);
 			}
 		}

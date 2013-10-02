@@ -39,7 +39,7 @@ public abstract class HTTPSeekableLineReader extends AbstractSeekableLineReader 
 
 	public abstract String getHeaderValue(String headerName);
 	
-	public String makeRangeHeader(long offset, int maxLength)
+	public static String makeRangeHeader(long offset, int maxLength)
 	{
 		StringBuilder builder = new StringBuilder(32);
 		builder.append("bytes=");

@@ -39,7 +39,7 @@ public class ApacheHttp31SLRFactory extends HTTPSeekableLineReaderFactory {
     }
 	
 	@Override
-	public HTTPSeekableLineReader get(String url) throws IOException {
+	public ApacheHttp31SLR get(String url) throws IOException {
 		
 		if (LOGGER.isLoggable(Level.FINEST)) {
 			LOGGER.finest("Connections: " + connectionManager.getConnectionsInPool(hostConfiguration));

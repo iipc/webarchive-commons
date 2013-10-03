@@ -122,7 +122,15 @@ public class ZipNumCluster extends ZipNumIndex {
 	protected boolean newIsDisabled = false;
 	protected boolean disabled = false;
 	
-	final static int DEFAULT_LOC_CACHE_EXPIRE_MILLIS = 5000;
+	//final static int DEFAULT_LOC_CACHE_EXPIRE_MILLIS = 120000;
+	
+	protected ConcurrentHashMap<String, LocCacheEntry> locCacheMap;
+	
+	protected boolean cacheRemoteLoc = false;
+
+	protected int locCacheExpireMillis = 120000;
+	
+	protected int locCacheMaxDuration = 1000;
 	
 	class LocCacheEntry
 	{
@@ -151,14 +159,7 @@ public class ZipNumCluster extends ZipNumIndex {
 			
 			return false;
 		}
-	}
-	
-	protected ConcurrentHashMap<String, LocCacheEntry> locCacheMap;
-	
-	protected boolean cacheRemoteLoc = false;
-
-	protected int locCacheExpireMillis = DEFAULT_LOC_CACHE_EXPIRE_MILLIS;
-	
+	}	
 	
 	@Override
 	public void init() throws IOException
@@ -285,6 +286,14 @@ public class ZipNumCluster extends ZipNumIndex {
 
 	public void setLocCacheExpireMillis(int locCacheExpireMillis) {
 		this.locCacheExpireMillis = locCacheExpireMillis;
+	}
+
+	public int getLocCacheMaxDuration() {
+		return locCacheMaxDuration;
+	}
+
+	public void setLocCacheMaxDuration(int locCacheMaxDuration) {
+		this.locCacheMaxDuration = locCacheMaxDuration;
 	}
 
 	public boolean isCacheRemoteLoc() {
@@ -525,25 +534,19 @@ public class ZipNumCluster extends ZipNumIndex {
 		}
 		
 		// Attempt cached load for http
-		if (cacheRemoteLoc && (locCacheMap != null)) {
-			// Non-http requests follow standard load path
-			if ((locations.length > 0) && GeneralURIStreamFactory.isHttp(locations[0])) {
-				reader = loadCachedBalancedReader(partId, locations, startOffset, totalLength);
+		if (cacheRemoteLoc && (locCacheMap != null) && (locations.length > 0) && GeneralURIStreamFactory.isHttp(locations[0])) {
+			reader = loadCachedBalancedReader(partId, locations, startOffset, totalLength);
+		} else {
+		// Standard block load path
+			for (String location : locations) {
+				reader = blockLoader.attemptLoadBlock(location, startOffset, totalLength, true, isRequired());
+				if (reader != null) {
+					return reader;
+				}
 			}
 		}
 		
-		if (reader != null) {
-			return reader;
-		}
-		
-		for (String location : locations) {
-			reader = blockLoader.attemptLoadBlock(location, startOffset, totalLength, true, isRequired());
-			if (reader != null) {
-				return reader;
-			}
-		}
-		
-		return null;
+		return reader;
 	}
 		
 	protected String locCacheGet(String key)
@@ -574,12 +577,18 @@ public class ZipNumCluster extends ZipNumIndex {
 		String cachedUrl = locCacheGet(partId);
 		
 		if (cachedUrl != null) {
+			long start = System.currentTimeMillis();
+			
 			reader = blockLoader.attemptLoadBlock(cachedUrl, offset, length, true, isRequired());
 		
+			long duration = System.currentTimeMillis() - start;
+			
+			if ((reader == null) || (duration > locCacheMaxDuration)) {
+				locCacheMap.remove(partId, cachedUrl);
+			}
+			
 			if (reader != null) {
 				return reader;
-			} else {
-				locCacheMap.remove(partId, cachedUrl);
 			}
 		}
 		
@@ -593,12 +602,16 @@ public class ZipNumCluster extends ZipNumIndex {
 		}
 		
 		for (int index : indexs) {
+			long start = System.currentTimeMillis();
+			
 			reader = blockLoader.attemptLoadBlock(locations[index], offset, length, true, isRequired());
+			
+			long duration = System.currentTimeMillis() - start;
 			
 			if (reader != null) {
 				String connectedUrl = ((HTTPSeekableLineReader)reader).getConnectedUrl();
 				
-				if (connectedUrl != null) {
+				if ((duration < locCacheMaxDuration) && (connectedUrl != null)) {
 					locCachePut(partId, connectedUrl);
 				}
 				

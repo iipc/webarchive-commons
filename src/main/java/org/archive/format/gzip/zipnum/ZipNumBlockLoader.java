@@ -15,7 +15,6 @@ import org.archive.util.binsearch.SeekableLineReaderFactory;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReader;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReaderFactory;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReaderFactory.HttpLibs;
-import org.archive.util.io.RuntimeIOException;
 
 public class ZipNumBlockLoader {
 		
@@ -169,9 +168,9 @@ public class ZipNumBlockLoader {
 				currReader = null;
 			}
 			
-			if (isRequired) {
-				throw new RuntimeIOException(io);
-			}
+//			if (isRequired) {
+//				throw new RuntimeIOException(io);
+//			}
 		}
 		
 		return currReader;

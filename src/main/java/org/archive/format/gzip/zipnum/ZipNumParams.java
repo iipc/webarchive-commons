@@ -6,6 +6,7 @@ public class ZipNumParams
 	protected int timestampDedupLength = 0;
 	protected int maxBlocks = 0;
 	private boolean reverse = false;
+	private boolean sequential = false;
 	
 	public ZipNumParams()
 	{
@@ -55,5 +56,13 @@ public class ZipNumParams
 	
 	public void setReverse(boolean reverse) {
 		this.reverse  = reverse;
+	}
+
+	public boolean isSequential() {
+		return sequential;
+	}
+
+	public void setSequential(boolean sequential) {
+		this.sequential = sequential;
 	}
 }

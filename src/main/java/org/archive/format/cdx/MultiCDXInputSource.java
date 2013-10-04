@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import org.archive.format.gzip.zipnum.ZipNumIndex;
 import org.archive.format.gzip.zipnum.ZipNumParams;
+import org.archive.util.iterator.CloseableCompositeIterator;
 import org.archive.util.iterator.CloseableIterator;
 import org.archive.util.iterator.SortedCompositeIterator;
 
@@ -70,8 +71,35 @@ public class MultiCDXInputSource implements CDXInputSource {
 		return scitr;
 	}
 	
+	public CloseableIterator<String> createSeqIterator(String key, String start, String end, ZipNumParams params)
+	{
+		CloseableCompositeIterator<String> composite = new CloseableCompositeIterator<String>();
+		CloseableIterator<String> iter = null;
+		
+		for (CDXInputSource cdxReader : cdx) {
+			try {
+				iter = cdxReader.getCDXIterator(key, start, end, params);
+				
+				if (!params.isReverse()) {
+					composite.addLast(iter);
+				} else {
+					composite.addFirst(iter);
+				}
+				
+			} catch (IOException io) {
+				LOGGER.warning(io.toString());
+			}
+		}
+		
+		return composite;
+	}
+	
 	
 	public CloseableIterator<String> getCDXIterator(String key, String start, String end, ZipNumParams params) throws IOException {
+		
+		if (params.isSequential()) {
+			return this.createSeqIterator(key, start, end, params);
+		}
 		
 		SortedCompositeIterator<String> scitr = new SortedCompositeIterator<String>(cdx.size(), params.isReverse() ? reverseComparator : comparator);
 		

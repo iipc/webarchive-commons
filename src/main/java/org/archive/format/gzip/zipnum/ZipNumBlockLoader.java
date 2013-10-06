@@ -155,8 +155,18 @@ public class ZipNumBlockLoader {
 		} catch (IOException io) {
 			Level level = (isRequired ? Level.SEVERE : Level.WARNING);
 			
+			String actualLocation = null;
+			
+			if (currReader instanceof HTTPSeekableLineReader) {
+				actualLocation = ((HTTPSeekableLineReader)currReader).getConnectedUrl();
+			}
+			
+			if (actualLocation == null) {
+				actualLocation = location;
+			}
+			
 			if (LOGGER.isLoggable(level)) {
-				LOGGER.log(level, io.toString() + " -- -r " + startOffset + "-" + (startOffset + totalLength - 1) + " " + location + " req? " + isRequired);
+				LOGGER.log(level, io.toString() + " -- -r " + startOffset + "-" + (startOffset + totalLength - 1) + " " + actualLocation + " req? " + isRequired);
 			}
 			
 			if (currReader != null) {

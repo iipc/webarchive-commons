@@ -602,6 +602,11 @@ public class ZipNumCluster extends ZipNumIndex {
 		}
 		
 		for (int index : indexs) {
+			// Skip failed cached url
+			if (cachedUrl != null && locations[index].equals(cachedUrl)) {
+				continue;
+			}
+			
 			long start = System.currentTimeMillis();
 			
 			reader = blockLoader.attemptLoadBlock(locations[index], offset, length, true, isRequired());

@@ -20,7 +20,7 @@ package org.archive.url;
 
 import gnu.inet.encoding.IDNA;
 import gnu.inet.encoding.IDNAException;
-import it.unimi.dsi.mg4j.util.MutableString;
+import it.unimi.dsi.lang.MutableString;
 
 import java.io.UnsupportedEncodingException;
 import java.util.BitSet;

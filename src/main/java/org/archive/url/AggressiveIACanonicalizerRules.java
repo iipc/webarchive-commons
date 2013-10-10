@@ -1,7 +1,13 @@
 package org.archive.url;
 
 public class AggressiveIACanonicalizerRules extends CanonicalizeRules {
-	public AggressiveIACanonicalizerRules() {
+	
+	public AggressiveIACanonicalizerRules()
+	{
+		this(true);
+	}
+	
+	public AggressiveIACanonicalizerRules(boolean stripSlash) {
 		
 		setRule(SCHEME_SETTINGS, SCHEME_LOWERCASE);
 		setRule(HOST_SETTINGS,
@@ -10,9 +16,13 @@ public class AggressiveIACanonicalizerRules extends CanonicalizeRules {
 		setRule(PORT_SETTINGS,
 				PORT_STRIP_DEFAULT);
 		
-		setRule(PATH_SETTINGS,
-				PATH_LOWERCASE|PATH_STRIP_SESSION_ID|
-				PATH_STRIP_TRAILING_SLASH_UNLESS_EMPTY);
+		int pathSettings = PATH_LOWERCASE|PATH_STRIP_SESSION_ID;
+		
+		if (stripSlash) {
+			pathSettings |= PATH_STRIP_TRAILING_SLASH_UNLESS_EMPTY;
+		}
+		
+		setRule(PATH_SETTINGS, pathSettings);
 
 		setRule(QUERY_SETTINGS,
 				QUERY_LOWERCASE|QUERY_STRIP_SESSION_ID|QUERY_STRIP_EMPTY|

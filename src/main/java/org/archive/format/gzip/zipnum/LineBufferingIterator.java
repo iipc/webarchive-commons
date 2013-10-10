@@ -10,13 +10,15 @@ public class LineBufferingIterator implements CloseableIterator<String> {
 	
 	protected CloseableIterator<String> inner;
 	protected int maxLines;
+	protected boolean reverse;
 	
 	protected Iterator<String> currIter;
 	
-	public LineBufferingIterator(CloseableIterator<String> inner, int maxLines)
+	public LineBufferingIterator(CloseableIterator<String> inner, int maxLines, boolean reverse)
 	{
 		this.inner = inner;
 		this.maxLines = maxLines;
+		this.reverse = reverse;
 	}
 		
 	public void bufferInput()
@@ -27,11 +29,24 @@ public class LineBufferingIterator implements CloseableIterator<String> {
 		
 		LinkedList<String> lineBuffer = new LinkedList<String>();
 		
-		while (inner.hasNext() && (lineBuffer.size() < maxLines)) {
-			lineBuffer.add(inner.next());
+		if (!reverse) {
+			while (inner.hasNext() && (lineBuffer.size() < maxLines)) {
+				lineBuffer.addLast(inner.next());
+			}
+			
+			currIter = lineBuffer.iterator();
+		} else {
+			while (inner.hasNext()) {
+				lineBuffer.addLast(inner.next());
+				
+				if (lineBuffer.size() > maxLines) {
+					lineBuffer.removeFirst();
+				}
+			}
+			
+			currIter = lineBuffer.descendingIterator();	
 		}
 		
-		currIter = lineBuffer.iterator();
 		
 		try {
 			inner.close();

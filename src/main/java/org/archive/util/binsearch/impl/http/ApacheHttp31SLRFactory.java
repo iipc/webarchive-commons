@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
@@ -28,7 +29,6 @@ public class ApacheHttp31SLRFactory extends HTTPSeekableLineReaderFactory {
     	connectionManager = new MultiThreadedHttpConnectionManager();
     	hostConfiguration = new HostConfiguration();
 		HttpClientParams params = new HttpClientParams();
-//        params.setParameter(HttpClientParams.RETRY_HANDLER, new NoRetryHandler());
     	http = new HttpClient(params,connectionManager);
     	http.setHostConfiguration(hostConfiguration);
     }
@@ -39,7 +39,7 @@ public class ApacheHttp31SLRFactory extends HTTPSeekableLineReaderFactory {
     }
 	
 	@Override
-	public HTTPSeekableLineReader get(String url) throws IOException {
+	public ApacheHttp31SLR get(String url) throws IOException {
 		
 		if (LOGGER.isLoggable(Level.FINEST)) {
 			LOGGER.finest("Connections: " + connectionManager.getConnectionsInPool(hostConfiguration));
@@ -176,4 +176,9 @@ public class ApacheHttp31SLRFactory extends HTTPSeekableLineReaderFactory {
 		
 		return 0;
 	}
+
+	@Override
+    public void setNumRetries(int numRetries) {
+		http.getParams().setParameter(HttpClientParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler(numRetries, true));
+    }
 }

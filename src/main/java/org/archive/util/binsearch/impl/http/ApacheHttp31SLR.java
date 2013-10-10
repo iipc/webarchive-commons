@@ -68,7 +68,7 @@ public class ApacheHttp31SLR extends HTTPSeekableLineReader {
 	{
 		return url;
 	}
-		
+			
 //	public void seek(long offset, boolean gzip) throws IOException {		
 //		is = doSeekLoad(offset, -1);
 //				
@@ -129,6 +129,8 @@ public class ApacheHttp31SLR extends HTTPSeekableLineReader {
 			if ((code != 206) && (code != 200)) {
 				throw new BadHttpStatusException(code, url + " " + rangeHeader);
 			}
+			
+			connectedUrl = activeMethod.getURI().toString();
 			
 			InputStream is = activeMethod.getResponseBodyAsStream();
 			cin = new CountingInputStream(is);

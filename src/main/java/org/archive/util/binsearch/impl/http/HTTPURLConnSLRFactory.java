@@ -85,4 +85,9 @@ public class HTTPURLConnSLRFactory extends HTTPSeekableLineReaderFactory {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+    public void setNumRetries(int numRetries) {
+	    // TODO Auto-generated method stub
+    }
 }

@@ -5,14 +5,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.archive.util.GeneralURIStreamFactory;
+import org.archive.util.HMACSigner;
 import org.archive.util.binsearch.SeekableLineReader;
 import org.archive.util.binsearch.SeekableLineReaderFactory;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReader;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReaderFactory;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReaderFactory.HttpLibs;
+import org.archive.util.io.RuntimeIOException;
 
 public class ZipNumBlockLoader {
 		
@@ -20,6 +23,12 @@ public class ZipNumBlockLoader {
 	
 	protected Map<String, SeekableLineReaderFactory> fileFactoryMap = null;
 	protected HTTPSeekableLineReaderFactory httpFactory = null;
+	
+	// Request signing
+	final static int DEFAULT_SIG_DURATION_SECS = 10;
+	
+	protected HMACSigner signer;
+	protected int signDurationSecs = DEFAULT_SIG_DURATION_SECS;
 	
 	protected boolean useNio = false;
 	protected String httpLib = HttpLibs.APACHE_31.name();
@@ -33,6 +42,8 @@ public class ZipNumBlockLoader {
 	
 	protected int connectTimeoutMS = 10000;
 	protected int readTimeoutMS = 10000;
+	
+	protected int numRetries = -1;
 	
 	protected boolean staleChecking = false;
 
@@ -91,12 +102,26 @@ public class ZipNumBlockLoader {
 			httpFactory.setConnectionTimeoutMS(connectTimeoutMS);
 			httpFactory.setSocketTimeoutMS(readTimeoutMS);
 			httpFactory.setStaleChecking(staleChecking);
+			
+			if (numRetries >= 0) {
+				httpFactory.setNumRetries(numRetries);
+			}
 		}
 		
 		HTTPSeekableLineReader reader = httpFactory.get(url);
 		reader.setBufferFully(bufferFully);
 		reader.setNoKeepAlive(noKeepAlive);
-		reader.setCookie(cookie);
+		
+		String reqCookie = cookie;
+		
+		if (signer != null) {
+			reqCookie = signer.getHMacCookieStr(signDurationSecs);
+		}
+		
+		if (reqCookie != null) {
+			reader.setCookie(reqCookie);
+		}
+		
 		return reader;
 	}
 	
@@ -117,6 +142,39 @@ public class ZipNumBlockLoader {
 		SeekableLineReader reader = factory.get();
 		reader.setBufferFully(bufferFully);
 		return reader;
+	}
+	
+	public SeekableLineReader attemptLoadBlock(String location, long startOffset, int totalLength, boolean decompress, boolean isRequired)
+	{
+		SeekableLineReader currReader = null;
+		
+		try {
+			currReader = createBlockReader(location);
+			
+	        currReader.seekWithMaxRead(startOffset, decompress, totalLength);
+		
+		} catch (IOException io) {
+			Level level = (isRequired ? Level.SEVERE : Level.WARNING);
+			
+			if (LOGGER.isLoggable(level)) {
+				LOGGER.log(level, io.toString() + " -- -r " + startOffset + "-" + (startOffset + totalLength - 1) + " " + location + " req? " + isRequired);
+			}
+			
+			if (currReader != null) {
+				try {
+					currReader.close();
+				} catch (IOException e) {
+	
+				}
+				currReader = null;
+			}
+			
+			if (isRequired) {
+				throw new RuntimeIOException(io);
+			}
+		}
+		
+		return currReader;
 	}
 	
 	public void closeFileFactory(String filename) throws IOException
@@ -203,6 +261,14 @@ public class ZipNumBlockLoader {
 		this.readTimeoutMS = readTimeoutMS;
 	}
 	
+	public int getNumRetries() {
+		return numRetries;
+	}
+
+	public void setNumRetries(int numRetries) {
+		this.numRetries = numRetries;
+	}
+
 	public void setStaleChecking(boolean staleChecking)
 	{
 		this.staleChecking = staleChecking;
@@ -227,5 +293,21 @@ public class ZipNumBlockLoader {
 
 	public void setCookie(String cookie) {
 		this.cookie = cookie;
+	}
+
+	public HMACSigner getSigner() {
+		return signer;
+	}
+
+	public void setSigner(HMACSigner signer) {
+		this.signer = signer;
+	}
+
+	public int getSignDurationSecs() {
+		return signDurationSecs;
+	}
+
+	public void setSignDurationSecs(int signDurationSecs) {
+		this.signDurationSecs = signDurationSecs;
 	}
 }

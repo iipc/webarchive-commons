@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 
-import org.archive.util.binsearch.SeekableLineReader;
+import org.archive.util.binsearch.AbstractSeekableLineReader;
 
 import com.google.common.io.LimitInputStream;
 
-public class RandomAccessFileSeekableLineReader extends SeekableLineReader {
+public class RandomAccessFileSeekableLineReader extends AbstractSeekableLineReader {
 	
 	private RandomAccessFile raf;
 

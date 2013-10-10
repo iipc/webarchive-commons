@@ -17,7 +17,7 @@ import org.archive.streamcontext.Stream;
 import org.archive.util.binsearch.SeekableLineReaderFactory;
 import org.archive.util.binsearch.impl.HDFSSeekableLineReaderFactory;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReaderFactory;
-import org.archive.util.binsearch.impl.NIOSeekableLineReaderFactory;
+import org.archive.util.binsearch.impl.MappedSeekableLineReaderFactory;
 import org.archive.util.binsearch.impl.RandomAccessFileSeekableLineReaderFactory;
 
 public class GeneralURIStreamFactory {
@@ -52,7 +52,7 @@ public class GeneralURIStreamFactory {
 			fs = FileSystem.get(c);
 		} else {
 			Configuration c = new Configuration();
-			c.set("fs.default.name", defaultFSURI);
+			c.set(FileSystem.FS_DEFAULT_NAME_KEY, defaultFSURI);
 			try {
 				fs = FileSystem.get(new URI(defaultFSURI),c);
 			} catch (URISyntaxException e) {
@@ -73,12 +73,17 @@ public class GeneralURIStreamFactory {
 		return uri.startsWith("http://");
 	}
 	
+	public static boolean isFileURI(String uri)
+	{
+		return uri.startsWith("file://");
+	}
+	
 	public static Stream createStream(String uri) throws IOException
 	{
 		if (isHttp(uri)) {
 			return new HTTP11Stream(new URL(uri));
 		} else if (isHdfs(uri)) {
-			return new HDFSStream(initHdfs().open(new Path(uri)));			
+			return new HDFSStream(initHdfs().open(new Path(uri)));	
 		} else {
 			return new RandomAccessFileStream(new File(uri));
 		}
@@ -94,16 +99,37 @@ public class GeneralURIStreamFactory {
 		}
 	}
 	
-	public static SeekableLineReaderFactory createSeekableStreamFactory(String uri, boolean useNio) throws IOException
+    public static SeekableLineReaderFactory createSeekableStreamFactory(String uri, boolean useNio) throws IOException
+	{
+        return createSeekableStreamFactory(uri, SeekableLineReaderFactory.BINSEARCH_BLOCK_SIZE, useNio);
+	}	
+	
+	public static SeekableLineReaderFactory createSeekableStreamFactory(String uri, int blockSize, boolean useNio) throws IOException
 	{
 		if (isHttp(uri)) {
 			return HTTPSeekableLineReaderFactory.getHttpFactory(uri);
 		} else if (isHdfs(uri)) {
-			return new HDFSSeekableLineReaderFactory(initHdfs(), new Path(uri));			
-		} else if (useNio) {
-			return new NIOSeekableLineReaderFactory(new File(uri));
+			return new HDFSSeekableLineReaderFactory(initHdfs(), new Path(uri));
 		} else {
-			return new RandomAccessFileSeekableLineReaderFactory(new File(uri));
+			
+			File file = null;
+			
+			if (isFileURI(uri)) {
+				try {
+					file = new File(new URI(uri));
+				} catch (URISyntaxException e) {
+					file = new File(uri);
+				}
+			} else {
+				file = new File(uri);
+			}
+			
+			if (useNio) {
+				//return new NIOSeekableLineReaderFactory(file);
+			    return new MappedSeekableLineReaderFactory(file, blockSize);
+			} else {
+				return new RandomAccessFileSeekableLineReaderFactory(file, blockSize);
+			}
 		}
 	}
 }

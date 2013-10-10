@@ -31,7 +31,7 @@ public class HTTPURLConnSLR extends HTTPSeekableLineReader {
 	public String getUrl() {
 		return this.url;
 	}
-
+	
 	@Override
 	public long getSize() throws IOException {
 		return 0;
@@ -80,6 +80,8 @@ public class HTTPURLConnSLR extends HTTPSeekableLineReader {
 		if ((code != 206) && (code != 200)) {
 			throw new BadHttpStatusException(code, url + " " + rangeHeader);
 		}
+		
+		connectedUrl =  httpUrlConn.getURL().toString();
 		
 		InputStream is = httpUrlConn.getInputStream();
 		cin = new CountingInputStream(is);

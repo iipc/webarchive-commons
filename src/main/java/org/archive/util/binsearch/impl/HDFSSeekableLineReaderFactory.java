@@ -41,4 +41,9 @@ public class HDFSSeekableLineReaderFactory implements SeekableLineReaderFactory 
 			return 0;
 		}
 	}
+	@Override
+    public void reload() throws IOException {
+	    // TODO Auto-generated method stub
+	    
+    }
 }

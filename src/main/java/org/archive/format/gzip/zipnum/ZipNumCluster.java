@@ -1,33 +1,42 @@
 package org.archive.format.gzip.zipnum;
+/**
+ * ZipNumCluster
+ * 
+ * A ZipNumIndex representing multiple shards which can be loaded dynamically. The shard locations are loaded dynamically
+ * from a specified file and can be reloaded at a specified internval.
+ *   Files used
+ *   - ALL.loc - a required file specifying <shard>\t<location uri>[\t<more location uris>]
+ *   - ALL.lastblocks - a file specifying size of last blocks in each shard. This is optional and only used for size calculation.
+ * 
+ */
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.archive.format.cdx.CDXInputSource;
+import org.archive.util.ArchiveUtils;
+import org.archive.util.GeneralURIStreamFactory;
 import org.archive.util.binsearch.SeekableLineReader;
-import org.archive.util.binsearch.SortedTextFile;
-import org.archive.util.iterator.BoundedStringIterator;
+import org.archive.util.binsearch.SeekableLineReaderFactory;
+import org.archive.util.binsearch.SeekableLineReaderIterator;
+import org.archive.util.binsearch.impl.HTTPSeekableLineReader;
 import org.archive.util.iterator.CloseableIterator;
-import org.archive.util.iterator.StartBoundedStringIterator;
 
-public class ZipNumCluster implements CDXInputSource {
+public class ZipNumCluster extends ZipNumIndex {
+	
 	final static Logger LOGGER = Logger.getLogger(ZipNumCluster.class.getName());
-
-	private String clusterRoot;
-		
-	protected String summaryFile;
-	protected SortedTextFile summary;
-	
-	protected String locFile;
-	
-	protected ZipNumBlockLoader blockLoader;
-	
-	//protected HashMap<String, String[]> locMap = null;
-	protected LocationUpdater locationUpdater = null;
-		
-	protected final static boolean DEFAULT_USE_NIO = true;
-	
-	protected boolean useNio = DEFAULT_USE_NIO;
 	
 	protected final static CloseableIterator<String> EMPTY_ITERATOR = new CloseableIterator<String>()
 	{
@@ -49,114 +58,422 @@ public class ZipNumCluster implements CDXInputSource {
 		@Override
 		public void close() throws IOException {
 			
-		}	
+		}
 	};
 	
-	public ZipNumCluster()
+	private class LocationUpdater implements Runnable
 	{
-		
-	}
-	
-	public ZipNumCluster(String clusterUri) throws IOException
-	{
-		this.clusterRoot = clusterUri;
-	}
+		@Override
+		public void run() {
+			try {
+				while (true) {
+					long currModTime = locReaderFactory.getModTime();
 					
-	public void init() throws IOException {
-		
-		if (summaryFile != null) {
-			this.summary = new SortedTextFile(summaryFile, useNio);
-		}
+					if (currModTime != lastModTime) {
+						syncLoad(currModTime);
 						
-		if (blockLoader == null) {
-			this.blockLoader = new ZipNumBlockLoader();
-		}
-		
-		if (locFile != null) {
-			this.locationUpdater = new LocationUpdater(locFile, this.blockLoader);
-		}
-	}
+						Thread.sleep(checkInterval);
+						
+						if (summary != null) {
+							summary.reloadFactory();	
+						}
+					}
+					
+					Thread.sleep(checkInterval);
+				}
+			} catch (InterruptedException ie) {
 				
-	protected static int extractLineCount(String line)
-	{
-		return (int)extractLongField(line, 4);
+			}
+		}
 	}
 	
-	protected static long extractLongField (String line, int index)
+	protected HashMap<String, String[]> locMap = null;
+	protected SeekableLineReaderFactory locReaderFactory = null;
+	protected String locFile;
+	
+	protected long lastModTime = 0;
+	
+	protected int checkInterval = 30000;
+	
+	protected Thread updaterThread;
+	
+	
+	public final static String EARLIEST_TIMESTAMP = "_EARLIEST";
+	public final static String LATEST_TIMESTAMP = "_LATEST";	
+	public final static String OFF = "OFF";
+	
+	protected SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	protected Date startDate, endDate;
+	
+	class BlockSize
 	{
-		String[] parts = line.split("\t");
+		String urltimestamp;
+		long count;
+	}
+	
+	protected BlockSize[] lastBlockSizes = new BlockSize[0];
+	protected String blockSizesFile;
+	
+	protected String locRoot = null, newLocRoot = null;
+	
+	protected long totalAdjustment = 0;
+	
+	protected Date newStartDate, newEndDate;
+	protected boolean newIsDisabled = false;
+	protected boolean disabled = false;
+	
+	final static int DEFAULT_LOC_CACHE_EXPIRE_MILLIS = 5000;
+	
+	class LocCacheEntry
+	{
+		String loc;
+		long expire;
 		
-		if (parts.length <= index) {
-			return -1;
+		LocCacheEntry(String loc, long expire) 
+		{ 
+			this.loc = loc;
+			this.expire = expire; 
 		}
 		
-		long count = -1;
+		public boolean equals(Object obj)
+		{
+			if (obj == null) {
+				return false;
+			}
+			
+			if (obj instanceof String) {
+				return loc.equals(obj);
+			}
+			
+			if (obj instanceof LocCacheEntry) {
+				return loc.equals(((LocCacheEntry)obj).loc);
+			}
+			
+			return false;
+		}
+	}
+	
+	protected ConcurrentHashMap<String, LocCacheEntry> locCacheMap;
+	
+	protected boolean cacheRemoteLoc = false;
+
+	protected int locCacheExpireMillis = DEFAULT_LOC_CACHE_EXPIRE_MILLIS;
+	
+	
+	@Override
+	public void init() throws IOException
+	{
+		super.init();
+		
+		this.blockSizesFile = locFile.replaceAll(".loc", ".lastblocks");
+		
+		locMap = new HashMap<String, String[]>();
+		
+		if (cacheRemoteLoc) {
+			locCacheMap = new ConcurrentHashMap<String, LocCacheEntry>();
+		}
 		
 		try {
-			count = Long.parseLong(parts[index]);
-		} catch (NumberFormatException n) {
+			locReaderFactory = GeneralURIStreamFactory.createSeekableStreamFactory(locFile, false);
+			lastModTime = locReaderFactory.getModTime();
+		
+			loadPartLocations(locMap);
 
+		} catch (IOException io) {
+			LOGGER.warning("Exception on Load -- Disabling Cluster! " + io.toString());
+			disabled = true;
+			return;
 		}
 		
-		return count;
+		disabled = newIsDisabled;
+		startDate = newStartDate;
+		endDate = newEndDate;
+		locRoot = newLocRoot;
+		
+		if (!disabled) {
+			this.loadLastBlockSizes(blockSizesFile);
+		}
+		
+		if (checkInterval > 0) {
+			updaterThread = new Thread(new LocationUpdater(), "LocationUpdaterThread");
+			updaterThread.start();
+		}
 	}
-
 	
-	public String getClusterPart(String partId)
+	protected void syncLoad(long newModTime)
 	{
-		if (clusterRoot == null) {
-			int lastSlash = summaryFile.lastIndexOf('/');
-			clusterRoot = this.summaryFile.substring(0, lastSlash + 1);
+		HashMap<String, String[]> destMap = new HashMap<String, String[]>();
+		
+		try {
+			loadPartLocations(destMap);
+		} catch (IOException e) {
+			LOGGER.warning(e.toString());
+			return;
 		}
 		
-		if (!partId.endsWith(".gz")) {
-			partId += ".gz";
+		if (!disabled) {
+			this.loadLastBlockSizes(blockSizesFile);
 		}
 		
-		return clusterRoot + partId;
-	}
-	
-	public int getNumLines(String[] blocks)
-	{
-		if (blocks.length < 2) {
-			return 0;
+		if (LOGGER.isLoggable(Level.INFO)) {
+			LOGGER.info("*** Location Update: " + locFile);
 		}
 		
-		int lastLine = -1;
-		int line = -1;
+		ArrayList<String[]> filesToClose = new ArrayList<String[]>();
 		
-		int size = 0;
-		
-		for (String block : blocks) {
-			lastLine = line;
-			line = extractLineCount(block);
+		synchronized (this) {
+			for (Entry<String, String[]> files : destMap.entrySet()) {
+				String[] existingFiles = locMap.get(files.getKey());
 				
-			if (lastLine >= 0) {
-				size += (line - lastLine);
+				String[] newFiles = files.getValue();
+				
+				if ((existingFiles != null) && !Arrays.equals(existingFiles, newFiles)) {					
+					filesToClose.add(existingFiles);
+				}
+				
+				locMap.put(files.getKey(), newFiles);
+			}
+			
+			//locMap.putAll(destMap);
+			
+			startDate = newStartDate;
+			endDate = newEndDate;
+			disabled = newIsDisabled;
+			locRoot = newLocRoot;
+		}
+		
+		closeExistingFiles(filesToClose);
+		
+		lastModTime = newModTime;
+	}
+	
+	private void closeExistingFiles(ArrayList<String[]> filesToClose) {
+		for (String[] files : filesToClose) {
+			for (String file : files) {
+				try {
+					blockLoader.closeFileFactory(file);
+				} catch (IOException e) {
+					LOGGER.warning(e.toString());
+				}
+			}
+		}
+	}
+
+	public synchronized String[] getLocations(String key)
+	{
+		return locMap.get(key);
+	}
+	
+	public String getLocRoot()
+	{
+		return locRoot;
+	}
+	
+	public String getLocFile()
+	{
+		return locFile;
+	}
+	
+	public void setLocFile(String locFile)
+	{
+		this.locFile = locFile;
+	}
+	
+	public int getLocCacheExpireMillis() {
+		return locCacheExpireMillis;
+	}
+
+	public void setLocCacheExpireMillis(int locCacheExpireMillis) {
+		this.locCacheExpireMillis = locCacheExpireMillis;
+	}
+
+	public boolean isCacheRemoteLoc() {
+		return cacheRemoteLoc;
+	}
+
+	public void setCacheRemoteLoc(boolean cacheRemoteLoc) {
+		this.cacheRemoteLoc = cacheRemoteLoc;
+	}
+
+	protected Date parseDate(String date)
+	{
+		try {
+			return dateFormat.parse(date);
+		} catch (ParseException e) {
+			return null;
+		}
+	}
+	
+	public boolean dateRangeCheck(String key)
+	{
+		// Allow a cluster to be "disabled" by specifying an empty ALL.loc
+		if (disabled) {
+			return false;
+		}
+		
+		if ((startDate == null) && (endDate == null)) {
+			return true;
+		}
+		
+		int spaceIndex = key.indexOf(' ');
+		if (spaceIndex < 0) {
+			return true;
+		}
+		
+		String dateStr = key.substring(spaceIndex + 1);
+		Date reqDate = null;
+		
+		try {
+			reqDate = ArchiveUtils.getDate(dateStr);
+		} catch (ParseException e) {
+			return true;
+		}
+		
+		if ((startDate != null) && reqDate.before(startDate)) {
+			return false;
+		}
+		
+		if ((endDate != null) && reqDate.after(endDate)) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	protected void loadLastBlockSizes(String filename)
+	{
+		BufferedReader reader = null;
+		
+		String line = null;
+		
+		List<BlockSize> list = new ArrayList<BlockSize>();
+		totalAdjustment = 0;
+		
+		try {
+			reader = new BufferedReader(new FileReader(filename));
+			
+			while ((line = reader.readLine()) != null) {
+				String[] splits = line.split("\t");
+				
+				BlockSize block = new BlockSize();
+				block.count = Long.parseLong(splits[1]);
+				block.urltimestamp = splits[2];
+				list.add(block);
+				totalAdjustment += block.count;
+			}
+		} catch (Exception e) {
+			LOGGER.warning(e.toString());
+
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					LOGGER.warning(e.toString());
+				}
 			}
 		}
 		
-		return size;
+		lastBlockSizes = list.toArray(new BlockSize[list.size()]);
 	}
 	
-	public long getTotalLength(String[] blocks)
-	{	
-		long size = 0;
-		
-		for (String block : blocks) {
-			size += extractLongField(block, 3);
-		}
-		
-		return size;
-	}
-	
-	// Adjust from shorter blocks, if loaded
-	public long getTotalLines(int cdxPerBlock)
+	protected void loadPartLocations(HashMap<String, String[]> destMap) throws IOException
 	{
-		if (locationUpdater == null) {
+		SeekableLineReaderIterator lines = null;
+		
+		newStartDate = newEndDate = null;
+		newIsDisabled = false;
+		
+		try {
+			
+			lines = new SeekableLineReaderIterator(locReaderFactory.get());
+			
+			while (lines.hasNext()) {
+				String line = lines.next();
+				
+				if (line.isEmpty()) {
+					continue;
+				}
+				
+				String[] parts = line.split("\\t");
+				
+				if (parts[0].equals(OFF)) {
+					newIsDisabled = true;
+					break;
+				}
+				
+				if (parts.length < 2) {
+					String msg = "Bad line(" + line + ") in (" + locFile + ")";
+					LOGGER.warning(msg);
+					continue;
+				}
+				
+				if (parts[0].equals(EARLIEST_TIMESTAMP)) {
+					newStartDate = parseDate(parts[1]);
+					continue;
+				} else if (parts[0].equals(LATEST_TIMESTAMP)) {
+					newEndDate = parseDate(parts[1]);
+					continue;
+				}
+				
+				String locations[] = new String[parts.length - 1];
+				
+				if (newLocRoot == null) {
+					int lastSlash = parts[1].lastIndexOf('/');
+					newLocRoot = parts[1].substring(0, lastSlash + 1);
+				}
+			
+				for (int i = 1; i < parts.length; i++) {
+					locations[i-1] = parts[i];
+				}
+				
+				destMap.put(parts[0], locations);
+			}
+		} finally {
+			if (lines != null) {
+				lines.close();
+			}
+		}
+	}
+
+	public int getCheckInterval() {
+		return checkInterval;
+	}
+
+	public void setCheckInterval(int checkInterval) {
+		this.checkInterval = checkInterval;
+	}
+
+	public long getTotalAdjustment() {
+		return totalAdjustment;
+	}
+
+	public int getNumBlocks() {
+		return lastBlockSizes.length;
+	}
+	
+	public long getLastBlockDiff(String startKey, int startPart, int endPart) {
+		if (startPart >= lastBlockSizes.length || endPart >= lastBlockSizes.length) {
 			return 0;
 		}
 		
+		if (startKey.equals(lastBlockSizes[startPart].urltimestamp)) {
+			startPart++;
+		}
+		
+		long diff = 0;
+		
+		for (int i = startPart; i < endPart; i++) {
+			diff += lastBlockSizes[i].count;
+			diff -= this.getCdxLinesPerBlock();
+		}
+		
+		return diff;
+	}
+	
+	// Adjust from shorter blocks, if loaded
+	public long getTotalLines()
+	{		
 		long numLines = 0;
 		
 		try {
@@ -166,252 +483,129 @@ public class ZipNumCluster implements CDXInputSource {
 			return 0;
 		}
 		
-		long adjustment = locationUpdater.getTotalAdjustment();
-		numLines -= (locationUpdater.getNumBlocks() - 1);
-		numLines *= cdxPerBlock;
+		long adjustment = getTotalAdjustment();
+		numLines -= (getNumBlocks() - 1);
+		numLines *= this.getCdxLinesPerBlock();
 		numLines += adjustment;
 		return numLines;
 	}
 	
-	public long getLastBlockDiff(String startKey, int startPart, int endPart, int cdxPerBlock)
-	{
-		if (locationUpdater == null) {
-			return 0;
-		}
+	public CloseableIterator<String> getCDXIterator(String key, String start, String end, ZipNumParams params) throws IOException {
 		
-		return locationUpdater.computeLastBlockDiff(startKey, startPart, endPart, cdxPerBlock);
-	}
-	
-	public int getNumLines(String start, String end) throws IOException
-	{
-		SeekableLineReader slr = null;
-		String startLine = null;
-		String endLine = null;
-		
-		int startCount = 0;
-		int endCount = 0;
-		
-		try {
-			slr = summary.getSLR();
-		
-			long[] offsets = summary.getStartEndOffsets(slr, start, end);
-			
-			if (offsets[0] > 0) {
-				slr.seek(offsets[0]);
-				slr.readLine();
-				
-				startLine = slr.readLine();
-			}
-			
-			if (offsets[1] < slr.getSize()) {
-				slr.seek(offsets[1]);
-				slr.readLine();
-			
-				endLine = slr.readLine();
-			}
-			
-			// Get the last line
-			if (endLine == null) {
-				endLine = summary.getLastLine(slr);
-			}
-			
-			if (endLine != null) {
-				endCount = extractLineCount(endLine);
-			}
-			
-			if (startLine != null) {
-				startCount = extractLineCount(startLine);
-			}
-			
-		} finally {
-			if (slr != null) {
-				slr.close();
-			}
-		}
-		
-		return endCount - startCount;
-	}
-	
-	//TODO: Experimental?
-	public long getEstimateSplitSize(String[] blocks)
-	{
-		String parts[] = null, lastParts[] = null;
-		
-		long totalSize = 0;
-		
-		for (String block : blocks) {
-			lastParts = parts;
-			parts = block.split("\t");
-			
-			if ((lastParts != null) && (parts.length >= 3) && (lastParts.length >= 3)) {
-				// If same shard, simply subtract
-				long newOffset = Long.parseLong(parts[2]);
-				
-				if (parts[1].equals(lastParts[1])) {
-					long lastOffset = Long.parseLong(lastParts[2]);
-					totalSize += (newOffset - lastOffset);
-				} else {
-					totalSize += newOffset;
-					//TODO: Compute size of all in between shards
-					//computeBlockSizeDiff();
-				}
-			}
-		}
-		
-		return totalSize;
-	}
-	
-	public CloseableIterator<String> getClusterRange(String start, String end, boolean inclusive, boolean includePrevLine) throws IOException
-	{
-		CloseableIterator<String> iter = null;
-		iter = summary.getRecordIterator(start, includePrevLine);
-		return wrapEndIterator(iter, end, inclusive);
-		//return wrapStartEndIterator(iter, start, end, inclusive);
-	}
-	
-	public CloseableIterator<String> wrapStartEndIterator(CloseableIterator<String> iter, String start, String end, boolean inclusive)
-	{
-		return wrapEndIterator(wrapStartIterator(iter, start), end, inclusive);
-	}
-	
-	public static CloseableIterator<String> wrapStartIterator(CloseableIterator<String> iter, String start)
-	{
-		return new StartBoundedStringIterator(iter, start);
-	}
-	
-	public static CloseableIterator<String> wrapEndIterator(CloseableIterator<String> iter, String end, boolean inclusive)
-	{		
-		if (end.isEmpty()) {
-			return iter;
-		} else {
-			return new BoundedStringIterator(iter, end, inclusive);	
-		}
-	}
-	
-	public CloseableIterator<String> getCDXIterator(CloseableIterator<String> summaryIterator, String start, String end, int split, int numSplits)	
-	{
-		return getCDXIterator(summaryIterator, start, end, split, numSplits, null);
-	}
-
-	public CloseableIterator<String> getCDXIterator(CloseableIterator<String> summaryIterator, String start, String end, int split, int numSplits, ZipNumParams params)	
-	{
-		CloseableIterator<String> blocklines = this.getCDXIterator(summaryIterator, params);
-		
-		if ((split == 0) && (start != null) && !start.isEmpty()) {
-			blocklines = wrapStartIterator(blocklines, start);
-		}
-		
-		if ((split >= (numSplits - 1)) && (end != null) && !end.isEmpty()) {
-			blocklines = wrapEndIterator(blocklines, end, false);
-		}
-		
-		return blocklines;
-	}
-	
-	public static String endKey(String key)
-	{
-		return key + "!";
-	}
-	
-	public CloseableIterator<String> getLastBlockCDXLineIterator(String key) throws IOException {
-		// the next line after last key<space> is key! so this will return last key<space> block
-		CloseableIterator<String> summaryIter = summary.getRecordIteratorLT(endKey(key));
-		
-		return wrapStartIterator(getCDXIterator(summaryIter), key);
-	}
-	
-	public static CloseableIterator<String> wrapPrefix(CloseableIterator<String> source, String prefix, boolean exact)
-	{
-		if (exact) {
-			return wrapEndIterator(source, endKey(prefix), false);
-		} else {
-			return wrapEndIterator(source, prefix, true);
-		}
-	}
-				
-	public CloseableIterator<String> getCDXIterator(String key, String start, boolean exact, ZipNumParams params) throws IOException {
-		
-		if ((locationUpdater != null) && !locationUpdater.dateRangeCheck(key)) {
+		if (!dateRangeCheck(key)) {
 			return EMPTY_ITERATOR;
 		}
 		
-		CloseableIterator<String> summaryIter = summary.getRecordIteratorLT(key);
+		return super.getCDXIterator(key, start, end, params);
+	}
+	
+	public CloseableIterator<String> getCDXIterator(String key, String prefix, boolean exact, ZipNumParams params) throws IOException {
 		
-		if (params.getTimestampDedupLength() > 0) {
-			summaryIter = new TimestampDedupIterator(summaryIter, params.getTimestampDedupLength());
+		if (!dateRangeCheck(key)) {
+			return EMPTY_ITERATOR;
 		}
 		
-		if (blockLoader.isBufferFully() && (params != null) && (params.getMaxBlocks() > 0)) {
-			LineBufferingIterator lineBufferIter = new LineBufferingIterator(summaryIter, params.getMaxBlocks());
-			lineBufferIter.bufferInput();
-			summaryIter = lineBufferIter;
-		}
-		
-		summaryIter = wrapPrefix(summaryIter, start, exact);
-				
-		return wrapStartIterator(getCDXIterator(summaryIter, params), start);
+		return super.getCDXIterator(key, prefix, exact, params);
 	}
 	
-	public CloseableIterator<String> getCDXIterator(String key, ZipNumParams params) throws IOException {
-		
-		CloseableIterator<String> summaryIter = summary.getRecordIteratorLT(key);		
-		return wrapStartIterator(getCDXIterator(summaryIter, params), key);
-	}
-	
-	public CloseableIterator<String> getCDXIterator(CloseableIterator<String> summaryIterator, ZipNumParams params)
-	{
-		SummaryBlockIterator blockIter = new SummaryBlockIterator(summaryIterator, this, params);
-		MultiBlockIterator zipIter = new MultiBlockIterator(blockIter);
-		return zipIter;
-	}
-	
-	public CloseableIterator<String> getCDXIterator(CloseableIterator<String> summaryIterator)
-	{
-		return getCDXIterator(summaryIterator, null);
-	}
-	
-	public void setSummaryFile(String summaryFile) {
-		this.summaryFile = summaryFile;
-	}
-
-	public String getSummaryFile() {
-		return summaryFile;
-	}
-	
-	public SortedTextFile getSummary()
-	{
-		return summary;
-	}
-
-	public ZipNumBlockLoader getBlockLoader() {
-		return blockLoader;
-	}
-
-	public void setBlockLoader(ZipNumBlockLoader blockLoader) {
-		this.blockLoader = blockLoader;
-	}
-
-	public boolean isUseNio() {
-		return useNio;
-	}
-
-	public void setUseNio(boolean useNio) {
-		this.useNio = useNio;
-	}
-
-	public String getLocFile() {
-		return locFile;
-	}
-
-	public void setLocFile(String locFile) {
-		this.locFile = locFile;
-	}
-
 	public boolean isDisabled() {
-		if (locationUpdater != null) {
-			return locationUpdater.isDisabled;
+		return this.disabled;
+	}
+		
+	@Override
+	SeekableLineReader doBlockLoad(String partId, long startOffset, int totalLength) {
+		
+		SeekableLineReader reader = null;
+		
+		String[] locations = getLocations(partId);
+		
+		if (locations == null) {
+			LOGGER.severe("No locations for block(" + partId +")");
+			return null;
 		}
 		
-		return false;
+		// Attempt cached load for http
+		if (cacheRemoteLoc && (locCacheMap != null)) {
+			// Non-http requests follow standard load path
+			if ((locations.length > 0) && GeneralURIStreamFactory.isHttp(locations[0])) {
+				reader = loadCachedBalancedReader(partId, locations, startOffset, totalLength);
+			}
+		}
+		
+		if (reader != null) {
+			return reader;
+		}
+		
+		for (String location : locations) {
+			reader = blockLoader.attemptLoadBlock(location, startOffset, totalLength, true, isRequired());
+			if (reader != null) {
+				return reader;
+			}
+		}
+		
+		return null;
+	}
+		
+	protected String locCacheGet(String key)
+	{
+		LocCacheEntry entry = locCacheMap.get(key);
+		
+		if (entry == null) {
+			return null;
+		}
+		
+		if (System.currentTimeMillis() > entry.expire) {
+			locCacheMap.remove(key);
+			return null;
+		}
+		
+		return entry.loc;
+	}
+	
+	protected void locCachePut(String key, String loc)
+	{
+		locCacheMap.putIfAbsent(key, new LocCacheEntry(loc, System.currentTimeMillis() + locCacheExpireMillis));
+	}
+	
+	SeekableLineReader loadCachedBalancedReader(String partId, String[] locations, long offset, int length)
+	{
+		SeekableLineReader reader = null;
+		
+		String cachedUrl = locCacheGet(partId);
+		
+		if (cachedUrl != null) {
+			reader = blockLoader.attemptLoadBlock(cachedUrl, offset, length, true, isRequired());
+		
+			if (reader != null) {
+				return reader;
+			} else {
+				locCacheMap.remove(partId, cachedUrl);
+			}
+		}
+		
+		ArrayList<Integer> indexs = new ArrayList<Integer>();
+		
+		for (int i = 0; i < locations.length; i++) {
+			indexs.add(i);
+		}
+		if (locations.length > 1) {
+			Collections.shuffle(indexs);
+		}
+		
+		for (int index : indexs) {
+			reader = blockLoader.attemptLoadBlock(locations[index], offset, length, true, isRequired());
+			
+			if (reader != null) {
+				String connectedUrl = ((HTTPSeekableLineReader)reader).getConnectedUrl();
+				
+				if (connectedUrl != null) {
+					locCachePut(partId, connectedUrl);
+				}
+				
+				return reader;
+			}
+		}
+
+		return reader;
 	}
 }

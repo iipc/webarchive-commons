@@ -258,6 +258,15 @@ public class ArchiveUtils {
         return TIMESTAMP14ISO8601Z.get().format(date);
     }
     
+    public static Date parse14DigitISODate(String datetime, Date defaultVal)
+    {
+    	try {
+	        return TIMESTAMP14ISO8601Z.get().parse(datetime);
+        } catch (ParseException e) {
+        	return defaultVal;
+        }
+    }
+    
     /**
      * Utility function for creating arc-style date stamps
      * in the format yyyyMMddHHmmssSSS.
@@ -381,6 +390,39 @@ public class ArchiveUtils {
         }
 
         return date;
+    }
+    
+    final static SimpleDateFormat dateToTimestampFormats[] = 
+          {new SimpleDateFormat("MM/dd/yyyy"), 
+		   new SimpleDateFormat("MM/yyyy"), 
+		   new SimpleDateFormat("yyyy")};
+
+    /**
+     * Convert a user-entered date into a timestamp
+     * @param input
+     * @return
+     */
+    public static String dateToTimestamp(String input) {
+        Date date = null;
+
+        if (input.isEmpty()) {
+            return null;
+        }
+
+        for (SimpleDateFormat format : dateToTimestampFormats) {
+            try {
+                date = format.parse(input);
+                break;
+            } catch (ParseException e) {
+                continue;
+            }
+        }
+
+        if (date == null) {
+            return null;
+        }
+
+        return get14DigitDate(date);
     }
 
     /**
@@ -570,7 +612,7 @@ public class ArchiveUtils {
         return doubleToString(val, maxFractionDigits, 0);
     }
 
-    private static String doubleToString(double val, int maxFractionDigits, int minFractionDigits) {
+    public static String doubleToString(double val, int maxFractionDigits, int minFractionDigits) {
         // NumberFormat returns U+FFFD REPLACEMENT CHARACTER for NaN which looks
         // like a bug in the UI
         if (Double.isNaN(val)) {
@@ -597,23 +639,29 @@ public class ArchiveUtils {
      */
     public static String formatBytesForDisplay(long amount) {
         double displayAmount = (double) amount;
-        int unitPowerOf1024 = 0; 
+        int unitPowerOf1024 = 0;
 
         if(amount <= 0){
             return "0 B";
         }
-        
-        while(displayAmount>=1024 && unitPowerOf1024 < 4) {
+
+        final String[] units = { " B", " KiB", " MiB", " GiB", " TiB" };
+
+        while (displayAmount >= 1024 && unitPowerOf1024 < units.length - 1) {
             displayAmount = displayAmount / 1024;
             unitPowerOf1024++;
         }
-        
-        final String[] units = { " B", " KiB", " MiB", " GiB", " TiB" };
-        
-        // ensure at least 2 significant digits (#.#) for small displayValues
-        int fractionDigits = (displayAmount < 10) ? 1 : 0; 
+
+        int fractionDigits;
+        if (unitPowerOf1024 == 0 || displayAmount >= 10) {
+            fractionDigits = 0;
+        } else { 
+            // ensure at least 2 significant digits (#.#) for small displayValues
+            fractionDigits = 1;
+        }
+
         return doubleToString(displayAmount, fractionDigits, fractionDigits) 
-                   + units[unitPowerOf1024];
+                + units[unitPowerOf1024];
     }
 
     /**

@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.hadoop.fs.FSDataInputStream;
-import org.archive.util.binsearch.SeekableLineReader;
+import org.archive.util.binsearch.AbstractSeekableLineReader;
 
 import com.google.common.io.LimitInputStream;
 
-public class HDFSSeekableLineReader extends SeekableLineReader {
+public class HDFSSeekableLineReader extends AbstractSeekableLineReader {
 	private FSDataInputStream fsdis;
 	private long length;
 	

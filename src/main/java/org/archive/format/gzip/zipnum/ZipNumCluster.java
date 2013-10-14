@@ -243,6 +243,10 @@ public class ZipNumCluster extends ZipNumIndex {
 			locRoot = newLocRoot;
 		}
 		
+		if (this.locCacheMap != null) {
+			locCacheMap.clear();
+		}
+		
 		closeExistingFiles(filesToClose);
 		
 		lastModTime = newModTime;

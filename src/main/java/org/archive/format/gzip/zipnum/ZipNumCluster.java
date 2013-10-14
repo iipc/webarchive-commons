@@ -75,7 +75,7 @@ public class ZipNumCluster extends ZipNumIndex {
 						Thread.sleep(checkInterval);
 						
 						if (summary != null) {
-							summary.reloadFactory();	
+							summary.reloadFactory();
 						}
 					}
 					
@@ -583,7 +583,7 @@ public class ZipNumCluster extends ZipNumIndex {
 		if (cachedUrl != null) {
 			long start = System.currentTimeMillis();
 			
-			reader = blockLoader.attemptLoadBlock(cachedUrl, offset, length, true, isRequired());
+			reader = blockLoader.attemptLoadBlock(cachedUrl, offset, length, true, false);
 		
 			long duration = System.currentTimeMillis() - start;
 			
@@ -605,6 +605,8 @@ public class ZipNumCluster extends ZipNumIndex {
 			Collections.shuffle(indexs);
 		}
 		
+		final int lastIndex = locations.length - 1;
+		
 		for (int index : indexs) {
 			// Skip failed cached url
 			if (cachedUrl != null && locations[index].equals(cachedUrl)) {
@@ -613,7 +615,9 @@ public class ZipNumCluster extends ZipNumIndex {
 			
 			long start = System.currentTimeMillis();
 			
-			reader = blockLoader.attemptLoadBlock(locations[index], offset, length, true, isRequired());
+			boolean required = (isRequired() && (index == lastIndex));
+			
+			reader = blockLoader.attemptLoadBlock(locations[index], offset, length, true, required);
 			
 			long duration = System.currentTimeMillis() - start;
 			

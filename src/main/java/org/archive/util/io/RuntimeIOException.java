@@ -10,6 +10,11 @@ public class RuntimeIOException extends RuntimeException {
     	
     }
     
+    public RuntimeIOException(String message)
+    {
+    	super(message);
+    }
+    
     public RuntimeIOException(int status)
     {
     	this.status = status;

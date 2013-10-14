@@ -129,7 +129,7 @@ public class ApacheHttp31SLR extends HTTPSeekableLineReader {
 			connectedUrl = activeMethod.getURI().toString();
 			
 			if ((code != 206) && (code != 200)) {
-				throw new BadHttpStatusException(code, url + " " + rangeHeader);
+				throw new BadHttpStatusException(code, connectedUrl + " " + rangeHeader);
 			}
 			
 			InputStream is = activeMethod.getResponseBodyAsStream();

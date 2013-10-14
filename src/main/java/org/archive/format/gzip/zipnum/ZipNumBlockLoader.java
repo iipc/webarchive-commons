@@ -177,10 +177,6 @@ public class ZipNumBlockLoader {
 				}
 				currReader = null;
 			}
-			
-//			if (isRequired) {
-//				throw new RuntimeIOException(io);
-//			}
 		}
 		
 		return currReader;

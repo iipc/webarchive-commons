@@ -15,6 +15,7 @@ import org.archive.util.binsearch.SeekableLineReaderFactory;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReader;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReaderFactory;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReaderFactory.HttpLibs;
+import org.archive.util.io.RuntimeIOException;
 
 public class ZipNumBlockLoader {
 		
@@ -165,8 +166,10 @@ public class ZipNumBlockLoader {
 				actualLocation = location;
 			}
 			
+			String msg = io.toString() + " -- -r " + startOffset + "-" + (startOffset + totalLength - 1) + " " + actualLocation;
+			
 			if (LOGGER.isLoggable(level)) {
-				LOGGER.log(level, io.toString() + " -- -r " + startOffset + "-" + (startOffset + totalLength - 1) + " " + actualLocation + " req? " + isRequired);
+				LOGGER.log(level, msg);
 			}
 			
 			if (currReader != null) {
@@ -176,6 +179,10 @@ public class ZipNumBlockLoader {
 	
 				}
 				currReader = null;
+			}
+			
+			if (isRequired) {
+				throw new RuntimeIOException(msg);
 			}
 		}
 		

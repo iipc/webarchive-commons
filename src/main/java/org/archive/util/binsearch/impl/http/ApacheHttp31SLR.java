@@ -137,6 +137,7 @@ public class ApacheHttp31SLR extends HTTPSeekableLineReader {
 			return cin;
 			
 		} catch (IOException io) {
+			connectedUrl = activeMethod.getURI().toString();
 			doClose();
 			throw io;
 		}

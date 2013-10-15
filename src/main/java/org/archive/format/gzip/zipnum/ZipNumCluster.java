@@ -607,15 +607,18 @@ public class ZipNumCluster extends ZipNumIndex {
 		
 		final int lastIndex = locations.length - 1;
 		
-		for (int index : indexs) {
+		for (int i = 0; i < indexs.size(); i++) {
+			
+			int index = indexs.get(i);
+			
 			// Skip failed cached url
-			if (cachedUrl != null && locations[index].equals(cachedUrl)) {
+			if ((cachedUrl != null) && locations[index].equals(cachedUrl)) {
 				continue;
 			}
 			
 			long start = System.currentTimeMillis();
 			
-			boolean required = (isRequired() && (index == lastIndex));
+			boolean required = (isRequired() && (i == lastIndex));
 			
 			reader = blockLoader.attemptLoadBlock(locations[index], offset, length, true, required);
 			

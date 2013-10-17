@@ -23,7 +23,13 @@ public class RuntimeIOException extends RuntimeException {
     public RuntimeIOException(Throwable cause)
     {
     	super(cause);
-    }   
+    }
+   
+    public RuntimeIOException(int status, Throwable cause)
+    {
+    	super(cause);
+    	this.status = status;
+    } 
     
     public int getStatus()
     {

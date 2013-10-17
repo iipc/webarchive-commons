@@ -32,6 +32,8 @@ public abstract class HTTPSeekableLineReader extends AbstractSeekableLineReader 
 	protected boolean noKeepAlive;
 	protected String cookie;
 	protected String connectedUrl;
+	protected String errHeader;
+	protected String saveErrHeader;
 
 	public abstract String getUrl();
 	
@@ -75,5 +77,21 @@ public abstract class HTTPSeekableLineReader extends AbstractSeekableLineReader 
 	public String getConnectedUrl()
 	{
 		return connectedUrl;
+	}
+
+	public String getSaveErrHeader() {
+		return saveErrHeader;
+	}
+
+	public void setSaveErrHeader(String saveErrHeader) {
+		this.saveErrHeader = saveErrHeader;
+	}
+
+	public String getErrHeader() {
+		return errHeader;
+	}
+
+	public void setErrHeader(String errHeader) {
+		this.errHeader = errHeader;
 	}
 }

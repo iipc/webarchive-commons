@@ -8,6 +8,7 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.io.input.CountingInputStream;
@@ -121,6 +122,7 @@ public class ApacheHttp31SLR extends HTTPSeekableLineReader {
 			}
 			
 			if (this.getCookie() != null) {
+				activeMethod.getParams().setCookiePolicy(CookiePolicy.IGNORE_COOKIES);
 				activeMethod.setRequestHeader("Cookie", this.getCookie());
 			}
 			

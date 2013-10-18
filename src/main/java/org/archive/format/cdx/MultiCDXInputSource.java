@@ -41,17 +41,21 @@ public class MultiCDXInputSource implements CDXInputSource {
 	}
 
 
-	Comparator<String> comparator = new Comparator<String>() {
+	public final static Comparator<String> defaultComparator = new Comparator<String>() {
 		public int compare(String s1, String s2) {
 			return s1.compareTo(s2);
 		}
 	};
 	
-	Comparator<String> reverseComparator = new Comparator<String>() {
+	public final static Comparator<String> defaultReverseComparator = new Comparator<String>() {
 		public int compare(String s1, String s2) {
 			return -s1.compareTo(s2);
 		}
 	};
+	
+	protected Comparator<String> comparator = defaultComparator;
+	protected Comparator<String> reverseComparator = defaultReverseComparator;	
+		
 	
 	public CloseableIterator<String> getCDXIterator(String key, String prefix, boolean exact, ZipNumParams params) throws IOException {
 		

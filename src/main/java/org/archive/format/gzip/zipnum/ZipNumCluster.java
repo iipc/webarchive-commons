@@ -190,6 +190,7 @@ public class ZipNumCluster extends ZipNumIndex {
 		startDate = newStartDate;
 		endDate = newEndDate;
 		locRoot = newLocRoot;
+		this.cdxLinesTotalCount = computeTotalLines();
 		
 		if (!disabled) {
 			this.loadLastBlockSizes(blockSizesFile);
@@ -241,6 +242,8 @@ public class ZipNumCluster extends ZipNumIndex {
 			endDate = newEndDate;
 			disabled = newIsDisabled;
 			locRoot = newLocRoot;
+			
+			this.cdxLinesTotalCount = computeTotalLines();
 		}
 		
 		if (this.locCacheMap != null) {
@@ -484,8 +487,9 @@ public class ZipNumCluster extends ZipNumIndex {
 		return diff;
 	}
 	
+
 	// Adjust from shorter blocks, if loaded
-	public long getTotalLines()
+	public long computeTotalLines()
 	{		
 		long numLines = 0;
 		

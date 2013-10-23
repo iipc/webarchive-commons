@@ -196,4 +196,15 @@ public class MultiCDXInputSource implements CDXInputSource {
 		
 		return scitr;
 	}
+
+	@Override
+    public long getTotalLines() {
+		long sum = 0;
+		
+		for (CDXInputSource cdxReader : cdx) {
+			sum += cdxReader.getTotalLines();
+		}
+		
+		return sum;
+    }
 }

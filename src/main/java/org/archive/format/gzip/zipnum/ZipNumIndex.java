@@ -29,6 +29,9 @@ public class ZipNumIndex implements CDXInputSource {
 	// Used only for reference / user info
 	protected int cdxLinesPerBlock = 3000;
 	
+	
+	protected long cdxLinesTotalCount = 0;
+	
 	//protected HashMap<String, String[]> locMap = null;
 		
 	protected final static boolean DEFAULT_USE_NIO = true;
@@ -528,4 +531,9 @@ public class ZipNumIndex implements CDXInputSource {
 	public void setRequired(boolean required) {
 		this.required = required;
 	}
+
+	@Override
+    public long getTotalLines() {
+		return cdxLinesTotalCount;
+    }
 }

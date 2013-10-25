@@ -10,7 +10,7 @@
 
 
   <groupId>org.netpreserve.commons</groupId>
-  <artifactId>web-commons</artifactId>
+  <artifactId>commons-web</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 

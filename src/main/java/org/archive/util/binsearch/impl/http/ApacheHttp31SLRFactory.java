@@ -10,9 +10,9 @@ import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.httpclient.params.HttpClientParams;
+import org.archive.httpclient.ThreadLocalHttpConnectionManager;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReader;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReaderFactory;
-import org.archive.util.httpclient.ThreadLocalHttpConnectionManager;
 
 public class ApacheHttp31SLRFactory extends HTTPSeekableLineReaderFactory {
 	private final static Logger LOGGER = Logger.getLogger(ApacheHttp31SLRFactory.class.getName());

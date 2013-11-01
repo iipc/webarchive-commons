@@ -15,7 +15,7 @@
  * ====================================================================
  *
  */
-package org.archive.util.io;
+package org.archive.util.httpclient;
 
 import java.io.IOException;
 import java.io.InputStream;

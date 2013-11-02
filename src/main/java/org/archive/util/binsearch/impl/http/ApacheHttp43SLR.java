@@ -1,5 +1,6 @@
 package org.archive.util.binsearch.impl.http;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -14,7 +15,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.impl.DefaultBHttpClientConnection;
 import org.apache.http.message.BasicHttpRequest;
+import org.apache.http.util.EntityUtils;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReader;
+import org.archive.util.zip.GZIPMembersInputStream;
 
 public class ApacheHttp43SLR extends HTTPSeekableLineReader {
 
@@ -83,11 +86,10 @@ public class ApacheHttp43SLR extends HTTPSeekableLineReader {
     protected InputStream doSeekLoad(long offset, int maxLength, URL url)
             throws IOException {
 		
-		SocketAddress endpoint = null;
-		
 		try {
+			SocketAddress endpoint = new InetSocketAddress(url.getHost(), getPort(url));
+			
 			socket = new Socket();
-			endpoint = new InetSocketAddress(url.getHost(), getPort(url));
 			socket.connect(endpoint, connectTimeout);
 			
 			activeConn = new DefaultBHttpClientConnection(BUFF_SIZE);
@@ -104,6 +106,8 @@ public class ApacheHttp43SLR extends HTTPSeekableLineReader {
 			
 			if (this.isNoKeepAlive()) {
 				request.setHeader("Connection", "close");
+			} else {
+				request.setHeader("Connection", "keep-alive");
 			}
 			
 			if (this.getCookie() != null) {
@@ -157,6 +161,36 @@ public class ApacheHttp43SLR extends HTTPSeekableLineReader {
 			throw io;
         }
     }
+    
+    @Override
+	public void seekWithMaxRead(long offset, boolean gzip, int maxLength) throws IOException
+	{
+		if (closed) {
+			throw new IOException("Seek after close()");
+		}
+		
+		br = null;
+		
+		try {
+			doSeekLoad(offset, maxLength);
+		
+			if (bufferFully && (maxLength > 0)) {
+				byte[] buffer = EntityUtils.toByteArray(response.getEntity());
+				
+				doClose();
+				
+				is = new ByteArrayInputStream(buffer);
+			}
+		
+	    	if (gzip) {
+	    		is = new GZIPMembersInputStream(is, blockSize);
+	    	}
+	    	
+		} catch (IOException io) {
+			doClose();
+			throw io;
+		}
+	}
 
 	@Override
     protected void doClose() throws IOException {

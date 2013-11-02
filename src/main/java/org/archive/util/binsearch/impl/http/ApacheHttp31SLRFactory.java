@@ -9,8 +9,8 @@ import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpConnectionManager;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.params.HttpClientParams;
-import org.archive.httpclient.ThreadLocalHttpConnectionManager;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReader;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReaderFactory;
 
@@ -26,8 +26,8 @@ public class ApacheHttp31SLRFactory extends HTTPSeekableLineReaderFactory {
     }
 
     public ApacheHttp31SLRFactory() {
-    	//connectionManager = new MultiThreadedHttpConnectionManager();
-    	connectionManager = new ThreadLocalHttpConnectionManager();
+    	connectionManager = new MultiThreadedHttpConnectionManager();
+    	//connectionManager = new ThreadLocalHttpConnectionManager();
     	hostConfiguration = new HostConfiguration();
 		HttpClientParams params = new HttpClientParams();
     	http = new HttpClient(params,connectionManager);

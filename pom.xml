@@ -2,13 +2,20 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.archive</groupId>
-  <artifactId>ia-web-commons</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
+
+
+  <groupId>org.netpreserve.commons</groupId>
+  <artifactId>commons-web</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>ia-web-commons</name>
-  <url>http://maven.apache.org</url>
+  <name>iipc-web-commons</name>
+  <url>https://github.com/iipc/iipc-web-commons</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -42,7 +49,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.mozilla</groupId>
+      <groupId>com.googlecode.juniversalchardet</groupId>
       <artifactId>juniversalchardet</artifactId>
       <version>1.0.3</version>
     </dependency>
@@ -86,6 +93,10 @@
           <groupId>tomcat</groupId>
           <artifactId>jasper-compiler</artifactId>
         </exclusion>                
+        <exclusion>
+          <groupId>hsqldb</groupId>
+          <artifactId>hsqldb</artifactId>
+        </exclusion>                
       </exclusions> 
     </dependency>
 
@@ -115,8 +126,8 @@
     </dependency>
     <dependency>                        
       <groupId>it.unimi.dsi</groupId>
-      <artifactId>mg4j</artifactId>
-      <version>1.0.1</version>
+      <artifactId>dsiutils</artifactId>
+      <version>2.0.12</version>
       <scope>compile</scope>
     </dependency>                
   </dependencies>
@@ -139,7 +150,7 @@
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
-          <finalName>ia-web-commons</finalName>
+          <finalName>iipc-web-commons</finalName>
         </configuration>
         <executions>
           <execution>
@@ -160,24 +171,6 @@
 
   </build>
   <repositories>
-    <repository>
-      <id>internetarchive</id>
-      <name>Internet Archive Maven Repository</name>
-      <url>http://builds.archive.org:8080/maven2</url>
-      <layout>default</layout>
-
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>daily</updatePolicy>
-        <checksumPolicy>warn</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>daily</updatePolicy>
-        <checksumPolicy>warn</checksumPolicy>
-      </snapshots>
-    </repository>
-
     <repository>
       <id>cloudera</id>
       <name>Cloudera Hadoop</name>

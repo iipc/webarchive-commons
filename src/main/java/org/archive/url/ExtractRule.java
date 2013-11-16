@@ -26,7 +26,7 @@ public class ExtractRule
 	
 	public Matcher extract(String url)
 	{		
-		if ((startsWith != null) && !url.startsWith(startsWith)) {
+		if ((startsWith != null) && !startsWith.isEmpty() && !url.startsWith(startsWith)) {
 			return null;
 		}
 		

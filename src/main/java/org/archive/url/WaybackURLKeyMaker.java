@@ -2,8 +2,6 @@ package org.archive.url;
 
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class WaybackURLKeyMaker implements URLKeyMaker {
 //	URLCanonicalizer canonicalizer = new NonMassagingIAURLCanonicalizer();
@@ -20,34 +18,6 @@ public class WaybackURLKeyMaker implements URLKeyMaker {
 	private boolean surtMode = true;
 	
 	protected List<RewriteRule> customRules;
-	
-	public static class RewriteRule
-	{
-		String startsWith;
-		String regex;
-		String replace;
-		Pattern regexPattern;
-		
-		public String getStartsWith() {
-			return startsWith;
-		}
-		public void setStartsWith(String startsWith) {
-			this.startsWith = startsWith;
-		}
-		public String getRegex() {
-			return regex;
-		}
-		public void setRegex(String regex) {
-			regexPattern = Pattern.compile(regex);
-			this.regex = regex;
-		}
-		public String getReplace() {
-			return replace;
-		}
-		public void setReplace(String replace) {
-			this.replace = replace;
-		}
-	}
 	
 	public WaybackURLKeyMaker()
 	{
@@ -117,22 +87,12 @@ public class WaybackURLKeyMaker implements URLKeyMaker {
 	
 	protected String applyCustomRules(String urlkey)
 	{
+		StringBuilder sb = new StringBuilder(urlkey);
+		
 		for (RewriteRule rule : customRules) {
-			if ((rule.startsWith != null) && !urlkey.startsWith(rule.startsWith)) {
-				continue;
-			}
-			
-			if (rule.regexPattern == null || rule.replace == null) {
-				continue;
-			}
-			
-			Matcher match = rule.regexPattern.matcher(urlkey);
-			
-			if (match.matches()) {
-				urlkey = match.replaceAll(rule.replace);
-			}
+			rule.rewrite(sb);
 		}
 		
-		return urlkey;
+		return sb.toString();
 	}
 }

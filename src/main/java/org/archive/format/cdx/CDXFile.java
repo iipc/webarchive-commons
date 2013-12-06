@@ -97,4 +97,10 @@ public class CDXFile extends SortedTextFile implements CDXInputSource {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 		return reader;
 	}
+
+	@Override
+    public long getTotalLines() {
+		//TODO: Implement
+		return 0;
+    }
 }

@@ -26,7 +26,7 @@ public class SeekableLineReaderIterator extends AbstractPeekableIterator<String>
 				next = slr.readLine();
 			} catch (IOException e) {
 				if (propagateException) {
-					throw new RuntimeIOException();
+					throw new RuntimeIOException(e.toString());
 				}
 			}
 		}

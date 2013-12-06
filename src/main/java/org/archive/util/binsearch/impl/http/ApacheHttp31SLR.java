@@ -8,6 +8,7 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.io.input.CountingInputStream;
@@ -121,22 +122,28 @@ public class ApacheHttp31SLR extends HTTPSeekableLineReader {
 			}
 			
 			if (this.getCookie() != null) {
+				activeMethod.getParams().setCookiePolicy(CookiePolicy.IGNORE_COOKIES);
 				activeMethod.setRequestHeader("Cookie", this.getCookie());
 			}
 			
 			int code = http.executeMethod(activeMethod);
 			
-			if ((code != 206) && (code != 200)) {
-				throw new BadHttpStatusException(code, url + " " + rangeHeader);
-			}
-			
 			connectedUrl = activeMethod.getURI().toString();
+			
+			if ((code != 206) && (code != 200)) {
+				throw new BadHttpStatusException(code, connectedUrl + " " + rangeHeader);
+			}
 			
 			InputStream is = activeMethod.getResponseBodyAsStream();
 			cin = new CountingInputStream(is);
 			return cin;
 			
 		} catch (IOException io) {
+			if (saveErrHeader != null) {
+				errHeader = getHeaderValue(saveErrHeader);	
+			}
+			
+			connectedUrl = activeMethod.getURI().toString();
 			doClose();
 			throw io;
 		}

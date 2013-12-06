@@ -76,12 +76,11 @@ public class HTTPURLConnSLR extends HTTPSeekableLineReader {
 		httpUrlConn.connect();
 		
 		int code = httpUrlConn.getResponseCode();
+		connectedUrl =  httpUrlConn.getURL().toString();
 		
 		if ((code != 206) && (code != 200)) {
-			throw new BadHttpStatusException(code, url + " " + rangeHeader);
+			throw new BadHttpStatusException(code, connectedUrl + " " + rangeHeader);
 		}
-		
-		connectedUrl =  httpUrlConn.getURL().toString();
 		
 		InputStream is = httpUrlConn.getInputStream();
 		cin = new CountingInputStream(is);

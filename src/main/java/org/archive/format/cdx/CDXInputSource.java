@@ -9,4 +9,6 @@ public interface CDXInputSource {
 
 	public CloseableIterator<String> getCDXIterator(String key, String prefix, boolean exact, ZipNumParams params) throws IOException;
 	public CloseableIterator<String> getCDXIterator(String key, String start, String startEndUrl, ZipNumParams params) throws IOException;
+	
+	public long getTotalLines();
 }

@@ -1,4 +1,5 @@
 language: java
+
 jdk:
   - oraclejdk7
 
@@ -10,7 +11,7 @@ before_script:
  - "echo $JAVA_OPTS"
 script: "target/travis/deploy-if.sh"
 
-# whitelist
+# whitelist in the master branch only
 branches:
   only:
     - master

@@ -3,13 +3,16 @@ language: java
 jdk:
   - oraclejdk7
 
-before_install: "git clone https://github.com/iipc/travis.git target/travis"
+before_install:
+  - "git clone https://github.com/iipc/travis.git target/travis"
 
 before_script:
  - "echo $JAVA_OPTS"
  - "export JAVA_OPTS=-Xmx1024m"
  - "echo $JAVA_OPTS"
-script: "target/travis/deploy-if.sh"
+
+script: 
+  - "target/travis/deploy-if.sh"
 
 # whitelist in the master branch only
 branches:

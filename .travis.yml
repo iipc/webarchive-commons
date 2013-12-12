@@ -7,12 +7,9 @@ before_install:
   - "git clone https://github.com/iipc/travis.git target/travis"
 
 before_script:
- - "echo $JAVA_OPTS"
  - "export JAVA_OPTS=-Xmx1024m"
- - "echo $JAVA_OPTS"
- - "ulimit -a"
+ - "export MAVEN_OPTS=-Xmx512m"
  - "ulimit -u 2048"
- - "ulimit -a"
 
 script: 
   - "target/travis/deploy-if.sh"

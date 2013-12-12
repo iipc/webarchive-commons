@@ -120,7 +120,7 @@ public class SummaryBlockIterator extends AbstractPeekableIterator<CloseableIter
 		SeekableLineReader currReader = zipnumIndex.doBlockLoad(currPartId, startOffset, totalLength);
 		
 		if ((currReader == null) && zipnumIndex.isRequired()) {
-			throw new RuntimeIOException();
+			throw new RuntimeIOException("Failed to load shards for: " + currPartId);
 		}
 		
 		if (currReader != null) {

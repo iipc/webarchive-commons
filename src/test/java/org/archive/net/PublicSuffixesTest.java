@@ -17,7 +17,7 @@
  *  limitations under the License.
  */
 
-package org.archive.url;
+package org.archive.net;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -26,7 +26,7 @@ import java.util.regex.Matcher;
 
 import junit.framework.TestCase;
 
-import org.archive.url.PublicSuffixes.Node;
+import org.archive.net.PublicSuffixes.Node;
 
 /**
  * Test cases for PublicSuffixes utility. Confirm expected matches/nonmatches
@@ -132,9 +132,9 @@ public class PublicSuffixesTest extends TestCase {
         matchPrefix("uk,co,virgin,", "uk,co,virgin,");
         matchPrefix("au,com,example,www,", "au,com,example,");
         matchPrefix("au,com,example,", "au,com,example,");
-        matchPrefix("jp,tokyo,public,assigned,www,",
-                "jp,tokyo,public,assigned,");
-        matchPrefix("jp,tokyo,public,assigned,", "jp,tokyo,public,assigned,");
+        matchPrefix("jp,yokohama,public,assigned,www,",
+                "jp,yokohama,public,assigned,");
+        matchPrefix("jp,yokohama,public,assigned,", "jp,yokohama,public,assigned,");
     }
 
     public void testDomainWithDash() {
@@ -161,8 +161,8 @@ public class PublicSuffixesTest extends TestCase {
     public void testExceptions() {
         matchPrefix("uk,bl,www,", "uk,bl,");
         matchPrefix("uk,bl,", "uk,bl,");
-        matchPrefix("jp,tokyo,metro,subdomain,", "jp,tokyo,metro,");
-        matchPrefix("jp,tokyo,metro,", "jp,tokyo,metro,");
+        matchPrefix("jp,tokyo,city,subdomain,", "jp,tokyo,city,");
+        matchPrefix("jp,tokyo,city,", "jp,tokyo,city,");
     }
 
     public void testFakeTLD() {

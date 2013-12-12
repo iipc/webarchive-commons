@@ -112,7 +112,7 @@ public class UrlSurtRangeComputer {
 		return new String[]{startKey, endKey, host};
 	}
 	
-	protected String incLastChar(String input)
+	public static String incLastChar(String input)
 	{
         StringBuilder sb = new StringBuilder(input);
         sb.setCharAt(sb.length() - 1, (char)(sb.charAt(sb.length() - 1) + 1));

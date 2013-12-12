@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.archive.util.binsearch.SeekableLineReaderFactory;
 import org.archive.util.binsearch.impl.http.ApacheHttp31SLRFactory;
+import org.archive.util.binsearch.impl.http.ApacheHttp43SLRFactory;
 import org.archive.util.binsearch.impl.http.HTTPURLConnSLRFactory;
 
 public abstract class HTTPSeekableLineReaderFactory implements SeekableLineReaderFactory {
@@ -20,6 +21,7 @@ public abstract class HTTPSeekableLineReaderFactory implements SeekableLineReade
 	public enum HttpLibs
 	{
 		APACHE_31,
+		APACHE_43,
 		URLCONN,
 	}
 		
@@ -49,6 +51,10 @@ public abstract class HTTPSeekableLineReaderFactory implements SeekableLineReade
 			
 		case URLCONN:
 			factory = new HTTPURLConnSLRFactory();
+			break;
+			
+		case APACHE_43:
+			factory = new ApacheHttp43SLRFactory();
 			break;
 		}
 		

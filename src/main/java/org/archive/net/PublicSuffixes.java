@@ -17,7 +17,7 @@
  *  limitations under the License.
  */
 
-package org.archive.url;
+package org.archive.net;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

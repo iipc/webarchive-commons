@@ -117,4 +117,16 @@ public class HttpRecorderGetMethod extends GetMethod {
         super.addProxyConnectionHeader(state, conn);
         this.httpRecorderMethod.handleAddProxyConnectionHeader(this);
     }
+
+    // XXX see https://webarchive.jira.com/browse/HER-2059
+    // We never call this method with the implied question mark prepended, so
+    // adding it does the trick, since commons-httpclient will strip it later.
+    public void setQueryString(String queryString) {
+        if (queryString != null) {
+            super.setQueryString('?' + queryString);
+        } else {
+            super.setQueryString(queryString);
+        }
+    }
+
 }

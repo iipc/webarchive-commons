@@ -84,7 +84,7 @@ public class RecordingOutputStream extends OutputStream {
     private byte[] buffer;
 
     /** current virtual position in the recording */
-    private long position;
+    long position;
     
     /** flag to disable recording */
     private boolean recording;
@@ -131,6 +131,29 @@ public class RecordingOutputStream extends OutputStream {
      * When recording HTTP, where the content-body starts.
      */
     protected long messageBodyBeginMark;
+
+    /**
+     * While messageBodyBeginMark is not set, the last two bytes seen.
+     * 
+     * <p>
+     * This class does automatic detection of http message body begin (i.e. end
+     * of http headers). Unfortunately httpcomponents did not want to add
+     * functionality to help us with this, see
+     * https://issues.apache.org/jira/browse/HTTPCORE-325
+     * 
+     * <p>
+     * It works like this: while messageBodyBeginMark is not set, we remember
+     * the last two bytes seen, and look at each byte we write. If the
+     * lastTwoBytes+currentByte is "\n\r\n", or lastTwoBytes[1]+currentByte is
+     * "\n\n" then we call markMessageBodyBegin() at the position after
+     * currentByte.
+     * 
+     * <p>
+     * An assumption here is that protocols other than http don't have headers,
+     * and for those protocols the user of this class will call
+     * markMessageBodyBegin() at position 0 before writing anything.
+     */
+    protected int[] lastTwoBytes = new int[] {-1, -1};
 
     /**
      * Stream to record.
@@ -204,6 +227,20 @@ public class RecordingOutputStream extends OutputStream {
         if (this.out != null) {
             this.out.write(b);
         }
+        
+        // see comment on int[] lastTwoBytes
+        if (messageBodyBeginMark < 0l) {
+            // looking for "\n\n" or "\n\r\n"
+            if (b == '\n' 
+                    && (lastTwoBytes[1] == '\n'
+                    || (lastTwoBytes[0] == '\n' && lastTwoBytes[1] == '\r'))) {
+                markMessageBodyBegin();
+            } else {
+                lastTwoBytes[0] = lastTwoBytes[1];
+                lastTwoBytes[1] = b;
+            }
+        }
+        
         checkLimits();
     }
 
@@ -220,6 +257,14 @@ public class RecordingOutputStream extends OutputStream {
             off += consumeRange;
             len -= consumeRange; 
         }
+        
+        // see comment on int[] lastTwoBytes
+        while (messageBodyBeginMark < 0 && len > 0) {
+            write(b[off]);
+            off++;
+            len--;
+        }
+        
         if(recording) {
             record(b, off, len);
         }
@@ -555,6 +600,18 @@ public class RecordingOutputStream extends OutputStream {
      */
     public long getRemainingLength() {
         return maxLength - position; 
+    }
+
+    /**
+     * Forget about anything past the point where the content-body starts. This
+     * is needed to support FetchHTTP's shouldFetchBody setting. See also the
+     * docs on {@link #lastTwoBytes}
+     */
+    public void chopAtMessageBodyBegin() {
+        if (messageBodyBeginMark >= 0) {
+            this.size = messageBodyBeginMark;
+            this.position = messageBodyBeginMark;
+        }
     }
 
     public void clearForReuse() throws IOException {

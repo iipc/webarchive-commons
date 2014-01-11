@@ -74,8 +74,10 @@ public class RecordingInputStream
     }
 
     public void open(InputStream wrappedStream) throws IOException {
-        logger.fine(Thread.currentThread().getName() + " opening " +
-            wrappedStream + ", " + Thread.currentThread().getName());
+        if (logger.isLoggable(Level.FINE)) {
+            logger.fine("wrapping " + wrappedStream + " in thread "
+                    + Thread.currentThread().getName());
+        }
         if(isOpen()) {
             // error; should not be opening/wrapping in an unclosed 
             // stream remains open
@@ -135,11 +137,11 @@ public class RecordingInputStream
 
     public void close() throws IOException {
         if (logger.isLoggable(Level.FINE)) {
-            logger.fine(Thread.currentThread().getName() + " closing " +
-                    this.in + ", " + Thread.currentThread().getName());
+            logger.fine("closing " + this.in + " in thread "
+                    + Thread.currentThread().getName());
         }
         IOUtils.closeQuietly(this.in);
-        this.in = null; 
+        this.in = null;
         IOUtils.closeQuietly(this.recordingOutputStream);
     }
 
@@ -159,20 +161,77 @@ public class RecordingInputStream
         return this.recordingOutputStream.getSize();
     }
 
+    public void readToEndOfContent(long contentLength)
+            throws IOException, InterruptedException {
+        // Check we're open before proceeding.
+        if (!isOpen()) {
+            // TODO: should this be a noisier exception-raising error? 
+            return;
+        } 
+
+        long totalBytes = recordingOutputStream.position - recordingOutputStream.getMessageBodyBegin();
+        long bytesRead = -1L;
+        long maxToRead = -1; 
+        while (contentLength <= 0 || totalBytes < contentLength) {
+            try {
+                // read no more than soft max
+                maxToRead = (contentLength <= 0) 
+                    ? drainBuffer.length 
+                    : Math.min(drainBuffer.length, contentLength - totalBytes);
+                // nor more than hard max
+                maxToRead = Math.min(maxToRead, recordingOutputStream.getRemainingLength());
+                // but always at least 1 (to trigger hard max exception) XXX wtf is this?
+                maxToRead = Math.max(maxToRead, 1);
+                
+                bytesRead = read(drainBuffer,0,(int)maxToRead);
+                if (bytesRead == -1) {
+                    break;
+                }
+                totalBytes += bytesRead;
+
+                if (Thread.interrupted()) {
+                    throw new InterruptedException("Interrupted during IO");
+                }
+            } catch (SocketTimeoutException e) {
+                // A socket timeout is just a transient problem, meaning
+                // nothing was available in the configured  timeout period,
+                // but something else might become available later.
+                // Take this opportunity to check the overall 
+                // timeout (below).  One reason for this timeout is 
+                // servers that keep up the connection, 'keep-alive', even
+                // though we asked them to not keep the connection open.
+                if (logger.isLoggable(Level.FINE)) {
+                    logger.log(Level.FINE, "socket timeout", e); 
+                }
+                // check for interrupt
+                if (Thread.interrupted()) {
+                    throw new InterruptedException("Interrupted during IO");
+                }
+                // check for overall timeout
+                recordingOutputStream.checkLimits();
+            } catch (SocketException se) {
+                throw se;
+            } catch (NullPointerException e) {
+                // [ 896757 ] NPEs in Andy's Th-Fri Crawl.
+                // A crawl was showing NPE's in this part of the code but can
+                // not reproduce.  Adding this rethrowing catch block w/
+                // diagnostics to help should we come across the problem in the
+                // future.
+                throw new NullPointerException("Stream " + this.in + ", " +
+                    e.getMessage() + " " + Thread.currentThread().getName());
+            }
+        }
+    }
+    
     /**
      * Read all of a stream (Or read until we timeout or have read to the max).
      * @param softMaxLength Maximum length to read; if zero or < 0, then no 
      * limit. If met, return normally. 
-     * @param hardMaxLength Maximum length to read; if zero or < 0, then no 
-     * limit. If exceeded, throw RecorderLengthExceededException
-     * @param timeout Timeout in milliseconds for total read; if zero or
-     * negative, timeout is <code>Long.MAX_VALUE</code>. If exceeded, throw
-     * RecorderTimeoutException
-     * @param maxBytesPerMs How many bytes per millisecond.
      * @throws IOException failed read.
      * @throws RecorderLengthExceededException
      * @throws RecorderTimeoutException
      * @throws InterruptedException
+     * @deprecated
      */
     public void readFullyOrUntil(long softMaxLength)
         throws IOException, RecorderLengthExceededException,
@@ -347,6 +406,13 @@ public class RecordingInputStream
      */
     public int getRecordedBufferLength() {
         return recordingOutputStream.getBufferLength();
+    }
+
+    /**
+     * See doc on {@link RecordingOutputStream#chopAtMessageBodyBegin()}
+     */
+    public void chopAtMessageBodyBegin() {
+        recordingOutputStream.chopAtMessageBodyBegin();
     }
 
     public void clearForReuse() throws IOException {

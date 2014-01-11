@@ -296,7 +296,7 @@ public class RecordingOutputStream extends OutputStream {
             throw new RecorderTimeoutException(); 
         }
         // need to throttle reading to hit max configured rate? 
-        if(position/duration > maxRateBytesPerMs) {
+        if(position/duration >= maxRateBytesPerMs) {
             long desiredDuration = position / maxRateBytesPerMs;
             try {
                 Thread.sleep(desiredDuration-duration);

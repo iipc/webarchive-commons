@@ -21,6 +21,7 @@ package org.archive.io;
 
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -88,12 +89,6 @@ public class RecordingOutputStream extends OutputStream {
     
     /** flag to disable recording */
     private boolean recording;
-    
-    /**
-     * Reusable buffer for FastBufferedOutputStream
-     */
-    protected byte[] bufStreamBuf = 
-        new byte [ FastBufferedOutputStream.DEFAULT_BUFFER_SIZE ];
     
     /**
      * True if we're to digest content.
@@ -206,14 +201,17 @@ public class RecordingOutputStream extends OutputStream {
         }
         clearForReuse();
         this.out = wrappedStream;
-        if (this.diskStream == null) {
-            // TODO: Fix so we only make file when its actually needed.
-            FileOutputStream fis = new FileOutputStream(this.backingFilename);
-            
-            this.diskStream = new RecyclingFastBufferedOutputStream(fis, bufStreamBuf);
-        }
         startTime = System.currentTimeMillis();
     }
+    
+    protected OutputStream ensureDiskStream() throws FileNotFoundException {
+        if (this.diskStream == null) {
+            FileOutputStream fis = new FileOutputStream(this.backingFilename);
+            this.diskStream = new FastBufferedOutputStream(fis);
+        }
+        return this.diskStream;
+    }
+
 
     public void write(int b) throws IOException {
         if(position<maxPosition) {
@@ -319,10 +317,7 @@ public class RecordingOutputStream extends OutputStream {
             this.digest.update((byte)b);
         }
         if (this.position >= this.buffer.length) {
-            // TODO: Its possible to call write w/o having first opened a
-            // stream.  Protect ourselves against this.
-            assert this.diskStream != null: "Diskstream is null";
-            this.diskStream.write(b);
+            this.ensureDiskStream().write(b);
         } else {
             this.buffer[(int) this.position] = (byte) b;
         }
@@ -357,12 +352,7 @@ public class RecordingOutputStream extends OutputStream {
      */
     private void tailRecord(byte[] b, int off, int len) throws IOException {
         if(this.position >= this.buffer.length){
-            // TODO: Its possible to call write w/o having first opened a
-            // stream.  Lets protect ourselves against this.
-            if (this.diskStream == null) {
-                throw new IOException("diskstream is null");
-            }
-            this.diskStream.write(b, off, len);
+            this.ensureDiskStream().write(b, off, len);
             this.position += len;
         } else {
             assert this.buffer != null: "Buffer is null";

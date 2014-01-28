@@ -1,5 +1,5 @@
-IIPC Web Commons
-=======================
+IIPC Web Archive Commons
+========================
 
 [![Build Status](https://travis-ci.org/iipc/iipc-web-commons.png?branch=master)](https://travis-ci.org/iipc/iipc-web-commons/)
 

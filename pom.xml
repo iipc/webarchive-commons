@@ -13,8 +13,8 @@
   <version>1.1.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>iipc-web-commons</name>
-  <url>https://github.com/iipc/iipc-web-commons</url>
+  <name>webarchive-commons</name>
+  <url>https://github.com/iipc/webarchive-commons</url>
 
    <organization>
       <name>The International Internet Preservation Consortium</name>
@@ -41,12 +41,12 @@
    </developers>
    <issueManagement>
       <system>GitHub Issues</system>
-      <url>https://github.com/iipc/iipc-web-commons/issues</url>
+      <url>https://github.com/iipc/webarchive-commons/issues</url>
    </issueManagement>
    <scm>
-      <connection>scm:git:git@github.com:iipc/iipc-web-commons.git</connection>
-      <developerConnection>scm:git:git@github.com:iipc/iipc-web-commons.git</developerConnection>
-      <url>git@github.com:iipc/iipc-web-commons.git</url>
+      <connection>scm:git:git@github.com:iipc/webarchive-commons.git</connection>
+      <developerConnection>scm:git:git@github.com:iipc/webarchive-commons.git</developerConnection>
+      <url>git@github.com:iipc/webarchive-commons.git</url>
    </scm>
 
    
@@ -199,7 +199,7 @@
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
-          <finalName>iipc-web-commons</finalName>
+          <finalName>webarchive-commons</finalName>
         </configuration>
         <executions>
           <execution>

@@ -21,4 +21,11 @@ public class GZIPFormatException extends RecoverableRecordFormatException {
 	public GZIPFormatException(String message, IOException e) {
 		super(message,e);
 	}
+	public static class GZIPExtraFieldShortException extends GZIPFormatException {
+		int bytesRead;
+		public GZIPExtraFieldShortException(int bytesRead) {
+			super("Extra Field short.");
+			this.bytesRead = bytesRead;
+		}
+	}
 }

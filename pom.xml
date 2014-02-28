@@ -54,6 +54,9 @@
     <build.time>${maven.build.timestamp}</build.time>
     <maven.build.timestamp.format>yyyyMMddhhmmss</maven.build.timestamp.format>
     <build.tag></build.tag>
+    <!-- sonatype repositories are defaults for distributionManagement -->
+    <repository.url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</repository.url>
+    <snapshotRepository.url>https://oss.sonatype.org/content/repositories/snapshots/</snapshotRepository.url>
   </properties>
 
   <dependencies>
@@ -243,13 +246,11 @@
   <distributionManagement>
     <repository>
       <id>repository</id>
-      <!--Pass as command-line system property to maven-->
       <url>${repository.url}</url>
     </repository>
     <snapshotRepository>
-      <id>repository</id>
-      <!--Pass as command-line system property to maven-->
-      <url>${repository.url}</url>
+      <id>snapshotRepository</id>
+      <url>${snapshotRepository.url}</url>
     </snapshotRepository>
   </distributionManagement>
 

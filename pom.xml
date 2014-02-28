@@ -240,4 +240,6 @@
       <!--Pass as command-line system property to maven-->
       <url>${repository.url}</url>
     </repository>
-  </distributionManagement></project>
+  </distributionManagement>
+  
+</project>

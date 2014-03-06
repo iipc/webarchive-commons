@@ -374,6 +374,9 @@ public class GZIPMemberSeriesTest extends TestCase {
 		assertNull(m);
 		assertTrue(s.gotEOF());
 	}
-	
 
+	public void testWgetProblem() throws IndexOutOfBoundsException, FileNotFoundException, IOException {
+		InputStream is = getClass().getResourceAsStream("IAH-urls-wget.warc.gz");
+		new GZIPDecoder().parseHeader(is);
+	}
 }

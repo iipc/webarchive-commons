@@ -98,12 +98,17 @@ public class GZIPFExtraRecord implements GZIPConstants {
 			os.write(value);
 		}
 	}
-	public int read(InputStream is) throws IOException {
+	public int read(InputStream is, int maxRead) throws IOException {
 		byte tmpName[] = null;
 		byte tmpVal[] = null;
 		int valLen = 0;
 		tmpName = ByteOp.readNBytes(is, GZIP_FEXTRA_NAME_BYTES);
 		valLen = ByteOp.readShort(is);
+		if (valLen > (maxRead - BYTES_IN_SHORT - GZIP_FEXTRA_NAME_BYTES)) {
+			/* read in what's left, but throw an exception */
+			tmpVal = ByteOp.readNBytes(is, maxRead - BYTES_IN_SHORT - GZIP_FEXTRA_NAME_BYTES);
+			throw new GZIPFormatException.GZIPExtraFieldShortException(maxRead);
+		}
 		if(valLen > 0) {
 			tmpVal = ByteOp.readNBytes(is, valLen);
 		}

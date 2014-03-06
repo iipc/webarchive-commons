@@ -19,6 +19,8 @@
 
 package org.archive.io;
 
+import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -79,9 +81,6 @@ public abstract class WriterPoolMember implements ArchiveFileConstants {
     protected OutputStream out = null;
     /** Counting stream for metering */
     protected MiserOutputStream countOut = null; 
-    
-    /** reusable buffer for recycling scenarios */ 
-    protected byte[] rebuf; 
     
     protected WriterPoolSettings settings; 
     private final String extension;
@@ -209,10 +208,7 @@ public abstract class WriterPoolMember implements ArchiveFileConstants {
     	close();
         this.f = file;
         FileOutputStream fos = new FileOutputStream(this.f);
-        if(rebuf==null) {
-            rebuf = new byte[settings.getWriteBufferSize()]; 
-        }
-        this.countOut = new MiserOutputStream(new RecyclingFastBufferedOutputStream(fos,rebuf),settings.getFrequentFlushes());
+        this.countOut = new MiserOutputStream(new FastBufferedOutputStream(fos),settings.getFrequentFlushes());
         this.out = this.countOut; 
         logger.fine("Opened " + this.f.getAbsolutePath());
         return this.f.getName();

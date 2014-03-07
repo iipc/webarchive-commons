@@ -7,10 +7,9 @@
     <version>7</version>
   </parent>
 
-
   <groupId>org.netpreserve.commons</groupId>
   <artifactId>webarchive-commons</artifactId>
-  <version>1.1.1</version>
+  <version>1.1.1-${build.tag}SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>webarchive-commons</name>
@@ -54,6 +53,12 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <build.time>${maven.build.timestamp}</build.time>
     <maven.build.timestamp.format>yyyyMMddhhmmss</maven.build.timestamp.format>
+    <build.tag></build.tag>
+    <!-- sonatype repositories are defaults for distributionManagement -->
+    <repository.id>sonatype-nexus-staging</repository.id>
+    <repository.url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</repository.url>
+    <snapshotRepository.id>sonatype-nexus-snapshots</snapshotRepository.id>
+    <snapshotRepository.url>https://oss.sonatype.org/content/repositories/snapshots/</snapshotRepository.url>
   </properties>
 
   <dependencies>
@@ -73,7 +78,7 @@
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>20090211</version>
+      <version>20131018</version>
     </dependency>
     <dependency>
       <groupId>org.htmlparser</groupId>
@@ -239,5 +244,16 @@
     </repository>
 
   </repositories>
+
+  <distributionManagement>
+    <repository>
+      <id>${repository.id}</id>
+      <url>${repository.url}</url>
+    </repository>
+    <snapshotRepository>
+      <id>${snapshotRepository.id}</id>
+      <url>${snapshotRepository.url}</url>
+    </snapshotRepository>
+  </distributionManagement>
 
 </project>

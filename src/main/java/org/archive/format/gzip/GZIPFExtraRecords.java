@@ -53,12 +53,17 @@ public class GZIPFExtraRecords extends ArrayList<GZIPFExtraRecord>{
 		ArrayList<GZIPFExtraRecord> tmpList = new ArrayList<GZIPFExtraRecord>();
 		while(bytesRemaining > 0) {
 			GZIPFExtraRecord tmpRecord = new GZIPFExtraRecord();
-			int bytesRead = tmpRecord.read(is);
-			bytesRemaining -= bytesRead;
+			try {
+				int bytesRead = tmpRecord.read(is, bytesRemaining);
+				bytesRemaining -= bytesRead;
+				tmpList.add(tmpRecord);
+			} catch (GZIPFormatException.GZIPExtraFieldShortException ex) {
+				/* not enough bytes for the extra field; move on */
+				bytesRemaining -= ex.bytesRead;
+			}
 			if(bytesRemaining < 0) {
 				throw new GZIPFormatException("Invalid FExtra length/records");
 			}
-			tmpList.add(tmpRecord);
 		}
 		this.addAll(tmpList);
 	}

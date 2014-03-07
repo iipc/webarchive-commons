@@ -21,6 +21,7 @@ package org.archive.io;
 
 import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -84,16 +85,10 @@ public class RecordingOutputStream extends OutputStream {
     private byte[] buffer;
 
     /** current virtual position in the recording */
-    private long position;
+    long position;
     
     /** flag to disable recording */
     private boolean recording;
-    
-    /**
-     * Reusable buffer for FastBufferedOutputStream
-     */
-    protected byte[] bufStreamBuf = 
-        new byte [ FastBufferedOutputStream.DEFAULT_BUFFER_SIZE ];
     
     /**
      * True if we're to digest content.
@@ -131,6 +126,29 @@ public class RecordingOutputStream extends OutputStream {
      * When recording HTTP, where the content-body starts.
      */
     protected long messageBodyBeginMark;
+
+    /**
+     * While messageBodyBeginMark is not set, the last two bytes seen.
+     * 
+     * <p>
+     * This class does automatic detection of http message body begin (i.e. end
+     * of http headers). Unfortunately httpcomponents did not want to add
+     * functionality to help us with this, see
+     * https://issues.apache.org/jira/browse/HTTPCORE-325
+     * 
+     * <p>
+     * It works like this: while messageBodyBeginMark is not set, we remember
+     * the last two bytes seen, and look at each byte we write. If the
+     * lastTwoBytes+currentByte is "\n\r\n", or lastTwoBytes[1]+currentByte is
+     * "\n\n" then we call markMessageBodyBegin() at the position after
+     * currentByte.
+     * 
+     * <p>
+     * An assumption here is that protocols other than http don't have headers,
+     * and for those protocols the user of this class will call
+     * markMessageBodyBegin() at position 0 before writing anything.
+     */
+    protected int[] lastTwoBytes = new int[] {-1, -1};
 
     /**
      * Stream to record.
@@ -183,14 +201,17 @@ public class RecordingOutputStream extends OutputStream {
         }
         clearForReuse();
         this.out = wrappedStream;
-        if (this.diskStream == null) {
-            // TODO: Fix so we only make file when its actually needed.
-            FileOutputStream fis = new FileOutputStream(this.backingFilename);
-            
-            this.diskStream = new RecyclingFastBufferedOutputStream(fis, bufStreamBuf);
-        }
         startTime = System.currentTimeMillis();
     }
+    
+    protected OutputStream ensureDiskStream() throws FileNotFoundException {
+        if (this.diskStream == null) {
+            FileOutputStream fis = new FileOutputStream(this.backingFilename);
+            this.diskStream = new FastBufferedOutputStream(fis);
+        }
+        return this.diskStream;
+    }
+
 
     public void write(int b) throws IOException {
         if(position<maxPosition) {
@@ -204,6 +225,20 @@ public class RecordingOutputStream extends OutputStream {
         if (this.out != null) {
             this.out.write(b);
         }
+        
+        // see comment on int[] lastTwoBytes
+        if (messageBodyBeginMark < 0l) {
+            // looking for "\n\n" or "\n\r\n"
+            if (b == '\n' 
+                    && (lastTwoBytes[1] == '\n'
+                    || (lastTwoBytes[0] == '\n' && lastTwoBytes[1] == '\r'))) {
+                markMessageBodyBegin();
+            } else {
+                lastTwoBytes[0] = lastTwoBytes[1];
+                lastTwoBytes[1] = b;
+            }
+        }
+        
         checkLimits();
     }
 
@@ -220,6 +255,14 @@ public class RecordingOutputStream extends OutputStream {
             off += consumeRange;
             len -= consumeRange; 
         }
+        
+        // see comment on int[] lastTwoBytes
+        while (messageBodyBeginMark < 0 && len > 0) {
+            write(b[off]);
+            off++;
+            len--;
+        }
+        
         if(recording) {
             record(b, off, len);
         }
@@ -251,7 +294,7 @@ public class RecordingOutputStream extends OutputStream {
             throw new RecorderTimeoutException(); 
         }
         // need to throttle reading to hit max configured rate? 
-        if(position/duration > maxRateBytesPerMs) {
+        if(position/duration >= maxRateBytesPerMs) {
             long desiredDuration = position / maxRateBytesPerMs;
             try {
                 Thread.sleep(desiredDuration-duration);
@@ -274,10 +317,7 @@ public class RecordingOutputStream extends OutputStream {
             this.digest.update((byte)b);
         }
         if (this.position >= this.buffer.length) {
-            // TODO: Its possible to call write w/o having first opened a
-            // stream.  Protect ourselves against this.
-            assert this.diskStream != null: "Diskstream is null";
-            this.diskStream.write(b);
+            this.ensureDiskStream().write(b);
         } else {
             this.buffer[(int) this.position] = (byte) b;
         }
@@ -312,12 +352,7 @@ public class RecordingOutputStream extends OutputStream {
      */
     private void tailRecord(byte[] b, int off, int len) throws IOException {
         if(this.position >= this.buffer.length){
-            // TODO: Its possible to call write w/o having first opened a
-            // stream.  Lets protect ourselves against this.
-            if (this.diskStream == null) {
-                throw new IOException("diskstream is null");
-            }
-            this.diskStream.write(b, off, len);
+            this.ensureDiskStream().write(b, off, len);
             this.position += len;
         } else {
             assert this.buffer != null: "Buffer is null";
@@ -555,6 +590,18 @@ public class RecordingOutputStream extends OutputStream {
      */
     public long getRemainingLength() {
         return maxLength - position; 
+    }
+
+    /**
+     * Forget about anything past the point where the content-body starts. This
+     * is needed to support FetchHTTP's shouldFetchBody setting. See also the
+     * docs on {@link #lastTwoBytes}
+     */
+    public void chopAtMessageBodyBegin() {
+        if (messageBodyBeginMark >= 0) {
+            this.size = messageBodyBeginMark;
+            this.position = messageBodyBeginMark;
+        }
     }
 
     public void clearForReuse() throws IOException {

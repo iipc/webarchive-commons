@@ -100,11 +100,15 @@ implements WARCConstants {
             atFirstRecord);
     }
     
+	/*
+	 * Note that the ARC companion does this differently, with quite a lot of duplication.
+	 * 
+	 * @see org.archive.io.arc.ARCReaderFactory.getArchiveReader(String, InputStream, boolean)
+	 */
     protected ArchiveReader getArchiveReader(final String f,
 			final InputStream is, final boolean atFirstRecord)
 			throws IOException {
-    	// Check if it's compressed:
-    	// TODO Currently relies on the file extension, but this should all really sniff the content properly.
+    	// Check if it's compressed, based on file extension.
     	if( f.endsWith(".gz") ) {
     		return new CompressedWARCReader(f, is, atFirstRecord);
     	} else {

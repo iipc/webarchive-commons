@@ -100,12 +100,20 @@ implements WARCConstants {
             atFirstRecord);
     }
     
+	/*
+	 * Note that the ARC companion does this differently, with quite a lot of duplication.
+	 * 
+	 * @see org.archive.io.arc.ARCReaderFactory.getArchiveReader(String, InputStream, boolean)
+	 */
     protected ArchiveReader getArchiveReader(final String f,
 			final InputStream is, final boolean atFirstRecord)
 			throws IOException {
-		// For now, assume stream is compressed. Later add test of input
-		// stream or handle exception thrown when figure not compressed stream.
-		return new CompressedWARCReader(f, is, atFirstRecord);
+    	// Check if it's compressed, based on file extension.
+    	if( f.endsWith(".gz") ) {
+    		return new CompressedWARCReader(f, is, atFirstRecord);
+    	} else {
+    		return new UncompressedWARCReader(f, is);
+    	}
 	}
     
     public static WARCReader get(final URL arcUrl, final long offset)

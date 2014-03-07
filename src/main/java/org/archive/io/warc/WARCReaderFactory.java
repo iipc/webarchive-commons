@@ -103,9 +103,13 @@ implements WARCConstants {
     protected ArchiveReader getArchiveReader(final String f,
 			final InputStream is, final boolean atFirstRecord)
 			throws IOException {
-		// For now, assume stream is compressed. Later add test of input
-		// stream or handle exception thrown when figure not compressed stream.
-		return new CompressedWARCReader(f, is, atFirstRecord);
+    	// Check if it's compressed:
+    	// TODO Currently relies on the file extension, but this should all really sniff the content properly.
+    	if( f.endsWith(".gz") ) {
+    		return new CompressedWARCReader(f, is, atFirstRecord);
+    	} else {
+    		return new UncompressedWARCReader(f, is);
+    	}
 	}
     
     public static WARCReader get(final URL arcUrl, final long offset)

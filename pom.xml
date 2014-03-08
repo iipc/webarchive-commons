@@ -245,6 +245,7 @@
 
   </repositories>
 
+<!--
   <distributionManagement>
     <repository>
       <id>${repository.id}</id>
@@ -255,5 +256,6 @@
       <url>${snapshotRepository.url}</url>
     </snapshotRepository>
   </distributionManagement>
+-->
 
 </project>

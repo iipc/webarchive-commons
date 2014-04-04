@@ -28,8 +28,8 @@ public class ARCReaderFactoryTest extends TestCase {
      * @throws Exception
      */
     public void testGetResource() throws Exception {
-    	this.offsetResourceTest(testfile1, 1515, "archive.org/robots.txt" );
-    	this.offsetResourceTest(testfile1, 36420, "archive.org/services/collection-rss.php" );
+    	this.offsetResourceTest(testfile1, 1515, "http://www.archive.org/robots.txt" );
+    	this.offsetResourceTest(testfile1, 36420, "http://www.archive.org/services/collection-rss.php" );
     }
     
     private void offsetResourceTest( File testfile, long offset, String uri ) throws Exception {

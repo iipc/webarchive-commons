@@ -292,13 +292,10 @@ public abstract class ArchiveRecord extends InputStream {
     }
 
     protected void incrementPosition() {
-    	System.err.println("incrementPostion()");
         this.position++;
     }
 
     protected void incrementPosition(final long incr) {
-    	new Exception().printStackTrace();
-    	System.err.println("incrementPostion("+incr+")");
         this.position += incr;
     }
 
@@ -407,8 +404,6 @@ public abstract class ArchiveRecord extends InputStream {
     }
 
     protected void setBodyOffset(int bodyOffset) {
-    	new Exception().printStackTrace();
-    	System.err.println("setBodyOffset("+bodyOffset+")");
         this.position = bodyOffset;
     }
 }

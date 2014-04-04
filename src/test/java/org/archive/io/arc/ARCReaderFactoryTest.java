@@ -41,16 +41,12 @@ public class ARCReaderFactoryTest extends TestCase {
 		// This one works:
 		//ArchiveReader reader = ARCReaderFactory.get(testfile, offset);
 		ArchiveRecord record = reader.get();
-        System.out.println("Position:"+record.getPosition());
 
 		final String url = record.getHeader().getUrl();
-		System.out.println("Got URL: "+url);
 		assertEquals("URL of record is not as expected.", uri, url);
 		
         final long position = record.getPosition();
         final long recordLength = record.getHeader().getLength();
-        System.out.println("Position:"+position);
-        System.out.println("Length:"+recordLength);
         assertTrue("Position " + position + " is after end of record " + recordLength, position <= recordLength);
 
         // Clean up:

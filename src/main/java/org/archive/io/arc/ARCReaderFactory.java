@@ -147,7 +147,7 @@ implements ARCConstants {
         possiblyWrapped.mark(100);
         boolean compressed = testCompressedARCStream(possiblyWrapped);
         possiblyWrapped.reset();
-
+        
         if (compressed) {
             return new CompressedARCReader(arc, possiblyWrapped, atFirstRecord);
         } else {

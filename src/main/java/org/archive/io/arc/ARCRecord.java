@@ -344,6 +344,8 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
         // save verbatim header String
         this.headerString = StringUtils.join(list," ");
         
+        System.err.println("This "+this.headerString);
+        
         return read;
     }
     
@@ -589,6 +591,7 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
         
         	statusLine = EncodingUtil.getString(statusBytes, 0,
         			statusBytes.length - eolCharCount, ARCConstants.DEFAULT_ENCODING);
+        	System.err.println("statusLine: "+statusLine);
         	
         	// If a null or DELETED break immediately
         	if ((statusLine == null) || statusLine.startsWith("DELETED")) {
@@ -602,6 +605,7 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
         	}
         	
         	// Add bytes read to error "offset" to add to position
+        	System.err.println("BYTES: "+new String(statusBytes));
         	errOffset += statusBytes.length;
         }
         

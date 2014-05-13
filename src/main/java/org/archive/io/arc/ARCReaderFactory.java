@@ -147,11 +147,11 @@ implements ARCConstants {
         possiblyWrapped.mark(100);
         boolean compressed = testCompressedARCStream(possiblyWrapped);
         possiblyWrapped.reset();
-
+        
         if (compressed) {
             return new CompressedARCReader(arc, possiblyWrapped, atFirstRecord);
         } else {
-            return new UncompressedARCReader(arc, possiblyWrapped);
+            return new UncompressedARCReader(arc, possiblyWrapped, atFirstRecord);
         }
 	}
     
@@ -330,10 +330,11 @@ implements ARCConstants {
          * @param f Uncompressed arc to read.
          * @param is InputStream.
          */
-        public UncompressedARCReader(final String f, final InputStream is) {
+        public UncompressedARCReader(final String f, final InputStream is, boolean atFirstRecord) {
             // Arc file has been tested for existence by time it has come
             // to here.
             setIn(new CountingInputStream(is));
+            setAlignedOnFirstRecord(atFirstRecord);
             initialize(f);
         }
     }

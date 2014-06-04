@@ -7,7 +7,7 @@ import java.io.RandomAccessFile;
 
 import org.archive.util.binsearch.AbstractSeekableLineReader;
 
-import com.google.common.io.LimitInputStream;
+import com.google.common.io.ByteStreams;
 
 public class RandomAccessFileSeekableLineReader extends AbstractSeekableLineReader {
 	
@@ -24,7 +24,7 @@ public class RandomAccessFileSeekableLineReader extends AbstractSeekableLineRead
     	FileInputStream fis = new FileInputStream(raf.getFD());
     	
     	if (maxLength > 0) {
-    		return new LimitInputStream(fis, maxLength);
+    		return ByteStreams.limit(fis, maxLength);
     	} else {
     		return fis;
     	}

@@ -1,6 +1,7 @@
 package org.archive.extract;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -23,8 +24,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.common.io.ByteStreams;
 import com.google.common.io.CountingOutputStream;
-import com.google.common.io.NullOutputStream;
 
 public class RealCDXExtractorOutput implements ExtractorOutput {
 	private static final Logger LOG = 
@@ -72,7 +73,7 @@ public class RealCDXExtractorOutput implements ExtractorOutput {
 //	SimpleJSONPathSpec gzFooterLengthSpec = new SimpleJSONPathSpec("Container.Gzip-Metadata.Footer-Length");
 //	SimpleJSONPathSpec gzHeaderLengthSpec = new SimpleJSONPathSpec("Container.Gzip-Metadata.Header-Length");
 	public void output(Resource resource) throws IOException {
-		NullOutputStream nullo = new NullOutputStream();
+		OutputStream nullo = ByteStreams.nullOutputStream();
 		CountingOutputStream co = new CountingOutputStream(nullo);
 		try {
 			StreamCopy.copy(resource.getInputStream(), co);

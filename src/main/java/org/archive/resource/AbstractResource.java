@@ -5,7 +5,7 @@ import java.io.PrintStream;
 
 import org.archive.util.StreamCopy;
 
-import com.google.common.io.NullOutputStream;
+import com.google.common.io.ByteStreams;
 
 public abstract class AbstractResource implements Resource {
 	protected ResourceContainer container;
@@ -44,7 +44,7 @@ public abstract class AbstractResource implements Resource {
 //		out.println("Headers Before");
 //		out.print(m.toString());
 		
-		long bytes = StreamCopy.copy(resource.getInputStream(), new NullOutputStream());
+		long bytes = StreamCopy.copy(resource.getInputStream(), ByteStreams.nullOutputStream());
 		out.println("Resource Was:"+bytes+" Long");
 
 		out.println("[\n]Headers After");

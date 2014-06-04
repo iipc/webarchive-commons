@@ -36,8 +36,9 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
-import com.google.common.base.Function;
-import com.google.common.collect.MapMaker;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 public class TextUtils {
     private static final String FIRSTWORD = "^([^\\s]*).*$";
@@ -51,11 +52,11 @@ public class TextUtils {
     };
     
     /** global soft-cache of Patterns, by string key */
-    private static final ConcurrentMap<String, Pattern> PATTERNS = new MapMaker()
+    private static final LoadingCache<String, Pattern> PATTERNS = CacheBuilder.newBuilder()
         .concurrencyLevel(16)
         .softValues()
-        .makeComputingMap(new Function<String, Pattern>() {
-            public Pattern apply(String regex) {
+        .build(new CacheLoader<String, Pattern>() {
+            public Pattern load(String regex) {
                 return Pattern.compile(regex);
             }
         });
@@ -84,7 +85,7 @@ public class TextUtils {
         final Map<String,Matcher> matchers = TL_MATCHER_MAP.get();
         Matcher m = (Matcher)matchers.get(pattern);
         if(m == null) {
-            m = PATTERNS.get(pattern).matcher(input);
+            m = PATTERNS.getUnchecked(pattern).matcher(input);
         } else {
             matchers.put(pattern,null);
             m.reset(input);

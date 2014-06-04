@@ -6,7 +6,7 @@ import java.io.InputStream;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.archive.util.binsearch.AbstractSeekableLineReader;
 
-import com.google.common.io.LimitInputStream;
+import com.google.common.io.ByteStreams;
 
 public class HDFSSeekableLineReader extends AbstractSeekableLineReader {
 	private FSDataInputStream fsdis;
@@ -23,7 +23,7 @@ public class HDFSSeekableLineReader extends AbstractSeekableLineReader {
 		fsdis.seek(offset);
 		
 		if (maxLength >= 0) {
-			return new LimitInputStream(fsdis, maxLength);
+			return ByteStreams.limit(fsdis, maxLength);
 		} else {
 			return fsdis;
 		}

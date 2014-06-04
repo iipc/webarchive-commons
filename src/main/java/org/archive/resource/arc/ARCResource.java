@@ -18,8 +18,8 @@ import org.archive.util.io.EOFNotifyingInputStream;
 import org.archive.util.io.EOFObserver;
 import org.archive.util.io.PushBackOneByteInputStream;
 
+import com.google.common.io.ByteStreams;
 import com.google.common.io.CountingInputStream;
-import com.google.common.io.LimitInputStream;
 
 public class ARCResource extends AbstractResource
 
@@ -54,7 +54,7 @@ implements ResourceConstants, ARCConstants, EOFObserver {
 		fields.putLong(DECLARED_LENGTH_KEY, arcMetaData.getLength());
 
 		countingIS = new CountingInputStream(
-				new LimitInputStream(raw, arcMetaData.getLength()));
+				ByteStreams.limit(raw, arcMetaData.getLength()));
 
 		try {
 			digIS = new DigestInputStream(countingIS, 

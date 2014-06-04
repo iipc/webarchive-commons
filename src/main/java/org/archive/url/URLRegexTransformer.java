@@ -101,7 +101,7 @@ public class URLRegexTransformer {
 		InternetDomainName idn;
 	
 		try {
-			idn = InternetDomainName.fromLenient(host);
+			idn = InternetDomainName.from(host);
 		} catch(IllegalArgumentException e) {
 			return host;
 		}
@@ -109,7 +109,7 @@ public class URLRegexTransformer {
 		if(tmp == null) {
 			return host;
 		}
-		String pubSuff = tmp.name();
+		String pubSuff = tmp.toString();
 		int idx = host.lastIndexOf(".", host.length() - (pubSuff.length()+2));
 		if(idx == -1) {
 			return host;

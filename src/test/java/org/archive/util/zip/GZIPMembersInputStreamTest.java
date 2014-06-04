@@ -30,7 +30,7 @@ import org.apache.commons.io.IOUtils;
 import org.archive.util.ArchiveUtils;
 import org.archive.util.zip.GZIPMembersInputStream;
 
-import com.google.common.io.NullOutputStream;
+import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Bytes;
 
 /**
@@ -70,14 +70,14 @@ public class GZIPMembersInputStreamTest extends TestCase {
     public void testFullReadAllFour() throws IOException {
         GZIPMembersInputStream gzin = 
             new GZIPMembersInputStream(new ByteArrayInputStream(allfour_gz));
-        int count = IOUtils.copy(gzin, new NullOutputStream());
+        int count = IOUtils.copy(gzin, ByteStreams.nullOutputStream());
         assertEquals("wrong length uncompressed data", 1024+(32*1024)+1+5, count);
     }
     
     public void testFullReadSixSmall() throws IOException {
         GZIPMembersInputStream gzin = 
             new GZIPMembersInputStream(new ByteArrayInputStream(sixsmall_gz));
-        int count = IOUtils.copy(gzin, new NullOutputStream());
+        int count = IOUtils.copy(gzin, ByteStreams.nullOutputStream());
         assertEquals("wrong length uncompressed data", 1+5+1+5+1+5, count);
     }
     
@@ -85,31 +85,31 @@ public class GZIPMembersInputStreamTest extends TestCase {
         GZIPMembersInputStream gzin = 
             new GZIPMembersInputStream(new ByteArrayInputStream(allfour_gz));
         gzin.setEofEachMember(true); 
-        int count0 = IOUtils.copy(gzin, new NullOutputStream());
+        int count0 = IOUtils.copy(gzin, ByteStreams.nullOutputStream());
         assertEquals("wrong 1k member count", 1024, count0);
         assertEquals("wrong member number", 0, gzin.getMemberNumber());
         assertEquals("wrong member0 start", 0, gzin.getCurrentMemberStart());
         assertEquals("wrong member0 end", noise1k_gz.length, gzin.getCurrentMemberEnd());
         gzin.nextMember(); 
-        int count1 = IOUtils.copy(gzin, new NullOutputStream());
+        int count1 = IOUtils.copy(gzin, ByteStreams.nullOutputStream());
         assertEquals("wrong 32k member count", (32*1024), count1);
         assertEquals("wrong member number", 1, gzin.getMemberNumber());
         assertEquals("wrong member1 start",  noise1k_gz.length, gzin.getCurrentMemberStart());
         assertEquals("wrong member1 end", noise1k_gz.length+noise32k_gz.length, gzin.getCurrentMemberEnd());
         gzin.nextMember(); 
-        int count2 = IOUtils.copy(gzin, new NullOutputStream());
+        int count2 = IOUtils.copy(gzin, ByteStreams.nullOutputStream());
         assertEquals("wrong 1-byte member count", 1, count2);
         assertEquals("wrong member number", 2, gzin.getMemberNumber());
         assertEquals("wrong member2 start",  noise1k_gz.length+noise32k_gz.length, gzin.getCurrentMemberStart());
         assertEquals("wrong member2 end", noise1k_gz.length+noise32k_gz.length+a_gz.length, gzin.getCurrentMemberEnd());
         gzin.nextMember(); 
-        int count3 = IOUtils.copy(gzin, new NullOutputStream());
+        int count3 = IOUtils.copy(gzin, ByteStreams.nullOutputStream());
         assertEquals("wrong 5-byte member count", 5, count3);
         assertEquals("wrong member number", 3, gzin.getMemberNumber());
         assertEquals("wrong member3 start", noise1k_gz.length+noise32k_gz.length+a_gz.length, gzin.getCurrentMemberStart());
         assertEquals("wrong member3 end", noise1k_gz.length+noise32k_gz.length+a_gz.length+hello_gz.length, gzin.getCurrentMemberEnd());
         gzin.nextMember();
-        int countEnd = IOUtils.copy(gzin, new NullOutputStream());
+        int countEnd = IOUtils.copy(gzin, ByteStreams.nullOutputStream());
         assertEquals("wrong eof count", 0, countEnd);
     }
     
@@ -118,14 +118,14 @@ public class GZIPMembersInputStreamTest extends TestCase {
             new GZIPMembersInputStream(new ByteArrayInputStream(sixsmall_gz));
         gzin.setEofEachMember(true); 
         for(int i = 0; i < 3; i++) {
-            int count2 = IOUtils.copy(gzin, new NullOutputStream());
+            int count2 = IOUtils.copy(gzin, ByteStreams.nullOutputStream());
             assertEquals("wrong 1-byte member count", 1, count2);
             gzin.nextMember(); 
-            int count3 = IOUtils.copy(gzin, new NullOutputStream());
+            int count3 = IOUtils.copy(gzin, ByteStreams.nullOutputStream());
             assertEquals("wrong 5-byte member count", 5, count3);
             gzin.nextMember();
         }
-        int countEnd = IOUtils.copy(gzin, new NullOutputStream());
+        int countEnd = IOUtils.copy(gzin, ByteStreams.nullOutputStream());
         assertEquals("wrong eof count", 0, countEnd);
     }
     
@@ -172,19 +172,19 @@ public class GZIPMembersInputStreamTest extends TestCase {
             new GZIPMembersInputStream(new ByteArrayInputStream(allfour_gz));
         gzin.setEofEachMember(true); 
         gzin.compressedSeek(noise1k_gz.length+noise32k_gz.length);
-        int count2 = IOUtils.copy(gzin, new NullOutputStream());
+        int count2 = IOUtils.copy(gzin, ByteStreams.nullOutputStream());
         assertEquals("wrong 1-byte member count", 1, count2);
 //        assertEquals("wrong Member number", 2, gzin.getMemberNumber());
         assertEquals("wrong Member2 start",  noise1k_gz.length+noise32k_gz.length, gzin.getCurrentMemberStart());
         assertEquals("wrong Member2 end", noise1k_gz.length+noise32k_gz.length+a_gz.length, gzin.getCurrentMemberEnd());
         gzin.nextMember(); 
-        int count3 = IOUtils.copy(gzin, new NullOutputStream());
+        int count3 = IOUtils.copy(gzin, ByteStreams.nullOutputStream());
         assertEquals("wrong 5-byte member count", 5, count3);
 //        assertEquals("wrong Member number", 3, gzin.getMemberNumber());
         assertEquals("wrong Member3 start", noise1k_gz.length+noise32k_gz.length+a_gz.length, gzin.getCurrentMemberStart());
         assertEquals("wrong Member3 end", noise1k_gz.length+noise32k_gz.length+a_gz.length+hello_gz.length, gzin.getCurrentMemberEnd());
         gzin.nextMember();
-        int countEnd = IOUtils.copy(gzin, new NullOutputStream());
+        int countEnd = IOUtils.copy(gzin, ByteStreams.nullOutputStream());
         assertEquals("wrong eof count", 0, countEnd);
     }
     
@@ -195,7 +195,7 @@ public class GZIPMembersInputStreamTest extends TestCase {
         Iterator<GZIPMembersInputStream> iter = gzin.memberIterator();
         assertTrue(iter.hasNext());
         GZIPMembersInputStream gzMember0 = iter.next();
-        int count0 = IOUtils.copy(gzMember0, new NullOutputStream());
+        int count0 = IOUtils.copy(gzMember0, ByteStreams.nullOutputStream());
         assertEquals("wrong 1k member count", 1024, count0);
         assertEquals("wrong member number", 0, gzin.getMemberNumber());
         assertEquals("wrong member0 start", 0, gzin.getCurrentMemberStart());
@@ -203,7 +203,7 @@ public class GZIPMembersInputStreamTest extends TestCase {
         
         assertTrue(iter.hasNext());
         GZIPMembersInputStream gzMember1 = iter.next();
-        int count1 = IOUtils.copy(gzMember1, new NullOutputStream());
+        int count1 = IOUtils.copy(gzMember1, ByteStreams.nullOutputStream());
         assertEquals("wrong 32k member count", (32*1024), count1);
         assertEquals("wrong member number", 1, gzin.getMemberNumber());
         assertEquals("wrong member1 start",  noise1k_gz.length, gzin.getCurrentMemberStart());
@@ -211,7 +211,7 @@ public class GZIPMembersInputStreamTest extends TestCase {
         
         assertTrue(iter.hasNext());
         GZIPMembersInputStream gzMember2 = iter.next();
-        int count2 = IOUtils.copy(gzMember2, new NullOutputStream()); 
+        int count2 = IOUtils.copy(gzMember2, ByteStreams.nullOutputStream()); 
         assertEquals("wrong 1-byte member count", 1, count2);
         assertEquals("wrong member number", 2, gzin.getMemberNumber());
         assertEquals("wrong member2 start",  noise1k_gz.length+noise32k_gz.length, gzin.getCurrentMemberStart());
@@ -219,7 +219,7 @@ public class GZIPMembersInputStreamTest extends TestCase {
         
         assertTrue(iter.hasNext());
         GZIPMembersInputStream gzMember3 = iter.next();
-        int count3 = IOUtils.copy(gzMember3, new NullOutputStream());
+        int count3 = IOUtils.copy(gzMember3, ByteStreams.nullOutputStream());
         assertEquals("wrong 5-byte member count", 5, count3);
         assertEquals("wrong member number", 3, gzin.getMemberNumber());
         assertEquals("wrong member3 start", noise1k_gz.length+noise32k_gz.length+a_gz.length, gzin.getCurrentMemberStart());

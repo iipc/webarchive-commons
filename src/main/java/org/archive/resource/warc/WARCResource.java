@@ -19,8 +19,8 @@ import org.archive.util.io.EOFNotifyingInputStream;
 import org.archive.util.io.EOFObserver;
 import org.archive.util.io.PushBackOneByteInputStream;
 
+import com.google.common.io.ByteStreams;
 import com.google.common.io.CountingInputStream;
-import com.google.common.io.LimitInputStream;
 
 public class WARCResource extends AbstractResource implements EOFObserver, ResourceConstants {
 	CountingInputStream countingIS;
@@ -51,7 +51,7 @@ public class WARCResource extends AbstractResource implements EOFObserver, Resou
 
 		if(length >= 0) {
 			countingIS = new CountingInputStream(
-					new LimitInputStream(response, length));
+					ByteStreams.limit(response, length));
 		} else {
 			throw new ResourceParseException(null);
 		}

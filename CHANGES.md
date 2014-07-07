@@ -1,3 +1,10 @@
+1.1.3
+-----
+* [Synchronised with IA fork](https://github.com/iipc/webarchive-commons/pull/18)
+* [Updated to more recent Guava APIs](https://github.com/iipc/webarchive-commons/pull/17)
+* [Fixed handling of uncompressed ARC files #13 and #14](https://github.com/iipc/webarchive-commons/pull/14)
+* [Avoid pulling in the logback dependency IA#13](https://github.com/internetarchive/webarchive-commons/pull/13)
+
 1.1.2
 -----
 * Fixed support for reading uncompressed WARCs, along with some unit testing. (https://github.com/iipc/webarchive-commons/pull/12)

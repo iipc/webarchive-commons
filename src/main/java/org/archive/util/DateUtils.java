@@ -65,7 +65,7 @@ public class DateUtils {
     private static ThreadLocal<SimpleDateFormat> threadLocalDateFormat(final String pattern) {
         ThreadLocal<SimpleDateFormat> tl = new ThreadLocal<SimpleDateFormat>() {
             protected SimpleDateFormat initialValue() {
-                SimpleDateFormat df = new SimpleDateFormat(pattern);
+                SimpleDateFormat df = new SimpleDateFormat(pattern, Locale.ENGLISH);
                 df.setTimeZone(TimeZone.getTimeZone("GMT"));
                 return df;
             }

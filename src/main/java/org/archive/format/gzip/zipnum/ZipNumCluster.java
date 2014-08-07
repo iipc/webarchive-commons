@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -102,7 +103,7 @@ public class ZipNumCluster extends ZipNumIndex {
 	public final static String LATEST_TIMESTAMP = "_LATEST";	
 	public final static String OFF = "OFF";
 	
-	protected SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	protected SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
 	protected Date startDate, endDate;
 	
 	class BlockSize

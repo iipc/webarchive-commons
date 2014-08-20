@@ -3,6 +3,7 @@ package org.archive.util.binsearch.impl.http;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
@@ -156,7 +157,7 @@ public class ApacheHttp31SLRFactory extends HTTPSeekableLineReaderFactory {
 	public long getModTime()
 	{
 		HTTPSeekableLineReader reader = null;
-		SimpleDateFormat lastModFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+		SimpleDateFormat lastModFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH);
 	
 		try {
 			reader = get();

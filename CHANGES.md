@@ -1,3 +1,8 @@
+1.1.4
+-----
+* [All dates should be independent of locale settings](https://github.com/iipc/webarchive-commons/pull/22)
+* [Resolved fastutil conflict in dependencies](https://github.com/iipc/webarchive-commons/pull/24)
+
 1.1.3
 -----
 * [Synchronised with IA fork](https://github.com/iipc/webarchive-commons/pull/18)

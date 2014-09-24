@@ -36,6 +36,7 @@ import org.archive.net.PublicSuffixes.Node;
  */
 public class PublicSuffixesTest extends TestCase {
     // test of low level implementation
+    private final String NL = System.lineSeparator();
     
     public void testCompare() {
         Node n = new Node("hoge");
@@ -78,27 +79,26 @@ public class PublicSuffixesTest extends TestCase {
         Node alt = new Node(null, new ArrayList<Node>());
         alt.addBranch("ac,");
         // specifically, should not have empty string as match.
-        assertEquals("(null)\n" +
-                "  \"ac,\"\n", dump(alt));
+        assertEquals("(null)" + NL + "  \"ac,\"" + NL, dump(alt));
         alt.addBranch("ac,com,");
-        assertEquals("(null)\n" +
-        		"  \"ac,\"\n" +
-        		"    \"com,\"\n" +
-        		"    \"\"\n", dump(alt));
+        assertEquals("(null)" + NL +
+        		"  \"ac,\"" + NL +
+        		"    \"com,\"" + NL +
+        		"    \"\"" + NL, dump(alt));
         alt.addBranch("ac,edu,");
-        assertEquals("(null)\n" +
-        		"  \"ac,\"\n" +
-        		"    \"com,\"\n" +
-        		"    \"edu,\"\n" +
-        		"    \"\"\n", dump(alt));
+        assertEquals("(null)" + NL +
+        		"  \"ac,\"" + NL +
+        		"    \"com,\"" + NL +
+        		"    \"edu,\"" + NL +
+        		"    \"\"" + NL, dump(alt));
     }
     public void testTrie2() {
         Node alt = new Node(null, new ArrayList<Node>());
         alt.addBranch("ac,");
         alt.addBranch("*,");
-        assertEquals("(null)\n" +
-        		"  \"ac,\"\n" +
-        		"  \"*,\"\n", dump(alt));
+        assertEquals("(null)" + NL +
+        		"  \"ac,\"" + NL +
+        		"  \"*,\"" + NL, dump(alt));
     }
 
     public void testTrie3() {
@@ -107,11 +107,11 @@ public class PublicSuffixesTest extends TestCase {
         alt.addBranch("ac,!hoge,");
         alt.addBranch("ac,*,");
         // exception goes first.
-        assertEquals("(null)\n" +
-        		"  \"ac,\"\n" +
-        		"    \"!hoge,\"\n" +
-        		"    \"*,\"\n" +
-        		"    \"\"\n", dump(alt));
+        assertEquals("(null)" + NL +
+        		"  \"ac,\"" + NL +
+        		"    \"!hoge,\"" + NL +
+        		"    \"*,\"" + NL +
+        		"    \"\"" + NL, dump(alt));
     }
 
     // test of higher-level functionality

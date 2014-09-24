@@ -14,11 +14,6 @@ public class SortedCompositeIteratorTest extends TestCase {
 
 	public void testHasNext() throws FileNotFoundException, IOException {
 		
-		long t = 210000;
-		long c = 134;
-		float f = (float)c / (float)t;
-		System.err.format("F(%f)\n",f);
-		
 		File a = File.createTempFile("filea", null); 
 		File b = File.createTempFile("fileb", null);
 		

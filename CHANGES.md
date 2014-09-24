@@ -1,3 +1,7 @@
+1.1.5
+-----
+* [Removed direct reference to Unix TMP-path](https://github.com/iipc/webarchive-commons/issues/2)
+
 1.1.4
 -----
 * [All dates should be independent of locale settings](https://github.com/iipc/webarchive-commons/pull/22)

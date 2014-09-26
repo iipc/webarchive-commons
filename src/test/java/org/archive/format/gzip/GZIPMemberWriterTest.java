@@ -12,8 +12,8 @@ import junit.framework.TestCase;
 public class GZIPMemberWriterTest extends TestCase {
 
 	public void testWrite() throws IOException {
-		String outPath = "/tmp/tmp.gz";
-		GZIPMemberWriter gzw = new GZIPMemberWriter(new FileOutputStream(new File(outPath)));
+                File outFile = File.createTempFile("tmp", ".gz");
+		GZIPMemberWriter gzw = new GZIPMemberWriter(new FileOutputStream(outFile));
 		gzw.write(new ByteArrayInputStream("Here is record 1".getBytes(IAUtils.UTF8)));
 		gzw.write(new ByteArrayInputStream("Here is record 2".getBytes(IAUtils.UTF8)));
 	}

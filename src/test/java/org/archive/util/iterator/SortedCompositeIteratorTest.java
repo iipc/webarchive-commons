@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Comparator;
 
@@ -11,21 +12,11 @@ import junit.framework.TestCase;
 
 public class SortedCompositeIteratorTest extends TestCase {
 
-	public void testHasNext() throws FileNotFoundException {
+	public void testHasNext() throws FileNotFoundException, IOException {
 		
-		long t = 210000;
-		long c = 134;
-		float f = (float)c / (float)t;
-		System.err.format("F(%f)\n",f);
+		File a = File.createTempFile("filea", null); 
+		File b = File.createTempFile("fileb", null);
 		
-		File a = new File("/tmp/a");
-		File b = new File("/tmp/b");
-		if(a.isFile()) {
-			a.delete();
-		}
-		if(b.isFile()) {
-			b.delete();
-		}
 		PrintWriter apw = new PrintWriter(a);
 		PrintWriter bpw = new PrintWriter(b);
 		apw.println("1");
@@ -38,6 +29,7 @@ public class SortedCompositeIteratorTest extends TestCase {
 		BufferedReader bbr = new BufferedReader(new FileReader(b));
 		SortedCompositeIterator<String> sci = new SortedCompositeIterator<String>(new Comparator<String>() {
 
+                        @Override
 			public int compare(String o1, String o2) {
 				return o1.compareTo(o2);
 			}

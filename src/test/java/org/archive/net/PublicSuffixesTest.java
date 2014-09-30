@@ -36,7 +36,7 @@ import org.archive.net.PublicSuffixes.Node;
  */
 public class PublicSuffixesTest extends TestCase {
     // test of low level implementation
-    private final String NL = System.lineSeparator();
+    private final String NL = System.getProperty("line.separator");
     
     public void testCompare() {
         Node n = new Node("hoge");

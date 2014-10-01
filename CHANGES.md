@@ -1,6 +1,6 @@
 1.1.5
 -----
-* [Removed direct reference to Unix TMP-path](https://github.com/iipc/webarchive-commons/issues/2)
+* [Tests fail on Windows](https://github.com/iipc/webarchive-commons/issues/2)
 
 1.1.4
 -----

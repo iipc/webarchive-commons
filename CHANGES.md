@@ -1,6 +1,7 @@
 1.1.5
 -----
 * [Tests fail on Windows](https://github.com/iipc/webarchive-commons/issues/2)
+* [Test fails on Java 8](https://github.com/iipc/webarchive-commons/issues/31)
 
 1.1.4
 -----

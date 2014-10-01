@@ -227,7 +227,7 @@
             <configuration>
               <rules>
                 <requireMavenVersion>
-                  <message>This project requires Maven 3</message>
+                  <message>This project requires Maven 3.0.5 or higher</message>
                   <version>3.0.5</version>
                 </requireMavenVersion>
               </rules>

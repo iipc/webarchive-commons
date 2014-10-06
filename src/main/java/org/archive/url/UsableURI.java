@@ -18,6 +18,7 @@
  */
 package org.archive.url;
 
+import gnu.inet.encoding.IDNA;
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -269,6 +270,53 @@ implements CharSequence, Serializable {
      */
     public String toString() {
         return toCustomString();
+    }
+
+    /**
+     * In the case of a puny encoded IDN, this method returns the decoded Unicode version.
+     * @return decoded IDN version of URI
+     */
+    public String toUnicodeHostString() {
+        if (!_is_hostname) {
+            return toString();
+        }
+        
+        try {
+            StringBuilder buf = new StringBuilder();
+
+            if (_scheme != null) {
+                buf.append(_scheme);
+                buf.append(':');
+            }
+            if (_is_net_path) {
+                buf.append("//");
+                if (_authority != null) { // has_authority
+                    if (_userinfo != null) {
+                        buf.append(_userinfo).append('@');
+                    }
+                    buf.append(IDNA.toUnicode(getHost()));
+                    if (_port >= 0) {
+                        buf.append(':').append(_port);
+                    }
+                    this._authority = buf.toString().toCharArray();
+                }
+            }
+            if (_opaque != null && _is_opaque_part) {
+                buf.append(_opaque);
+            } else if (_path != null) {
+                // _is_hier_part or _is_relativeURI
+                if (_path.length != 0) {
+                    buf.append(_path);
+                }
+            }
+            if (_query != null) { // has_query
+                buf.append('?');
+                buf.append(_query);
+            }
+            return buf.toString();
+        } catch (URIException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     public synchronized String getEscapedURI() {

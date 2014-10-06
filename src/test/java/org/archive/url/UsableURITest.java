@@ -53,4 +53,16 @@ public class UsableURITest extends TestCase {
         UsableURI test = new UsableURI(base, relative);
         assertEquals("http://www.facebook.com/?href=http://www.archive.org/a", test.toString());
     }
+
+    /**
+     * Test of toUnicodeHostString method, of class UsableURI.
+     */
+    public void testToUnicodeHostString() throws URIException {
+        assertEquals("http://øx.dk", new UsableURI("http://xn--x-4ga.dk", true, "UTF-8").toUnicodeHostString());
+        assertEquals("xn--x-4ga.dk", new UsableURI("xn--x-4ga.dk", true, "UTF-8").toUnicodeHostString());
+        assertEquals("http://user:pass@øx.dk:8080", new UsableURI("http://user:pass@xn--x-4ga.dk:8080", true, "UTF-8").toUnicodeHostString());
+        assertEquals("http://user@øx.dk:8080", new UsableURI("http://user@xn--x-4ga.dk:8080", true, "UTF-8").toUnicodeHostString());
+        assertEquals("http://øx.dk/foo/bar?query=q", new UsableURI("http://xn--x-4ga.dk/foo/bar?query=q", true, "UTF-8").toUnicodeHostString());
+        assertEquals("http://127.0.0.1/foo/bar?query=q", new UsableURI("http://127.0.0.1/foo/bar?query=q", true, "UTF-8").toUnicodeHostString());
+    }
 }

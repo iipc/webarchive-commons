@@ -245,10 +245,11 @@ implements WARCConstants {
             write(bytes);
             totalBytes += bytes.length;
 
+            // Write out the header/body separator.
+            write(CRLF_BYTES);
+            totalBytes += CRLF_BYTES.length;
+
             if (recordInfo.getContentStream() != null && recordInfo.getContentLength() > 0) {
-                // Write out the header/body separator.
-                write(CRLF_BYTES); // TODO: should this be written even for zero-length?
-                totalBytes += CRLF_BYTES.length;
                 contentBytes += copyFrom(recordInfo.getContentStream(),
                         recordInfo.getContentLength(),
                         recordInfo.getEnforceLength());

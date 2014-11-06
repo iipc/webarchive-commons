@@ -1,3 +1,8 @@
+1.1.5
+-----
+* [Tests fail on Windows](https://github.com/iipc/webarchive-commons/issues/2)
+* [Test fails on Java 8](https://github.com/iipc/webarchive-commons/issues/31)
+
 1.1.4
 -----
 * [All dates should be independent of locale settings](https://github.com/iipc/webarchive-commons/pull/22)

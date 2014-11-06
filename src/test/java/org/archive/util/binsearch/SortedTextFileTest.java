@@ -25,7 +25,7 @@ public class SortedTextFileTest extends TestCase {
 
 
 	public void testGetRecordIteratorStringBoolean() throws IOException {
-		File test = new File("/tmp/test.tmp");
+		File test = File.createTempFile("test", null);
 		int max = 1000000;
 		createFile(test,max);
 		RandomAccessFileSeekableLineReaderFactory factory = 

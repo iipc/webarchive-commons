@@ -21,7 +21,6 @@ package org.archive.url;
 import java.net.URISyntaxException;
 
 import org.apache.commons.httpclient.URIException;
-import org.archive.url.UsableURI;
 
 import junit.framework.TestCase;
 

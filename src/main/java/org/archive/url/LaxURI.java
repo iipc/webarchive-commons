@@ -211,7 +211,7 @@ public class LaxURI extends URI {
             if (_scheme.length == 4 && Arrays.equals(_scheme, HTTP_SCHEME)) {
                 _scheme = HTTP_SCHEME;
             } else if (_scheme.length == 5
-                    && Arrays.equals(_scheme, HTTP_SCHEME)) {
+                    && Arrays.equals(_scheme, HTTPS_SCHEME)) {
                 _scheme = HTTPS_SCHEME;
             }
         }

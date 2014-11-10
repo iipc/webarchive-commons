@@ -274,6 +274,9 @@ implements CharSequence, Serializable {
 
     /**
      * In the case of a puny encoded IDN, this method returns the decoded Unicode version.
+     * <p>
+     * Most of this implementation is copied from {@link org.apache.commons.httpclient.URI#setURI()}.
+     * 
      * @return decoded IDN version of URI
      */
     public String toUnicodeHostString() {
@@ -298,7 +301,6 @@ implements CharSequence, Serializable {
                     if (_port >= 0) {
                         buf.append(':').append(_port);
                     }
-                    this._authority = buf.toString().toCharArray();
                 }
             }
             if (_opaque != null && _is_opaque_part) {

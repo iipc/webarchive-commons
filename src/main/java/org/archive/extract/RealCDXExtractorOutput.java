@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
@@ -307,12 +308,14 @@ public class RealCDXExtractorOutput implements ExtractorOutput {
 		return "-";
 	}
 	
-	private String resolve(String context, String spec) {
+	static String resolve(String context, String spec) {
 		// TODO: test!
 		try {
 			URL cUrl = new URL(context);
-			URL resolved = new URL(cUrl,spec);
-			return resolved.toURI().toASCIIString();
+			URL url = new URL(cUrl, spec);
+			// this constructor escapes its arguments, if necessary
+			URI uri = new URI(url.getProtocol(), url.getHost(), url.getPath(), url.getQuery(), url.getRef());
+			return uri.toASCIIString();
 			
 		} catch (URISyntaxException e) {			
 		} catch (MalformedURLException e) {

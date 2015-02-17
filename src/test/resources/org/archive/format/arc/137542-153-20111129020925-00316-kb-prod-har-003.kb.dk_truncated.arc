@@ -17,7 +17,7 @@ URL IP-address Archive-date Content-type Archive-length
 <dcterms:conformsTo xsi:type="dcterms:URI">http://www.archive.org/web/researcher/ArcFileFormat.php</dcterms:conformsTo>
 </arcmetadata>
 
-http://www.deerhunter.dk////Default.aspx?ID=361&ProductComp=2634 80.63.58.81 20111129020924 text/html 548
+http://www.deerhunter.dk////Default.aspx?ID=361&ProductComp=2634 80.63.58.81 20111129020924 text/html 546
 HTTP/1.1 200 OK
 Connection: close
 Date: Tue, 29 Nov 2011 02:09:25 GMT
@@ -26,7 +26,7 @@ X-Powered-By: ASP.NET
 X-AspNet-Version: 2.0.50727
 Cache-Control: private
 Content-Type: text/html; charset=utf-8
-Content-Length: 78781
+Content-Length: 307
 
 <!DOCTYPE html PUBLIC  "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="da">
@@ -37,7 +37,7 @@ Content-Length: 78781
 
 </html>
 <!-- Exe time: 0,265  <Deerhunter_TopDropdownNavigation2007.html (1749) >  <PageID (361)>  <Master/HTML401TransStandard2007.html>  -->
-http://www.def.dk/sitecore/service/notfound.aspx?item=%2farbejdsforhold%2farbejdsmiljoe%2fsitecore%2fservice%2fnotfound&user=extranet%5cAnonymous&site=website 217.145.53.21 20111129021529 text/html 703
+http://www.def.dk/sitecore/service/notfound.aspx?item=%2farbejdsforhold%2farbejdsmiljoe%2fsitecore%2fservice%2fnotfound&user=extranet%5cAnonymous&site=website 217.145.53.21 20111129021529 text/html 702
 HTTP/1.1 404 Item not found: /arbejdsforhold/arbejdsmiljoe/sitecore/service/notfound
 Connection: close
 Date: Tue, 29 Nov 2011 02:15:29 GMT
@@ -49,7 +49,7 @@ Cache-Control: no-cache, no-store
 Pragma: no-cache
 Expires: -1
 Content-Type: text/html; charset=utf-8
-Content-Length: 4802
+Content-Length: 315
 
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

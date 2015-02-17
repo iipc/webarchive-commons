@@ -32,9 +32,8 @@ public class ARCTestHelper {
             throw new IOException("The file '" + arc + "' does not exist");
         }
         LineInputStream in = new LineInputStream(arc);
-
-        String line;
-        long oldOffset = 0;
+        String line = in.readLine();
+/*        long oldOffset = 0;
 
         // Skip the ARC header
         majorheader:
@@ -52,7 +51,7 @@ public class ARCTestHelper {
             // No recognized records
             return urls;
         }
-
+  */
         final Pattern URL_EXTRACT = Pattern.compile("^(.+) [0-9]{14} .*");
         // Iterate the records
         while (line != null) {
@@ -70,7 +69,7 @@ public class ARCTestHelper {
             if (in.read() == -1) {
                 break;
             }
-            oldOffset = in.getOffset();
+            //oldOffset = in.getOffset();
             line = in.readLine();
             //noinspection StatementWithEmptyBody
             //while ((line = in.readLine()) != null && line.isEmpty());

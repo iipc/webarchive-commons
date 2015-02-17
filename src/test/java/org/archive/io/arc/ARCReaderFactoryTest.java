@@ -62,13 +62,13 @@ public class ARCReaderFactoryTest extends TestCase {
     // Independent of the ARCReader code
     public void testBaseSampleIntegrity() throws IOException {
         List<String> urls = ARCTestHelper.getURLs(testfile1);
-        assertEquals("The correct number of URLs should be extracted", 8, urls.size());
+        assertEquals("The correct number of URLs should be extracted", 9, urls.size());
     }
 
     // Independent of the ARCReader code
     public void testVerifyNewlinedSampleIntegrity() throws IOException {
         List<String> urls = ARCTestHelper.getURLs(testfile_nl);
-        assertEquals("The correct number of URLs should be extracted", 3, urls.size());
+        assertEquals("The correct number of URLs should be extracted", 4, urls.size());
     }
 
     /*

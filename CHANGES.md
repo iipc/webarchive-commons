@@ -3,6 +3,7 @@
 * [Escape redirect URLs in RealCDXExtractorOutput](https://github.com/iipc/webarchive-commons/pull/36)
 * [Tests fail on Windows](https://github.com/iipc/webarchive-commons/issues/2)
 * [Test fails on Java 8](https://github.com/iipc/webarchive-commons/issues/31)
+* [RecordingOutputStream can affect tcp packets sent in an undesirable way](https://github.com/iipc/webarchive-commons/issues/38)
 
 1.1.4
 -----

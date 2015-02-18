@@ -242,6 +242,26 @@ public class RecordingOutputStream extends OutputStream {
         checkLimits();
     }
 
+    private int findMessageBodyBeginMark(byte[] b, int off, int len) {
+        if ((lastTwoBytes[1] == '\n' || lastTwoBytes[0] == '\n' && lastTwoBytes[1] == '\r')
+                && len >= 1 && b[off] == '\n') {
+            return 1;
+        } else if (lastTwoBytes[1] == '\n' && len >= 2 && b[off] == '\r' && b[off+1] == '\n') {
+            return 2;
+        }
+
+        for (int i = off; i < off + len - 1; i++) {
+            if (b[i] == '\n' && b[i+1] == '\n') {
+                return i + 2;
+            } else if (b[i] == '\n' && b[i+1] == '\r'
+                    && i + 2 < off + len && b[i+2] == '\n') {
+                return i + 3;
+            }
+        }
+
+        return -1;
+    }
+
     public void write(byte[] b, int off, int len) throws IOException {
         if(position < maxPosition) {
             if(position+len<=maxPosition) {
@@ -255,19 +275,34 @@ public class RecordingOutputStream extends OutputStream {
             off += consumeRange;
             len -= consumeRange; 
         }
-        
-        // see comment on int[] lastTwoBytes
-        while (messageBodyBeginMark < 0 && len > 0) {
-            write(b[off]);
-            off++;
-            len--;
+
+        if (messageBodyBeginMark < 0) {
+            // see comment on int[] lastTwoBytes
+            int mark = findMessageBodyBeginMark(b, off, len);
+            if (mark > 0) {
+                if(recording) {
+                    record(b, off, mark - off);
+                }
+                if (this.out != null) {
+                    this.out.write(b, off, mark - off);
+                }
+                markMessageBodyBegin();
+                len = len - (mark - off);
+                off = mark;
+            }
         }
-        
+
         if(recording) {
             record(b, off, len);
         }
         if (this.out != null) {
             this.out.write(b, off, len);
+        }
+        if (len >= 1) {
+            lastTwoBytes[1] = b[off + len - 1];
+            if (len >= 2) {
+                lastTwoBytes[0] = b[off + len - 2];
+            }
         }
         checkLimits();
     }

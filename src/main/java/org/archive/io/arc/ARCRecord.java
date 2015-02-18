@@ -596,11 +596,12 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
         	
         	// If it's actually the status line, break, otherwise continue skipping any
         	// previous header values
-        	if (!statusLine.contains(":") && StatusLine.startsWithHTTP(statusLine)) {
+            // Old code contained {@code !statusLine.contains(":")}, which conflicts with RFC2616-sec6
+        	if (StatusLine.startsWithHTTP(statusLine)) {
         		break;
         	}
 
-            if (statusLine.replace("\r", "").isEmpty()) { // No more headerlines
+            if (statusLine.replace("\r", "").isEmpty()) { // No more header lines
                 break;
             }
 

@@ -57,13 +57,13 @@ public class ARCReaderFactoryTest extends TestCase {
     }
 
     public void testBaseSampleARC() throws IOException {
-        testARCReaderIteration(testfile1, 9);
+        testARCReaderIteration(testfile1, 9, 7);
     }
     /*
     This failed with the old http-header parsing code in {@code ARCRecord#readHttpHeader}.
      */
     public void testNewlinedSampleARC() throws IOException {
-        testARCReaderIteration(testfile_nl, 4);
+        testARCReaderIteration(testfile_nl, 4, 3); // Status has 2*200 & 1*404
     }
 
     // Independent of the ARCReader code
@@ -88,10 +88,14 @@ public class ARCReaderFactoryTest extends TestCase {
 //    }
 
     // Uncomment println for manual inspection of first content line
-    private void testARCReaderIteration(File arc, int expectedRecords) throws IOException {
+    private void testARCReaderIteration(File arc, int expectedRecords, int hasStatus) throws IOException {
         ARCReader reader = ARCReaderFactory.get(arc);
         int recordCount = 0;
+        int okCount = 0;
         for (ArchiveRecord record : reader) {
+            if (((ARCRecord)record).getStatusCode() != -1) {
+                okCount++;
+            }
             SubInputStream sub = new SubInputStream(record);
             sub.skip(record.getHeader().getContentBegin());
             //System.out.println(record.getPosition() + "> " + sub.readLine());
@@ -100,6 +104,7 @@ public class ARCReaderFactoryTest extends TestCase {
         }
         reader.close();
         assertEquals("There should be the right number of records in " + arc, expectedRecords, recordCount);
+        assertEquals("There should be the right number of status 200 records in " + arc, hasStatus, okCount);
     }
 
     private static File getResource(String resource) {

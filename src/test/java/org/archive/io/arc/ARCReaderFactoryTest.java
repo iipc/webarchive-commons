@@ -2,13 +2,13 @@ package org.archive.io.arc;
 
 import java.io.*;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.List;
 
 import org.archive.io.ArchiveReader;
 import org.archive.io.ArchiveRecord;
 
 import junit.framework.TestCase;
+import org.archive.io.SubInputStream;
 
 /**
  * 
@@ -57,35 +57,49 @@ public class ARCReaderFactoryTest extends TestCase {
     }
 
     public void testBaseSampleARC() throws IOException {
-        testIteration(testfile1);
+        testARCReaderIteration(testfile1, 9);
     }
+    /*
+    This failed with the old http-header parsing code in {@code ARCRecord#readHttpHeader}.
+     */
+    public void testNewlinedSampleARC() throws IOException {
+        testARCReaderIteration(testfile_nl, 4);
+    }
+
     // Independent of the ARCReader code
     public void testBaseSampleIntegrity() throws IOException {
         List<String> urls = ARCTestHelper.getURLs(testfile1);
         assertEquals("The correct number of URLs should be extracted", 9, urls.size());
     }
-
-    // Independent of the ARCReader code
     public void testVerifyNewlinedSampleIntegrity() throws IOException {
         List<String> urls = ARCTestHelper.getURLs(testfile_nl);
         assertEquals("The correct number of URLs should be extracted", 4, urls.size());
     }
 
-    /*
-    This fails, but the independent {@link ARCTestHelper} is able to process it.
-    Logically one of the implementations is faulty.
-     */
-    public void testNewlinedSampleARC() throws IOException {
-        testIteration(testfile_nl);
+    public void testNewlinedSampleARCContentLength() throws IOException {
+        ARCTestHelper.testARCContentLength(testfile_nl);
     }
+    public void testBaseSampleARCContentLength() throws IOException {
+        ARCTestHelper.testARCContentLength(testfile1);
+    }
+//    public void testLocalSampleARCContentLength() throws IOException {
+//        ARCTestHelper.testARCContentLength(
+//                new File("/home/te/tmp/warc/137542-153-20111129020925-00316-kb-prod-har-003.kb.dk.arc"));
+//    }
 
-    private void testIteration(File arc) throws IOException {
+    // Uncomment println for manual inspection of first content line
+    private void testARCReaderIteration(File arc, int expectedRecords) throws IOException {
         ARCReader reader = ARCReaderFactory.get(arc);
-        Iterator<ArchiveRecord> ir = reader.iterator();
-        while (ir.hasNext()) {
-            System.out.println(ir.next().getHeader().getHeaderValue("subject-uri"));
+        int recordCount = 0;
+        for (ArchiveRecord record : reader) {
+            SubInputStream sub = new SubInputStream(record);
+            sub.skip(record.getHeader().getContentBegin());
+            //System.out.println(record.getPosition() + "> " + sub.readLine());
+            sub.close();
+            recordCount++;
         }
         reader.close();
+        assertEquals("There should be the right number of records in " + arc, expectedRecords, recordCount);
     }
 
     private static File getResource(String resource) {

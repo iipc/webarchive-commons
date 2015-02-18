@@ -14,8 +14,9 @@
  */
 package org.archive.io.arc;
 
+import org.archive.io.SubInputStream;
+
 import java.io.*;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -26,32 +27,15 @@ import java.util.regex.Pattern;
  */
 public class ARCTestHelper {
 
+    // Extracts the header URLs from an ARC file
     public static List<String> getURLs(File arc) throws IOException {
         List<String> urls = new ArrayList<String>();
         if (!arc.exists()) {
             throw new IOException("The file '" + arc + "' does not exist");
         }
-        LineInputStream in = new LineInputStream(arc);
+        InputStream fis = new FileInputStream(arc);
+        SubInputStream in = new SubInputStream(fis);
         String line = in.readLine();
-/*        long oldOffset = 0;
-
-        // Skip the ARC header
-        majorheader:
-        while ((line = in.readLine()) != null) {
-            if (!line.contains("</arcmetadata>")) {
-                continue;
-            }
-            while ((line = in.readLine()) != null) {
-                if (!line.isEmpty()) {
-                    break majorheader;
-                }
-            }
-        }
-        if (line == null) {
-            // No recognized records
-            return urls;
-        }
-  */
         final Pattern URL_EXTRACT = Pattern.compile("^(.+) [0-9]{14} .*");
         // Iterate the records
         while (line != null) {
@@ -75,52 +59,51 @@ public class ARCTestHelper {
             //while ((line = in.readLine()) != null && line.isEmpty());
         }
         in.close();
+        fis.close();
         return urls;
     }
 
-    public static class LineInputStream extends FileInputStream {
-        private long offset = 0;
-        public LineInputStream(File file) throws FileNotFoundException {
-            super(file);
+    // Checks that the two content lengths (ARC and server-issued) for each record matches
+    public static void testARCContentLength(File arc) throws IOException {
+        if (!arc.exists()) {
+            throw new IOException("The file '" + arc + "' does not exist");
         }
-        public String readLine() throws IOException {
-            ByteArrayOutputStream by = new ByteArrayOutputStream();
-            int b;
-            while ((b = read()) != '\n' && b != -1) {
-                by.write(b);
+        InputStream fis = new FileInputStream(arc);
+        SubInputStream out = new SubInputStream(fis);
+
+        final Pattern CONTENT_LENGTH = Pattern.compile("Content-Length: ([0-9]+)[^0-9]*");
+        String outline;
+        while ((outline = out.readLine()) != null) {
+            if (outline.isEmpty()) {
+                throw new IllegalStateException("Got unexpected empty line. Next line is\n" + out.readLine());
+
             }
-            return by.size() == 0 && b == -1 ? null : by.toString("utf-8");
-        }
-        public long getOffset() {
-            return offset;
-        }
+            final long delta = getDelta(outline);
+            SubInputStream sub = new SubInputStream(out, delta, out.getPosition());
+            long contentLength = -1;
+            String inline;
+            while ((inline = sub.readLine()) != null) {
+                Matcher clMatcher = CONTENT_LENGTH.matcher(inline);
+                if (clMatcher.matches()) {
+                    contentLength = Long.parseLong(clMatcher.group(1));
+                }
+                if (inline.isEmpty() || "\r".equals(inline)) {
+                    break;
+                }
+            }
+            if (contentLength != -1 && contentLength != sub.available()) {
+                throw new IllegalStateException(String.format(
+                        "sub_pos=%6d, sub_length=%6d, sub_available=%6d, Content-Length=%6d, header=%s",
+                        sub.getPosition(), sub.getLength(), sub.available(), contentLength, outline));
+            }
+            sub.close();
 
-        @Override
-        public int read() throws IOException {
-            offset++;
-            return super.read();
+            // Newline delimiter
+            if (out.read() == -1) {
+                break;
+            }
         }
-
-        @Override
-        public int read(byte[] b) throws IOException {
-            int read = super.read(b);
-            offset += read;
-            return read;
-        }
-
-        @Override
-        public int read(byte[] b, int off, int len) throws IOException {
-            int read = super.read(b, off, len);
-            offset += read;
-            return read;
-        }
-
-        @Override
-        public long skip(long n) throws IOException {
-            long read = super.skip(n);
-            offset += read;
-            return read;
-        }
+        fis.close();
     }
 
     /// http://www.example.com/somepath 192.168.10.12 20111129020924 text/html 79022

@@ -137,7 +137,7 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
     public String getHeaderString() {
         return this.headerString;
     }
-    
+
     /**
      * Constructor.
      *
@@ -233,7 +233,7 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
         this(in, identifier, offset, digest, strict, parseHttpHeaders, 
                 false, null);
     }
-    
+
     private ArchiveRecordHeader parseHeaders(final InputStream in,
         final String identifier, final long offset, final boolean strict, 
         final boolean isAlignedOnFirstRecord, String version)
@@ -241,7 +241,7 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
         
         ArrayList<String> firstLineValues = new ArrayList<String>(20);
         getTokenizedHeaderLine(in, firstLineValues);
-        
+
         int bodyOffset = 0;
         if (offset == 0 && isAlignedOnFirstRecord) {
             // If offset is zero and we were aligned at first record on
@@ -343,7 +343,7 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
 
         // save verbatim header String
         this.headerString = StringUtils.join(list," ");
-        
+
         return read;
     }
     
@@ -569,7 +569,6 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
             getHeader().getLength() <= MIN_HTTP_HEADER_LENGTH) {
             return null;
         }
-        
         String statusLine;
         byte[] statusBytes;
         int eolCharCount = 0;
@@ -600,11 +599,15 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
         	if (!statusLine.contains(":") && StatusLine.startsWithHTTP(statusLine)) {
         		break;
         	}
-        	
+
+            if (statusLine.replace("\r", "").isEmpty()) { // No more headerlines
+                break;
+            }
+
         	// Add bytes read to error "offset" to add to position
         	errOffset += statusBytes.length;
         }
-        
+
         if (errOffset > 0) {
             this.incrementPosition(errOffset);
         }

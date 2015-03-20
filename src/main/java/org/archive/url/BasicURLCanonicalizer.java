@@ -74,15 +74,15 @@ public class BasicURLCanonicalizer implements URLCanonicalizer {
 		url.setPath(escapeOnce(normalizePath(path)));
 	}
 
-	private static final Pattern SINGLE_FORWARDSLASH_PATTERN = Pattern
-			.compile("/");
+	private static final Pattern SINGLE_FORWARDANDBACKSLASH_PATTERN = Pattern
+			.compile("[/\\\\]");
 
 	public String normalizePath(String path) {
 		if (path == null) {
 			path = "/";
 		} else {
 			// -1 gives an empty trailing element if path ends with '/':
-			String[] paths = SINGLE_FORWARDSLASH_PATTERN.split(path, -1);
+			String[] paths = SINGLE_FORWARDANDBACKSLASH_PATTERN.split(path, -1);
 			ArrayList<String> keptPaths = new ArrayList<String>();
 			boolean first = true;
 			for (String p : paths) {

@@ -91,8 +91,18 @@ public class WATExtractorOutput implements ExtractorOutput {
 			}
 		}
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("Software-Info", IAUtils.COMMONS_VERSION);
-		headers.addDateHeader("Extracted-Date", new Date());
+		headers.add("software", IAUtils.COMMONS_VERSION);
+		headers.addDateHeader("extractedDate", new Date());
+		
+		//add ip, hostname, format, etc.
+		headers.add("ip", InetAddress.getLocalHost().getHostAddress());
+		headers.add("hostname", InetAddress.getLocalHost().getHostName());
+		headers.add("format", IAUtils.WARC_FORMAT);
+		headers.add("conformsTo", IAUtils.WARC_FORMAT_CONFORMS_TO);
+		headers.add("operator", IAUtils.OPERATOR);
+		headers.add("publisher", IAUtils.PUBLISHER);
+		headers.add("description", IAUtils.WAT_WARCINFO_DESCRIPTION);
+		
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		headers.write(baos);
                 recW.writeWARCInfoRecord(recOut,filename,baos.toByteArray());

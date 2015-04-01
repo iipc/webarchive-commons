@@ -24,7 +24,10 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.Properties;
 
 /**
  * Miscellaneous useful methods.
@@ -35,6 +38,11 @@ public class IAUtils {
     public final static Charset UTF8 = Charset.forName("utf-8");
 
     final public static String COMMONS_VERSION = loadCommonsVersion();
+    final public static String PUBLISHER = loadCommons("publisher");
+    final public static String OPERATOR = loadCommons("operator");
+    final public static String WAT_WARCINFO_DESCRIPTION = loadCommons("wat.warcinfo.description");
+    final public static String WARC_FORMAT = loadCommons("warc.format");
+    final public static String WARC_FORMAT_CONFORMS_TO = loadCommons("warc.format.conforms.to");
 
     public static String loadCommonsVersion() {
         InputStream input = IAUtils.class.getResourceAsStream(
@@ -55,6 +63,31 @@ public class IAUtils {
 		}
 		
 		return version.trim();
+    }
+    
+    public static String loadCommons(String id) {
+        InputStream input = IAUtils.class.getResourceAsStream("/org/archive/commons.properties");
+        Reader reader = null;
+        if (input == null) {
+            return "UNKNOWN";
+        }
+        try {
+            reader = new InputStreamReader(input, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return "UNKNOWN";
+        }
+        Properties prop = new Properties();
+        try {
+            prop.load(reader);
+        } catch (IOException e1) {
+            return "UNKNOWN";
+        }
+        if (prop.getProperty(id) != null) {
+            return prop.getProperty(id);
+        } else {
+            return "UNKNOWN";
+        }
+        
     }
     
     public static void closeQuietly(Object input) {

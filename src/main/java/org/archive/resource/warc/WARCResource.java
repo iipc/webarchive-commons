@@ -36,7 +36,7 @@ public class WARCResource extends AbstractResource implements EOFObserver, Resou
 		this.response = response;
 
 		long length = -1;
-		metaData.putString(ENVELOPE_FORMAT, ENVELOPE_FORMAT_WARC);
+		metaData.putString(ENVELOPE_FORMAT, ENVELOPE_FORMAT_WARC_1_0);
 		metaData.putLong(WARC_HEADER_LENGTH, response.getHeaderBytes());
 		MetaData fields = metaData.createChild(WARC_HEADER_METADATA);
 		for(HttpHeader h : response.getHeaders()) {

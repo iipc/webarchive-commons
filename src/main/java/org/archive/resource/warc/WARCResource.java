@@ -70,9 +70,9 @@ public class WARCResource extends AbstractResource implements EOFObserver, Resou
 	public void notifyEOF() throws IOException {
 		envelope.putLong(PAYLOAD_LENGTH, countingIS.getCount());
 		String digString = Base32.encode(digIS.getMessageDigest().digest());
-		envelope.putString(PAYLOAD_DIGEST, "sha1:"+digString);
 		if(container.isCompressed()) {
 			metaData.putLong(PAYLOAD_SLOP_BYTES, StreamCopy.readToEOF(response));
+			metaData.putString(PAYLOAD_DIGEST, "sha1:"+digString);
 		} else {
 			// consume trailing bytes if we can...
 			InputStream raw = response.getInner();
@@ -82,6 +82,7 @@ public class WARCResource extends AbstractResource implements EOFObserver, Resou
 				long numNewlines = StreamCopy.skipChars(pb1bis, CR_NL_CHARS);
 				if(numNewlines > 0) {
 					metaData.putLong(PAYLOAD_SLOP_BYTES, numNewlines);
+					metaData.putString(PAYLOAD_DIGEST, "sha1:"+digString);
 				}
 			}
 		}

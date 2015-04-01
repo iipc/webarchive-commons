@@ -22,6 +22,10 @@ import org.archive.util.StreamCopy;
 import org.archive.util.io.CommitedOutputStream;
 import org.json.JSONException;
 
+import java.net.InetAddress;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 public class WATExtractorOutput implements ExtractorOutput {
 	WARCRecordWriter recW;
 	private boolean wroteFirst;
@@ -29,11 +33,13 @@ public class WATExtractorOutput implements ExtractorOutput {
 	private static int DEFAULT_BUFFER_RAM = 1024 * 1024;
 	private int bufferRAM = DEFAULT_BUFFER_RAM;
 	private final static Charset UTF8 = Charset.forName("UTF-8");
+	private String outputFile;
 	
-	public WATExtractorOutput(OutputStream out) {
+	public WATExtractorOutput(OutputStream out, String outputFile) {
 		gzW = new GZIPMemberWriter(out);
 		recW = new WARCRecordWriter();
 		wroteFirst = false;
+		this.outputFile = outputFile;
 	}
 
 	private CommitedOutputStream getOutput() {
@@ -56,9 +62,9 @@ public class WATExtractorOutput implements ExtractorOutput {
 			throw new IOException("Missing Envelope.Format");
 		}
 		cos = getOutput();
-		if(envelopeFormat.equals("ARC")) {
+		if(envelopeFormat.startsWith("ARC")) {
 			writeARC(cos,top);
-		} else if(envelopeFormat.equals("WARC")) {
+		} else if(envelopeFormat.startsWith("WARC")) {
 			writeWARC(cos,top);
 		} else {
 			// hrm...
@@ -68,9 +74,21 @@ public class WATExtractorOutput implements ExtractorOutput {
 	}
 
 	private void writeWARCInfo(OutputStream recOut, MetaData md) throws IOException {
-		String filename = JSONUtils.extractSingle(md, "Container.Filename");
-		if(filename == null) {
-			throw new IOException("No Container.Filename...");
+		// filename is given in the command line
+		String filename = outputFile;
+		if (filename == null || filename.length() == 0) {
+			// if no filename by command line, we construct a default filename base on container filename
+			filename = JSONUtils.extractSingle(md, "Container.Filename");
+			if (filename == null) {
+				throw new IOException("No Container.Filename...");
+			}
+			if (filename.endsWith(".warc") || filename.endsWith(".warc.gz")) {
+				filename = filename.replaceFirst("\\.warc$", ".warc.wat.gz");
+				filename = filename.replaceFirst("\\.warc\\.gz$", ".warc.wat.gz");
+			} else if (filename.endsWith(".arc") || filename.endsWith(".arc.gz")) {
+				filename = filename.replaceFirst("\\.arc$", ".arc.wat.gz");
+				filename = filename.replaceFirst("\\.arc\\.gz$", ".arc.wat.gz");
+			}
 		}
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Software-Info", IAUtils.COMMONS_VERSION);

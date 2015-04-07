@@ -68,7 +68,7 @@ public class WARCMetadataRecordExtractorOutput implements ExtractorOutput {
 			String date = "TBD";
 			String canUrl = "TBD";
 
-			if(format.equals("WARC")) {
+			if(format.startsWith("WARC")) {
 				origUrl = getWARCURL(m);
 				date = getWARCDate(m);
 				String type = getWARCType(m);

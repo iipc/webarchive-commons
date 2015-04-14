@@ -94,7 +94,7 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 	    if(args.length >= arg + 2) {
 	        //if a output file is specified in the command line
 	        if(args.length == arg + 3) {
-	            outputFile=args[arg+2];
+	            outputFile = args[arg+2];
 	            os.close();
 	            os = new FileOutputStream(outputFile);
 	        }

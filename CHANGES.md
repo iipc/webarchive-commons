@@ -1,3 +1,11 @@
+1.1.7
+-----
+* [WAT extractor: adding information in WAT's warcinfo](https://github.com/iipc/webarchive-commons/issues/47)
+* [WAT extractor: missing WARC format version](https://github.com/iipc/webarchive-commons/issues/45)
+* [WAT extractor: envelope structure does not conform to the WAT specification](https://github.com/iipc/webarchive-commons/issues/44)
+* [WAT extractor: WARC-Date in all records should be the WAT record generation date](https://github.com/iipc/webarchive-commons/issues/43)
+* [WAT extractor: WARC-Filename in the WAT warcinfo record should be the WAT filename itself](https://github.com/iipc/webarchive-commons/issues/42)
+
 1.1.5
 -----
 * [Escape redirect URLs in RealCDXExtractorOutput](https://github.com/iipc/webarchive-commons/pull/36)

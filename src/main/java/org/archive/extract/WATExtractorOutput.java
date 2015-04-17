@@ -2,6 +2,7 @@ package org.archive.extract;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -90,6 +91,9 @@ public class WATExtractorOutput implements ExtractorOutput {
 				filename = filename.replaceFirst("\\.arc\\.gz$", ".arc.wat.gz");
 			}
 		}
+		//removing path from filename
+		File tmpFile = new File(filename);
+		filename = tmpFile.getName();
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("software", IAUtils.COMMONS_VERSION);
 		headers.addDateHeader("extractedDate", new Date());

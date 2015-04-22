@@ -33,8 +33,8 @@ public class WARCMetaDataResourceFactory implements ResourceFactory, ResourceCon
 			if(headers.isCorrupt()) {
 				md.putBoolean(WARC_META_FIELDS_CORRUPT, true);
 			}
-			//md.putLong(PAYLOAD_SLOP_BYTES, StreamCopy.readToEOF(is));		
-			//md.putLong(PAYLOAD_LENGTH, bytes);
+			parentMetaData.putLong(PAYLOAD_SLOP_BYTES, StreamCopy.readToEOF(is));		
+			parentMetaData.putLong(PAYLOAD_LENGTH, bytes);
 			return new WARCMetaDataResource(md,container, headers);
 			
 		} catch (HttpParseException e) {

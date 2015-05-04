@@ -91,19 +91,19 @@ public class WATExtractorOutput implements ExtractorOutput {
 				filename = filename.replaceFirst("\\.arc\\.gz$", ".arc.wat.gz");
 			}
 		}
-		//removing path from filename
+		// removing path from filename
 		File tmpFile = new File(filename);
 		filename = tmpFile.getName();
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("software", IAUtils.COMMONS_VERSION);
 		headers.addDateHeader("extractedDate", new Date());
 		
-		//add ip, hostname, format, etc.
+		// add ip, hostname, format, etc.
 		headers.add("ip", InetAddress.getLocalHost().getHostAddress());
 		headers.add("hostname", InetAddress.getLocalHost().getHostName());
 		headers.add("format", IAUtils.WARC_FORMAT);
 		headers.add("conformsTo", IAUtils.WARC_FORMAT_CONFORMS_TO);
-		//optionnal arguments
+		// optional arguments
 		if(IAUtils.OPERATOR != null && IAUtils.OPERATOR.length() > 0) {
 			headers.add("operator", IAUtils.OPERATOR);
 		}

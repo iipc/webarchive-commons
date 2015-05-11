@@ -1,4 +1,4 @@
-1.1.7
+1.1.6
 -----
 * [WAT extractor: adding information in WAT's warcinfo](https://github.com/iipc/webarchive-commons/issues/47)
 * [WAT extractor: missing WARC format version](https://github.com/iipc/webarchive-commons/issues/45)

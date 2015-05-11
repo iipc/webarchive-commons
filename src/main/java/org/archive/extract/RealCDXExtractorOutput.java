@@ -104,7 +104,7 @@ public class RealCDXExtractorOutput implements ExtractorOutput {
 			String meta = "TBD";
 			String redir = "TBD";
 			
-			if(format.equals("WARC")) {
+			if(format.startsWith("WARC")) {
 				origUrl = getWARCURL(m);
 				date = getWARCDate(m);
 				String type = getWARCType(m);

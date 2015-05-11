@@ -1,6 +1,7 @@
 package org.archive.extract;
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -74,7 +75,7 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 		if(args.length < 1) {
 			return USAGE(1);
 		}
-		if(args.length > 3) {
+		if(args.length > 4) {
 			return USAGE(1);
 		}
 		int max = Integer.MAX_VALUE;
@@ -89,7 +90,14 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 	    	}	   
 	    }
 	    String path = args[arg];
-	    if(args.length == arg + 2) {
+	    String outputFile = null;
+	    if(args.length >= arg + 2) {
+	        //if a output file is specified in the command line
+	        if(args.length == arg + 3) {
+	            outputFile = args[arg+2];
+	            os.close();
+	            os = new FileOutputStream(outputFile);
+	        }
 	    	if(args[arg].equals("-cdx")) {
 	    		path = args[arg+1];
 	    		out = new RealCDXExtractorOutput(makePrintWriter(os));
@@ -100,7 +108,7 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 
 	    	} else if(args[arg].equals("-wat")) {
 	    		path = args[arg+1];
-	    		out = new WATExtractorOutput(os);
+	    		out = new WATExtractorOutput(os, outputFile);
 	    	} else {
 	    		String filter = args[arg+1];
 	    		out = new JSONViewExtractorOutput(os, filter);

@@ -31,6 +31,7 @@ public interface ResourceConstants {
 	public static final String ENVELOPE_FORMAT      = "Format";
 	public static final String ENVELOPE_FORMAT_ARC  = "ARC";
 	public static final String ENVELOPE_FORMAT_WARC = "WARC";
+	public static final String ENVELOPE_FORMAT_WARC_1_0 = "WARC/1.0";
 
 	public static final String WARC_HEADER_LENGTH   = "WARC-Header-Length";
 	public static final String WARC_HEADER_METADATA = "WARC-Header-Metadata";
@@ -104,7 +105,7 @@ public interface ResourceConstants {
 	
 	public static final String HTTP_ENTITY_LENGTH        = "Entity-Length";
 	public static final String HTTP_ENTITY_DIGEST        = "Entity-Digest";
-	public static final String HTTP_ENTITY_TRAILING_SLOP = "Entity-Trailing-Slop-Bytes";
+	public static final String HTTP_ENTITY_TRAILING_SLOP = "Entity-Trailing-Slop-Length";
 	
 	public static final String HTML_METADATA    = "HTML-Metadata";
 	public static final String HTML_HEAD        = "Head";

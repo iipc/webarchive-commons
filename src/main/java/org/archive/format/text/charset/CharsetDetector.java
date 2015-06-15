@@ -178,6 +178,9 @@ public abstract class CharsetDetector {
 	}
 
 	private static String trimAttrValue(String value) {
+		if (value.isEmpty()) {
+			return value;
+		}
 		String result = value;
 		if (result.charAt(0) == '"') {
 			result = result.substring(1, result.length() - 1);

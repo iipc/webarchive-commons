@@ -1,3 +1,7 @@
+1.1.6
+-----
+* [Handle empty String argument in CharsetDetector.trimAttrValue](https://github.com/iipc/webarchive-commons/pull/49)
+
 1.1.5
 -----
 * [Escape redirect URLs in RealCDXExtractorOutput](https://github.com/iipc/webarchive-commons/pull/36)

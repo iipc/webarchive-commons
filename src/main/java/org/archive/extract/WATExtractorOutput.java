@@ -100,7 +100,7 @@ public class WATExtractorOutput implements ExtractorOutput {
 		
 		// add ip, hostname, format, etc.
 		headers.add("ip", InetAddress.getLocalHost().getHostAddress());
-		headers.add("hostname", InetAddress.getLocalHost().getHostName());
+		headers.add("hostname", InetAddress.getLocalHost().getCanonicalHostName());
 		headers.add("format", IAUtils.WARC_FORMAT);
 		headers.add("conformsTo", IAUtils.WARC_FORMAT_CONFORMS_TO);
 		// optional arguments

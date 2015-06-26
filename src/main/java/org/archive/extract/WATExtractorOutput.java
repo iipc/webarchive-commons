@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.text.ParseException;
+import java.net.UnknownHostException;
 import java.util.Date;
 
 import org.archive.format.gzip.GZIPMemberWriter;
@@ -27,6 +28,8 @@ import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import java.util.logging.Logger;
+
 public class WATExtractorOutput implements ExtractorOutput {
 	WARCRecordWriter recW;
 	private boolean wroteFirst;
@@ -35,6 +38,8 @@ public class WATExtractorOutput implements ExtractorOutput {
 	private int bufferRAM = DEFAULT_BUFFER_RAM;
 	private final static Charset UTF8 = Charset.forName("UTF-8");
 	private String outputFile;
+	
+	private static final Logger LOG = Logger.getLogger(WATExtractorOutput.class.getName());
 	
 	public WATExtractorOutput(OutputStream out, String outputFile) {
 		gzW = new GZIPMemberWriter(out);
@@ -97,10 +102,16 @@ public class WATExtractorOutput implements ExtractorOutput {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("software", IAUtils.COMMONS_VERSION);
 		headers.addDateHeader("extractedDate", new Date());
-		
-		// add ip, hostname, format, etc.
-		headers.add("ip", InetAddress.getLocalHost().getHostAddress());
-		headers.add("hostname", InetAddress.getLocalHost().getCanonicalHostName());
+
+		// add ip, hostname
+		try {
+			InetAddress host = InetAddress.getLocalHost();
+			headers.add("ip", host.getHostAddress());
+			headers.add("hostname", host.getCanonicalHostName());
+		} catch (UnknownHostException e) {
+			LOG.warning("unable top obtain local crawl engine host :\n"+e.getMessage());
+        }
+
 		headers.add("format", IAUtils.WARC_FORMAT);
 		headers.add("conformsTo", IAUtils.WARC_FORMAT_CONFORMS_TO);
 		// optional arguments

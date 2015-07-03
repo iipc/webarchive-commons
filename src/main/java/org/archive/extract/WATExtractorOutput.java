@@ -109,7 +109,7 @@ public class WATExtractorOutput implements ExtractorOutput {
 			headers.add("ip", host.getHostAddress());
 			headers.add("hostname", host.getCanonicalHostName());
 		} catch (UnknownHostException e) {
-			LOG.warning("unable top obtain local crawl engine host :\n"+e.getMessage());
+			LOG.warning("unable to obtain local crawl engine host :\n"+e.getMessage());
         }
 
 		headers.add("format", IAUtils.WARC_FORMAT);

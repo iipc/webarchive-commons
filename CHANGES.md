@@ -1,6 +1,12 @@
 1.1.6
 -----
 * [Handle empty String argument in CharsetDetector.trimAttrValue](https://github.com/iipc/webarchive-commons/pull/49)
+* [WAT extractor: adding information in WAT's warcinfo](https://github.com/iipc/webarchive-commons/issues/47)
+* [WAT extractor: missing WARC format version](https://github.com/iipc/webarchive-commons/issues/45)
+* [WAT extractor: envelope structure does not conform to the WAT specification](https://github.com/iipc/webarchive-commons/issues/44)
+* [WAT extractor: WARC-Date in all records should be the WAT record generation date](https://github.com/iipc/webarchive-commons/issues/43)
+* [WAT extractor: WARC-Filename in the WAT warcinfo record should be the WAT filename itself](https://github.com/iipc/webarchive-commons/issues/42)
+* [WAT extractor: Entity-Trailing-Slop-Bytes should be called Entity-Trailing-Slop-Length](https://github.com/iipc/webarchive-commons/issues/48)
 
 1.1.5
 -----

@@ -174,7 +174,7 @@ public class UsableURIFactoryTest extends TestCase {
         assertTrue("Not equal " + uuri.toString(),
                 uuri.toString().equals(tgtUri));     
         uri = "http://archive.org/index%25\u001D.html";
-        tgtUri = "http://archive.org/index%25%1D.html".toLowerCase();
+        tgtUri = "http://archive.org/index%25%1D.html";
         uuri = UsableURIFactory.getInstance(uri);
         assertEquals("whitespace escaping", tgtUri, uuri.toString());
         uri = "http://gemini.info.usaid.gov/directory/" +
@@ -185,6 +185,12 @@ public class UsableURIFactoryTest extends TestCase {
             "faxResults.cfm?name=Ebenezer +Rumplestiltskin,&location=" +
             "RRB%20%20%20%205%2E08%2D006");
         assertEquals("whitespace escaping", tgtUri, uuri.toString());
+
+        // https://webarchive.jira.com/browse/HER-2089
+        uri = "http://archive.org/index%25\u3000.html";
+        tgtUri = "http://archive.org/index%25%E3%80%80.html";
+        uuri = UsableURIFactory.getInstance(uri);
+        assertEquals("U+3000 ideographic space escaping", tgtUri, uuri.toString());
     }
     
 //	public final void testFailedGetPath() throws URIException {

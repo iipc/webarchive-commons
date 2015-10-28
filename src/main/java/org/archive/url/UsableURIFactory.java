@@ -49,8 +49,8 @@ import org.archive.util.TextUtils;
  * @author stack
  */
 public class UsableURIFactory extends URI {
-    
-    private static final long serialVersionUID = -6146295130382209042L;
+
+    private static final long serialVersionUID = 2L;
 
     /**
      * Logging instance.
@@ -395,9 +395,6 @@ public class UsableURIFactory extends URI {
         }
         TextUtils.recycleMatcher(matcher); 
 
-        // now, minimally escape any whitespace
-        uri = escapeWhitespace(uri);
-        
         // For further processing, get uri elements.  See the RFC2396REGEX
         // comment above for explanation of group indices used in the below.
 //        matcher = RFC2396REGEX.matcher(uri);
@@ -661,51 +658,6 @@ public class UsableURIFactory extends URI {
             }
         }
         return u;
-    }
-
-    /**
-     * Escape any whitespace found.
-     * 
-     * The parent class takes care of the bulk of escaping.  But if any
-     * instance of escaping is found in the URI, then we ask for parent
-     * to do NO escaping.  Here we escape any whitespace found irrespective
-     * of whether the uri has already been escaped.  We do this for
-     * case where uri has been judged already-escaped only, its been
-     * incompletly done and whitespace remains.  Spaces, etc., in the URI are
-     * a real pain.  Their presence will break log file and ARC parsing.
-     * @param uri URI string to check.
-     * @return uri with spaces escaped if any found.
-     */
-    protected String escapeWhitespace(String uri) {
-        // Just write a new string anyways.  The perl '\s' is not
-        // as inclusive as the Character.isWhitespace so there are
-        // whitespace characters we could miss.  So, rather than
-        // write some awkward regex, just go through the string
-        // a character at a time.  Only create buffer first time
-        // we find a space.
-        MutableString buffer = null;
-        for (int i = 0; i < uri.length(); i++) {
-            char c = uri.charAt(i);
-            if (Character.isWhitespace(c)) {
-                if (buffer == null) {
-                    buffer = new MutableString(uri.length() +
-                        2 /*If space, two extra characters (at least)*/);
-                    buffer.append(uri.substring(0, i));
-                }
-                buffer.append("%");
-                String hexStr = Integer.toHexString(c);
-                if ((hexStr.length() % 2) > 0) {
-                    buffer.append("0");
-                }
-                buffer.append(hexStr);
-                
-            } else {
-                if (buffer != null) {
-                    buffer.append(c);
-                }
-            }
-        }
-        return (buffer !=  null)? buffer.toString(): uri;
     }
 
     /**

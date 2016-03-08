@@ -169,6 +169,13 @@ public class ARCRecordMetaData implements ArchiveRecordHeader, ARCConstants {
     }
 
     /**
+     * @return Arcfile origin code.
+     */
+    public String getOrigin() {
+        return (String)this.headerFields.get(ORIGIN_FIELD_KEY);
+    }
+
+    /**
      * @return Offset into arcfile at which this record begins.
      */
     public long getOffset() {

@@ -44,6 +44,11 @@ public interface ArchiveFileConstants {
      * Key for the Archive File version field.
      */
     public static final String VERSION_FIELD_KEY = "version";
+
+    /**
+     * Key for the Archive File origin-code field.
+     */
+    public static final String ORIGIN_FIELD_KEY = "origin";
     
     /**
      * Key for the Archive File length field.
@@ -80,7 +85,7 @@ public interface ArchiveFileConstants {
      * Key for the Archive Record absolute offset into Archive file.
      */
     public static final String ABSOLUTE_OFFSET_KEY = "absolute-offset";
-    
+
     public static final String READER_IDENTIFIER_FIELD_KEY =
     	"reader-identifier";
     

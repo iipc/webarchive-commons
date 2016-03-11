@@ -46,7 +46,7 @@ public interface ArchiveFileConstants {
     public static final String VERSION_FIELD_KEY = "version";
 
     /**
-     * Key for the Archive File origin-code field.
+     * Key for the Archive File origin-code field. This value is often hard-coded, so use with care.
      */
     public static final String ORIGIN_FIELD_KEY = "origin";
     

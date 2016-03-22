@@ -63,25 +63,24 @@ public class IAURLCanonicalizer implements URLCanonicalizer, CanonicalizerConsta
 		
 		String query = url.getQuery();
 		if(query != null) {
-			if(query.equals("")) {
-				if(rules.isSet(QUERY_SETTINGS, QUERY_STRIP_EMPTY)) {
-					query = null;
-				}
-			} else {
-				// we have a query... what to do with it?
+			// we have a query... what to do with it?
 				
-				// first remove uneeded:
-				if(rules.isSet(QUERY_SETTINGS, QUERY_STRIP_SESSION_ID)) {
-					query = URLRegexTransformer.stripQuerySessionID(query);
-				}
-				// lower-case:
-				if(rules.isSet(QUERY_SETTINGS, QUERY_LOWERCASE)) {
-					query = query.toLowerCase();
-				}
-				// re-order?
-				if(rules.isSet(QUERY_SETTINGS, QUERY_ALPHA_REORDER)) {
-					query = alphaReorderQuery(query);
-				}
+			// first remove uneeded:
+			if(rules.isSet(QUERY_SETTINGS, QUERY_STRIP_SESSION_ID)) {
+				query = URLRegexTransformer.stripQuerySessionID(query);
+			}
+			// lower-case:
+			if(rules.isSet(QUERY_SETTINGS, QUERY_LOWERCASE)) {
+				query = query.toLowerCase();
+			}
+			// re-order?
+			if(rules.isSet(QUERY_SETTINGS, QUERY_ALPHA_REORDER)) {
+				query = alphaReorderQuery(query);
+			}
+			if(query.equals("")) {
+			    if(rules.isSet(QUERY_SETTINGS, QUERY_STRIP_EMPTY)) {
+			        query = null;
+			    }
 			}
 			url.setQuery(query);
 		}

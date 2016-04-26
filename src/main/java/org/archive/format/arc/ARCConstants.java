@@ -196,7 +196,7 @@ public interface ARCConstants extends ArchiveFileConstants {
             .asList(new String[] { URL_FIELD_KEY, IP_HEADER_FIELD_KEY,
                     DATE_FIELD_KEY, MIMETYPE_FIELD_KEY,
                     LENGTH_FIELD_KEY, VERSION_FIELD_KEY,
-                    ABSOLUTE_OFFSET_KEY });
+                    ORIGIN_FIELD_KEY, ABSOLUTE_OFFSET_KEY });
 
     /**
      * Minimum possible record length.

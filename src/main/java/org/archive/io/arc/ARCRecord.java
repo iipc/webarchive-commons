@@ -200,7 +200,7 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
     public ARCRecord(InputStream in, final String identifier, 
                 final long offset, boolean digest,      boolean strict, 
                 final boolean parseHttpHeaders, 
-                final boolean isAlignedOnFirstRecord, String version) 
+                final boolean isAlignedOnFirstRecord, String version)
     throws IOException {
         super(in, null, 0, digest, strict);
         setHeader(parseHeaders(in, identifier, offset, strict, isAlignedOnFirstRecord, version));
@@ -243,6 +243,7 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
         getTokenizedHeaderLine(in, firstLineValues);
         
         int bodyOffset = 0;
+        String origin = "";
         if (offset == 0 && isAlignedOnFirstRecord) {
             // If offset is zero and we were aligned at first record on
             // creation (See #alignedOnFirstRecord for more on this), then no
@@ -263,6 +264,7 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
             bodyOffset += getTokenizedHeaderLine(in, secondLineValues);
             version = ((String)secondLineValues.get(0) +
                 "." + (String)secondLineValues.get(1));
+            origin = (String)secondLineValues.get(2);
             // Just read over the 3rd line.  We used to parse it and use
             // values found here but now we just hardcode them to avoid
             // having to read this 3rd line even for random arc file accesses.
@@ -271,7 +273,8 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
         }
         setBodyOffset(bodyOffset);
         
-        return computeMetaData(this.headerFieldNameKeys, firstLineValues, version, offset, identifier);
+        return computeMetaData(this.headerFieldNameKeys, firstLineValues, 
+            version, origin, offset, identifier);
     }
     
     /**
@@ -362,7 +365,8 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
      * @exception IOException  If no. of keys doesn't match no. of values.
      */
     private ARCRecordMetaData computeMetaData(List<String> keys,
-                List<String> values, String v, long offset, final String identifier)
+                List<String> values, String v, String origin,
+                long offset, final String identifier)
     throws IOException {
         if (keys.size() != values.size()) {
             List<String> originalValues = values;
@@ -423,6 +427,7 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
         }
 
         headerFields.put(VERSION_FIELD_KEY, v);
+        headerFields.put(ORIGIN_FIELD_KEY, origin);
         headerFields.put(ABSOLUTE_OFFSET_KEY, new  Long(offset));
 
         return new ARCRecordMetaData(identifier, headerFields);

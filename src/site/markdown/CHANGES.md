@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+2.0.0
+-----
+* [Require Java 8](https://github.com/iipc/webarchive-commons/issues/56)
+* [Reorganize into mother and child pom](https://github.com/iipc/webarchive-commons/issues/55)
+
 1.1.7
 -----
 * [Store origin-code of ARC file header](https://github.com/iipc/webarchive-commons/pull/52/)

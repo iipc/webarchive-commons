@@ -13,8 +13,16 @@ local.properties
 .settings/
 .loadpath
 
-# Target
+# Maven specific
 target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
 
 # External tool builders
 .externalToolBuilders/

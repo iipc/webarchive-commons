@@ -1,8 +1,8 @@
 /*
  *  This file is part of the Heritrix web crawler (crawler.archive.org).
  *
- *  Licensed to the Internet Archive (IA) by one or more individual 
- *  contributors. 
+ *  Licensed to the Internet Archive (IA) by one or more individual
+ *  contributors.
  *
  *  The IA licenses this file to You under the Apache License, Version 2.0
  *  (the "License"); you may not use this file except in compliance with
@@ -100,8 +100,8 @@ public abstract class TmpDirTestCase extends TestCase
             }
         }
     }
-    
-    
+
+
     public static File tmpDir() throws IOException {
         String tmpDirStr = System.getProperty(TEST_TMP_SYSTEM_PROPERTY_NAME);
         tmpDirStr = (tmpDirStr == null)? DEFAULT_TEST_TMP_DIR: tmpDirStr;
@@ -113,7 +113,7 @@ public abstract class TmpDirTestCase extends TestCase
             throw new IOException(tmpDir.getAbsolutePath() +
                  " is unwriteable.");
         }
-        
+
         return tmpDir;
     }
 }

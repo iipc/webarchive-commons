@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="OpenWayback">
+    <bannerRight>
+        <name>International Internet Preservation Consortium</name>
+        <src>images/iipc_logo.png</src>
+        <href>http://netpreserve.org/</href>
+    </bannerRight>
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.5</version>
+    </skin>
+    <body>
+        <breadcrumbs>
+            <item name="Webarchive Commons" href="index.html"/>
+        </breadcrumbs>
+
+        <links>
+            <item name="GitHub" href="https://github.com/iipc/webarchive-commons"/>
+            <item name="Home" href="index.html"/>
+        </links>
+
+        <menu name="Overview">
+            <item name="Release Notes" href="CHANGES.html"/>
+            <item name="API" href="./apidocs/index.html"/>
+            <item name="Browse/Submit a Bug" href="https://github.com/iipc/webarchive-commons/issues"/>
+        </menu>
+
+        <menu ref="reports" inherit="top"/>
+        <menu ref="modules" inherit="bottom"/>
+        <menu ref="parent" inherit="bottom"/>
+    </body>
+</project>

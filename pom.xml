@@ -24,6 +24,7 @@
 
     <modules>
         <module>webarchive-commons-core</module>
+        <module>webarchive-commons-uri</module>
     </modules>
 
     <developers>

@@ -19,7 +19,7 @@ package org.netpreserve.commons.uri;
 /**
  *
  */
-public class UriFormat {
+public final class UriFormat {
     final boolean surtEncoding;
 
     final boolean ignoreScheme;
@@ -38,7 +38,7 @@ public class UriFormat {
 
     final boolean ignoreFragment;
 
-    public static class Builder {
+    public static final class Builder {
 
         private boolean surtEncoding;
 

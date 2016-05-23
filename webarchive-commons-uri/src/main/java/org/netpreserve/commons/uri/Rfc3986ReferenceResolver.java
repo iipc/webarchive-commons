@@ -80,12 +80,10 @@ public class Rfc3986ReferenceResolver {
     /**
      * Resolve the base and relative path.
      * <p>
-     * @param basePath a character array of the basePath
-     * @param relPath a character array of the relPath
-     * @return the resolved path
-     * @throws UriException no more higher path level to be resolved
+     * @param base a UriBuilder for the basePath.
+     * @param reference a UriBuilder for the reference's path
      */
-    public void mergePath(UriBuilder base, UriBuilder reference) throws UriException {
+    public void mergePath(UriBuilder base, UriBuilder reference) {
         if (base.authority != null && base.path.isEmpty()) {
             base.path = "/" + reference.path;
             return;

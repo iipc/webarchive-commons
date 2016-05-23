@@ -23,7 +23,7 @@ import java.util.List;
 /**
  *
  */
-public class UriBuilderConfig {
+public final class UriBuilderConfig {
 
     private final int maxUrlLength;
 
@@ -146,7 +146,7 @@ public class UriBuilderConfig {
         return defaultFormat;
     }
 
-    public static class ConfigBuilder {
+    public static final class ConfigBuilder {
 
         private int maxUrlLength = Integer.MAX_VALUE;
 

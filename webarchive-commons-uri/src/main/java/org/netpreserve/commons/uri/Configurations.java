@@ -26,7 +26,7 @@ import org.netpreserve.commons.uri.normalization.StripWwwN;
 /**
  * Common configurations to use with UriBuilder.
  */
-public class Configurations {
+public final class Configurations {
 
     public static final Rfc3986Parser STRICT_PARSER = new Rfc3986Parser();
 
@@ -131,4 +131,8 @@ public class Configurations {
 //            .addPostNormalizer(new StripSessionCFIDs());
 //            .addPostNormalizer(new FixupQueryString());
             .build();
+
+    private Configurations() {
+    }
+
 }

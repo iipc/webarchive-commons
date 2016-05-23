@@ -22,7 +22,7 @@ import java.nio.charset.StandardCharsets;
 /**
  *
  */
-public class UriBuilder {
+public final class UriBuilder {
 
     public static final String SCHEME_HTTP = "http";
 

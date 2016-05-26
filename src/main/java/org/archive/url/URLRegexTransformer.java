@@ -16,11 +16,11 @@ public class URLRegexTransformer {
     
     private static final OptimizedPattern QUERY_OPTS[] = {
 
-    	new OptimizedPattern("(?i)^(.+)(?:jsessionid=[0-9a-zA-Z]{32})(?:&(.*))?$", "jsessionid=", 1, 2),
-    	new OptimizedPattern("(?i)^(.+)(?:phpsessid=[0-9a-zA-Z]{32})(?:&(.*))?$", "phpsessid=", 1, 2),
-    	new OptimizedPattern("(?i)^(.+)(?:sid=[0-9a-zA-Z]{32})(?:&(.*))?$", "sid=", 1, 2),
-    	new OptimizedPattern("(?i)^(.+)(?:ASPSESSIONID[a-zA-Z]{8}=[a-zA-Z]{24})(?:&(.*))?$", "aspsessionid", 1, 2),
-    	new OptimizedPattern("(?i)^(.+)(?:cfid=[^&]+&cftoken=[^&]+)(?:&(.*))?$", "cftoken=", 1, 2),
+    	new OptimizedPattern("(?i)^(.*)(?:jsessionid=[0-9a-zA-Z]{32})(?:&(.*))?$", "jsessionid=", 1, 2),
+    	new OptimizedPattern("(?i)^(.*)(?:phpsessid=[0-9a-zA-Z]{32})(?:&(.*))?$", "phpsessid=", 1, 2),
+    	new OptimizedPattern("(?i)^(.*)(?:sid=[0-9a-zA-Z]{32})(?:&(.*))?$", "sid=", 1, 2),
+    	new OptimizedPattern("(?i)^(.*)(?:ASPSESSIONID[a-zA-Z]{8}=[a-zA-Z]{24})(?:&(.*))?$", "aspsessionid", 1, 2),
+    	new OptimizedPattern("(?i)^(.*)(?:cfid=[^&]+&cftoken=[^&]+)(?:&(.*))?$", "cftoken=", 1, 2),
     };
 
 

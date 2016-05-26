@@ -53,5 +53,15 @@ public class IAURLCanonicalizerTest extends TestCase {
 		assertEquals(80,IAURLCanonicalizer.getDefaultPort("http"));
 		assertEquals(443,IAURLCanonicalizer.getDefaultPort("https"));
 	}
+	
+	public void testStripSessionId() throws URISyntaxException {
+	    IAURLCanonicalizer iaC = new IAURLCanonicalizer(new DefaultIACanonicalizerRules());
+	    compCan(iaC,
+                "http://www.nsf.gov/statistics/sed/2009/SED_2009.zip?CFID=14387305&CFTOKEN=72942008&jsessionid=f030eacc7e49c4ca0b077922347418418766",
+                "http://nsf.gov/statistics/sed/2009/sed_2009.zip?jsessionid=f030eacc7e49c4ca0b077922347418418766");
+	    compCan(iaC,
+                "http://www.nsf.gov/statistics/sed/2009/SED_2009.zip?CFID=14387305&CFTOKEN=72942008",
+                "http://nsf.gov/statistics/sed/2009/sed_2009.zip");        
+    }	
 
 }

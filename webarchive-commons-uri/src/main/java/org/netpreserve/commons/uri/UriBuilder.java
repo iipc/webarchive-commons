@@ -101,8 +101,8 @@ public final class UriBuilder {
     }
 
     public UriBuilder uri(String uriString) {
-        for (PreParseNormalizer preNormalizer : config.getPreNormalizers()) {
-            uriString = preNormalizer.normalize(uriString);
+        for (PreParseNormalizer normalizer : config.getPreParseNormalizers()) {
+            uriString = normalizer.normalize(uriString);
         }
 
         config.getParser().parseUri(this, uriString, 0);
@@ -138,31 +138,24 @@ public final class UriBuilder {
         return this;
     }
 
-    public UriBuilder authority(final String value) {
-        config.getParser().parseAuthority(this, value);
-        return this;
-    }
-
     public UriBuilder userinfo(final String value) {
         this.userinfo = value;
-        config.getParser().constructAuthority(this);
         return this;
     }
 
     public UriBuilder host(final String value) {
         this.host = value;
-        config.getParser().constructAuthority(this);
         return this;
     }
 
     public UriBuilder port(final int value) {
+
         this.port = value;
-        config.getParser().constructAuthority(this);
         return this;
     }
 
     public UriBuilder path(final String value) {
-        config.getParser().parsePath(this, value, 0);
+        config.getParser().parsePath(new Rfc3986Parser.ParserState(this, value, 0));
         return this;
     }
 
@@ -215,8 +208,20 @@ public final class UriBuilder {
     }
 
     public Uri build() {
-        for (PostParseNormalizer normalizer : config.getPostNormalizers()) {
-            normalizer.normalize(this);
+        if (scheme == null && config.isRequireAbsoluteUri()) {
+            throw new UriException("Uri is not absolute");
+        }
+
+        if (authority != null) {
+            parser().decomposeAuthority(this, authority);
+        } else {
+            parser().constructAuthority(this);
+        }
+
+        for (PostParseNormalizer normalizer : config.getPostParseNormalizers()) {
+            if (normalizer.validFor(this)) {
+                normalizer.normalize(this);
+            }
         }
 
         Uri uri = new Uri(this);
@@ -261,12 +266,15 @@ public final class UriBuilder {
     }
 
     public UriBuilder resolve(UriBuilder relative) throws UriException {
+        if (authority != null) {
+            parser().decomposeAuthority(this, authority);
+        }
         config.getReferenceResolver().resolve(this, relative);
         return this;
     }
 
     public UriBuilder resolve(Uri relative) throws UriException {
-        config.getReferenceResolver().resolve(this, UriBuilder.builder(config).uri(relative));
+        resolve(UriBuilder.builder(config).uri(relative));
         return this;
     }
 
@@ -275,7 +283,7 @@ public final class UriBuilder {
                 config.toBuilder().requireAbsoluteUri(false).build())
                 .uri(relative);
 
-        config.getReferenceResolver().resolve(this, uri);
+        resolve(uri);
         return this;
     }
 

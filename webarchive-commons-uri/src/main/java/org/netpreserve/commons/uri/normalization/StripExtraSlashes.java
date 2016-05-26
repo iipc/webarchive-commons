@@ -15,23 +15,61 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
+import java.util.Set;
+
+import org.netpreserve.commons.uri.InParseNormalizer;
+import org.netpreserve.commons.uri.PostParseNormalizer;
+import org.netpreserve.commons.uri.Rfc3986Parser;
 import org.netpreserve.commons.uri.UriBuilder;
+
 import static org.netpreserve.commons.uri.UriBuilder.SCHEME_HTTP;
 import static org.netpreserve.commons.uri.UriBuilder.SCHEME_HTTPS;
 
 /**
+ * Normalizer for skipping errorneous extra slashes.
  *
+ * Skips:
+ * <ul>
+ *   <li>extra slashes at start of authority</li>
+ *   <li>double slashes in path</li>
+ *   <li>slashs at end of path</li>
+ * </ul>
  */
-public class StripExtraSlashes extends SchemeBasedNormalizer {
+public class StripExtraSlashes extends SchemeBasedNormalizer implements InParseNormalizer, PostParseNormalizer {
+
+    private static final Set<String> SUPPORTED_SCHEMES = immutableSetOf(SCHEME_HTTP, SCHEME_HTTPS);
+
+    @Override
+    public void preParseAuthority(Rfc3986Parser.ParserState parserState) {
+        // Skip errorneous extra slashes at start of authority
+        if (!parserState.hasAuthority() && parserState.uriHasAtLeastMoreChararcters(1)
+                && parserState.getUri().charAt(parserState.getOffset()) == '/') {
+
+            int leadingSlashCount = 1;
+            while (parserState.uriHasAtLeastMoreChararcters(1 + leadingSlashCount)
+                    && parserState.getUri().charAt(parserState.getOffset() + leadingSlashCount) == '/') {
+                leadingSlashCount++;
+            }
+            if (leadingSlashCount >= 2) {
+                parserState.setHasAuthority(true);
+                parserState.incrementOffset(leadingSlashCount);
+            }
+        }
+    }
 
     @Override
     public void normalize(UriBuilder builder) {
-        if (!builder.path().isEmpty() && matchesScheme(builder, SCHEME_HTTP, SCHEME_HTTPS)) {
-            builder.path(builder.path().replace("//", "/"));
+        if (!builder.path().isEmpty()) {
+            builder.path(builder.path().replace("/+", "/"));
             if (builder.path().endsWith("/")) {
                 builder.path(builder.path().substring(0, builder.path().length() - 1));
             }
         }
+    }
+
+    @Override
+    public Set<String> getSupportedSchemes() {
+        return SUPPORTED_SCHEMES;
     }
 
 }

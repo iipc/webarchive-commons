@@ -19,19 +19,28 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import org.netpreserve.commons.uri.PostParseNormalizer;
 import org.netpreserve.commons.uri.UriBuilder;
 
 import static org.netpreserve.commons.uri.UriBuilder.SCHEME_HTTP;
 import static org.netpreserve.commons.uri.UriBuilder.SCHEME_HTTPS;
+import static org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer.immutableSetOf;
 
 /**
  *
  */
-public class QueryNormalizers extends SchemeBasedNormalizer {
+public class QueryNormalizers extends SchemeBasedNormalizer implements PostParseNormalizer {
+
+    private static final Set<String> SUPPORTED_SCHEMES = immutableSetOf(SCHEME_HTTP, SCHEME_HTTPS);
+
     public interface QueryNormalizer {
+
         void normalize(SortedMap<String, List<String>> queries);
+
     }
 
     List<QueryNormalizer> normalizers = new ArrayList<>();
@@ -42,7 +51,7 @@ public class QueryNormalizers extends SchemeBasedNormalizer {
 
     @Override
     public void normalize(UriBuilder builder) {
-        if (!normalizers.isEmpty() && builder.query() != null && matchesScheme(builder, SCHEME_HTTP, SCHEME_HTTPS)) {
+        if (!normalizers.isEmpty() && builder.query() != null) {
             SortedMap<String, List<String>> queries = new TreeMap<>();
 
             for (String queryElement : builder.query().split("&")) {
@@ -84,6 +93,11 @@ public class QueryNormalizers extends SchemeBasedNormalizer {
                 builder.query(query.toString());
             }
         }
+    }
+
+    @Override
+    public Set<String> getSupportedSchemes() {
+        return SUPPORTED_SCHEMES;
     }
 
 }

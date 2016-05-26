@@ -15,21 +15,36 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
-import org.netpreserve.commons.uri.PostParseNormalizer;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.netpreserve.commons.uri.Normalizer;
 import org.netpreserve.commons.uri.UriBuilder;
 
 /**
  *
  */
-public abstract class SchemeBasedNormalizer implements PostParseNormalizer {
+public abstract class SchemeBasedNormalizer implements Normalizer {
 
-    protected boolean matchesScheme(UriBuilder builder, String... scheme) {
-        for (String s : scheme) {
-            if (s.equals(builder.scheme())) {
+    public abstract Set<String> getSupportedSchemes();
+
+    @Override
+    public boolean validFor(UriBuilder builder) {
+        if (builder.config.isSchemeBasedNormalization()) {
+            Set<String> supportedSchemes = getSupportedSchemes();
+            if (supportedSchemes.isEmpty()) {
                 return true;
+            } else {
+                return getSupportedSchemes().contains(builder.scheme());
             }
         }
         return false;
+    }
+
+    protected final static Set<String> immutableSetOf(String... values) {
+        return Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(values)));
     }
 
 }

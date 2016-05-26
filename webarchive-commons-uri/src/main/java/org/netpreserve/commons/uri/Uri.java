@@ -53,6 +53,8 @@ public class Uri {
 
     final UriFormat defaultFormat;
 
+    private transient String toStringCache;
+
     Uri(final UriBuilder uriBuilder) {
         // There are usually only a little number of schemes. Interning the field reuses the same
         // string to reduce memory footprint.
@@ -69,10 +71,10 @@ public class Uri {
         this.isIPv6reference = uriBuilder.isIPv6reference;
         this.isAbsPath = uriBuilder.isAbsPath;
 
-        // Coalesce the host and authority fields where possible.
+        // Coalesce the getHost and getAuthority fields where possible.
         //
-        // In the web crawl/http domain, most URIs have an identical host and authority. (There is
-        // no port or user info.)
+        // In the web crawl/http domain, most URIs have an identical getHost and getAuthority. (There is
+        // no getPort or user info.)
         //
         // Notably, the lengths of these fields are equal if and only if their values are identical.
         // This code makes use of this fact to reduce the two instances to one where possible,
@@ -88,30 +90,30 @@ public class Uri {
         this.defaultFormat = uriBuilder.config.getDefaultFormat();
     }
 
-    public String scheme() {
+    public String getScheme() {
         return scheme;
     }
 
-    public String userinfo() {
+    public String getUserinfo() {
         return userinfo;
     }
 
-    public String host() {
+    public String getHost() {
         return host;
     }
 
-    public String decodedHost() {
+    public String getDecodedHost() {
         if (SchemeParams.forName(scheme).punycodedHost) {
             return IDN.toUnicode(host);
         }
         return decode(host);
     }
 
-    public int port() {
+    public int getPort() {
         return port;
     }
 
-    public int decodedPort() {
+    public int getDecodedPort() {
         if (port == -1) {
             return SchemeParams.forName(scheme).defaultPort;
         } else {
@@ -119,23 +121,23 @@ public class Uri {
         }
     }
 
-    public String authority() {
+    public String getAuthority() {
         return authority;
     }
 
-    public String path() {
+    public String getPath() {
         return path;
     }
 
-    public String decodedPath() {
+    public String getDecodedPath() {
         return decode(path);
     }
 
-    public String query() {
+    public String getQuery() {
         return query;
     }
 
-    public String fragment() {
+    public String getFragment() {
         return fragment;
     }
 
@@ -180,7 +182,10 @@ public class Uri {
 
     @Override
     public String toString() {
-        return toCustomString(defaultFormat, false);
+        if (toStringCache == null) {
+            toStringCache = toCustomString(defaultFormat, false);
+        }
+        return toStringCache;
     }
 
     public String toDecodedString() {
@@ -215,7 +220,7 @@ public class Uri {
                     }
                     if (!format.ignoreHost && host != null) {
                         if (decode) {
-                            buf.append(decodedHost());
+                            buf.append(getDecodedHost());
                         } else {
                             buf.append(host);
                         }
@@ -231,7 +236,7 @@ public class Uri {
             if (!format.ignorePath && path != null) {
                 if (!path.isEmpty()) {
                     if (decode) {
-                        buf.append(decodedPath());
+                        buf.append(getDecodedPath());
                     } else {
                         buf.append(path);
                     }
@@ -265,7 +270,7 @@ public class Uri {
                     if (i > 0 && host.charAt(i - 1) != '.') {
                         continue;
                     }
-                    buf.append(host, i, hostSegEnd); // rev host segment
+                    buf.append(host, i, hostSegEnd); // rev getHost segment
                     buf.append(',');     // ','
                     hostSegEnd = i - 1;
                 }

@@ -18,6 +18,7 @@ package org.netpreserve.commons.uri;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,9 +32,11 @@ public final class UriBuilderConfig {
 
     private final Rfc3986ReferenceResolver referenceResolver;
 
-    private final List<PreParseNormalizer> preNormalizers = new ArrayList<>();
+    private final PreParseNormalizer[] preParseNormalizers;
 
-    private final List<PostParseNormalizer> postNormalizers = new ArrayList<>();
+    private final InParseNormalizer[] inParseNormalizers;
+
+    private final PostParseNormalizer[] postParseNormalizers;
 
     private final Charset charset;
 
@@ -85,8 +88,9 @@ public final class UriBuilderConfig {
         this.pathSegmentNormalization = config.isPathSegmentNormalization();
         this.schemeBasedNormalization = config.isSchemeBasedNormalization();
         this.encodeIllegalCharacters = config.isEncodeIllegalCharacters();
-        this.preNormalizers.addAll(config.getPreNormalizers());
-        this.postNormalizers.addAll(config.getPostNormalizers());
+        this.preParseNormalizers = config.preParseNormalizers.toArray(new PreParseNormalizer[0]);
+        this.inParseNormalizers = config.inParseNormalizers.toArray(new InParseNormalizer[0]);
+        this.postParseNormalizers = config.postParseNormalizers.toArray(new PostParseNormalizer[0]);
         this.defaultFormat = config.getDefaultFormat();
     }
 
@@ -134,12 +138,16 @@ public final class UriBuilderConfig {
         return encodeIllegalCharacters;
     }
 
-    public List<PreParseNormalizer> getPreNormalizers() {
-        return preNormalizers;
+    public PreParseNormalizer[] getPreParseNormalizers() {
+        return preParseNormalizers;
     }
 
-    public List<PostParseNormalizer> getPostNormalizers() {
-        return postNormalizers;
+    public InParseNormalizer[] getInParseNormalizers() {
+        return inParseNormalizers;
+    }
+
+    public PostParseNormalizer[] getPostParseNormalizers() {
+        return postParseNormalizers;
     }
 
     public UriFormat getDefaultFormat() {
@@ -154,9 +162,11 @@ public final class UriBuilderConfig {
 
         private Rfc3986ReferenceResolver referenceResolver = Configurations.REFERENCE_RESOLVER;
 
-        private final List<PreParseNormalizer> preNormalizers = new ArrayList<>();
+        private final List<PreParseNormalizer> preParseNormalizers = new ArrayList<>();
 
-        private final List<PostParseNormalizer> postNormalizers = new ArrayList<>();
+        private final List<InParseNormalizer> inParseNormalizers = new ArrayList<>();
+
+        private final List<PostParseNormalizer> postParseNormalizers = new ArrayList<>();
 
         private Charset charset = StandardCharsets.UTF_8;
 
@@ -191,8 +201,9 @@ public final class UriBuilderConfig {
             this.pathSegmentNormalization = config.isPathSegmentNormalization();
             this.schemeBasedNormalization = config.isSchemeBasedNormalization();
             this.encodeIllegalCharacters = config.isEncodeIllegalCharacters();
-            this.preNormalizers.addAll(config.getPreNormalizers());
-            this.postNormalizers.addAll(config.getPostNormalizers());
+            this.preParseNormalizers.addAll(Arrays.asList(config.preParseNormalizers));
+            this.inParseNormalizers.addAll(Arrays.asList(config.inParseNormalizers));
+            this.postParseNormalizers.addAll(Arrays.asList(config.postParseNormalizers));
             this.defaultFormat = config.getDefaultFormat();
         }
 
@@ -256,13 +267,16 @@ public final class UriBuilderConfig {
             return this;
         }
 
-        public ConfigBuilder addPreNormalizer(PreParseNormalizer preNormalizer) {
-            this.preNormalizers.add(preNormalizer);
-            return this;
-        }
-
-        public ConfigBuilder addPostNormalizer(PostParseNormalizer postNormalizer) {
-            this.postNormalizers.add(postNormalizer);
+        public ConfigBuilder addNormalizer(Normalizer normalizer) {
+            if (normalizer instanceof PreParseNormalizer) {
+                this.preParseNormalizers.add((PreParseNormalizer) normalizer);
+            }
+            if (normalizer instanceof InParseNormalizer) {
+                this.inParseNormalizers.add((InParseNormalizer) normalizer);
+            }
+            if (normalizer instanceof PostParseNormalizer) {
+                this.postParseNormalizers.add((PostParseNormalizer) normalizer);
+            }
             return this;
         }
 
@@ -310,12 +324,16 @@ public final class UriBuilderConfig {
             return encodeIllegalCharacters;
         }
 
-        public List<PreParseNormalizer> getPreNormalizers() {
-            return preNormalizers;
+        public List<PreParseNormalizer> getPreParseNormalizers() {
+            return preParseNormalizers;
         }
 
-        public List<PostParseNormalizer> getPostNormalizers() {
-            return postNormalizers;
+        public List<InParseNormalizer> getInParseNormalizers() {
+            return inParseNormalizers;
+        }
+
+        public List<PostParseNormalizer> getPostParseNormalizers() {
+            return postParseNormalizers;
         }
 
         public UriFormat getDefaultFormat() {

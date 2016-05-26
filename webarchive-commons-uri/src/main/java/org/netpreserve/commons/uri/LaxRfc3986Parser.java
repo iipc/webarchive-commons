@@ -17,10 +17,6 @@ package org.netpreserve.commons.uri;
 
 import java.util.BitSet;
 
-import static org.netpreserve.commons.uri.UriBuilder.ESCAPED_SPACE;
-import static org.netpreserve.commons.uri.SchemeParams.HTTP;
-import static org.netpreserve.commons.uri.SchemeParams.HTTPS;
-
 /**
  *
  */
@@ -53,42 +49,6 @@ public class LaxRfc3986Parser extends Rfc3986Parser {
     }
 
     @Override
-    int parseAuthority(UriBuilder builder, String uri, int offset) {
-        if (uri.length() > offset + 2 && uri.charAt(offset) == '/' && uri.charAt(offset + 1) == '/') {
-            // Skip errorneous extra slashes if SCHEME is HTTP/HTTPS
-            if (uri.length() > offset + 2 && SchemeParams.isType(builder.scheme, HTTP, HTTPS)) {
-                while (uri.charAt(offset + 2) == '/') {
-                    offset++;
-                }
-            }
-
-            int end = indexOf(uri, offset + 2, '/', '?', '#');
-            if (end == -1) {
-                end = uri.length();
-            }
-
-            String authority = uri.substring(offset + 2, end);
-            // Remove trailing escaped space
-            while (authority.endsWith(ESCAPED_SPACE)) {
-                authority = authority.substring(0, authority.length() - 3);
-            }
-
-            parseAuthority(builder, authority);
-
-            return end;
-        } else {
-            builder.authority = null;
-            builder.userinfo = null;
-            builder.host = null;
-            builder.port = -1;
-            builder.isIPv4address = false;
-            builder.isIPv6reference = false;
-            builder.isRegName = false;
-            return offset;
-        }
-    }
-
-    @Override
     String preCheckRegistryName(String registryName) {
         if (registryName.contains("..")) {
             throw new UriException("Illegal hostname: " + registryName);
@@ -111,4 +71,5 @@ public class LaxRfc3986Parser extends Rfc3986Parser {
         }
         return ((st > 0) || (len < string.length())) ? string.substring(st, len) : string;
     }
+
 }

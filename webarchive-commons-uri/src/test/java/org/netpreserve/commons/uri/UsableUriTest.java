@@ -126,9 +126,9 @@ public class UsableUriTest {
         final String path = "/clzreceive/";
         final String uri = ftp + "://" + authority + path;
         Uri uuri = UriBuilder.usableUriBuilder().uri(uri).build();
-        assertThat(uuri.scheme()).isEqualTo(ftp);
-        assertThat(uuri.authority()).isEqualTo(authority);
-        assertThat(uuri.path()).isEqualTo(path);
+        assertThat(uuri.getScheme()).isEqualTo(ftp);
+        assertThat(uuri.getAuthority()).isEqualTo(authority);
+        assertThat(uuri.getPath()).isEqualTo(path);
     }
 
     @Test
@@ -147,43 +147,43 @@ public class UsableUriTest {
 
         uri = "http://gemini.info.usaid.gov/directory/pbResults.cfm?&urlNameLast=Rumplestiltskin";
         tgtUri = "http://gemini.info.usaid.gov/directory/faxResults.cfm?"
-                + "name=Ebenezer%20+Rumplestiltskin,&location=RRB%20%20%20%205%2E08%2D006";
+                + "name=Ebenezer%20+Rumplestiltskin,&location=RRB%20%20%20%205.08-006";
 
         Uri base = UriBuilder.usableUriBuilder().uri(uri).build();
         uuri = UriBuilder.usableUriBuilder().uri(base)
                 .resolve("faxResults.cfm?name=Ebenezer +Rumplestiltskin,&location="
                         + "RRB%20%20%20%205%2E08%2D006").build();
-        assertThat(uuri.toString()).isEqualTo(tgtUri);
+        assertThat(uuri).hasToString(tgtUri);
 
         uri = "http://archive.org/index%25\u3000.html";
         tgtUri = "http://archive.org/index%25%E3%80%80.html";
         uuri = UriBuilder.usableUriBuilder().uri(uri).build();
-        assertThat(uuri.toString()).isEqualTo(tgtUri);
+        assertThat(uuri).hasToString(tgtUri);
     }
 
     @Test
     public final void testFailedGetPath() {
         final String path = "/RealMedia/ads/click_lx.ads/%%PAGE%%/%%RAND%%/%%POS%%/%%CAMP%%/empty";
-        // decoding in path will interpret %CA as 8-bit escaped char,
+        // decoding in getPath will interpret %CA as 8-bit escaped char,
         // possibly incomplete
         final String uri = "http://ads.nandomedia.com" + path;
         Uri uuri = UriBuilder.usableUriBuilder().uri(uri).build();
-        assertThat(uuri.path()).isEqualTo(path);
+        assertThat(uuri.getPath()).isEqualTo(path);
     }
 
     @Test
     public final void testDnsHost() {
         String uri = "dns://ads.nandomedia.com:81/one.html";
         Uri uuri = UriBuilder.usableUriBuilder().uri(uri).build();
-        assertThat(uuri.host()).isEqualTo("ads.nandomedia.com");
+        assertThat(uuri.getHost()).isEqualTo("ads.nandomedia.com");
 
         uri = "dns:ads.nandomedia.com";
         uuri = UriBuilder.usableUriBuilder().uri(uri).build();
-        assertThat(uuri.host()).isEqualTo("ads.nandomedia.com");
+        assertThat(uuri.getHost()).isEqualTo("ads.nandomedia.com");
 
         uri = "dns:ads.nandomedia.com?a=b";
         uuri = UriBuilder.usableUriBuilder().uri(uri).build();
-        assertThat(uuri.host()).isEqualTo("ads.nandomedia.com");
+        assertThat(uuri.getHost()).isEqualTo("ads.nandomedia.com");
     }
 
     @Test
@@ -199,7 +199,7 @@ public class UsableUriTest {
     public final void testRelativeDblPathSlashes() {
         Uri uuri = UriBuilder.usableUriBuilder().uri("http://www.archive.org/index.html")
                 .resolve("JIGOU//KYC//INDEX.HTM").build();
-        assertThat(uuri.path()).isEqualTo("/JIGOU//KYC//INDEX.HTM");
+        assertThat(uuri.getPath()).isEqualTo("/JIGOU//KYC//INDEX.HTM");
     }
 
     @Test
@@ -227,11 +227,11 @@ public class UsableUriTest {
 
     @Test
     public final void testCurlies() {
-        // Firefox allows curlies in the query string portion of a URL only
-        // (converts curlies if they are in the path portion ahead of the
-        // query string).
+        // Firefox allows curlies in the getQuery string portion of a URL only
+        // (converts curlies if they are in the getPath portion ahead of the
+        // getQuery string).
         Uri uuri = noChangeExpected("http://license.joins.com/igor?one={curly}");
-        assertThat(uuri.query()).isEqualTo("one={curly}");
+        assertThat(uuri.getQuery()).isEqualTo("one={curly}");
         assertThat(UriBuilder.usableUriBuilder().uri("http://license.joins.com/igor{curly}.html")
                 .build().
                 toString()).isEqualTo("http://license.joins.com/igor%7Bcurly%7D.html");
@@ -459,18 +459,18 @@ public class UsableUriTest {
     }
 
     /**
-     * Test for doing separate DNS lookup for same host
+     * Test for doing separate DNS lookup for same getHost
      * <p>
      * @see
      * <a href="https://sourceforge.net/tracker/?func=detail&aid=788277&group_id=73833&atid=539099">[
-     * 788277 ] Doing separate DNS lookup for same host</a>
+ 788277 ] Doing separate DNS lookup for same getHost</a>
      */
     @Test
     public final void testHostWithPeriod() {
         Uri uuri1 = UriBuilder.usableUriBuilder().uri("http://www.loc.gov./index.html").build();
         Uri uuri2 = UriBuilder.usableUriBuilder().uri("http://www.loc.gov/index.html").build();
 
-        assertThat(uuri1.host()).isEqualTo(uuri2.host());
+        assertThat(uuri1.getHost()).isEqualTo(uuri2.getHost());
     }
 
     /**
@@ -492,11 +492,11 @@ public class UsableUriTest {
     }
 
     /**
-     * Test for java.net.URI parses %20 but host null
+     * Test for java.net.URI parses %20 but getHost null
      * <p>
      * See
      * <a href="https://sourceforge.net/tracker/?func=detail&aid=927940&group_id=73833&atid=539099">[
-     * 927940 ] java.net.URI parses %20 but host null</a>
+ 927940 ] java.net.URI parses %20 but getHost null</a>
      */
     @Test
     public final void testSpaceInHost() {
@@ -530,7 +530,7 @@ public class UsableUriTest {
     public final void testHostWithUnderscores() {
         Uri uuri = UriBuilder.usableUriBuilder()
                 .uri("http://x_underscore_underscore.2u.com.tw/nonexistent_page.html").build();
-        assertThat(uuri.host())
+        assertThat(uuri.getHost())
                 .as("Failed get of host with underscore")
                 .isEqualTo("x_underscore_underscore.2u.com.tw");
     }
@@ -550,18 +550,18 @@ public class UsableUriTest {
     }
 
     /**
-     * Test for java.net.URI#host fails when leading digit.
+     * Test for java.net.URI#getHost fails when leading digit.
      * <p>
      * @see
      * <a href="https://sourceforge.net/tracker/?func=detail&aid=910120&group_id=73833&atid=539099">[
-     * 910120 ] java.net.URI#host fails when leading digit.</a>
+ 910120 ] java.net.URI#getHost fails when leading digit.</a>
      */
     @Test
     public final void testHostWithDigit() {
         Uri uuri = UriBuilder.usableUriBuilder()
                 .uri("http://0204chat.2u.com.tw/nonexistent_page.html").build();
 
-        assertThat(uuri.host()).as("Failed get of host with digit").isEqualTo("0204chat.2u.com.tw");
+        assertThat(uuri.getHost()).as("Failed get of host with digit").isEqualTo("0204chat.2u.com.tw");
     }
 
     /**
@@ -581,9 +581,9 @@ public class UsableUriTest {
     }
 
     /**
-     * Test bad port throws exception.
+     * Test bad getPort throws exception.
      * <p>
-     * @param uri URI with bad port to check.
+     * @param uri URI with bad getPort to check.
      */
     private void checkBadPort(String uri) {
         try {
@@ -595,7 +595,7 @@ public class UsableUriTest {
     }
 
     /**
-     * Preserve userinfo capitalization.
+     * Preserve getUserinfo capitalization.
      */
     @Test
     public final void testUserinfo() {
@@ -603,13 +603,13 @@ public class UsableUriTest {
         final String uri = "http://" + authority + "/robots.txt";
         Uri uuri = UriBuilder.usableUriBuilder().uri(uri).build();
 
-        assertThat(uuri.authority())
+        assertThat(uuri.getAuthority())
                 .as("Authority did not preserve userinfo capitalization")
                 .isEqualTo(authority);
     }
 
     /**
-     * Test user info + port
+     * Test user info + getPort
      */
     @Test
     public final void testUserinfoPlusPort() {
@@ -620,10 +620,10 @@ public class UsableUriTest {
         final String uri = "http://" + authority + "/robots.txt";
         Uri uuri = UriBuilder.usableUriBuilder().uri(uri).build();
 
-        assertThat(uuri.host()).isEqualTo(host);
-        assertThat(uuri.userinfo()).isEqualTo(userInfo);
-        assertThat(uuri.port()).isEqualTo(port);
-        assertThat(uuri.authority()).isEqualTo(authority);
+        assertThat(uuri.getHost()).isEqualTo(host);
+        assertThat(uuri.getUserinfo()).isEqualTo(userInfo);
+        assertThat(uuri.getPort()).isEqualTo(port);
+        assertThat(uuri.getAuthority()).isEqualTo(authority);
     }
 
     @Test
@@ -744,7 +744,7 @@ public class UsableUriTest {
         // tryRelative(base, "?y", "http://a/b/c/?y");
         tryRelative(base, "g?y", "http://a/b/c/g?y");
         // EXTRAS beyond the RFC set.
-        // TODO: That these resolve to a path of /a/g might be wrong. Perhaps it should be '/g'?.
+        // TODO: That these resolve to a getPath of /a/g might be wrong. Perhaps it should be '/g'?.
         tryRelative(base, "/../../../../../../../../g", "http://a/g");
         tryRelative(base, "../../../../../../../../g", "http://a/g");
         tryRelative(base, "../G", "http://a/b/G");
@@ -759,8 +759,8 @@ public class UsableUriTest {
     }
 
     /**
-     * A UURI should always be without a 'fragment' segment, which is unused and irrelevant for
-     * network fetches.
+     * A UURI should always be without a 'getFragment' segment, which is unused and irrelevant for
+ network fetches.
      * <p>
      * See [ 970666 ] #anchor links not trimmed, and thus recrawled
      */
@@ -774,8 +774,8 @@ public class UsableUriTest {
 
     /**
      * Ensure that URI strings beginning with a colon are treated
-     * the same as browsers do (as relative, rather than as absolute
-     * with zero-length scheme).
+ the same as browsers do (as relative, rather than as absolute
+ with zero-length getScheme).
      */
     @Test
     public void testStartsWithColon() {
@@ -856,7 +856,7 @@ public class UsableUriTest {
         assertThat(precededByValidEscapeUuri.toString())
                 .as("Failed parsing '%' preceeded by valid escape")
                 .isEqualTo(precededByValidEscape);
-        assertThat(precededByValidEscapeUuri.decodedPath()).isEqualTo("/pa th%way");
+        assertThat(precededByValidEscapeUuri.getDecodedPath()).isEqualTo("/pa th%way");
 
         String followedByValidEscape = "http://www.example.com/pa%th%20way";
         Uri followedByValidEscapeUuri = UriBuilder.usableUriBuilder().uri(followedByValidEscape)
@@ -864,7 +864,7 @@ public class UsableUriTest {
         assertThat(followedByValidEscapeUuri.toString())
                 .as("Failed parsing '%' followed by valid escape")
                 .isEqualTo(followedByValidEscape);
-        assertThat(followedByValidEscapeUuri.decodedPath()).isEqualTo("/pa%th way");
+        assertThat(followedByValidEscapeUuri.getDecodedPath()).isEqualTo("/pa%th way");
 
     }
 
@@ -874,7 +874,7 @@ public class UsableUriTest {
             "http://www.example.com/misc;reserved:chars@that&don't=need"
             +"+escaping$even,though!you(might)initially?think#so";
 
-        // expect everything but the #fragment
+        // expect everything but the #getFragment
         String expected = escapesUnnecessary.substring(0, escapesUnnecessary.length() - 3);
         assertThat(UriBuilder.usableUriBuilder().uri(escapesUnnecessary).build().toString())
                 .isEqualTo(expected);
@@ -890,7 +890,7 @@ public class UsableUriTest {
         assertThat(uri1.toString())
                 .as("Failed encoding %s", idn1)
                 .isEqualTo(puny1);
-        assertThat(uri1.decodedHost()).isEqualTo("r\u00e4ksm\u00f6rg\u00e5s.josefsson.org");
+        assertThat(uri1.getDecodedHost()).isEqualTo("r\u00e4ksm\u00f6rg\u00e5s.josefsson.org");
 
         // http://www.pølse.dk/
         String idn2 = "http://www.p\u00f8lse.dk/";
@@ -899,7 +899,7 @@ public class UsableUriTest {
         assertThat(uri2.toString())
                 .as("Failed encoding %s", idn2)
                 .isEqualTo(puny2);
-        assertThat(uri2.decodedHost()).isEqualTo("www.p\u00f8lse.dk");
+        assertThat(uri2.getDecodedHost()).isEqualTo("www.p\u00f8lse.dk");
 
         // http://例子.測試
         String idn3 = "http://\u4F8B\u5B50.\u6E2C\u8A66";
@@ -908,7 +908,7 @@ public class UsableUriTest {
         assertThat(uri3.toString())
                 .as("Failed encoding %s", idn3)
                 .isEqualTo(puny3);
-        assertThat(uri3.decodedHost()).isEqualTo("\u4F8B\u5B50.\u6E2C\u8A66");
+        assertThat(uri3.getDecodedHost()).isEqualTo("\u4F8B\u5B50.\u6E2C\u8A66");
     }
 
     @Test
@@ -952,17 +952,17 @@ public class UsableUriTest {
         uuri = UriBuilder.usableUriBuilder().uri("HTTP://foo.com/").build();
         assertThat(uuri.toString()).isEqualTo("http://foo.com/");
 
-        // check that host is lower cased
+        // check that getHost is lower cased
         uuri = UriBuilder.usableUriBuilder().uri("http://Foo.Com/index.html").build();
         assertThat(uuri.toString()).isEqualTo("http://foo.com/index.html");
 
-        // check that port number is normalized
+        // check that getPort number is normalized
         uuri = UriBuilder.usableUriBuilder().uri("http://foo.com:80/index.html").build();
         assertThat(uuri.toString()).isEqualTo("http://foo.com/index.html");
         uuri = UriBuilder.usableUriBuilder().uri("http://foo.com:81/").build();
         assertThat(uuri.toString()).isEqualTo("http://foo.com:81/");
 
-        // check that null path is normalized
+        // check that null getPath is normalized
         uuri = UriBuilder.usableUriBuilder().uri("http://foo.com").build();
         assertThat(uuri.toString()).isEqualTo("http://foo.com/");
 
@@ -971,17 +971,20 @@ public class UsableUriTest {
         assertThat(uuri.toString()).isEqualTo("http://foo.com/foo.html");
 
         // check that encoding is normalized
-        UriBuilderConfig config = Configurations.USABLE_URI.toBuilder()
-                .percentEncodingNormalization(true).build();
-        uuri = UriBuilder.builder(config).uri("http://foo.com/%66oo.html").build();
+        uuri = UriBuilder.usableUriBuilder().uri("http://foo.com/%66oo.html").build();
         assertThat(uuri.toString()).isEqualTo("http://foo.com/foo.html");
 
         // check that unnecessary "../" are removed
         uuri = UriBuilder.usableUriBuilder().uri("http://foo.com/aa/../").build();
         assertThat(uuri.toString()).isEqualTo("http://foo.com/");
 
-        uuri = UriBuilder.usableUriBuilder().uri("http://foo.com/aa/bb/../").build();
+        // Default normalization is to remove trailing slash. To get this one working we must change config.
+        uuri = UriBuilder.builder(Configurations.USABLE_URI.toBuilder().schemeBasedNormalization(false).build())
+                .uri("http://foo.com/aa/bb/../").build();
         assertThat(uuri.toString()).isEqualTo("http://foo.com/aa/");
+        // Check for default behavior of above
+        uuri = UriBuilder.usableUriBuilder().uri("http://foo.com/aa/bb/../").build();
+        assertThat(uuri.toString()).isEqualTo("http://foo.com/aa");
 
         // We fail this one.  Here we produce: 'http://foo.com/'.
         // uuri = UriBuilder.usableUriBuilder().uri("http://foo.com/aa/..").build();
@@ -1078,8 +1081,8 @@ public class UsableUriTest {
 
         Uri goodUuri = UriBuilder.usableUriBuilder().uri("http://www.example.com")
                 .resolve(suspectUri).build();
-        assertThat(goodUuri.host()).isEqualTo("www.example.com");
-        assertThat(goodUuri.path()).isEqualTo("/http//www.test.foo");
+        assertThat(goodUuri.getHost()).isEqualTo("www.example.com");
+        assertThat(goodUuri.getPath()).isEqualTo("/http//www.test.foo");
     }
 
     /**
@@ -1133,7 +1136,7 @@ public class UsableUriTest {
     }
 
     /**
-     * Test bad port throws UriException not NumberFormatException.
+     * Test bad getPort throws UriException not NumberFormatException.
      */
     @Test
     public void testExtremePort() {
@@ -1146,8 +1149,8 @@ public class UsableUriTest {
     }
 
     /**
-     * Bars ('|') in path-segments aren't encoded by FF, preferred by some
-     * RESTful-URI-ideas guides, so should work without error.
+     * Bars ('|') in getPath-segments aren't encoded by FF, preferred by some
+ RESTful-URI-ideas guides, so should work without error.
      */
     @Test
     public void testBarsInRelativePath() {
@@ -1158,9 +1161,9 @@ public class UsableUriTest {
     }
 
     /**
-     * To match IE behavior, backslashes in path-info (really, anywhere before
-     * query string) assumed to be slashes, to match IE behavior. In
-     * query-string, they are escaped to %5C.
+     * To match IE behavior, backslashes in getPath-info (really, anywhere before
+ getQuery string) assumed to be slashes, to match IE behavior. In
+ getQuery-string, they are escaped to %5C.
      */
     @Test
     public void testBackslashes() {

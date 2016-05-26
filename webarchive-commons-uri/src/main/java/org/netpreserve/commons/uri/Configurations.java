@@ -20,6 +20,7 @@ import org.netpreserve.commons.uri.normalization.CheckLongEnough;
 import org.netpreserve.commons.uri.normalization.LaxTrimming;
 import org.netpreserve.commons.uri.normalization.OptimisticDnsScheme;
 import org.netpreserve.commons.uri.normalization.QueryNormalizers;
+import org.netpreserve.commons.uri.normalization.StripTrailingEscapedSpaceOnAuthority;
 import org.netpreserve.commons.uri.normalization.StripExtraSlashes;
 import org.netpreserve.commons.uri.normalization.StripWwwN;
 
@@ -68,16 +69,18 @@ public final class Configurations {
             .requireAbsoluteUri(true)
             .strictReferenceResolution(false)
             .caseNormalization(true)
-            .percentEncodingNormalization(false)
+            .percentEncodingNormalization(true)
             .pathSegmentNormalization(true)
             .schemeBasedNormalization(true)
             .encodeIllegalCharacters(true)
              // Consider URIs too long for IE as illegal.
             .maxUrlLength(2083)
             .defaultFormat(Configurations.USABLE_URI_FORMAT)
-            .addPreNormalizer(new LaxTrimming())
-            .addPostNormalizer(new OptimisticDnsScheme())
-            .addPostNormalizer(new CheckLongEnough())
+            .addNormalizer(new LaxTrimming())
+            .addNormalizer(new StripExtraSlashes())
+            .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
+            .addNormalizer(new OptimisticDnsScheme())
+            .addNormalizer(new CheckLongEnough())
             .build();
 
     public static final UriBuilderConfig CANONICALIZED_URI =
@@ -94,16 +97,17 @@ public final class Configurations {
              // Consider URIs too long for IE as illegal.
             .maxUrlLength(2083)
             .defaultFormat(Configurations.CANONICALIZED_URI_FORMAT)
-            .addPreNormalizer(new LaxTrimming())
-            .addPreNormalizer(new AllLowerCase())
-            .addPostNormalizer(new StripWwwN())
-            .addPostNormalizer(new QueryNormalizers())
-            .addPostNormalizer(new StripExtraSlashes())
-            .addPostNormalizer(new OptimisticDnsScheme())
-            .addPostNormalizer(new CheckLongEnough())
-//            .addPostNormalizer(new StripSessionIDs());
-//            .addPostNormalizer(new StripSessionCFIDs());
-//            .addPostNormalizer(new FixupQueryString());
+            .addNormalizer(new LaxTrimming())
+            .addNormalizer(new AllLowerCase())
+            .addNormalizer(new StripWwwN())
+            .addNormalizer(new QueryNormalizers())
+            .addNormalizer(new StripExtraSlashes())
+            .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
+            .addNormalizer(new OptimisticDnsScheme())
+            .addNormalizer(new CheckLongEnough())
+//            .addNormalizer(new StripSessionIDs());
+//            .addNormalizer(new StripSessionCFIDs());
+//            .addNormalizer(new FixupQueryString());
             .build();
 
     public static final UriBuilderConfig SURT_KEY =
@@ -120,16 +124,17 @@ public final class Configurations {
              // Consider URIs too long for IE as illegal.
             .maxUrlLength(2083)
             .defaultFormat(Configurations.SURT_KEY_FORMAT)
-            .addPreNormalizer(new LaxTrimming())
-            .addPreNormalizer(new AllLowerCase())
-            .addPostNormalizer(new StripWwwN())
-            .addPostNormalizer(new QueryNormalizers())
-            .addPostNormalizer(new StripExtraSlashes())
-            .addPostNormalizer(new OptimisticDnsScheme())
-            .addPostNormalizer(new CheckLongEnough())
-//            .addPostNormalizer(new StripSessionIDs());
-//            .addPostNormalizer(new StripSessionCFIDs());
-//            .addPostNormalizer(new FixupQueryString());
+            .addNormalizer(new LaxTrimming())
+            .addNormalizer(new AllLowerCase())
+            .addNormalizer(new StripWwwN())
+            .addNormalizer(new QueryNormalizers())
+            .addNormalizer(new StripExtraSlashes())
+            .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
+            .addNormalizer(new OptimisticDnsScheme())
+            .addNormalizer(new CheckLongEnough())
+//            .addNormalizer(new StripSessionIDs());
+//            .addNormalizer(new StripSessionCFIDs());
+//            .addNormalizer(new FixupQueryString());
             .build();
 
     private Configurations() {

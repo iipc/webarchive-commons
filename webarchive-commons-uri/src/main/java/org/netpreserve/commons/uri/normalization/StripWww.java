@@ -15,6 +15,9 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
+import java.util.Set;
+
+import org.netpreserve.commons.uri.PostParseNormalizer;
 import org.netpreserve.commons.uri.UriBuilder;
 
 import static org.netpreserve.commons.uri.UriBuilder.SCHEME_HTTP;
@@ -23,15 +26,19 @@ import static org.netpreserve.commons.uri.UriBuilder.SCHEME_HTTPS;
 /**
  *
  */
-public class StripWww extends SchemeBasedNormalizer {
+public class StripWww extends SchemeBasedNormalizer implements PostParseNormalizer {
+    private static final Set<String> SUPPORTED_SCHEMES = immutableSetOf(SCHEME_HTTP, SCHEME_HTTPS);
+
     @Override
     public void normalize(UriBuilder builder) {
-        int dotIdx;
-        if (matchesScheme(builder, SCHEME_HTTP, SCHEME_HTTPS)) {
-            if (builder.host() != null && builder.host().startsWith("www.")) {
-                builder.host(builder.host().substring(builder.host().indexOf('.') + 1));
-            }
+        if (builder.host() != null && builder.host().startsWith("www.")) {
+            builder.host(builder.host().substring(builder.host().indexOf('.') + 1));
         }
+    }
+
+    @Override
+    public Set<String> getSupportedSchemes() {
+        return SUPPORTED_SCHEMES;
     }
 
 }

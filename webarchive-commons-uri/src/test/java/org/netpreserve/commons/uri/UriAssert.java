@@ -47,16 +47,16 @@ public class UriAssert extends AbstractAssert<UriAssert, Uri> {
     }
 
     /**
-     * Verifies that the actual Uri's scheme is equal to the given one.
+     * Verifies that the actual Uri's getScheme is equal to the given one.
      * <p>
-     * @param value the value to compare the actual Uri's scheme to.
+     * @param value the value to compare the actual Uri's getScheme to.
      * @return this assertion object.
-     * @throws AssertionError - if the actual Uri's scheme is not equal to the given one.
+     * @throws AssertionError - if the actual Uri's getScheme is not equal to the given one.
      */
     public UriAssert hasScheme(String value) {
         isNotNull();
 
-        String actualValue = actual.scheme();
+        String actualValue = actual.getScheme();
         if (!Objects.areEqual(actualValue, value)) {
             failWithMessage(errorMsg, "scheme", actual, value, actualValue);
         }
@@ -65,16 +65,16 @@ public class UriAssert extends AbstractAssert<UriAssert, Uri> {
     }
 
     /**
-     * Verifies that the actual Uri's authority is equal to the given one.
+     * Verifies that the actual Uri's getAuthority is equal to the given one.
      * <p>
-     * @param value the value to compare the actual Uri's authority to.
+     * @param value the value to compare the actual Uri's getAuthority to.
      * @return this assertion object.
-     * @throws AssertionError - if the actual Uri's authority is not equal to the given one.
+     * @throws AssertionError - if the actual Uri's getAuthority is not equal to the given one.
      */
     public UriAssert hasAuthority(String value) {
         isNotNull();
 
-        String actualValue = actual.authority();
+        String actualValue = actual.getAuthority();
         if (!Objects.areEqual(actualValue, value)) {
             failWithMessage(errorMsg, "authority", actual, value, actualValue);
         }
@@ -83,16 +83,16 @@ public class UriAssert extends AbstractAssert<UriAssert, Uri> {
     }
 
     /**
-     * Verifies that the actual Uri's userinfo is equal to the given one.
+     * Verifies that the actual Uri's getUserinfo is equal to the given one.
      * <p>
-     * @param value the value to compare the actual Uri's userinfo to.
+     * @param value the value to compare the actual Uri's getUserinfo to.
      * @return this assertion object.
-     * @throws AssertionError - if the actual Uri's userinfo is not equal to the given one.
+     * @throws AssertionError - if the actual Uri's getUserinfo is not equal to the given one.
      */
     public UriAssert hasUserinfo(String value) {
         isNotNull();
 
-        String actualValue = actual.userinfo();
+        String actualValue = actual.getUserinfo();
         if (!Objects.areEqual(actualValue, value)) {
             failWithMessage(errorMsg, "userinfo", actual, value, actualValue);
         }
@@ -101,16 +101,16 @@ public class UriAssert extends AbstractAssert<UriAssert, Uri> {
     }
 
     /**
-     * Verifies that the actual Uri's host is equal to the given one.
+     * Verifies that the actual Uri's getHost is equal to the given one.
      * <p>
-     * @param value the value to compare the actual Uri's host to.
+     * @param value the value to compare the actual Uri's getHost to.
      * @return this assertion object.
-     * @throws AssertionError - if the actual Uri's host is not equal to the given one.
+     * @throws AssertionError - if the actual Uri's getHost is not equal to the given one.
      */
     public UriAssert hasHost(String value) {
         isNotNull();
 
-        String actualValue = actual.host();
+        String actualValue = actual.getHost();
         if (!Objects.areEqual(actualValue, value)) {
             failWithMessage(errorMsg, "host", actual, value, actualValue);
         }
@@ -119,16 +119,16 @@ public class UriAssert extends AbstractAssert<UriAssert, Uri> {
     }
 
     /**
-     * Verifies that the actual Uri's decodedHost is equal to the given one.
+     * Verifies that the actual Uri's getDecodedHost is equal to the given one.
      * <p>
-     * @param value the value to compare the actual Uri's decodedHost to.
+     * @param value the value to compare the actual Uri's getDecodedHost to.
      * @return this assertion object.
-     * @throws AssertionError - if the actual Uri's decodedHost is not equal to the given one.
+     * @throws AssertionError - if the actual Uri's getDecodedHost is not equal to the given one.
      */
     public UriAssert hasDecodedHost(String value) {
         isNotNull();
 
-        String actualValue = actual.decodedHost();
+        String actualValue = actual.getDecodedHost();
         if (!Objects.areEqual(actualValue, value)) {
             failWithMessage(errorMsg, "decodedHost", actual, value, actualValue);
         }
@@ -137,16 +137,16 @@ public class UriAssert extends AbstractAssert<UriAssert, Uri> {
     }
 
     /**
-     * Verifies that the actual Uri's port is equal to the given one.
+     * Verifies that the actual Uri's getPort is equal to the given one.
      * <p>
-     * @param value the value to compare the actual Uri's port to.
+     * @param value the value to compare the actual Uri's getPort to.
      * @return this assertion object.
-     * @throws AssertionError - if the actual Uri's port is not equal to the given one.
+     * @throws AssertionError - if the actual Uri's getPort is not equal to the given one.
      */
     public UriAssert hasPort(int value) {
         isNotNull();
 
-        int actualValue = actual.port();
+        int actualValue = actual.getPort();
         if (!Objects.areEqual(actualValue, value)) {
             failWithMessage(errorMsg, "port", actual, value, actualValue);
         }
@@ -155,16 +155,16 @@ public class UriAssert extends AbstractAssert<UriAssert, Uri> {
     }
 
     /**
-     * Verifies that the actual Uri's decodedPort is equal to the given one.
+     * Verifies that the actual Uri's getDecodedPort is equal to the given one.
      * <p>
-     * @param value the value to compare the actual Uri's decodedPort to.
+     * @param value the value to compare the actual Uri's getDecodedPort to.
      * @return this assertion object.
-     * @throws AssertionError - if the actual Uri's decodedPort is not equal to the given one.
+     * @throws AssertionError - if the actual Uri's getDecodedPort is not equal to the given one.
      */
     public UriAssert hasDecodedPort(int value) {
         isNotNull();
 
-        int actualValue = actual.decodedPort();
+        int actualValue = actual.getDecodedPort();
         if (!Objects.areEqual(actualValue, value)) {
             failWithMessage(errorMsg, "decodedPort", actual, value, actualValue);
         }
@@ -173,16 +173,16 @@ public class UriAssert extends AbstractAssert<UriAssert, Uri> {
     }
 
     /**
-     * Verifies that the actual Uri's path is equal to the given one.
+     * Verifies that the actual Uri's getPath is equal to the given one.
      * <p>
-     * @param value the value to compare the actual Uri's path to.
+     * @param value the value to compare the actual Uri's getPath to.
      * @return this assertion object.
-     * @throws AssertionError - if the actual Uri's path is not equal to the given one.
+     * @throws AssertionError - if the actual Uri's getPath is not equal to the given one.
      */
     public UriAssert hasPath(String value) {
         isNotNull();
 
-        String actualValue = actual.path();
+        String actualValue = actual.getPath();
         if (!Objects.areEqual(actualValue, value)) {
             failWithMessage(errorMsg, "path", actual, value, actualValue);
         }
@@ -191,16 +191,16 @@ public class UriAssert extends AbstractAssert<UriAssert, Uri> {
     }
 
     /**
-     * Verifies that the actual Uri's decodedPath is equal to the given one.
+     * Verifies that the actual Uri's getDecodedPath is equal to the given one.
      * <p>
-     * @param value the value to compare the actual Uri's decodedPath to.
+     * @param value the value to compare the actual Uri's getDecodedPath to.
      * @return this assertion object.
-     * @throws AssertionError - if the actual Uri's decodedPath is not equal to the given one.
+     * @throws AssertionError - if the actual Uri's getDecodedPath is not equal to the given one.
      */
     public UriAssert hasDecodedPath(String value) {
         isNotNull();
 
-        String actualValue = actual.decodedPath();
+        String actualValue = actual.getDecodedPath();
         if (!Objects.areEqual(actualValue, value)) {
             failWithMessage(errorMsg, "decodedPath", actual, value, actualValue);
         }
@@ -209,16 +209,16 @@ public class UriAssert extends AbstractAssert<UriAssert, Uri> {
     }
 
     /**
-     * Verifies that the actual Uri's query is equal to the given one.
+     * Verifies that the actual Uri's getQuery is equal to the given one.
      * <p>
-     * @param value the value to compare the actual Uri's query to.
+     * @param value the value to compare the actual Uri's getQuery to.
      * @return this assertion object.
-     * @throws AssertionError - if the actual Uri's query is not equal to the given one.
+     * @throws AssertionError - if the actual Uri's getQuery is not equal to the given one.
      */
     public UriAssert hasQuery(String value) {
         isNotNull();
 
-        String actualValue = actual.query();
+        String actualValue = actual.getQuery();
         if (!Objects.areEqual(actualValue, value)) {
             failWithMessage(errorMsg, "query", actual, value, actualValue);
         }
@@ -227,16 +227,16 @@ public class UriAssert extends AbstractAssert<UriAssert, Uri> {
     }
 
     /**
-     * Verifies that the actual Uri's fragment is equal to the given one.
+     * Verifies that the actual Uri's getFragment is equal to the given one.
      * <p>
-     * @param value the value to compare the actual Uri's fragment to.
+     * @param value the value to compare the actual Uri's getFragment to.
      * @return this assertion object.
-     * @throws AssertionError - if the actual Uri's fragment is not equal to the given one.
+     * @throws AssertionError - if the actual Uri's getFragment is not equal to the given one.
      */
     public UriAssert hasFragment(String value) {
         isNotNull();
 
-        String actualValue = actual.fragment();
+        String actualValue = actual.getFragment();
         if (!Objects.areEqual(actualValue, value)) {
             failWithMessage(errorMsg, "fragment", actual, value, actualValue);
         }

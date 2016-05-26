@@ -15,23 +15,30 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
+import java.util.Set;
+
+import org.netpreserve.commons.uri.PostParseNormalizer;
 import org.netpreserve.commons.uri.UriException;
 import org.netpreserve.commons.uri.UriBuilder;
 
 import static org.netpreserve.commons.uri.UriBuilder.SCHEME_HTTP;
 import static org.netpreserve.commons.uri.UriBuilder.SCHEME_HTTPS;
+import static org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer.immutableSetOf;
 
-public class CheckLongEnough extends SchemeBasedNormalizer {
+public class CheckLongEnough extends SchemeBasedNormalizer implements PostParseNormalizer {
+    private static final Set<String> SUPPORTED_SCHEMES = immutableSetOf(SCHEME_HTTP, SCHEME_HTTPS);
 
     @Override
     public void normalize(UriBuilder builder) {
-        if (matchesScheme(builder, SCHEME_HTTP, SCHEME_HTTPS)) {
-            if (builder.authority() == null && builder.path().length() <= 2) {
+            if ((builder.authority() == null || builder.authority().isEmpty()) && builder.path().length() <= 2) {
                 throw new UriException("http(s) scheme specific part is "
                         + "too short: " + toString());
             }
+    }
 
-        }
+    @Override
+    public Set<String> getSupportedSchemes() {
+        return SUPPORTED_SCHEMES;
     }
 
 }

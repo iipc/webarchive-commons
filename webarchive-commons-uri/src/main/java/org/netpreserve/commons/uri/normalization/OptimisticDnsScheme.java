@@ -15,24 +15,33 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
+import java.util.Set;
+
+import org.netpreserve.commons.uri.PostParseNormalizer;
 import org.netpreserve.commons.uri.UriBuilder;
 
 import static org.netpreserve.commons.uri.UriBuilder.SCHEME_DNS;
+import static org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer.immutableSetOf;
 
-public class OptimisticDnsScheme extends SchemeBasedNormalizer {
+public class OptimisticDnsScheme extends SchemeBasedNormalizer implements PostParseNormalizer {
+
+    private static final Set<String> SUPPORTED_SCHEMES = immutableSetOf(SCHEME_DNS);
 
     @Override
     public void normalize(UriBuilder builder) {
-        if (matchesScheme(builder, SCHEME_DNS)) {
+        if (builder.host() != null) {
+            builder.path("");
+        } else if (!builder.path().isEmpty()) {
+            builder.config.getParser().decomposeAuthority(builder, builder.path());
             if (builder.host() != null) {
                 builder.path("");
-            } else if (!builder.path().isEmpty()) {
-                builder.authority(builder.path());
-                if (builder.host() != null) {
-                    builder.path("");
-                }
             }
         }
+    }
+
+    @Override
+    public Set<String> getSupportedSchemes() {
+        return SUPPORTED_SCHEMES;
     }
 
 }

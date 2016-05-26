@@ -13,12 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.netpreserve.commons.uri;
 
 /**
  *
  */
-public interface PostParseNormalizer extends Normalizer {
+public interface InParseNormalizer extends Normalizer {
+    default void preParseAuthority(Rfc3986Parser.ParserState parserState) {
 
-    void normalize(UriBuilder builder);
+    }
+
+    default void postParseAuthority(Rfc3986Parser.ParserState parserState) {
+        
+    }
+
 }

@@ -15,32 +15,41 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
+import java.util.Set;
+
+import org.netpreserve.commons.uri.PostParseNormalizer;
 import org.netpreserve.commons.uri.UriBuilder;
 
 import static org.netpreserve.commons.uri.UriBuilder.SCHEME_HTTP;
 import static org.netpreserve.commons.uri.UriBuilder.SCHEME_HTTPS;
+import static org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer.immutableSetOf;
 
 /**
  *
  */
-public class StripWwwN extends SchemeBasedNormalizer {
+public class StripWwwN extends SchemeBasedNormalizer implements PostParseNormalizer {
+
+    private static final Set<String> SUPPORTED_SCHEMES = immutableSetOf(SCHEME_HTTP, SCHEME_HTTPS);
+
     @Override
     public void normalize(UriBuilder builder) {
-        if (matchesScheme(builder, SCHEME_HTTP, SCHEME_HTTPS)) {
-//            if (builder.host() != null && (builder.path().length() > 1 || builder.query() != null)
-            if (builder.host() != null && builder.host().length() > 3
-                    && builder.host().startsWith("www")) {
-                int dotIdx = builder.host().indexOf('.');
-                if (dotIdx > 3) {
-                    try {
-                        Integer.parseInt(builder.host().substring(3, dotIdx));
-                    } catch (NumberFormatException e) {
-                        return;
-                    }
+        if (builder.host() != null && builder.host().length() > 3
+                && builder.host().startsWith("www")) {
+            int dotIdx = builder.host().indexOf('.');
+            if (dotIdx > 3) {
+                try {
+                    Integer.parseInt(builder.host().substring(3, dotIdx));
+                } catch (NumberFormatException e) {
+                    return;
                 }
-                builder.host(builder.host().substring(dotIdx + 1));
             }
+            builder.host(builder.host().substring(dotIdx + 1));
         }
+    }
+
+    @Override
+    public Set<String> getSupportedSchemes() {
+        return SUPPORTED_SCHEMES;
     }
 
 }

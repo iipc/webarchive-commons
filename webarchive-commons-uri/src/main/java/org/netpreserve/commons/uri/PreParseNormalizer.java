@@ -18,6 +18,6 @@ package org.netpreserve.commons.uri;
 /**
  *
  */
-public interface PreParseNormalizer {
+public interface PreParseNormalizer extends Normalizer {
     String normalize(String uriString);
 }

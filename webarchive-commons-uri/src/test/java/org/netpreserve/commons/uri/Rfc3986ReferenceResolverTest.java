@@ -173,12 +173,12 @@ public class Rfc3986ReferenceResolverTest {
                 .schemeBasedNormalization(false).build();
         UriBuilder uriBuilder = UriBuilder.builder(config);
         Rfc3986Parser parser = new Rfc3986Parser();
-        int nextOffset = 0;
-        nextOffset = parser.parseScheme(uriBuilder, uriString, nextOffset);
-        nextOffset = parser.parseAuthority(uriBuilder, uriString, nextOffset);
-        nextOffset = parser.parsePath(uriBuilder, uriString, nextOffset);
-        nextOffset = parser.parseQuery(uriBuilder, uriString, nextOffset);
-        parser.parseFragment(uriBuilder, uriString, nextOffset);
+        Rfc3986Parser.ParserState parserState = new Rfc3986Parser.ParserState(uriBuilder, uriString, 0);
+        parser.parseScheme(parserState);
+        parser.parseAuthority(parserState);
+        parser.parsePath(parserState);
+        parser.parseQuery(parserState);
+        parser.parseFragment(parserState);
         return uriBuilder;
     }
 

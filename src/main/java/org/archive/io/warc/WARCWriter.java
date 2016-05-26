@@ -236,8 +236,8 @@ implements WARCConstants {
         long totalBytes = 0;
         long startPosition;
 
-    	try {
-    	    startPosition = getPosition();
+        startPosition = getPosition();
+        try {
             preWriteRecordTasks();
 
             // TODO: Revisit encoding of header.
@@ -261,13 +261,12 @@ implements WARCConstants {
             write(CRLF_BYTES);
             totalBytes += 2 * CRLF_BYTES.length;
             
-            tally(recordInfo.getType(), contentBytes, totalBytes, getPosition() - startPosition);
-            
             recordInfo.setWARCFilename(getFilenameWithoutOccupiedSuffix());
             recordInfo.setWARCFileOffset(startPosition);
             tmpRecordLog.add(recordInfo);
         } finally {
             postWriteRecordTasks();
+            tally(recordInfo.getType(), contentBytes, totalBytes, getPosition() - startPosition);
         }
     }
 

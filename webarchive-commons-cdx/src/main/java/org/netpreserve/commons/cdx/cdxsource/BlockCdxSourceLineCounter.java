@@ -18,19 +18,21 @@ package org.netpreserve.commons.cdx.cdxsource;
 import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 
+import org.netpreserve.commons.cdx.SearchKey;
+
 /**
  *
  */
 public class BlockCdxSourceLineCounter extends BlockCdxSourceIterator {
 
     public BlockCdxSourceLineCounter(SourceDescriptor sourceDescriptor,
-            Iterator<SourceBlock> blockIterator, String startKey, String endKey) {
-        super(sourceDescriptor, blockIterator, startKey, endKey);
+            Iterator<SourceBlock> blockIterator, SearchKey key) {
+        super(sourceDescriptor, blockIterator, key);
     }
 
     @Override
     BlockCdxSourceLineCounter init() {
-        cdxBuffer = new CdxBuffer(sourceDescriptor.getInputFormat(), startFilter, endFilter);
+        cdxBuffer = new CdxBuffer(sourceDescriptor.getInputFormat(), key);
         return this;
     }
 
@@ -38,10 +40,10 @@ public class BlockCdxSourceLineCounter extends BlockCdxSourceIterator {
         try {
             long count = 0L;
 
-            if (startFilter != null && blockIterator.hasNext()) {
+            if (blockIterator.hasNext()) {
                 cdxBuffer.setByteBuf(fillBuffer(blockIterator.next(), cdxBuffer.getByteBuf()).get());
                 cdxBuffer.skipLines();
-                if (endFilter != null && !blockIterator.hasNext()) {
+                if (!blockIterator.hasNext()) {
                     count += cdxBuffer.countLinesCheckingFilter();
                 } else {
                     count += cdxBuffer.countLines();
@@ -50,10 +52,10 @@ public class BlockCdxSourceLineCounter extends BlockCdxSourceIterator {
 
             while (blockIterator.hasNext()) {
                 SourceBlock nextBlock = blockIterator.next();
-                if (nextBlock.getLineCount() < 0 || (endFilter != null && !blockIterator.hasNext())) {
+                if (nextBlock.getLineCount() < 0 || (!blockIterator.hasNext())) {
 
                     cdxBuffer.setByteBuf(fillBuffer(nextBlock, cdxBuffer.getByteBuf()).get());
-                    if (endFilter != null && !blockIterator.hasNext()) {
+                    if (!blockIterator.hasNext()) {
                         count += cdxBuffer.countLinesCheckingFilter();
                     } else {
                         count += cdxBuffer.countLines();

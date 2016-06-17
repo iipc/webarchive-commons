@@ -22,6 +22,7 @@ import java.util.Objects;
 import org.netpreserve.commons.cdx.BaseCdxRecord;
 import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.CdxFormat;
+import org.netpreserve.commons.cdx.SearchKey;
 
 /**
  *
@@ -32,16 +33,18 @@ public class CdxBuffer {
 
     final CdxFormat lineFormat;
 
-    final byte[] firstFilter;
+//    final byte[] firstFilter;
+//
+//    final byte[] secondFilter;
 
-    final byte[] secondFilter;
+    final SearchKey key;
 
-    public CdxBuffer(final CdxFormat lineFormat,
-            final byte[] startFilter, final byte[] endFilter) {
+    public CdxBuffer(final CdxFormat lineFormat, final SearchKey key) {
 
         this.lineFormat = Objects.requireNonNull(lineFormat);
-        this.firstFilter = startFilter;
-        this.secondFilter = endFilter;
+//        this.firstFilter = startFilter;
+//        this.secondFilter = endFilter;
+        this.key = key;
     }
 
     public ByteBuffer getByteBuf() {
@@ -114,7 +117,7 @@ public class CdxBuffer {
      * @param c the character to check
      * @return true if LF or CR
      */
-    boolean isLf(int c) {
+    final boolean isLf(int c) {
         return c == '\n' || c == '\r';
     }
 
@@ -145,7 +148,7 @@ public class CdxBuffer {
     CdxRecord readLineCheckingFilter() {
         byteBuf.mark();
         if (hasRemaining()) {
-            if (secondFilter == null || includableByFilter(secondFilter)) {
+            if (key.included(byteBuf)) {
                 CdxRecord cdxLine = createCdxLine(byteBuf, getEndOfLinePosition(), lineFormat);
                 moveToNextLine();
                 return cdxLine;
@@ -181,7 +184,7 @@ public class CdxBuffer {
      * @return negative number if filter is before current line, zero if equal, and positive number
      * if filter is after current line
      */
-    int compareToFilter(final byte[] filter) {
+    final int compareToFilter(final byte[] filter) {
         int filterLength = filter.length;
 
         int k = 0;
@@ -228,12 +231,13 @@ public class CdxBuffer {
      * If a start filter exist, skip lines not matching filter.
      */
     boolean skipLines() {
-        if (firstFilter == null) {
-            return true;
-        }
+//        if (firstFilter == null) {
+//            return true;
+//        }
         while (byteBuf.hasRemaining()) {
             byteBuf.mark();
-            if (includableByFilter(firstFilter)) {
+            if (!key.included(byteBuf)) {
+//            if (includableByFilter(firstFilter)) {
                 skipToEndOfLine();
                 skipLF();
             } else {
@@ -259,7 +263,8 @@ public class CdxBuffer {
     int countLinesCheckingFilter() {
         int count = 0;
         while (byteBuf.hasRemaining()) {
-            if (includableByFilter(secondFilter)) {
+//            if (includableByFilter(secondFilter)) {
+            if (key.included(byteBuf)) {
                 skipToEndOfLine();
                 skipLF();
                 count++;

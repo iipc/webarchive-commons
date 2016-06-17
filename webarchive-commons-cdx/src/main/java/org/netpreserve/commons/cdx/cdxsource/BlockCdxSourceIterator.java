@@ -24,6 +24,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import org.netpreserve.commons.cdx.CdxRecord;
+import org.netpreserve.commons.cdx.SearchKey;
 
 /**
  * A {@link CdxIterator} which iterates over a block based cdx source.
@@ -38,9 +39,11 @@ public class BlockCdxSourceIterator implements CdxIterator {
 
     final ExecutorService executorService = CdxSourceExecutorService.getInstance();
 
-    final byte[] startFilter;
+//    final byte[] startFilter;
+//
+//    final byte[] endFilter;
 
-    final byte[] endFilter;
+    final SearchKey key;
 
     boolean eof = false;
 
@@ -51,23 +54,25 @@ public class BlockCdxSourceIterator implements CdxIterator {
     CdxRecord nextLine = null;
 
     public BlockCdxSourceIterator(final SourceDescriptor sourceDescriptor,
-            final Iterator<SourceBlock> blockIterator, final String startKey, final String endKey) {
+            final Iterator<SourceBlock> blockIterator, final SearchKey key) {
 
         this.sourceDescriptor = sourceDescriptor;
 
-        if (startKey == null || startKey.isEmpty()) {
-            this.startFilter = null;
-        } else {
-            this.startFilter = startKey.getBytes();
-        }
-
-        if (endKey == null || endKey.isEmpty()) {
-            this.endFilter = null;
-        } else {
-            this.endFilter = endKey.getBytes();
-        }
+//        if (startKey == null || startKey.isEmpty()) {
+//            this.startFilter = null;
+//        } else {
+//            this.startFilter = startKey.getBytes();
+//        }
+//
+//        if (endKey == null || endKey.isEmpty()) {
+//            this.endFilter = null;
+//        } else {
+//            this.endFilter = endKey.getBytes();
+//        }
 
         this.blockIterator = blockIterator;
+
+        this.key = key;
 
     }
 
@@ -79,7 +84,7 @@ public class BlockCdxSourceIterator implements CdxIterator {
      * @return this iterator for easy chaining
      */
     BlockCdxSourceIterator init() {
-        cdxBuffer = new CdxBuffer(sourceDescriptor.getInputFormat(), startFilter, endFilter);
+        cdxBuffer = new CdxBuffer(sourceDescriptor.getInputFormat(), key);
         fillBuffer();
         skipLines();
         return this;

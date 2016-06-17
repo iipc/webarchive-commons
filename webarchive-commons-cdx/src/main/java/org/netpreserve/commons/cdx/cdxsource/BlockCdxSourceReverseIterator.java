@@ -17,6 +17,8 @@ package org.netpreserve.commons.cdx.cdxsource;
 
 import java.util.Iterator;
 
+import org.netpreserve.commons.cdx.SearchKey;
+
 /**
  * Iterator for searching backwards in cdx.
  */
@@ -31,13 +33,13 @@ public class BlockCdxSourceReverseIterator extends BlockCdxSourceIterator {
      * @param endKey the range end (exclusive)
      */
     public BlockCdxSourceReverseIterator(final SourceDescriptor sourceDescriptor,
-            final Iterator<SourceBlock> blockIterator, final String startKey, final String endKey) {
-        super(sourceDescriptor, blockIterator, startKey, endKey);
+            final Iterator<SourceBlock> blockIterator, final SearchKey key) {
+        super(sourceDescriptor, blockIterator, key);
     }
 
     @Override
     BlockCdxSourceIterator init() {
-        cdxBuffer = new ReverseCdxBuffer(sourceDescriptor.getInputFormat(), startFilter, endFilter);
+        cdxBuffer = new ReverseCdxBuffer(sourceDescriptor.getInputFormat(), key);
         fillBuffer();
         skipLines();
         return this;

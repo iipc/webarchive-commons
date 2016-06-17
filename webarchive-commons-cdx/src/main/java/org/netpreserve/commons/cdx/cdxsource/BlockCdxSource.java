@@ -22,6 +22,7 @@ import java.util.ListIterator;
 
 import org.netpreserve.commons.cdx.processor.Processor;
 import org.netpreserve.commons.cdx.CdxSource;
+import org.netpreserve.commons.cdx.SearchKey;
 import org.netpreserve.commons.cdx.SearchResult;
 
 /**
@@ -36,23 +37,19 @@ public class BlockCdxSource implements CdxSource {
     }
 
     @Override
-    public SearchResult search(final String startUrl, final String endUrl,
-            final List<Processor> processors, final boolean reverse) {
+    public SearchResult search(final SearchKey key, final List<Processor> processors, final boolean reverse) {
 
         return new AbstractSearchResult() {
-            final List<SourceBlock> blocks = sourceDescriptor.calculateBlocks(startUrl, endUrl);
+            final List<SourceBlock> blocks = sourceDescriptor.calculateBlocks(key);
 
             @Override
             public CdxIterator newIterator() {
                 CdxIterator iterator;
 
                 if (reverse) {
-                    iterator = new BlockCdxSourceReverseIterator(sourceDescriptor,
-                            reverseIterator(blocks),
-                            startUrl, endUrl).init();
+                    iterator = new BlockCdxSourceReverseIterator(sourceDescriptor, reverseIterator(blocks), key).init();
                 } else {
-                    iterator = new BlockCdxSourceIterator(sourceDescriptor, blocks.iterator(),
-                            startUrl, endUrl).init();
+                    iterator = new BlockCdxSourceIterator(sourceDescriptor, blocks.iterator(), key).init();
                 }
 
                 if (processors != null) {
@@ -99,11 +96,11 @@ public class BlockCdxSource implements CdxSource {
     }
 
     @Override
-    public long count(final String startUrl, final String endUrl) {
-        final List<SourceBlock> blocks = sourceDescriptor.calculateBlocks(startUrl, endUrl);
+    public long count(final SearchKey key) {
+        final List<SourceBlock> blocks = sourceDescriptor.calculateBlocks(key);
 
         BlockCdxSourceLineCounter counter = new BlockCdxSourceLineCounter(sourceDescriptor,
-                blocks.iterator(), startUrl, endUrl).init();
+                blocks.iterator(), key).init();
 
         return counter.count();
     }

@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 import org.netpreserve.commons.cdx.CdxFormat;
+import org.netpreserve.commons.cdx.SearchKey;
 
 /**
  * Interaction with a {@link CdxSource}'s underlying data.
@@ -34,7 +35,7 @@ public interface SourceDescriptor extends Closeable {
      * @param toKey the key giving a ending point or null for unlimited.
      * @return the list of blocks.
      */
-    List<SourceBlock> calculateBlocks(String fromKey, String toKey);
+    List<SourceBlock> calculateBlocks(SearchKey key);
 
     /**
      * Get the input format for this source.

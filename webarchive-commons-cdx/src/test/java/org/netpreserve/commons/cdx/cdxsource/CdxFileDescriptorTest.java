@@ -24,6 +24,7 @@ import java.util.List;
 import org.junit.Test;
 import org.netpreserve.commons.cdx.CdxLineFormat;
 import org.netpreserve.commons.cdx.FieldName;
+import org.netpreserve.commons.cdx.SearchKey;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -46,9 +47,10 @@ public class CdxFileDescriptorTest {
 
         CdxFileDescriptor meta = new CdxFileDescriptor(path);
 
-        SourceBlock expectedBlock1 = new SourceBlock("as,hotel)/robots.txt", 27, 434660);
+        SourceBlock expectedBlock1 = new SourceBlock("(as,hotel,)/robots.txt", 27, 437992);
 
-        List<SourceBlock> blocks = meta.calculateBlocks("ac,", "biz,");
+        SearchKey key = new SearchKey().surtUriFrom("(ac,").surtUriTo("(biz,");
+        List<SourceBlock> blocks = meta.calculateBlocks(key);
 
         assertThat(blocks)
                 .hasSize(1)
@@ -57,7 +59,7 @@ public class CdxFileDescriptorTest {
         // Test with small file
         path = Paths.get(ClassLoader.getSystemResource("cdxfile3.cdx").toURI());
         meta = new CdxFileDescriptor(path);
-        blocks = meta.calculateBlocks(null, null);
+        blocks = meta.calculateBlocks(new SearchKey());
 
         assertThat(blocks)
                 .hasSize(1);

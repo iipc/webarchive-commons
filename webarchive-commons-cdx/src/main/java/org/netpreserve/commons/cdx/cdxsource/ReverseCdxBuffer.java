@@ -18,6 +18,7 @@ package org.netpreserve.commons.cdx.cdxsource;
 import java.nio.ByteBuffer;
 
 import org.netpreserve.commons.cdx.CdxFormat;
+import org.netpreserve.commons.cdx.SearchKey;
 
 /**
  *
@@ -31,9 +32,8 @@ public class ReverseCdxBuffer extends CdxBuffer {
 
     private int endOfLine;
 
-    public ReverseCdxBuffer(CdxFormat lineFormat,
-            final byte[] startFilter, final byte[] endFilter) {
-        super(lineFormat, endFilter, startFilter);
+    public ReverseCdxBuffer(final CdxFormat lineFormat, final SearchKey key) {
+        super(lineFormat, key);
     }
 
     @Override
@@ -88,12 +88,13 @@ public class ReverseCdxBuffer extends CdxBuffer {
 
     @Override
     boolean skipLines() {
-        if (firstFilter == null) {
-            return true;
-        }
+//        if (firstFilter == null) {
+//            return true;
+//        }
 
         byteBuf.mark();
-        while (includableByFilter(firstFilter)) {
+        while (!key.included(byteBuf)) {
+//        while (includableByFilter(firstFilter)) {
             byteBuf.reset();
             skipLF();
             endOfLine = byteBuf.position();

@@ -29,6 +29,7 @@ import org.netpreserve.commons.cdx.CdxLineFormat;
 import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.CdxSource;
 import org.netpreserve.commons.cdx.FieldName;
+import org.netpreserve.commons.cdx.SearchKey;
 import org.netpreserve.commons.cdx.SearchResult;
 import org.netpreserve.commons.cdx.SourceDescriptorFactory;
 import org.netpreserve.commons.cdx.cdxsource.BlockCdxSource;
@@ -188,8 +189,9 @@ public class BiFunctionProcessorTest {
         SourceDescriptor sd = SourceDescriptorFactory.getDescriptor("cdxfile",
                 ClassLoader.getSystemResource("cdxfile3.cdx").toURI(), null);
 
+        SearchKey key = new SearchKey();
         CdxSource cdxSource = new BlockCdxSource(sd);
-        SearchResult result = cdxSource.search(null, null, processors, false);
+        SearchResult result = cdxSource.search(key, processors, false);
 
 //        assertThat(result).hasSize(113);
         assertThat(result).hasSize(2);
@@ -204,7 +206,7 @@ public class BiFunctionProcessorTest {
         processors.add(fp);
         fp.addFunctionProvider(cf);
 
-        result = cdxSource.search(null, null, processors, false);
+        result = cdxSource.search(key, processors, false);
 
 //        assertThat(result).hasSize(113);
         assertThat(result).hasSize(2);
@@ -225,8 +227,9 @@ public class BiFunctionProcessorTest {
         CdxSource cdxSource2 = new BlockCdxSource(SourceDescriptorFactory.getDescriptor("cdxfile",
                 ClassLoader.getSystemResource("cdxfile5.cdx").toURI(), null));
 
+        SearchKey key = new SearchKey();
         MultiCdxSource cdxSource = new MultiCdxSource(cdxSource1, cdxSource2);
-        SearchResult result = cdxSource.search(null, null, processors, false);
+        SearchResult result = cdxSource.search(key, processors, false);
 
 //        assertThat(result).hasSize(113);
         assertThat(result).hasSize(2);
@@ -245,7 +248,7 @@ public class BiFunctionProcessorTest {
 //                ClassLoader.getSystemResource("cdxfile3.cdx").toURI(), null);
 //
 //        cdxSource = new BlockCdxSource(sd);
-        result = cdxSource.search(null, null, processors, false);
+        result = cdxSource.search(key, processors, false);
 
 //        assertThat(result).hasSize(113);
         assertThat(result).hasSize(2);

@@ -262,6 +262,7 @@ public class MultiCdxIterator implements CdxIterator {
             if (cdx2 == null) {
                 return 1;
             }
+//            System.out.println(cdx2.peek() + " <> " + cdx1.peek() + " == " + cdx2.peek().compareTo(cdx1.peek()));
             return cdx2.peek().compareTo(cdx1.peek());
         }
 

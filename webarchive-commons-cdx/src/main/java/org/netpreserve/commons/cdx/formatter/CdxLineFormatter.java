@@ -48,13 +48,13 @@ public class CdxLineFormatter implements CdxFormatter {
             if (value == NullValue.NULL) {
                 if (fieldName == FieldName.FILENAME) {
                     Uri locator = ((Uri) record.get(FieldName.LOCATOR).getValue());
-                    if ("warcfile".equals(locator.scheme())) {
-                        value = StringValue.valueOf(locator.path());
+                    if ("warcfile".equals(locator.getScheme())) {
+                        value = StringValue.valueOf(locator.getPath());
                     }
                 } else if (fieldName == FieldName.OFFSET) {
                     Uri locator = ((Uri) record.get(FieldName.LOCATOR).getValue());
-                    if ("warcfile".equals(locator.scheme())) {
-                        value = NumberValue.valueOf(locator.fragment());
+                    if ("warcfile".equals(locator.getScheme())) {
+                        value = NumberValue.valueOf(locator.getFragment());
                     }
                 }
             }

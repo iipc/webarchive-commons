@@ -38,7 +38,7 @@ public interface CdxSource extends Closeable {
      * @param reverse if true the result list will be sorted in descending order
      * @return an {@link SearchResult} returning iterators over the requested list
      */
-    SearchResult search(String startKey, String endKey, List<Processor> processors,
+    SearchResult search(SearchKey key, List<Processor> processors,
             boolean reverse);
 
     /**
@@ -48,6 +48,6 @@ public interface CdxSource extends Closeable {
      * @param endKey the lexiografically highest key (exclusive) to get
      * @return the number of lines
      */
-    long count(String startKey, String endKey);
+    long count(SearchKey key);
 
 }

@@ -18,13 +18,17 @@ package org.netpreserve.commons.cdx.cdxsource;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.netpreserve.commons.cdx.CdxDate;
+import org.netpreserve.commons.cdx.CdxDateRange;
 import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.CdxSource;
 import org.netpreserve.commons.cdx.FieldName;
+import org.netpreserve.commons.cdx.SearchKey;
 import org.netpreserve.commons.cdx.SearchResult;
 import org.netpreserve.commons.cdx.processor.Processor;
 
@@ -41,7 +45,7 @@ public class ClosestCdxIterator implements CdxIterator {
 
     final CdxIterator backwardIterator;
 
-    final long timestamp;
+    final CdxDate timestamp;
 
     CdxRecord nextLine;
 
@@ -49,17 +53,24 @@ public class ClosestCdxIterator implements CdxIterator {
 
     Candidate nextBackwardCandidate;
 
-    public ClosestCdxIterator(CdxSource source, String url, String timestamp,
-            List<Processor> processors) {
+    public ClosestCdxIterator(CdxSource source, SearchKey key, CdxDate timestamp, List<Processor> processors) {
 
-        String closestKey = url + " " + timestamp;
+        if (key.getMatchType() != SearchKey.UriMatchType.EXACT) {
+            throw new IllegalArgumentException("Closest match not allowed for wildcard uri");
+        }
 
-        forwardResult = source.search(closestKey, url + "~", processors, false);
-        backwardResult = source.search(url, closestKey, processors, true);
+        SearchKey forwardKey = key.clone().dateRange(CdxDateRange.from(timestamp));
+        SearchKey backwardKey = key.clone().dateRange(CdxDateRange.to(timestamp));
+        forwardResult = source.search(key, processors, false);
+        backwardResult = source.search(key, processors, true);
+//        String closestKey = url + " " + timestamp;
+//
+//        forwardResult = source.search(closestKey, url + "~", processors, false);
+//        backwardResult = source.search(url, closestKey, processors, true);
 
         forwardIterator = forwardResult.iterator();
         backwardIterator = backwardResult.iterator();
-        this.timestamp = timestampStringToSeconds(timestamp);
+        this.timestamp = timestamp;
     }
 
     @Override
@@ -90,9 +101,11 @@ public class ClosestCdxIterator implements CdxIterator {
 
         if (nextForwardCandidate == null && forwardIterator.hasNext()) {
             nextForwardCandidate = new Candidate(forwardIterator.next());
+            System.out.println("AAA " + nextForwardCandidate.line + " - " + nextForwardCandidate.distance);
         }
         if (nextBackwardCandidate == null && backwardIterator.hasNext()) {
             nextBackwardCandidate = new Candidate(backwardIterator.next());
+            System.out.println("BBB " + nextBackwardCandidate.line + " - " + nextBackwardCandidate.distance);
         }
 
         if (nextForwardCandidate == null && nextBackwardCandidate == null) {
@@ -139,19 +152,18 @@ public class ClosestCdxIterator implements CdxIterator {
 
         final CdxRecord line;
 
-        final long distance;
+        final Duration distance;
 
         Candidate(CdxRecord line) {
             this.line = line;
-            this.distance = Math.abs(
-                    timestampStringToSeconds(line.get(FieldName.TIMESTAMP).toString()) - timestamp);
+            this.distance = CdxDate.fromHeritrixDate(line.get(FieldName.TIMESTAMP).toString()).distanceTo(timestamp);
         }
 
         public boolean greaterDistanceThan(Candidate o) {
             if (o == null) {
                 return false;
             }
-            return distance > o.distance;
+            return distance.compareTo(o.distance) > 0;
         }
 
     }

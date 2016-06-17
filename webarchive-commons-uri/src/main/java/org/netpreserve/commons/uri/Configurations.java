@@ -17,11 +17,13 @@ package org.netpreserve.commons.uri;
 
 import org.netpreserve.commons.uri.normalization.AllLowerCase;
 import org.netpreserve.commons.uri.normalization.CheckLongEnough;
+import org.netpreserve.commons.uri.normalization.InsertCommonSchemesForSchemelessUri;
 import org.netpreserve.commons.uri.normalization.LaxTrimming;
 import org.netpreserve.commons.uri.normalization.OptimisticDnsScheme;
 import org.netpreserve.commons.uri.normalization.QueryNormalizers;
+import org.netpreserve.commons.uri.normalization.StripErrorneousExtraSlashes;
 import org.netpreserve.commons.uri.normalization.StripTrailingEscapedSpaceOnAuthority;
-import org.netpreserve.commons.uri.normalization.StripExtraSlashes;
+import org.netpreserve.commons.uri.normalization.StripSlashesAtEndOfPath;
 import org.netpreserve.commons.uri.normalization.StripWwwN;
 
 /**
@@ -77,7 +79,8 @@ public final class Configurations {
             .maxUrlLength(2083)
             .defaultFormat(Configurations.USABLE_URI_FORMAT)
             .addNormalizer(new LaxTrimming())
-            .addNormalizer(new StripExtraSlashes())
+            .addNormalizer(new StripErrorneousExtraSlashes())
+            .addNormalizer(new StripSlashesAtEndOfPath())
             .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
             .addNormalizer(new OptimisticDnsScheme())
             .addNormalizer(new CheckLongEnough())
@@ -101,7 +104,8 @@ public final class Configurations {
             .addNormalizer(new AllLowerCase())
             .addNormalizer(new StripWwwN())
             .addNormalizer(new QueryNormalizers())
-            .addNormalizer(new StripExtraSlashes())
+            .addNormalizer(new StripErrorneousExtraSlashes())
+            .addNormalizer(new StripSlashesAtEndOfPath())
             .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
             .addNormalizer(new OptimisticDnsScheme())
             .addNormalizer(new CheckLongEnough())
@@ -128,8 +132,10 @@ public final class Configurations {
             .addNormalizer(new AllLowerCase())
             .addNormalizer(new StripWwwN())
             .addNormalizer(new QueryNormalizers())
-            .addNormalizer(new StripExtraSlashes())
+            .addNormalizer(new StripErrorneousExtraSlashes())
+            .addNormalizer(new StripSlashesAtEndOfPath())
             .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
+            .addNormalizer(new InsertCommonSchemesForSchemelessUri())
             .addNormalizer(new OptimisticDnsScheme())
             .addNormalizer(new CheckLongEnough())
 //            .addNormalizer(new StripSessionIDs());

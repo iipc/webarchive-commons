@@ -26,6 +26,7 @@ import java.util.List;
 import org.netpreserve.commons.cdx.CdxFormat;
 import org.netpreserve.commons.cdx.CdxLineFormat;
 import org.netpreserve.commons.cdx.CdxjLineFormat;
+import org.netpreserve.commons.cdx.SearchKey;
 
 /**
  * Metadata for a local CDX file.
@@ -75,11 +76,11 @@ public class CdxFileDescriptor implements SourceDescriptor {
                         inBuf.arrayOffset(),
                         inBuf.arrayOffset() + inBuf.position());
 
+                // TODO: Allow for more than one line of format information
                 if (formatLine.startsWith("CDX", 1)) {
                     inputFormat = new CdxLineFormat(formatLine);
-                } else if (formatLine.startsWith("(")) {
+                } else if (formatLine.startsWith("!OpenWayback-CDXJ 1.0")) {
                     inputFormat = new CdxjLineFormat();
-                    inBuf.reset();
                 } else {
                     throw new IllegalArgumentException(path + " is not a recognized CDX format");
                 }
@@ -126,13 +127,10 @@ public class CdxFileDescriptor implements SourceDescriptor {
     }
 
     @Override
-    public List<SourceBlock> calculateBlocks(String fromKey, String toKey) {
+    public List<SourceBlock> calculateBlocks(SearchKey key) {
         ArrayList<SourceBlock> result = new ArrayList<>();
 
-        int firstIdx = findFirstBlockIndex(fromKey);
-
-        // make sure that empty string is handled as null
-        toKey = toKey == null || toKey.isEmpty() ? null : toKey;
+        int firstIdx = findFirstBlockIndex(key);
 
         SourceBlock block = blocks.get(firstIdx).clone();
         result.add(block);
@@ -143,9 +141,13 @@ public class CdxFileDescriptor implements SourceDescriptor {
             // Merge blocks if they are smaller than BUFFER_SIZE
             if (block.length + nextBlock.length < BUFFER_SIZE) {
                 block.length += nextBlock.length;
-                block.lineCount += nextBlock.lineCount;
+                if (block.lineCount < 0 || nextBlock.lineCount < 0) {
+                    block.lineCount = -1;
+                } else {
+                    block.lineCount += nextBlock.lineCount;
+                }
             } else {
-                if (toKey != null && toKey.compareTo(nextBlock.key) < 0) {
+                if (!key.included(nextBlock.key)) {
                     break;
                 } else {
                     block = nextBlock.clone();
@@ -169,14 +171,14 @@ public class CdxFileDescriptor implements SourceDescriptor {
      * @param fromKey the starting point.
      * @return index of first block matching fromKey.
      */
-    private int findFirstBlockIndex(String fromKey) {
-        if (fromKey == null || fromKey.isEmpty()) {
-            return 0;
-        }
-
-        for (int i = 1; i < blocks.size(); i++) {
-            if (fromKey.compareTo(blocks.get(i).key) <= 0) {
-                return i - 1;
+    private int findFirstBlockIndex(SearchKey key) {
+        for (int i = 0; i < blocks.size(); i++) {
+            if (!key.isBefore(blocks.get(i).key)) {
+                if (i == 0) {
+                    return 0;
+                } else {
+                    return i - 1;
+                }
             }
         }
         return blocks.size() - 1;

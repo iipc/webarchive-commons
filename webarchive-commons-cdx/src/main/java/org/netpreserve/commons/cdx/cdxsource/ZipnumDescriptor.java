@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 import org.netpreserve.commons.cdx.CdxFormat;
+import org.netpreserve.commons.cdx.SearchKey;
 
 /**
  *
@@ -76,20 +77,21 @@ public class ZipnumDescriptor implements SourceDescriptor {
     }
 
     @Override
-    public List<SourceBlock> calculateBlocks(String fromKey, String toKey) {
+    public List<SourceBlock> calculateBlocks(SearchKey key) {
         ArrayList<SourceBlock> result = new ArrayList<>();
 
-        int firstIdx = findFirstBlockIndex(fromKey);
+        int firstIdx = findFirstBlockIndex(key);
 
         // make sure that empty string is handled as null
-        toKey = toKey == null || toKey.isEmpty() ? null : toKey;
+//        toKey = toKey == null || toKey.isEmpty() ? null : toKey;
 
         SourceBlock block = blocks.get(firstIdx).clone();
         result.add(block);
 
         for (int i = firstIdx + 1; i < blocks.size(); i++) {
             SourceBlock nextBlock = blocks.get(i);
-            if (toKey != null && toKey.compareTo(nextBlock.key) < 0) {
+            if (!key.included(nextBlock.key)) {
+//            if (toKey != null && toKey.compareTo(nextBlock.key) < 0) {
                 break;
             } else {
                 block = nextBlock.clone();
@@ -107,15 +109,22 @@ public class ZipnumDescriptor implements SourceDescriptor {
      * @param fromKey the starting point.
      * @return index of first block matching fromKey.
      */
-    private int findFirstBlockIndex(String fromKey) {
-        if (fromKey == null || fromKey.isEmpty()) {
-            return 0;
-        }
+    private int findFirstBlockIndex(SearchKey key) {
+//        if (fromKey == null || fromKey.isEmpty()) {
+//            return 0;
+//        }
 
-        for (int i = 1; i < blocks.size(); i++) {
-            if (fromKey.compareTo(blocks.get(i).key) <= 0) {
-                return i - 1;
+        for (int i = 0; i < blocks.size(); i++) {
+            if (key.included(blocks.get(i).key)) {
+                if (i == 0) {
+                    return 0;
+                } else {
+                    return i - 1;
+                }
             }
+//            if (fromKey.compareTo(blocks.get(i).key) <= 0) {
+//                return i - 1;
+//            }
         }
         return blocks.size() - 1;
     }

@@ -1,6 +1,9 @@
 1.1.7
 -----
+* [Make canonicalizer be able to strip session id params even if they are the first params in the query string](https://github.com/iipc/webarchive-commons/pull/54)
 * [Store origin-code of ARC file header](https://github.com/iipc/webarchive-commons/pull/52/)
+* [Flush output etc before tallying stats to fix sizeOnDisk calculation](https://github.com/iipc/webarchive-commons/pull/51)
+* [Get rid of broken, seemingly unnecessary escapeWhitespace() step of uri fixup](https://github.com/iipc/webarchive-commons/pull/50)
 
 1.1.6
 -----

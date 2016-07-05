@@ -19,7 +19,8 @@ public class ExtractingParseObserverTest extends TestCase {
 				"url (' ')",
 				"url('\")",
 				"url(')",
-				"url('\"')"
+				"url('\"')",
+				"url('\\\"\"')"
 		};
 		boolean except = false;
 		HTMLMetaData md = new HTMLMetaData(new MetaData());

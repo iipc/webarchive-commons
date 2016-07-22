@@ -13,42 +13,62 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.netpreserve.commons.cdx;
 
+import java.time.OffsetDateTime;
+
 import org.junit.Test;
+
 import static org.assertj.core.api.Assertions.*;
 
 /**
- *
+ * Tests for Class CdxDate.
  */
 public class CdxDateTest {
 
-    public CdxDateTest() {
-    }
     /**
-     * Test of fromWarcDate method, of class CdxDate.
+     * Test of of method, of class CdxDate.
      */
     @Test
-    public void testFromWarcDate() {
-        CdxDate date = CdxDate.fromWarcDate("2016-12");
-        CdxDate date2 = CdxDate.fromWarcDate("2016-12-01T12:13:54.335Z");
-        CdxDate date3 = CdxDate.fromWarcDate("2016-12-01T12");
-        CdxDate date4 = CdxDate.fromWarcDate("2016-12-01T12:13Z");
-        CdxDate date5 = CdxDate.fromWarcDate("2016-12-01T12:13:00Z");
+    public void testOf() {
+        CdxDate warcDate;
+        CdxDate heritrixDate;
 
-        System.out.println(date);
-        System.out.println(date2);
-        System.out.println(date3);
-        System.out.println(date4);
-        System.out.println(date5);
-        fail("XXX");
+        warcDate = CdxDate.of("2016-12");
+        heritrixDate = CdxDate.of("201612");
+        assertThat(warcDate)
+                .isEqualTo(heritrixDate)
+                .hasFieldOrPropertyWithValue("date", OffsetDateTime.parse("2016-12-01T00:00Z"))
+                .hasFieldOrPropertyWithValue("granularity", CdxDate.Granularity.MONTH);
+
+        warcDate = CdxDate.of("2016-12-01T12:13:54.335Z");
+        heritrixDate = CdxDate.of("20161201121354335");
+        assertThat(warcDate)
+                .isEqualTo(heritrixDate)
+                .hasFieldOrPropertyWithValue("date", OffsetDateTime.parse("2016-12-01T12:13:54.335Z"))
+                .hasFieldOrPropertyWithValue("granularity", CdxDate.Granularity.NANOSECOND);
+
+        warcDate = CdxDate.of("2016-12-01T12");
+        heritrixDate = CdxDate.of("2016120112");
+        assertThat(warcDate)
+                .isEqualTo(heritrixDate)
+                .hasFieldOrPropertyWithValue("date", OffsetDateTime.parse("2016-12-01T12:00Z"))
+                .hasFieldOrPropertyWithValue("granularity", CdxDate.Granularity.HOUR);
+
+        warcDate = CdxDate.of("2016-12-01T12:13Z");
+        heritrixDate = CdxDate.of("201612011213");
+        assertThat(warcDate)
+                .isEqualTo(heritrixDate)
+                .hasFieldOrPropertyWithValue("date", OffsetDateTime.parse("2016-12-01T12:13Z"))
+                .hasFieldOrPropertyWithValue("granularity", CdxDate.Granularity.MINUTE);
+
+        warcDate = CdxDate.of("2016-12-01T12:13:00Z");
+        heritrixDate = CdxDate.of("20161201121300");
+        assertThat(warcDate)
+                .isEqualTo(heritrixDate)
+                .hasFieldOrPropertyWithValue("date", OffsetDateTime.parse("2016-12-01T12:13Z"))
+                .hasFieldOrPropertyWithValue("granularity", CdxDate.Granularity.SECOND);
+
     }
 
-    /**
-     * Test of fromHeritrixDate method, of class CdxDate.
-     */
-    @Test
-    public void testFromHeritrixDate() {
-    }
 }

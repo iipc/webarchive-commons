@@ -16,328 +16,205 @@
 package org.netpreserve.commons.cdx;
 
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalAdjuster;
-import java.time.temporal.TemporalAdjusters;
-import java.util.Locale;
-
-import static java.time.temporal.ChronoField.*;
 
 /**
- * A representation of a date used for searching.
+ * A representation of a date range used for searching.
  * <p>
- * As dates are allowed to be of variable precision, this class computes the earliest and latest dates that will fit
- * into the submitted date.
+ * As dates are allowed to be of variable precision, this class can compute the earliest and latest dates that will fit
+ * into the submitted date. A date range can also be constructed from a start date and an end date, or if only a start
+ * or an end date is used for construction, the date range will be open ended.
  * <p>
  * This class is immutable and thread safe.
  */
 public final class CdxDateRange {
 
-    static final DateTimeFormatter WARC_DATE_FORMAT_FLOOR;
+    final CdxDate dateStart;
 
-    static final DateTimeFormatter WARC_DATE_FORMAT_CEELING;
-
-    static final DateTimeFormatter WARC_DATE_OUTPUT_FORMAT;
-
-    static final DateTimeFormatter HERITRIX_DATE_FORMAT_FLOOR;
-
-    static final DateTimeFormatter HERITRIX_DATE_FORMAT_CEELING;
-
-    static final DateTimeFormatter HERITRIX_DATE_OUTPUT_FORMAT;
-
-    static {
-        WARC_DATE_FORMAT_FLOOR = new DateTimeFormatterBuilder()
-                .appendValue(ChronoField.YEAR, 4)
-                .optionalStart()
-                .appendLiteral('-')
-                .appendValue(ChronoField.MONTH_OF_YEAR, 2)
-                .optionalStart()
-                .appendLiteral('-')
-                .appendValue(ChronoField.DAY_OF_MONTH, 2)
-                .optionalStart()
-                .appendLiteral('T')
-                .appendValue(ChronoField.HOUR_OF_DAY, 2)
-                .optionalStart()
-                .appendLiteral(':')
-                .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
-                .optionalStart()
-                .appendLiteral(':')
-                .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
-                .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true)
-                .optionalStart()
-                .appendOffsetId()
-                .optionalEnd()
-                .optionalEnd()
-                .optionalEnd()
-                .optionalEnd()
-                .optionalEnd()
-                .optionalEnd()
-                .parseDefaulting(ChronoField.OFFSET_SECONDS, 0)
-                .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
-                .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
-                .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
-                .parseDefaulting(ChronoField.NANO_OF_SECOND, 0)
-                .toFormatter(Locale.ENGLISH);
-
-        WARC_DATE_FORMAT_CEELING = new DateTimeFormatterBuilder()
-                .appendValue(ChronoField.YEAR, 4)
-                .optionalStart()
-                .appendLiteral('-')
-                .appendValue(ChronoField.MONTH_OF_YEAR, 2)
-                .optionalStart()
-                .appendLiteral('-')
-                .appendValue(ChronoField.DAY_OF_MONTH, 2)
-                .optionalStart()
-                .appendLiteral('T')
-                .appendValue(ChronoField.HOUR_OF_DAY, 2)
-                .optionalStart()
-                .appendLiteral(':')
-                .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
-                .optionalStart()
-                .appendLiteral(':')
-                .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
-                .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, true)
-                .optionalStart()
-                .appendOffsetId()
-                .optionalEnd()
-                .optionalEnd()
-                .optionalEnd()
-                .optionalEnd()
-                .optionalEnd()
-                .optionalEnd()
-                .parseDefaulting(ChronoField.OFFSET_SECONDS, 0)
-                .parseDefaulting(ChronoField.MONTH_OF_YEAR, 12)
-                .parseDefaulting(ChronoField.DAY_OF_MONTH, 31)
-                .parseDefaulting(ChronoField.HOUR_OF_DAY, 23)
-                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 59)
-                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 59)
-                .parseDefaulting(ChronoField.NANO_OF_SECOND, 999999999)
-                .toFormatter(Locale.ENGLISH);
-
-        WARC_DATE_OUTPUT_FORMAT = new DateTimeFormatterBuilder()
-                .appendValue(ChronoField.YEAR, 4)
-                .appendLiteral('-')
-                .appendValue(ChronoField.MONTH_OF_YEAR, 2)
-                .appendLiteral('-')
-                .appendValue(ChronoField.DAY_OF_MONTH, 2)
-                .appendLiteral('T')
-                .appendValue(ChronoField.HOUR_OF_DAY, 2)
-                .appendLiteral(':')
-                .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
-                .appendLiteral(':')
-                .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
-                .appendFraction(ChronoField.NANO_OF_SECOND, 9, 9, true)
-                .appendOffsetId()
-                .toFormatter(Locale.ENGLISH);
-
-        HERITRIX_DATE_FORMAT_FLOOR = new DateTimeFormatterBuilder()
-                .appendValue(ChronoField.YEAR, 4)
-                .optionalStart()
-                .appendValue(ChronoField.MONTH_OF_YEAR, 2)
-                .optionalStart()
-                .appendValue(ChronoField.DAY_OF_MONTH, 2)
-                .optionalStart()
-                .appendValue(ChronoField.HOUR_OF_DAY, 2)
-                .optionalStart()
-                .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
-                .optionalStart()
-                .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
-                .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, false)
-                .optionalEnd()
-                .optionalEnd()
-                .optionalEnd()
-                .optionalEnd()
-                .optionalEnd()
-                .parseDefaulting(ChronoField.OFFSET_SECONDS, 0)
-                .parseDefaulting(ChronoField.MONTH_OF_YEAR, 1)
-                .parseDefaulting(ChronoField.DAY_OF_MONTH, 1)
-                .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
-                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
-                .parseDefaulting(ChronoField.NANO_OF_SECOND, 0)
-                .toFormatter(Locale.ENGLISH);
-
-        HERITRIX_DATE_FORMAT_CEELING = new DateTimeFormatterBuilder()
-                .appendValue(ChronoField.YEAR, 4)
-                .optionalStart()
-                .appendValue(ChronoField.MONTH_OF_YEAR, 2)
-                .optionalStart()
-                .appendValue(ChronoField.DAY_OF_MONTH, 2)
-                .optionalStart()
-                .appendValue(ChronoField.HOUR_OF_DAY, 2)
-                .optionalStart()
-                .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
-                .optionalStart()
-                .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
-                .appendFraction(ChronoField.NANO_OF_SECOND, 0, 9, false)
-                .optionalEnd()
-                .optionalEnd()
-                .optionalEnd()
-                .optionalEnd()
-                .optionalEnd()
-                .parseDefaulting(ChronoField.OFFSET_SECONDS, 0)
-                .parseDefaulting(ChronoField.MONTH_OF_YEAR, 12)
-                .parseDefaulting(ChronoField.DAY_OF_MONTH, 31)
-                .parseDefaulting(ChronoField.HOUR_OF_DAY, 23)
-                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 59)
-                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 59)
-                .parseDefaulting(ChronoField.NANO_OF_SECOND, 999999999)
-                .toFormatter(Locale.ENGLISH);
-
-        HERITRIX_DATE_OUTPUT_FORMAT = new DateTimeFormatterBuilder()
-                .appendValue(ChronoField.YEAR, 4)
-                .appendValue(ChronoField.MONTH_OF_YEAR, 2)
-                .appendValue(ChronoField.DAY_OF_MONTH, 2)
-                .appendValue(ChronoField.HOUR_OF_DAY, 2)
-                .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
-                .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
-                .appendFraction(ChronoField.NANO_OF_SECOND, 9, 9, false)
-                .toFormatter(Locale.ENGLISH);
-    }
-
-    final OffsetDateTime dateFloor;
-
-    final OffsetDateTime dateCeeling;
+    final CdxDate dateEnd;
 
     /**
-     * Private constructor to create a new immutable CdxDate.
+     * Private constructor to create a new immutable CdxDateRange.
      * <p>
-     * @param dateFloor the earliest date for this CdxDate.
-     * @param dateCeeling the latest date for this CdxDate.
+     * @param startDate the earliest date for this CdxDate.
+     * @param endDate the latest date for this CdxDate.
      */
-    private CdxDateRange(OffsetDateTime dateFloor, OffsetDateTime dateCeeling) {
-        this.dateFloor = dateFloor;
-        this.dateCeeling = dateCeeling;
+    private CdxDateRange(CdxDate startDate, CdxDate endDate) {
+        if (startDate != null) {
+            this.dateStart = new CdxDate(startDate.getDate(), CdxDate.Granularity.NANOSECOND);
+        } else {
+            this.dateStart = null;
+        }
+
+        if (endDate != null) {
+            this.dateEnd = new CdxDate(endDate.getDate(), CdxDate.Granularity.NANOSECOND);
+        } else {
+            this.dateEnd = null;
+        }
     }
 
-    public static CdxDateRange fromSingleDate(CdxDate date) {
-        OffsetDateTime dateCeeling = date.getDate();
+    /**
+     * Obtain a CdxDateRange from a single date.
+     * <p>
+     * This method will create a date range based on the granularity of the date. For example a date range based on the
+     * date {@code 2016-02-15} (granularity is day), will have a start date of {@code 2000-02-15T00:00:00.000000000Z}
+     * and an end date of {@code 2000-02-16T00:00:00.000000000Z}.
+     * <p>
+     * @param date the date to obtain a date range from.
+     * @return the immutable date range, not null.
+     */
+    public static CdxDateRange ofSingleDate(CdxDate date) {
+        OffsetDateTime endDate = date.getDate();
         switch (date.getGranularity()) {
             case NANOSECOND:
-                dateCeeling = dateCeeling.plusNanos(1);
+                endDate = endDate.plusNanos(1);
                 break;
             case SECOND:
-                dateCeeling = dateCeeling.plusSeconds(1);
+                endDate = endDate.plusSeconds(1);
                 break;
             case MINUTE:
-                dateCeeling = dateCeeling.plusMinutes(1);
+                endDate = endDate.plusMinutes(1);
                 break;
             case HOUR:
-                dateCeeling = dateCeeling.plusHours(1);
+                endDate = endDate.plusHours(1);
                 break;
             case DAY:
-                dateCeeling = dateCeeling.plusDays(1);
+                endDate = endDate.plusDays(1);
                 break;
             case MONTH:
-                dateCeeling = dateCeeling.plusMonths(1);
+                endDate = endDate.plusMonths(1);
                 break;
             case YEAR:
-                dateCeeling = dateCeeling.plusYears(1);
+                endDate = endDate.plusYears(1);
                 break;
+            default:
+                // All granularities should be supported. If not, this is a bug.
+                throw new RuntimeException("Granularity " + date.getGranularity() + " is not supported.");
         }
-        return new CdxDateRange(date.getDate(), dateCeeling);
-    }
-
-    public static CdxDateRange fromDates(CdxDate fromDateInclusive, CdxDate toDateExclusive) {
-        return new CdxDateRange(fromDateInclusive.getDate(), toDateExclusive.getDate());
-    }
-
-    public static CdxDateRange from(CdxDate fromDateInclusive) {
-        return new CdxDateRange(fromDateInclusive.getDate(), null);
-    }
-
-    public static CdxDateRange to(CdxDate toDateExclusive) {
-        return new CdxDateRange(null, toDateExclusive.getDate());
+        return new CdxDateRange(date, new CdxDate(endDate, date.getGranularity()));
     }
 
     /**
-     * Create a new CdxDate from a date formatted according to the WARC standard.
-     * @param warcDate the date to parse.
-     * @return the validated CdxDate.
+     * Obtain a date range from two dates.
+     * <p>
+     * @param startDateInclusive the start date (inclusive)
+     * @param endDateExclusive the end date (exclusive)
+     * @return the immutable date range, not null.
      */
-//    public static CdxDateRange fromWarcDate(String warcDate) {
-//        OffsetDateTime dateFloor = WARC_DATE_FORMAT_FLOOR.parse(warcDate, OffsetDateTime::from);
-//        OffsetDateTime dateCeeling = WARC_DATE_FORMAT_CEELING.parse(warcDate, OffsetDateTime::from);
-//        return new CdxDateRange(dateFloor, dateCeeling.plusNanos(1L));
-//    }
-
-    public static CdxDateRange fromWarcDate(String warcDateFromInclusive, String warcDateToExclusive) {
-        OffsetDateTime dateFloor = null;
-        OffsetDateTime dateCeeling = null;
-        if (warcDateFromInclusive != null && !warcDateFromInclusive.isEmpty()) {
-            dateFloor = WARC_DATE_FORMAT_FLOOR.parse(warcDateFromInclusive, OffsetDateTime::from);
-        }
-        if (warcDateToExclusive != null && !warcDateToExclusive.isEmpty()) {
-            dateCeeling = WARC_DATE_FORMAT_CEELING.parse(warcDateToExclusive, OffsetDateTime::from);
-        }
-        return new CdxDateRange(dateFloor, dateCeeling);
+    public static CdxDateRange between(CdxDate startDateInclusive, CdxDate endDateExclusive) {
+        return new CdxDateRange(startDateInclusive, endDateExclusive);
     }
 
     /**
-     * Create a new CdxDate from a Heritrix formatted date.
-     * @param heritrixDate the date to parse.
-     * @return the validated CdxDate.
+     * Obtain an open ended date range beginning at the submitted date and with infinite end.
+     * <p>
+     * @param startDateInclusive the start date (inclusive)
+     * @return the immutable date range, not null.
      */
-    public static CdxDateRange fromHeritrixDate(String heritrixDate) {
-        OffsetDateTime dateFloor = HERITRIX_DATE_FORMAT_FLOOR.parse(heritrixDate, OffsetDateTime::from);
-        OffsetDateTime dateCeeling = HERITRIX_DATE_FORMAT_CEELING.parse(heritrixDate, OffsetDateTime::from);
-        return new CdxDateRange(dateFloor, dateCeeling.plusNanos(1L));
-    }
-
-    public static CdxDateRange fromHeritrixDate(String heritrixDateFromInclusive, String heritrixDateToExclusive) {
-        OffsetDateTime dateFloor = null;
-        OffsetDateTime dateCeeling = null;
-        if (heritrixDateFromInclusive != null && !heritrixDateFromInclusive.isEmpty()) {
-            dateFloor = HERITRIX_DATE_FORMAT_FLOOR.parse(heritrixDateFromInclusive, OffsetDateTime::from);
-        }
-        if (heritrixDateToExclusive != null && !heritrixDateToExclusive.isEmpty()) {
-            dateCeeling = HERITRIX_DATE_FORMAT_CEELING.parse(heritrixDateToExclusive, OffsetDateTime::from);
-        }
-        return new CdxDateRange(dateFloor, dateCeeling);
-    }
-
-    public boolean hasFromDate() {
-        return dateFloor != null;
-    }
-
-    public boolean hasToDate() {
-        return dateCeeling != null;
+    public static CdxDateRange start(CdxDate startDateInclusive) {
+        return new CdxDateRange(startDateInclusive, null);
     }
 
     /**
-     * Get the earliest date formatted as a WARC date.
-     * @return the formatted string.
+     * Obtain an open ended date range ending at the submitted date and with infinite start.
+     * <p>
+     * @param endDateExclusive the end date (exclusive)
+     * @return the immutable date range, not null.
      */
-    public String toWarcDateFloor() {
-        return WARC_DATE_OUTPUT_FORMAT.format(dateFloor);
+    public static CdxDateRange end(CdxDate endDateExclusive) {
+        return new CdxDateRange(null, endDateExclusive);
     }
 
     /**
-     * Get the latest date formatted as a WARC date.
-     * @return the formatted string.
+     * Obtain a CdxDateRange from a single date.
+     * <p>
+     * Convenience method. Does the same as {@code CdxDateRange.ofSingleDate(CdxDate.of(date))}
+     * <p>
+     * @param date the date to obtain a date range from.
+     * @return the immutable date range, not null.
+     * @see #ofSingleDate(org.netpreserve.commons.cdx.CdxDate)
      */
-    public String toWarcDateCeeling() {
-        return WARC_DATE_OUTPUT_FORMAT.format(dateCeeling);
+    public static CdxDateRange ofSingleDate(String date) {
+        return CdxDateRange.ofSingleDate(CdxDate.of(date));
     }
 
     /**
-     * Get the earliest date formatted as a Heritrix date.
-     * @return the formatted string.
+     * Obtain a date range from two dates.
+     * <p>
+     * Convenience method. Does the same as {@code CdxDateRange.between(CdxDate.of(startDate), CdxDate.of(endDate))}
+     * <p>
+     * @param startDateInclusive the start date (inclusive)
+     * @param endDateExclusive the end date (exclusive)
+     * @return the immutable date range, not null.
+     * @see #between(org.netpreserve.commons.cdx.CdxDate, org.netpreserve.commons.cdx.CdxDate)
      */
-    public String toHeritrixDateFloor() {
-        return HERITRIX_DATE_OUTPUT_FORMAT.format(dateFloor);
+    public static CdxDateRange between(String startDateInclusive, String endDateExclusive) {
+        return CdxDateRange.between(CdxDate.of(startDateInclusive), CdxDate.of(endDateExclusive));
     }
 
     /**
-     * Get the latest date formatted as a Heritrix date.
-     * @return the formatted string.
+     * Obtain an open ended date range beginning at the submitted date and with infinite end.
+     * <p>
+     * Convenience method. Does the same as {@code CdxDateRange.start(CdxDate.of(startDate))}
+     * <p>
+     * @param startDateInclusive the start date (inclusive)
+     * @return the immutable date range, not null.
      */
-    public String toHeritrixDateCeeling() {
-        return HERITRIX_DATE_OUTPUT_FORMAT.format(dateCeeling);
+    public static CdxDateRange start(String startDateInclusive) {
+        return CdxDateRange.start(CdxDate.of(startDateInclusive));
+    }
+
+    /**
+     * Obtain an open ended date range ending at the submitted date and with infinite start.
+     * <p>
+     * Convenience method. Does the same as {@code CdxDateRange.end(CdxDate.of(startDate))}
+     * <p>
+     * @param endDateExclusive the end date (exclusive)
+     * @return the immutable date range, not null.
+     */
+    public static CdxDateRange end(String endDateExclusive) {
+        return CdxDateRange.end(CdxDate.of(endDateExclusive));
+    }
+
+    /**
+     * Check if this date range has a start date.
+     * <p>
+     * A date range without a start date is considered a date range with infinite start date.
+     * <p>
+     * @return true if start date is set.
+     */
+    public boolean hasStartDate() {
+        return dateStart != null;
+    }
+
+    /**
+     * Check if this date range has an end date.
+     * <p>
+     * A date range without an end date is considered a date range with infinite end date.
+     * <p>
+     * @return true if end date is set.
+     */
+    public boolean hasEndDate() {
+        return dateEnd != null;
+    }
+
+    /**
+     * Get the start date of this range.
+     * <p>
+     * @return the start date, possibly null if infinite start.
+     * @see #hasStartDate()
+     */
+    public CdxDate getStart() {
+        return dateStart;
+    }
+
+    /**
+     * Get the end date of this range.
+     * <p>
+     * @return the end date, possibly null if infinite end.
+     * @see #hasEndDate()
+     */
+    public CdxDate getEnd() {
+        return dateEnd;
     }
 
 }

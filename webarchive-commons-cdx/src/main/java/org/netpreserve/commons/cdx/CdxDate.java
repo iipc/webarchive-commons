@@ -16,49 +16,65 @@
 package org.netpreserve.commons.cdx;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.SignStyle;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAdjuster;
-import java.util.Arrays;
 import java.util.Locale;
-
-import org.netpreserve.commons.cdx.time.WarcDateFormatter;
-
-import static org.netpreserve.commons.cdx.CdxDateRange.WARC_DATE_OUTPUT_FORMAT;
+import java.util.Objects;
 
 /**
- * A representation of a date used for searching.
+ * A representation of a date.
  * <p>
- * As dates are allowed to be of variable precision, this class computes the earliest and latest dates that will fit
- * into the submitted date.
+ * CdxDates are allowed to be of variable granularity. A CdxDate can be produced from strings in either Heritrix date
+ * format or WARC date format.
+ * <p>
+ * A CdxDate is always in UTC.
  * <p>
  * This class is immutable and thread safe.
  */
 public final class CdxDate {
 
+    /**
+     * A set of allowed granularities for a date.
+     */
     public enum Granularity {
 
+        /**
+         * A date with only the year known.
+         */
         YEAR,
+        /**
+         * A date with only the year and month known.
+         */
         MONTH,
+        /**
+         * A date with only the year, month and day known.
+         */
         DAY,
+        /**
+         * A date with only the year, month, day and hour known.
+         */
         HOUR,
+        /**
+         * A date with only the year, month, day, hour and minute known.
+         */
         MINUTE,
+        /**
+         * A date with only the year, month, day, hour, minute and second known.
+         */
         SECOND,
+        /**
+         * A date with the highest possible precision.
+         */
         NANOSECOND;
 
     }
 
+    /**
+     * Format for parsing WARC date syntax.
+     */
     private static final DateTimeFormatter WARC_DATE_PARSE_FORMAT = new DateTimeFormatterBuilder()
             .appendValue(ChronoField.YEAR, 4)
             .optionalStart()
@@ -94,6 +110,46 @@ public final class CdxDate {
             .parseDefaulting(ChronoField.NANO_OF_SECOND, 0)
             .toFormatter(Locale.ENGLISH);
 
+    /**
+     * Array of formats for formatting dates of different granularities allowed in the WARC date format.
+     */
+    private static final DateTimeFormatter[] WARC_DATE_OUTPUT_FORMAT;
+
+    static {
+        WARC_DATE_OUTPUT_FORMAT = new DateTimeFormatter[Granularity.values().length];
+
+        DateTimeFormatterBuilder warcDateBuilder = new DateTimeFormatterBuilder()
+                .appendValue(ChronoField.YEAR, 4);
+        WARC_DATE_OUTPUT_FORMAT[Granularity.YEAR.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
+
+        warcDateBuilder.appendLiteral('-')
+                .appendValue(ChronoField.MONTH_OF_YEAR, 2);
+        WARC_DATE_OUTPUT_FORMAT[Granularity.MONTH.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
+
+        warcDateBuilder.appendLiteral('-')
+                .appendValue(ChronoField.DAY_OF_MONTH, 2);
+        WARC_DATE_OUTPUT_FORMAT[Granularity.DAY.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
+
+        warcDateBuilder.appendLiteral('T')
+                .appendValue(ChronoField.HOUR_OF_DAY, 2);
+        WARC_DATE_OUTPUT_FORMAT[Granularity.HOUR.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
+
+        warcDateBuilder.appendLiteral(':')
+                .appendValue(ChronoField.MINUTE_OF_HOUR, 2);
+        WARC_DATE_OUTPUT_FORMAT[Granularity.MINUTE.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
+
+        warcDateBuilder.appendLiteral(':')
+                .appendValue(ChronoField.SECOND_OF_MINUTE, 2);
+        WARC_DATE_OUTPUT_FORMAT[Granularity.SECOND.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
+
+        warcDateBuilder.appendFraction(ChronoField.NANO_OF_SECOND, 9, 9, true)
+                .appendOffsetId();
+        WARC_DATE_OUTPUT_FORMAT[Granularity.NANOSECOND.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
+    }
+
+    /**
+     * Format for parsing Heritrix date syntax.
+     */
     private static final DateTimeFormatter HERITRIX_DATE_PARSE_FORMAT = new DateTimeFormatterBuilder()
             .appendValue(ChronoField.YEAR, 4)
             .optionalStart()
@@ -121,33 +177,73 @@ public final class CdxDate {
             .parseDefaulting(ChronoField.NANO_OF_SECOND, 0)
             .toFormatter(Locale.ENGLISH);
 
+    /**
+     * Array of formats for formatting dates of different granularities allowed in the Heritrix date format.
+     */
+    private static final DateTimeFormatter[] HERITRIX_DATE_OUTPUT_FORMAT;
+
+    static {
+        HERITRIX_DATE_OUTPUT_FORMAT = new DateTimeFormatter[Granularity.values().length];
+
+        DateTimeFormatterBuilder warcDateBuilder = new DateTimeFormatterBuilder()
+                .appendValue(ChronoField.YEAR, 4);
+        HERITRIX_DATE_OUTPUT_FORMAT[Granularity.YEAR.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
+
+        warcDateBuilder.appendValue(ChronoField.MONTH_OF_YEAR, 2);
+        HERITRIX_DATE_OUTPUT_FORMAT[Granularity.MONTH.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
+
+        warcDateBuilder.appendValue(ChronoField.DAY_OF_MONTH, 2);
+        HERITRIX_DATE_OUTPUT_FORMAT[Granularity.DAY.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
+
+        warcDateBuilder.appendValue(ChronoField.HOUR_OF_DAY, 2);
+        HERITRIX_DATE_OUTPUT_FORMAT[Granularity.HOUR.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
+
+        warcDateBuilder.appendValue(ChronoField.MINUTE_OF_HOUR, 2);
+        HERITRIX_DATE_OUTPUT_FORMAT[Granularity.MINUTE.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
+
+        warcDateBuilder.appendValue(ChronoField.SECOND_OF_MINUTE, 2);
+        HERITRIX_DATE_OUTPUT_FORMAT[Granularity.SECOND.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
+
+        warcDateBuilder.appendFraction(ChronoField.NANO_OF_SECOND, 9, 9, false);
+        HERITRIX_DATE_OUTPUT_FORMAT[Granularity.NANOSECOND.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
+    }
+
     final OffsetDateTime date;
 
     final Granularity granularity;
 
     /**
-     * Private constructor to create a new immutable CdxDate.
+     * Constructs a new immutable CdxDate.
      * <p>
-     * @param dateFloor the earliest date for this CdxDate.
-     * @param dateCeeling the latest date for this CdxDate.
+     * @param date the date for this CdxDate.
+     * @param granularity the granularity for this CdxDate.
      */
-    private CdxDate(OffsetDateTime date, Granularity granularity) {
+    public CdxDate(final OffsetDateTime date, final Granularity granularity) {
         this.date = date;
         this.granularity = granularity;
     }
 
     /**
-     * Create a new CdxDate from a date formatted according to the WARC standard.
+     * Obtains an instance of CdxDate from a text string.
      * <p>
-     * @param warcDate the date to parse.
-     * @return the validated CdxDate.
+     * The string must represent a valid date-time in one of WARC or Heritrix date formats.
+     * <p>
+     * @param dateString in WARC or Heritrix date formats.
+     * @return the parsed CdxDate, not null.
+     * @throws DateTimeParseException if the date cannot be parsed.
      */
-    public static CdxDate fromWarcDate(String warcDate) {
-        String[] tokens = warcDate.split("[-T:\\.Z]");
-        Granularity granularity = Granularity.values()[tokens.length - 1];
-        OffsetDateTime date = WARC_DATE_PARSE_FORMAT.parse(warcDate, OffsetDateTime::from);
+    public static CdxDate of(String dateString) {
+        String[] tokens = dateString.split("[-T:\\.Z]");
 
-        return new CdxDate(date, granularity);
+        if (tokens.length == 1 && tokens[0].length() > 4) {
+            // No delimiters found and value is longer than year, assume it is a Heritrix formatted date.
+            return fromHeritrixDate(dateString);
+        } else {
+            Granularity granularity = Granularity.values()[tokens.length - 1];
+            OffsetDateTime date = WARC_DATE_PARSE_FORMAT.parse(dateString, OffsetDateTime::from);
+
+            return new CdxDate(date, granularity);
+        }
     }
 
     /**
@@ -156,7 +252,7 @@ public final class CdxDate {
      * @param heritrixDate the date to parse.
      * @return the validated CdxDate.
      */
-    public static CdxDate fromHeritrixDate(String heritrixDate) {
+    static CdxDate fromHeritrixDate(String heritrixDate) {
         Granularity granularity;
         switch (heritrixDate.length()) {
             case 4:
@@ -196,32 +292,82 @@ public final class CdxDate {
 
         return new CdxDate(date, granularity);
     }
-//        OffsetDateTime dateAdjusted;
-//        Temporal date = (Temporal) CdxDateRange.HERITRIX_DATE_OUTPUT_FORMAT.parseBest(heritrixDate,
-//                OffsetDateTime::from, LocalDate::from, YearMonth::from, Year::from);
-//        if (date instanceof OffsetDateTime) {
-//            dateAdjusted = (OffsetDateTime) date;
-//        } else {
-//            dateAdjusted = CdxDateRange.HERITRIX_DATE_FORMAT_FLOOR.parse(heritrixDate, OffsetDateTime::from);
-//        }
-//        return new CdxDate(date, dateAdjusted);
-//    }
 
+    /**
+     * Compute the time between this and another CdxDate.
+     * <p>
+     * @param other the date to compute the distance to.
+     * @return the absolute duration between the two dates.
+     */
     public Duration distanceTo(CdxDate other) {
         return Duration.between(date, other.date).abs();
     }
 
+    /**
+     * Get the immutable temporal of this CdxDate.
+     * <p>
+     * @return the date.
+     */
     public OffsetDateTime getDate() {
         return date;
     }
 
+    /**
+     * Get the granularity of this CdxDate.
+     * <p>
+     * @return the granularity.
+     */
     public Granularity getGranularity() {
         return granularity;
+    }
+
+    /**
+     * Get the date formatted as a WARC date.
+     * <p>
+     * @return the formatted string.
+     */
+    public String toWarcDateString() {
+        return WARC_DATE_OUTPUT_FORMAT[granularity.ordinal()].format(date);
+    }
+
+    /**
+     * Get the date formatted as a Heritrix date.
+     * <p>
+     * @return the formatted string.
+     */
+    public String toHeritrixDateString() {
+        return HERITRIX_DATE_OUTPUT_FORMAT[granularity.ordinal()].format(date);
     }
 
     @Override
     public String toString() {
         return "CdxDate{" + "date=" + date + ", granularity=" + granularity + '}';
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 59 * hash + Objects.hashCode(this.date);
+        hash = 59 * hash + Objects.hashCode(this.granularity);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CdxDate other = (CdxDate) obj;
+        if (!Objects.equals(this.date, other.date)) {
+            return false;
+        }
+        if (this.granularity != other.granularity) {
+            return false;
+        }
+        return true;
     }
 
 }

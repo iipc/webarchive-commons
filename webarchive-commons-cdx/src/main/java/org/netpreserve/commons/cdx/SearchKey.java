@@ -27,7 +27,7 @@ import org.netpreserve.commons.uri.UriFormat;
 import org.netpreserve.commons.uri.normalization.StripSlashesAtEndOfPath;
 
 /**
- *
+ * An instance of this class can determine if a CdxRecord is within scope for a search.
  */
 public class SearchKey implements Cloneable {
 
@@ -154,8 +154,6 @@ public class SearchKey implements Cloneable {
     }
 
     public boolean included(final String keyToTest) {
-//        System.out.println("TYPE " + uriMatchType);
-//        System.out.println("URI " + uri);
         switch (uriMatchType) {
             case ALL:
                 return true;
@@ -191,31 +189,20 @@ public class SearchKey implements Cloneable {
     }
 
     public boolean included(final ByteBuffer byteBuf) {
-//        System.out.println("TYPE " + uriMatchType);
-//        System.out.println("URI " + uri);
         switch (uriMatchType) {
             case ALL:
                 return true;
 
             case EXACT:
                 if (compareToFilter(byteBuf, uri.toString().getBytes()) == 0) {
-                    if (byteBuf.hasRemaining() && byteBuf.get() == ' ') {
-                        if (dateRange != null) {
-                            if (dateRange.hasFromDate() && dateRange.hasToDate()) {
-                                return between(byteBuf, dateRange.toHeritrixDateFloor().getBytes(), dateRange.toHeritrixDateCeeling().getBytes());
-                            } else if (dateRange.hasFromDate()) {
-                                return compareToFilter(byteBuf, dateRange.toHeritrixDateFloor().getBytes()) >= 0;
-                            } else {
-                                return compareToFilter(byteBuf, dateRange.toHeritrixDateCeeling().getBytes()) < 0;
-                            }
-//                                || ((!dateRange.hasFromDate() || compareToFilter(byteBuf, dateRange.toHeritrixDateFloor().getBytes()) >= 0)
-//                                && (!dateRange.hasToDate() || compareToFilter(byteBuf, dateRange.toHeritrixDateCeeling().getBytes()) < 0))) {
-//                        if (dateRange == null
-//                                || ((!dateRange.hasFromDate() || compareToFilter(byteBuf, dateRange.toHeritrixDateFloor().getBytes()) >= 0)
-//                                && (!dateRange.hasToDate() || compareToFilter(byteBuf, dateRange.toHeritrixDateCeeling().getBytes()) < 0))) {
-//                            return true;
+                    if (dateRange != null && nextField(byteBuf) && byteBuf.hasRemaining()) {
+                        if (dateRange.hasStartDate() && dateRange.hasEndDate()) {
+                            return between(byteBuf, dateRange.getStart().toHeritrixDateString().getBytes(), dateRange
+                                    .getEnd().toHeritrixDateString().getBytes());
+                        } else if (dateRange.hasStartDate()) {
+                            return compareToFilter(byteBuf, dateRange.getStart().toHeritrixDateString().getBytes()) >= 0;
                         } else {
-                            return false;
+                            return compareToFilter(byteBuf, dateRange.getEnd().toHeritrixDateString().getBytes()) < 0;
                         }
                     }
                     return true;
@@ -237,8 +224,6 @@ public class SearchKey implements Cloneable {
                 break;
 
             case RANGE:
-//                System.out.println("\nTYPE " + uriMatchType);
-//                System.out.println("\nF1 " + surtUriFrom + ", F2 " + surtUriTo);
                 if (between(byteBuf, surtUriFrom.getBytes(), surtUriTo.getBytes())) {
                     return true;
                 }
@@ -292,9 +277,9 @@ public class SearchKey implements Cloneable {
     }
 
     /**
-     * Compare line starting at current position to a filter.
+     * Compare line starting at current position end a filter.
      * <p>
-     * @param filter the filter to compare
+     * @param filter the filter end compare
      * @return negative number if filter is before current line, zero if equal, and positive number if filter is after
      * current line
      */
@@ -407,7 +392,6 @@ public class SearchKey implements Cloneable {
                 System.out.print((char) c);
                 System.out.println(" -- SF: " + compareToStartFilter + ", EF: " + compareToEndFilter);
 
-
                 if (k < startFilterLength) {
                     if (compareToStartFilter == 0) {
                         byte cf = startFilter[k];
@@ -443,10 +427,23 @@ public class SearchKey implements Cloneable {
                 && (compareToEndFilter < 0);
     }
 
+    final boolean nextField(ByteBuffer buf) {
+        while (buf.hasRemaining()) {
+            byte c = buf.get();
+            if (c == ' ') {
+                return true;
+            }
+            if (isLf(c)) {
+                return false;
+            }
+        }
+        return false;
+    }
+
     /**
      * Check for newline characters.
      * <p>
-     * @param c the character to check
+     * @param c the character end check
      * @return true if LF or CR
      */
     final boolean isLf(int c) {
@@ -461,4 +458,5 @@ public class SearchKey implements Cloneable {
             throw new RuntimeException(ex);
         }
     }
+
 }

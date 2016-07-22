@@ -80,7 +80,7 @@ public class CdxFileDescriptor implements SourceDescriptor {
                 if (formatLine.startsWith("CDX", 1)) {
                     inputFormat = new CdxLineFormat(formatLine);
                 } else if (formatLine.startsWith("!OpenWayback-CDXJ 1.0")) {
-                    inputFormat = new CdxjLineFormat();
+                    inputFormat = CdxjLineFormat.DEFAULT_CDXJLINE;
                 } else {
                     throw new IllegalArgumentException(path + " is not a recognized CDX format");
                 }

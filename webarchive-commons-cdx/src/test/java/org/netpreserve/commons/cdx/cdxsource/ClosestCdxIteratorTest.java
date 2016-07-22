@@ -48,39 +48,39 @@ public class ClosestCdxIteratorTest {
     public void testNext() throws URISyntaxException, IOException {
         Path path = Paths.get(ClassLoader.getSystemResource("cdxfile3.cdx").toURI());
         try (SourceDescriptor sourceDescriptor = new CdxFileDescriptor(path);) {
-            SearchKey url = new SearchKey().uri("http://vg.no/din_verden/assets/images/himmel.gif");
+            SearchKey searchKey = new SearchKey().uri("http://vg.no/din_verden/assets/images/himmel.gif");
             SearchKey missingUrl = new SearchKey().uri("http://vg.no/din_verden/assets/images/hinder.gif");
 
             CdxSource cdxSource = new BlockCdxSource(sourceDescriptor);
             CdxIterator it;
 
             // Test with url not in cdx
-            it = new ClosestCdxIterator(cdxSource, missingUrl, CdxDate.fromHeritrixDate("20070905173550"), null);
+            it = new ClosestCdxIterator(cdxSource, missingUrl, CdxDate.of("20070905173550"), null);
             assertThat(it).isEmpty();
 
             // Test with timestamp equal to one of the lines
-            it = new ClosestCdxIterator(cdxSource, url, CdxDate.fromHeritrixDate("20070905173550"), null);
+            it = new ClosestCdxIterator(cdxSource, searchKey, CdxDate.of("20070905173550"), null);
             assertThat(it).hasSize(2).usingElementComparator(comparator).containsExactly(
-                    BaseCdxRecord.create(url + " 20070905173550", format),
-                    BaseCdxRecord.create(url + " 20070822103939", format));
+                    BaseCdxRecord.create(searchKey.getUri() + " 20070905173550", format),
+                    BaseCdxRecord.create(searchKey.getUri() + " 20070822103939", format));
 
             // Test with timestamp in between the lines
-            it = new ClosestCdxIterator(cdxSource, url, CdxDate.fromHeritrixDate("20070823173549"), null);
+            it = new ClosestCdxIterator(cdxSource, searchKey, CdxDate.of("20070823173549"), null);
             assertThat(it).hasSize(2).usingElementComparator(comparator).containsExactly(
-                    BaseCdxRecord.create(url + " 20070822103939", format),
-                    BaseCdxRecord.create(url + " 20070905173550", format));
+                    BaseCdxRecord.create(searchKey.getUri() + " 20070822103939", format),
+                    BaseCdxRecord.create(searchKey.getUri() + " 20070905173550", format));
 
             // Test with timestamp earlier than all the lines
-            it = new ClosestCdxIterator(cdxSource, url, CdxDate.fromHeritrixDate("20060823173549"), null);
+            it = new ClosestCdxIterator(cdxSource, searchKey, CdxDate.of("20060823173549"), null);
             assertThat(it).hasSize(2).usingElementComparator(comparator).containsExactly(
-                    BaseCdxRecord.create(url + " 20070822103939", format),
-                    BaseCdxRecord.create(url + " 20070905173550", format));
+                    BaseCdxRecord.create(searchKey.getUri() + " 20070822103939", format),
+                    BaseCdxRecord.create(searchKey.getUri() + " 20070905173550", format));
 
             // Test with timestamp later than all the lines
-            it = new ClosestCdxIterator(cdxSource, url, CdxDate.fromHeritrixDate("20090823173549"), null);
+            it = new ClosestCdxIterator(cdxSource, searchKey, CdxDate.of("20090823173549"), null);
             assertThat(it).hasSize(2).usingElementComparator(comparator).containsExactly(
-                    BaseCdxRecord.create(url + " 20070905173550", format),
-                    BaseCdxRecord.create(url + " 20070822103939", format));
+                    BaseCdxRecord.create(searchKey.getUri() + " 20070905173550", format),
+                    BaseCdxRecord.create(searchKey.getUri() + " 20070822103939", format));
         }
     }
 
@@ -92,22 +92,22 @@ public class ClosestCdxIteratorTest {
         Path path = Paths.get(ClassLoader.getSystemResource("cdxfile3.cdx").toURI());
         try (SourceDescriptor sourceDescriptor = new CdxFileDescriptor(path);) {
 
-            SearchKey url = new SearchKey().uri("http://vg.no/din_verden/assets/images/himmel.gif");
+            SearchKey searchKey = new SearchKey().uri("http://vg.no/din_verden/assets/images/himmel.gif");
             SearchKey missingUrl = new SearchKey().uri("http://vg.no/din_verden/assets/images/hinder.gif");
 
             CdxSource cdxSource = new BlockCdxSource(sourceDescriptor);
             CdxIterator it;
 
-            it = new ClosestCdxIterator(cdxSource, missingUrl, CdxDate.fromHeritrixDate("20070905173550"), null);
+            it = new ClosestCdxIterator(cdxSource, missingUrl, CdxDate.of("20070905173550"), null);
             assertThat((Comparable) it.peek()).isNull();
 
-            it = new ClosestCdxIterator(cdxSource, url, CdxDate.fromHeritrixDate("20070905173550"), null);
+            it = new ClosestCdxIterator(cdxSource, searchKey, CdxDate.of("20070905173550"), null);
             assertThat((Comparable) it.peek())
-                    .isEqualByComparingTo(BaseCdxRecord.create(url + " 20070905173550", format));
+                    .isEqualByComparingTo(BaseCdxRecord.create(searchKey.getUri() + " 20070905173550", format));
 
-            it = new ClosestCdxIterator(cdxSource, url, CdxDate.fromHeritrixDate("20070823173549"), null);
+            it = new ClosestCdxIterator(cdxSource, searchKey, CdxDate.of("20070823173549"), null);
             assertThat((Comparable) it.peek())
-                    .isEqualByComparingTo(BaseCdxRecord.create(url + " 20070822103939", format));
+                    .isEqualByComparingTo(BaseCdxRecord.create(searchKey.getUri() + " 20070822103939", format));
         }
     }
 
@@ -119,19 +119,19 @@ public class ClosestCdxIteratorTest {
         Path path = Paths.get(ClassLoader.getSystemResource("cdxfile3.cdx").toURI());
         try (SourceDescriptor sourceDescriptor = new CdxFileDescriptor(path);) {
 
-            SearchKey url = new SearchKey().uri("http://vg.no/din_verden/assets/images/himmel.gif");
+            SearchKey searchKey = new SearchKey().uri("http://vg.no/din_verden/assets/images/himmel.gif");
             SearchKey missingUrl = new SearchKey().uri("http://vg.no/din_verden/assets/images/hinder.gif");
 
             CdxSource cdxSource = new BlockCdxSource(sourceDescriptor);
             CdxIterator it;
 
-            it = new ClosestCdxIterator(cdxSource, missingUrl, CdxDate.fromHeritrixDate("20070905173550"), null);
+            it = new ClosestCdxIterator(cdxSource, missingUrl, CdxDate.of("20070905173550"), null);
             assertThat(it.hasNext()).isFalse();
 
-            it = new ClosestCdxIterator(cdxSource, url, CdxDate.fromHeritrixDate("20070905173550"), null);
+            it = new ClosestCdxIterator(cdxSource, searchKey, CdxDate.of("20070905173550"), null);
             assertThat(it.hasNext()).isTrue();
 
-            it = new ClosestCdxIterator(cdxSource, url, CdxDate.fromHeritrixDate("20070823173549"), null);
+            it = new ClosestCdxIterator(cdxSource, searchKey, CdxDate.of("20070823173549"), null);
             assertThat(it.hasNext()).isTrue();
         }
     }

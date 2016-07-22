@@ -59,14 +59,11 @@ public class ClosestCdxIterator implements CdxIterator {
             throw new IllegalArgumentException("Closest match not allowed for wildcard uri");
         }
 
-        SearchKey forwardKey = key.clone().dateRange(CdxDateRange.from(timestamp));
-        SearchKey backwardKey = key.clone().dateRange(CdxDateRange.to(timestamp));
-        forwardResult = source.search(key, processors, false);
-        backwardResult = source.search(key, processors, true);
-//        String closestKey = url + " " + timestamp;
-//
-//        forwardResult = source.search(closestKey, url + "~", processors, false);
-//        backwardResult = source.search(url, closestKey, processors, true);
+        SearchKey forwardKey = key.clone().dateRange(CdxDateRange.start(timestamp));
+        SearchKey backwardKey = key.clone().dateRange(CdxDateRange.end(timestamp));
+
+        forwardResult = source.search(forwardKey, processors, false);
+        backwardResult = source.search(backwardKey, processors, true);
 
         forwardIterator = forwardResult.iterator();
         backwardIterator = backwardResult.iterator();
@@ -101,11 +98,9 @@ public class ClosestCdxIterator implements CdxIterator {
 
         if (nextForwardCandidate == null && forwardIterator.hasNext()) {
             nextForwardCandidate = new Candidate(forwardIterator.next());
-            System.out.println("AAA " + nextForwardCandidate.line + " - " + nextForwardCandidate.distance);
         }
         if (nextBackwardCandidate == null && backwardIterator.hasNext()) {
             nextBackwardCandidate = new Candidate(backwardIterator.next());
-            System.out.println("BBB " + nextBackwardCandidate.line + " - " + nextBackwardCandidate.distance);
         }
 
         if (nextForwardCandidate == null && nextBackwardCandidate == null) {
@@ -156,7 +151,7 @@ public class ClosestCdxIterator implements CdxIterator {
 
         Candidate(CdxRecord line) {
             this.line = line;
-            this.distance = CdxDate.fromHeritrixDate(line.get(FieldName.TIMESTAMP).toString()).distanceTo(timestamp);
+            this.distance = CdxDate.of(line.get(FieldName.TIMESTAMP).toString()).distanceTo(timestamp);
         }
 
         public boolean greaterDistanceThan(Candidate o) {

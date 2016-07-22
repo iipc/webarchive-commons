@@ -17,9 +17,7 @@ package org.netpreserve.commons.cdx;
 
 import java.nio.ByteBuffer;
 
-import org.junit.Ignore;
 import org.junit.Test;
-import org.netpreserve.commons.uri.Configurations;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -27,58 +25,6 @@ import static org.assertj.core.api.Assertions.*;
  *
  */
 public class SearchKeyTest {
-
-    /**
-     * Test of uri method, of class SearchKey.
-     */
-//    @Test
-//    @Ignore
-//    public void testUri() {
-//        SearchKey key;
-//
-//        key = new SearchKey().uri("example.com/foo/index.html").dateFrom("2000").dateTo("2001");
-//        System.out.println(key.getMatchType());
-//        System.out.println(key.getUri().toCustomString(Configurations.DEFAULT_FORMAT));
-//        System.out.println(key.getFromKey());
-//        System.out.println(key.getToKey());
-//
-//        key = new SearchKey().uri("*example.com/foo/index.html").dateFrom("2000").dateTo("2001");
-//        System.out.println(key.getMatchType());
-//        System.out.println(key.getUri().toCustomString(Configurations.DEFAULT_FORMAT));
-//        System.out.println(key.getFromKey());
-//        System.out.println(key.getToKey());
-//
-//        key = new SearchKey().uri("*.example.com/foo/index.html").dateFrom("2000").dateTo("2001");
-//        System.out.println(key.getMatchType());
-//        System.out.println(key.getUri().toCustomString(Configurations.DEFAULT_FORMAT));
-//        System.out.println(key.getFromKey());
-//        System.out.println(key.getToKey());
-//
-//        key = new SearchKey().uri("*foo.example.com/foo/index.html").dateFrom("2000").dateTo("2001");
-//        System.out.println(key.getMatchType());
-//        System.out.println(key.getUri().toCustomString(Configurations.DEFAULT_FORMAT));
-//        System.out.println(key.getFromKey());
-//        System.out.println(key.getToKey());
-//
-//        key = new SearchKey().uri("example.com/foo/*").dateFrom("2000").dateTo("2001");
-//        System.out.println(key.getMatchType());
-//        System.out.println(key.getUri().toCustomString(Configurations.DEFAULT_FORMAT));
-//        System.out.println(key.getFromKey());
-//        System.out.println(key.getToKey());
-//
-//        assertThatThrownBy(() -> {
-//            new SearchKey().uri("*example.com/foo/*").dateFrom("2000").dateTo("2001");
-//        }).isInstanceOf(IllegalArgumentException.class)
-//                .hasMessageContaining("wildcard");
-//
-//        key = new SearchKey();
-//        System.out.println(key.getMatchType());
-//        System.out.println(key.getUri());
-//        System.out.println(key.getFromKey());
-//        System.out.println(key.getToKey());
-//
-//        fail("prototype");
-//    }
 
     @Test
     public void testIncludedString() {
@@ -105,9 +51,9 @@ public class SearchKeyTest {
         // Host wildcard match
         key = new SearchKey().uri("*example.com/foo/index.html");
         assertThat(key.included("(com,example,)/foo/index.html")).isTrue();
-//        assertThat(key.included("(com,example,)/foo/index.html1")).isFalse();
+        assertThat(key.included("(com,example,)/foo/index.html1")).isFalse();
         assertThat(key.included("(com,example,host,)/foo/index.html")).isTrue();
-//        assertThat(key.included("(com,example,host,)/foo/index.html1")).isFalse();
+        assertThat(key.included("(com,example,host,)/foo/index.html1")).isFalse();
 
         // Range match
         key = new SearchKey().surtUriFrom("(be,halten,)").surtUriTo("(ch,");
@@ -130,9 +76,8 @@ public class SearchKeyTest {
         key = new SearchKey();
         assertThat(key.included(ByteBuffer.wrap("foo".getBytes()))).isTrue();
 
-        System.out.println(CdxDateRange.fromHeritrixDate("20000202").toHeritrixDateCeeling());
         // Exact match
-        key = new SearchKey().uri("example.com/foo/index.html").dateRange(CdxDateRange.fromHeritrixDate("20000202"));
+        key = new SearchKey().uri("example.com/foo/index.html").dateRange(CdxDateRange.ofSingleDate(CdxDate.of("20000202")));
         assertThat(key.included(ByteBuffer.wrap("(com,example,)/foo/index.html 20000202".getBytes()))).isTrue();
         assertThat(key.included(ByteBuffer.wrap("(com,example,)/foo/index.html1".getBytes()))).isFalse();
         key = new SearchKey().uri("http://example.com/foo/index.html");
@@ -166,8 +111,5 @@ public class SearchKeyTest {
 
         key = new SearchKey().uri("åå.jalla.øx.com/foo/index.html");
         assertThat(key.included(ByteBuffer.wrap("(ch,)".getBytes()))).isFalse();
-
-
-//        fail("prototype");
     }
 }

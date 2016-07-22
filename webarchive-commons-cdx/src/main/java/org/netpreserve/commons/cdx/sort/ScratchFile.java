@@ -23,8 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- *
- * @author johnh
+ * Representation of a temporary file used for polyphase merge sorting.
  */
 public class ScratchFile implements Comparable<ScratchFile> {
 

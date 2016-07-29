@@ -24,9 +24,11 @@ import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.CdxRecordKey;
 import org.netpreserve.commons.cdx.CdxjLineFormat;
 import org.netpreserve.commons.cdx.FieldName;
+import org.netpreserve.commons.cdx.HasUnparsedData;
 import org.netpreserve.commons.cdx.SearchResult;
 import org.netpreserve.commons.cdx.json.NullValue;
 import org.netpreserve.commons.cdx.json.StringValue;
+import org.netpreserve.commons.cdx.json.TimestampValue;
 import org.netpreserve.commons.cdx.json.Value;
 import org.netpreserve.commons.uri.Configurations;
 import org.netpreserve.commons.uri.Uri;
@@ -64,10 +66,8 @@ public class CdxRecordFormatter {
         if (createKey) {
             CdxRecordKey key = createKey(record);
             record.setKey(key);
-        }
-
-        if (record.getCdxFormat().equals(format)) {
-            return record.toString();
+        } else if (record instanceof HasUnparsedData && record.getCdxFormat().equals(format)) {
+            return new String(((HasUnparsedData) record).getUnparsed());
         }
 
         StringBuilderWriter sbw = new StringBuilderWriter();
@@ -84,10 +84,8 @@ public class CdxRecordFormatter {
         if (createKey) {
             CdxRecordKey key = createKey(record);
             record.setKey(key);
-        }
-
-        if (record.getCdxFormat().equals(format)) {
-            out.write(record.toCharArray());
+        } else if (record instanceof HasUnparsedData && record.getCdxFormat().equals(format)) {
+            out.write(((HasUnparsedData) record).getUnparsed());
             return;
         }
 
@@ -116,7 +114,7 @@ public class CdxRecordFormatter {
 
     /**
      * Create a key for a record from the uri and timestamp of the record.
-     *
+     * <p>
      * @param record the record to create a key for.
      * @return the created key.
      */
@@ -129,8 +127,15 @@ public class CdxRecordFormatter {
             timeStamp = record.getKey().getTimeStamp();
         }
 
-        CdxRecordKey key = new CdxRecordKey(StringValue.valueOf(surt.toString()), (StringValue) timeStamp);
+        Value recordType = record.get(FieldName.RECORD_TYPE);
+        if (recordType instanceof NullValue) {
+            recordType = record.getKey().getRecordType();
+        }
+
+        CdxRecordKey key = new CdxRecordKey(
+                StringValue.valueOf(surt.toString()), (TimestampValue) timeStamp, (StringValue) recordType);
 
         return key;
     }
+
 }

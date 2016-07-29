@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.*;
 /**
  *
  */
-public class CdxRecordKeyTest {
+public class CdxLineRecordKeyTest {
 
     /**
      * Test of getUriKey and getTimeStamp methods, of class CdxRecordKey.
@@ -33,8 +33,9 @@ public class CdxRecordKeyTest {
         String uriKey = "abc";
         String timeStamp = "123";
         String recordType = "response";
+        char[] recordKey = (uriKey + " " + timeStamp).toCharArray();
 
-        CdxRecordKey instance = new CdxRecordKey(uriKey, timeStamp, recordType);
+        CdxRecordKey instance = new CdxLineRecordKey(recordKey);
         assertThat(instance.getUriKey()).hasToString(uriKey);
         assertThat(instance.getTimeStamp()).hasToString(timeStamp);
         assertThat(instance.getRecordType()).hasToString(recordType);
@@ -51,22 +52,31 @@ public class CdxRecordKeyTest {
     @Test
     public void testCompareTo() {
         String uriKey1 = "abc";
-        String timeStamp1 = "20160214";
+        String timeStamp1 = "20160213";
         String recordType = "response";
+        char[] recordKey1 = (uriKey1 + " " + timeStamp1).toCharArray();
 
         // Check that two records created from same source are equal
-        CdxRecordKey instance1 = new CdxRecordKey(uriKey1, timeStamp1, recordType);
-        CdxRecordKey instance2 = new CdxRecordKey(uriKey1, timeStamp1, recordType);
+        CdxRecordKey instance1 = new CdxLineRecordKey(recordKey1);
+        CdxRecordKey instance2 = new CdxLineRecordKey(recordKey1);
         assertThat(instance1).isEqualByComparingTo(instance2);
 
         instance1 = new CdxRecordKey(uriKey1, timeStamp1, recordType);
         instance2 = new CdxRecordKey(uriKey1, timeStamp1, recordType);
         assertThat(instance1).isEqualByComparingTo(instance2);
 
+        // Check that two records created from different sources are equal
+        instance1 = new CdxLineRecordKey(recordKey1);
+        instance2 = new CdxRecordKey(uriKey1, timeStamp1, recordType);
+        assertThat(instance1).isEqualByComparingTo(instance2);
+
         // Check less and greater than
-        instance1 = new CdxRecordKey("abc", "20160213", recordType);
-        instance2 = new CdxRecordKey("abcd", "20160212", recordType);
-        CdxRecordKey instance3 = new CdxRecordKey("abc", "20160214", recordType);
+        char[] recordKey2 = "abcd 20160213".toCharArray();
+        char[] recordKey3 = "abc 20160214".toCharArray();
+
+        instance1 = new CdxLineRecordKey(recordKey1);
+        instance2 = new CdxLineRecordKey(recordKey2);
+        CdxRecordKey instance3 = new CdxLineRecordKey(recordKey3);
 
         assertThat(instance1).isLessThan(instance2);
         assertThat(instance1).isLessThan(instance3);
@@ -75,6 +85,22 @@ public class CdxRecordKeyTest {
         assertThat(instance2).isGreaterThan(instance1);
         assertThat(instance3).isGreaterThan(instance1);
         assertThat(instance2).isGreaterThan(instance3);
+    }
+
+    /**
+     * Test of toString method, of class CdxRecordKey.
+     */
+    @Test
+    public void testToString() {
+        String uriKey = "abc";
+        String timeStamp = "20160214";
+        String recordKey = uriKey + " " + timeStamp;
+
+        CdxRecordKey instance = new CdxLineRecordKey(recordKey);
+        assertThat(instance).hasToString(recordKey + " response");
+
+        instance = new CdxLineRecordKey(recordKey.toCharArray());
+        assertThat(instance).hasToString(recordKey + " response");
     }
 
 }

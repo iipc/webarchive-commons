@@ -23,12 +23,16 @@ import java.util.Objects;
  * Representation of a field name.
  */
 public final class FieldName {
+
     public enum Type {
+
         STRING,
         NUMBER,
         BOOLEAN,
         URI,
+        TIMESTAMP,
         ANY
+
     }
 
     private static final Map<String, FieldName> FIELDS_BY_NAME = new HashMap<>();
@@ -37,75 +41,133 @@ public final class FieldName {
 
     /**
      * Ceta tags (AIF).
+     * <p>
      * Code 'M' in legacy CDX format
      */
     public static final FieldName ROBOT_FLAGS = forNameAndCode("robotflags", 'M');
 
     /**
-     * Url key (massaged url e.g. Surt format).
+     * A searchable version of the URI.
+     * <p>
      * Code 'N' in legacy CDX format
      */
-    public static final FieldName URI_KEY = forNameAndCodeAndType("urlkey", 'N', Type.STRING);
+    public static final FieldName URI_KEY = forNameAndCodeAndType("ssu", 'N', Type.STRING);
 
     /**
      * Language string.
+     * <p>
      * Code 'Q' in legacy CDX format
      */
     public static final FieldName LANGUAGE = forNameAndCode("lang", 'Q');
 
     /**
-     * Length.
-     * Code 'S' in legacy CDX format
+     * Payload Length.
+     * <p>
+     * The length of the payload (uncompressed). The exact meaning will vary by content type, but the common case is the
+     * length of the document, excluding any HTTP headers in a HTTP response record.
      */
-    public static final FieldName LENGTH = forNameAndCodeAndType("length", 'S', Type.NUMBER);
+    public static final FieldName PAYLOAD_LENGTH = forNameAndType("ple", Type.NUMBER);
 
     /**
-     * Compressed arc file offset.
+     * Content Length.
+     * <p>
+     * The length of the content (uncompressed), ignoring WARC headers, but including any HTTP headers or similar.
+     */
+    public static final FieldName CONTENT_LENGTH = forNameAndType("cle", Type.NUMBER);
+
+    /**
+     * Record length.
+     * <p>
+     * The length of the record. This is the entire record (including e.g. WARC headers) as written on disk (compressed
+     * if stored compressed).
+     * <p>
+     * Code 'S' in legacy CDX format
+     */
+    public static final FieldName RECORD_LENGTH = forNameAndCodeAndType("rle", 'S', Type.NUMBER);
+
+    /**
+     * ARC/WARC file offset.
+     * <p>
      * Code 'V' in legacy CDX format
      */
     public static final FieldName OFFSET = forNameAndCodeAndType("offset", 'V', Type.NUMBER);
 
     /**
      * Original Url.
+     * <p>
      * Code 'a' in legacy CDX format
      */
-    public static final FieldName ORIGINAL_URI = forNameAndCodeAndType("url", 'a', Type.URI);
+    public static final FieldName ORIGINAL_URI = forNameAndCodeAndType("uri", 'a', Type.URI);
 
     /**
-     * Date.
+     * Timestamp.
+     * <p>
      * Code 'b' in legacy CDX format
      */
-    public static final FieldName TIMESTAMP = forNameAndCodeAndType("timestamp", 'b', Type.STRING);
+    public static final FieldName TIMESTAMP = forNameAndCodeAndType("sts", 'b', Type.TIMESTAMP);
 
     /**
      * File name.
+     * <p>
      * Code 'g' in legacy CDX format
      */
     public static final FieldName FILENAME = forNameAndCodeAndType("filename", 'g', Type.STRING);
 
     /**
      * New style checksum.
+     * <p>
      * Code 'k' in legacy CDX format
      */
     public static final FieldName DIGEST = forNameAndCodeAndType("digest", 'k', Type.STRING);
 
     /**
-     * Mime type of original document.
+     * A Base32 encoded SHA-1 digest of the payload.
+     * <p>
+     * Omit if the URI has no intrinsic payload. For revisit records, this is the digest of the original payload. The
+     * algorithm prefix (e.g. sha-1) is not included in this field.
+     * <p>
+     */
+    public static final FieldName PAYLOAD_DIGEST = forNameAndType("sha", Type.STRING);
+
+    /**
+     * Media Content Type (MIME type).
+     * <p>
+     * For HTTP(S) response records this is typically the “Content-Type” from the HTTP header. This field, however, does
+     * not specify the origin of the information. It may be used to include content type that was derived from content
+     * analysis or other sources.
+     * <p>
      * Code 'm' in legacy CDX format
      */
-    public static final FieldName MIME_TYPE = forNameAndCodeAndType("mime", 'm', Type.STRING);
+    public static final FieldName CONTENT_TYPE = forNameAndCodeAndType("mct", 'm', Type.STRING);
 
     /**
      * Redirect.
+     * <p>
      * Code 'r' in legacy CDX format
      */
     public static final FieldName REDIRECT = forNameAndCode("redirect", 'r');
 
     /**
-     * Response code.
+     * HTTP Status Code.
+     * <p>
+     * Applicable for response records for HTTP(S) URIs.
+     * <p>
      * Code 's' in legacy CDX format
      */
-    public static final FieldName RESPONSE_CODE = forNameAndCode("statuscode", 's');
+    public static final FieldName RESPONSE_CODE = forNameAndCodeAndType("hsc", 's', Type.NUMBER);
+
+    /**
+     * Record ID.
+     * <p>
+     * Typically WARC-Record-ID or equivalent if not using WARCs. In a mixed environment, you should ensure that record
+     * ID is unique.
+     */
+    public static final FieldName RECORD_ID = forNameAndType("rid", Type.STRING);
+
+    /**
+     * Reference used to fetch the record.
+     */
+    public static final FieldName RESOURCE_REF = forNameAndType("ref", Type.URI);
 
     /**
      * Comment.
@@ -113,14 +175,22 @@ public final class FieldName {
     public static final FieldName COMMENT = forNameAndCode("comment", '#');
 
     /**
-     * Record id in warc file.
+     * Record type.
+     * <p>
+     * Indicates what type of record the current line refers to. This field is fully compatible with WARC 1.0 definition
+     * of WARC-Type (chapter 5.5 and chapter 6). For content not stored in WARCs, a reasonable equivalent should be
+     * chosen.
+     * <p>
+     * E.g.
+     * <ul>
+     * <li><b>response</b> - Suitable for any record that contains the response from a server to a specific request
+     * (irrespective of protocol).</li>
+     * <li><b>request</b> - Suitable for any record containing a request made to a server.</li>
+     * <li><b>revisit</b> - Suitable for any record of a response from a server to a specific request, where the content
+     * body is equal to that of another record.</li>
+     * </ul>
      */
-    public static final FieldName WARC_ID = forNameAndType("warcid", Type.STRING);
-
-    /**
-     * Locator used to fetch the record.
-     */
-    public static final FieldName LOCATOR = forNameAndType("loc", Type.URI);
+    public static final FieldName RECORD_TYPE = forNameAndType("srt", Type.STRING);
 
     private final String name;
 

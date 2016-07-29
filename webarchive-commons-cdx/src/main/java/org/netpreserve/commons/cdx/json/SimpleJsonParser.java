@@ -126,10 +126,13 @@ public class SimpleJsonParser {
             case '"':
                 checkLegalType(fieldName, FieldName.Type.STRING, FieldName.Type.URI);
                 StringValue val = parseString();
-                if (fieldName.getType() == FieldName.Type.URI) {
-                    return UriValue.valueOf(val.getValue());
-                } else {
-                    return val;
+                switch (fieldName.getType()) {
+                    case URI:
+                        return UriValue.valueOf(val.getValue());
+                    case TIMESTAMP:
+                        return TimestampValue.valueOf(val.getValue());
+                    default:
+                        return val;
                 }
             case '[':
                 checkLegalType(fieldName, FieldName.Type.STRING);
@@ -341,4 +344,5 @@ public class SimpleJsonParser {
     private boolean isInBitSet(char ch, BitSet bitSet) {
         return ch > 0 && ch < 256 && bitSet.get(ch);
     }
+
 }

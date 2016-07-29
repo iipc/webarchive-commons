@@ -20,12 +20,20 @@ import java.util.Iterator;
 import org.netpreserve.commons.cdx.json.Value;
 
 /**
- *
- * @param <T>
+ * A CDX record.
+ * <p>
+ * @param <T> The format of the raw data this record is read from. If no such raw data exist, a format of
+ * {@link NonCdxLineFormat} should be used.
  */
 public interface CdxRecord<T extends CdxFormat> extends
         Comparable<CdxRecord>, Iterable<CdxRecord.Field> {
 
+    /**
+     * Get the format of the raw data connected to this record.
+     * <p>
+     * @return The format of the raw data this record is read from or {@link NonCdxLineFormat}, if no such raw data
+     * exist.
+     */
     T getCdxFormat();
 
     /**
@@ -37,6 +45,7 @@ public interface CdxRecord<T extends CdxFormat> extends
 
     /**
      * Set the key for this record.
+     * <p>
      * @param recordKey the key to set
      */
     void setKey(CdxRecordKey recordKey);
@@ -70,40 +79,45 @@ public interface CdxRecord<T extends CdxFormat> extends
     Iterator<CdxRecord.Field> iterator();
 
     /**
-     * Compares this object with the specified LegacyCdxLine for order. Returns a negative integer,
-     * zero, or a positive integer as this LegacyCdxLine is less than, equal to, or greater than the
-     * specified LegacyCdxLine.
+     * Compares this object with the specified CdxRecord for order.
      * <p>
-     * Note: This method uses only the key in the LegacyCdxLine for determining the natural order.
-     * It is expected that the key fields are the url key and timestamp which in general uniquely
-     * identifies the line. In contrast the {@link #equals(java.lang.Object)} method compares the
-     * whole line. It is then possible that (x.compareTo(y)==0) == (x.equals(y)) is not always true,
-     * but it usually is when comparing CdxLines with the same number of input fields.
+     * Returns a negative integer, zero, or a positive integer as this CdxRecord is less than, equal to, or greater than
+     * the specified CdxRecord.
      * <p>
-     * @param other the LegacyCdxLine to be compared
-     * @return a negative integer, zero, or a positive integer as this object is less than, equal
-     * to, or greater than the specified object
+     * Note: This method uses only the key for determining the natural order. It is expected that the key fields are the
+     * url key, timestamp and record type which in general uniquely identifies the line (but it is not guaranteed to do
+     * so). In contrast the {@link #equals(java.lang.Object)} method compares the whole record. It is then possible that
+     * (x.compareTo(y)==0) == (x.equals(y)) is not always true.
+     * <p>
+     * @param other the CdxRecord to be compared
+     * @return a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than
+     * the specified object
      * @throws NullPointerException if the specified object is null
      */
     @Override
     int compareTo(CdxRecord other);
 
+    /**
+     * A combination of field name and value used for the field iterator.
+     */
     interface Field {
 
+        /**
+         * Get the field name.
+         * <p>
+         * @return the FieldName object. Never null.
+         */
         FieldName getFieldName();
 
+        /**
+         * Get the value.
+         * <p>
+         * The value should never be null. To indicate a null value, an object of type
+         * {@link org.netpreserve.commons.cdx.json.NullValue} should be returned.
+         * <p>
+         * @return the Value object. Never null.
+         */
         Value getValue();
 
     }
-
-    /**
-     * Convert this record to a character array.
-     * <p>
-     * If the underlying data structure for this record is a character array, it is returned as is.
-     * The array should therefore not be modified.
-     * <p>
-     * @return the record as a character array.
-     */
-    char[] toCharArray();
-
 }

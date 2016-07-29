@@ -20,6 +20,8 @@ import java.io.Writer;
 
 import org.netpreserve.commons.cdx.CdxFormat;
 import org.netpreserve.commons.cdx.CdxRecord;
+import org.netpreserve.commons.cdx.CdxRecordKey;
+import org.netpreserve.commons.cdx.CdxjLineRecordKey;
 import org.netpreserve.commons.cdx.FieldName;
 
 /**
@@ -37,7 +39,16 @@ public class CdxjLineFormatter implements CdxFormatter {
     public void format(final Writer out, final CdxRecord<? extends CdxFormat> record,
             final CdxFormat outputFormat) throws IOException {
 
-        out.write(record.getKey().toCharArray());
+        CdxRecordKey key = record.getKey();
+        if (key instanceof CdxjLineRecordKey) {
+            out.write(((CdxjLineRecordKey) key).getUnparsed());
+        } else {
+            out.write(key.getUriKey().getValue());
+            out.write(' ');
+            out.write(key.getTimeStamp().getValue().toWarcDateString());
+            out.write(' ');
+            out.write(key.getRecordType().getValue());
+        }
 
         out.write(JSON_START);
 
@@ -46,7 +57,8 @@ public class CdxjLineFormatter implements CdxFormatter {
             if (!entry.getFieldName().equals(FieldName.URI_KEY)
                     && !entry.getFieldName().equals(FieldName.TIMESTAMP)
                     && !entry.getFieldName().equals(FieldName.FILENAME)
-                    && !entry.getFieldName().equals(FieldName.OFFSET)) {
+                    && !entry.getFieldName().equals(FieldName.OFFSET)
+                    && !entry.getFieldName().equals(FieldName.RECORD_TYPE)) {
 
                 if (notFirst) {
                     out.write(COMMA);
@@ -63,12 +75,12 @@ public class CdxjLineFormatter implements CdxFormatter {
             }
         }
 
-        if (!record.hasField(FieldName.LOCATOR)) {
+        if (!record.hasField(FieldName.RESOURCE_REF)) {
             if (notFirst) {
                 out.write(COMMA);
             }
             out.write(FIELD_NAME_START);
-            out.write(FieldName.LOCATOR.getName());
+            out.write(FieldName.RESOURCE_REF.getName());
             out.write(FIELD_NAME_END);
             out.write("\"warcfile:");
             out.write(record.get(FieldName.FILENAME).toString());

@@ -52,6 +52,10 @@ public class CdxFileDescriptor implements SourceDescriptor {
      * @throws IOException if failing reading file.
      */
     public CdxFileDescriptor(Path path) throws IOException {
+        this(path, true);
+    }
+
+    public CdxFileDescriptor(Path path, boolean server) throws IOException {
         this.channel = FileChannel.open(path, StandardOpenOption.READ);
         this.channelSize = channel.size();
         int blockCount = Math.max((int) (this.channelSize / BLOCK_SIZE), 1);

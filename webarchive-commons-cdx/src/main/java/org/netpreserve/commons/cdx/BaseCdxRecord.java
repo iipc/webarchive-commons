@@ -15,9 +15,9 @@
  */
 package org.netpreserve.commons.cdx;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import org.netpreserve.commons.cdx.json.Value;
 
@@ -34,11 +34,22 @@ public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord<T>
 
     protected boolean modified = false;
 
-    public static final CdxRecord create(final char[] value, final CdxFormat format) {
+    /**
+     * Factory method for creating CdxRecords.
+     * <p>
+     * @param data a character array containing raw record formatted according to the format. Might be null if format
+     * allows.
+     * @param format a forma for the unparsed CDX data.
+     * @return the newly created record.
+     * @throws IllegalArgumentException if CdxFormat is not recognized by this method.
+     */
+    public static final CdxRecord create(final char[] data, final CdxFormat format) {
         if (format instanceof CdxLineFormat) {
-            return new CdxLine(value, (CdxLineFormat) format);
+            return new CdxLine(data, (CdxLineFormat) format);
         } else if (format instanceof CdxjLineFormat) {
-            return new CdxjLine(value, (CdxjLineFormat) format);
+            return new CdxjLine(data, (CdxjLineFormat) format);
+        } else if (format instanceof NonCdxLineFormat) {
+            return new UnconnectedCdxRecord();
         }
 
         throw new IllegalArgumentException("Unknow CdxFormat: " + format.getClass());
@@ -84,36 +95,15 @@ public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord<T>
     }
 
     /**
-     * Helper method to extract the first two fields from a line based CDX format.
-     * <p>
-     * @param line the line containing the key
-     * @return a CdxRecordKey with the parsed values
-     */
-    protected static CdxRecordKey getKeyFromLine(final char[] line) {
-        int indexOfSecondField = indexOf(line, ' ', 0);
-        if (indexOfSecondField > 0) {
-            int indexOfThirdField = indexOf(line, ' ', indexOfSecondField + 1);
-            if (indexOfThirdField > 0) {
-                return new CdxRecordKey(Arrays.copyOf(line, indexOfThirdField));
-            } else if (line.length > indexOfSecondField + 1) {
-                return new CdxRecordKey(line);
-            }
-        }
-
-        throw new IllegalArgumentException("The CDX record '" + new String(line)
-                + "' cannot be parsed");
-    }
-
-    /**
      * Helper method to find the index of a character in a char array.
      * <p>
      * @param src the array to search
      * @param ch the char to look for
-     * @param fromIndex where in the src to start. If &lt;= 0, the beggining of the array is
-     * assumed. If &gt;= src.length, then -1 is returned.
+     * @param fromIndex where in the src to start. If &lt;= 0, the beggining of the array is assumed. If &gt;=
+     * src.length, then -1 is returned.
      * @return the index of the first occurence of ch or -1 if not found.
      */
-    protected static int indexOf(char[] src, char ch, int fromIndex) {
+    public static int indexOf(char[] src, char ch, int fromIndex) {
         final int max = src.length;
         if (fromIndex < 0) {
             fromIndex = 0;
@@ -131,6 +121,35 @@ public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord<T>
         return -1;
     }
 
+    /**
+     * Helper method to find the last index of a character in a char array.
+     * <p>
+     * @param src the array to search
+     * @param ch the char to look for
+     * @param fromIndex where in the src to start, searching backwards. If &lt;= 0, the beggining of the array is
+     * assumed. If &gt;= src.length, then -1 is returned.
+     * @return the index of the last occurence of ch or -1 if not found.
+     */
+    public static int lastIndexOf(char[] src, char ch, int fromIndex) {
+        if (fromIndex < 0) {
+            fromIndex = 0;
+        } else if (fromIndex >= src.length) {
+            // Note: fromIndex might be near -1>>>1.
+            return -1;
+        }
+
+        final char[] value = src;
+        for (int i = fromIndex; i >= 0; i--) {
+            if (value[i] == ch) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Helper class for implementing an iterator over a CdxRecord's fields.
+     */
     protected abstract class FieldIterator implements Iterator<CdxRecord.Field> {
 
         private CdxRecord.Field next;
@@ -162,19 +181,35 @@ public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord<T>
             throw new UnsupportedOperationException();
         }
 
+        /**
+         * Get the next record.
+         * <p>
+         * The only method needed to be implemented by subclasses.
+         * <p>
+         * @return the next record.
+         */
         protected abstract CdxRecord.Field getNext();
 
     }
 
+    /**
+     * An immutable implementation of the {@link Field} interface.
+     */
     protected static class ImmutableField implements Field {
 
         private final FieldName name;
 
         private final Value value;
 
+        /**
+         * Constructs an immutable field.
+         * <p>
+         * @param name the field name
+         * @param value the value
+         */
         public ImmutableField(FieldName name, Value value) {
-            this.name = name;
-            this.value = value;
+            this.name = Objects.requireNonNull(name);
+            this.value = Objects.requireNonNull(value);
         }
 
         @Override

@@ -20,7 +20,9 @@ import java.io.Writer;
 
 import org.netpreserve.commons.cdx.CdxFormat;
 import org.netpreserve.commons.cdx.CdxLineFormat;
+import org.netpreserve.commons.cdx.CdxLineRecordKey;
 import org.netpreserve.commons.cdx.CdxRecord;
+import org.netpreserve.commons.cdx.CdxRecordKey;
 import org.netpreserve.commons.cdx.FieldName;
 import org.netpreserve.commons.cdx.json.NullValue;
 import org.netpreserve.commons.cdx.json.NumberValue;
@@ -39,7 +41,14 @@ public class CdxLineFormatter implements CdxFormatter {
 
         CdxLineFormat format = (CdxLineFormat) outputFormat;
 
-        out.write(record.getKey().toCharArray());
+        CdxRecordKey key = record.getKey();
+        if (key instanceof CdxLineRecordKey) {
+            out.write(((CdxLineRecordKey) key).getUnparsed());
+        } else {
+            out.write(key.getUriKey().getValue());
+            out.write(' ');
+            out.write(key.getTimeStamp().getValue().toHeritrixDateString());
+        }
 
         for (int i = 2; i < format.getLength(); i++) {
             FieldName fieldName = format.getField(i);
@@ -47,12 +56,12 @@ public class CdxLineFormatter implements CdxFormatter {
 
             if (value == NullValue.NULL) {
                 if (fieldName == FieldName.FILENAME) {
-                    Uri locator = ((Uri) record.get(FieldName.LOCATOR).getValue());
+                    Uri locator = ((Uri) record.get(FieldName.RESOURCE_REF).getValue());
                     if ("warcfile".equals(locator.getScheme())) {
                         value = StringValue.valueOf(locator.getPath());
                     }
                 } else if (fieldName == FieldName.OFFSET) {
-                    Uri locator = ((Uri) record.get(FieldName.LOCATOR).getValue());
+                    Uri locator = ((Uri) record.get(FieldName.RESOURCE_REF).getValue());
                     if ("warcfile".equals(locator.getScheme())) {
                         value = NumberValue.valueOf(locator.getFragment());
                     }

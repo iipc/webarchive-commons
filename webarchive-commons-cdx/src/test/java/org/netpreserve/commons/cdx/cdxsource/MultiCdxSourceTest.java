@@ -154,7 +154,7 @@ public class MultiCdxSourceTest {
 //        String toKey = "ch,";
         SearchKey key = new SearchKey().surtUriFrom("(be,halten,)").surtUriTo("(ch,");
 
-        FieldRegexFilter f = new FieldRegexFilter(Collections.singletonList("!statuscode:200"));
+        FieldRegexFilter f = new FieldRegexFilter(Collections.singletonList("!hsc:200"));
         Processor<Filter> fp = new FilterProcessor().addFunction(f);
         List filters = Collections.singletonList(fp);
 

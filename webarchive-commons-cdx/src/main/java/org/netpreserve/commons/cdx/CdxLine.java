@@ -22,13 +22,14 @@ import org.netpreserve.commons.cdx.json.BooleanValue;
 import org.netpreserve.commons.cdx.json.NullValue;
 import org.netpreserve.commons.cdx.json.NumberValue;
 import org.netpreserve.commons.cdx.json.StringValue;
+import org.netpreserve.commons.cdx.json.TimestampValue;
 import org.netpreserve.commons.cdx.json.UriValue;
 import org.netpreserve.commons.cdx.json.Value;
 
 /**
  * A representation of a line in a legacy CDX file.
  */
-public class CdxLine extends BaseCdxRecord<CdxLineFormat> {
+public class CdxLine extends BaseCdxRecord<CdxLineFormat> implements HasUnparsedData {
 
     private static final char EMPTY_FIELD_VALUE = '-';
 
@@ -67,7 +68,6 @@ public class CdxLine extends BaseCdxRecord<CdxLineFormat> {
             throw new IllegalArgumentException("No such field");
         }
         return getValue(getCdxFormat().getField(fieldIndex), fieldIndex);
-//        return String.copyValueOf(data, fieldOffsets[fieldIndex], fieldLengths[fieldIndex]);
     }
 
     private Value getValue(FieldName name, int fieldIndex) {
@@ -102,6 +102,10 @@ public class CdxLine extends BaseCdxRecord<CdxLineFormat> {
                     break;
                 case BOOLEAN:
                     result = BooleanValue.valueOf(data, fieldOffsets[fieldIndex],
+                            fieldOffsets[fieldIndex] + fieldLengths[fieldIndex]);
+                    break;
+                case TIMESTAMP:
+                    result = TimestampValue.valueOf(data, fieldOffsets[fieldIndex],
                             fieldOffsets[fieldIndex] + fieldLengths[fieldIndex]);
                     break;
                 default:
@@ -144,7 +148,7 @@ public class CdxLine extends BaseCdxRecord<CdxLineFormat> {
     }
 
     @Override
-    public char[] toCharArray() {
+    public char[] getUnparsed() {
         if (modified) {
             StringBuilder sb = new StringBuilder(data.length);
             sb.append(getKey().toString());
@@ -208,6 +212,27 @@ public class CdxLine extends BaseCdxRecord<CdxLineFormat> {
             lastIndex = currIndex + 1;
             fieldCount++;
         } while (lastIndex > 0);
+    }
+
+    /**
+     * Extract the first two fields from a CDX line.
+     * <p>
+     * @param line the line containing the key
+     * @return a CdxRecordKey with the parsed values
+     */
+    static final CdxRecordKey getKeyFromLine(final char[] line) {
+        int indexOfSecondField = indexOf(line, ' ', 0);
+        if (indexOfSecondField > 0) {
+            int indexOfThirdField = indexOf(line, ' ', indexOfSecondField + 1);
+            if (indexOfThirdField > 0) {
+                return new CdxLineRecordKey(Arrays.copyOf(line, indexOfThirdField));
+            } else if (line.length > indexOfSecondField + 1) {
+                return new CdxLineRecordKey(line);
+            }
+        }
+
+        throw new IllegalArgumentException("The CDX record '" + new String(line)
+                + "' cannot be parsed");
     }
 
     @Override

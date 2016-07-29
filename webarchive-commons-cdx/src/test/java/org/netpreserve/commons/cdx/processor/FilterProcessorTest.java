@@ -49,7 +49,7 @@ public class FilterProcessorTest {
         fp.addFunction(new Filter() {
             @Override
             public boolean include(CdxRecord line) {
-                return String.valueOf(line.get("statuscode")).equals("200");
+                return String.valueOf(line.get("hsc")).equals("200");
             }
 
         });

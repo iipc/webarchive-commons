@@ -53,6 +53,7 @@ public class ClosestCdxIteratorTest {
 
             CdxSource cdxSource = new BlockCdxSource(sourceDescriptor);
             CdxIterator it;
+            it = cdxSource.search(searchKey, null, false).iterator();
 
             // Test with url not in cdx
             it = new ClosestCdxIterator(cdxSource, missingUrl, CdxDate.of("20070905173550"), null);

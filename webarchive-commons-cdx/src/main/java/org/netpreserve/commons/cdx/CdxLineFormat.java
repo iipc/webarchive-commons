@@ -40,12 +40,12 @@ public class CdxLineFormat implements CdxFormat {
             FieldName.URI_KEY,
             FieldName.TIMESTAMP,
             FieldName.ORIGINAL_URI,
-            FieldName.MIME_TYPE,
+            FieldName.CONTENT_TYPE,
             FieldName.RESPONSE_CODE,
             FieldName.DIGEST,
             FieldName.REDIRECT,
             FieldName.ROBOT_FLAGS,
-            FieldName.LENGTH,
+            FieldName.RECORD_LENGTH,
             FieldName.OFFSET,
             FieldName.FILENAME);
 
@@ -56,7 +56,7 @@ public class CdxLineFormat implements CdxFormat {
             FieldName.URI_KEY,
             FieldName.TIMESTAMP,
             FieldName.ORIGINAL_URI,
-            FieldName.MIME_TYPE,
+            FieldName.CONTENT_TYPE,
             FieldName.RESPONSE_CODE,
             FieldName.DIGEST,
             FieldName.REDIRECT,

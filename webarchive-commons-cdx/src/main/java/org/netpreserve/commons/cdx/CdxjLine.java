@@ -16,6 +16,7 @@
 package org.netpreserve.commons.cdx;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -26,33 +27,48 @@ import org.netpreserve.commons.cdx.json.Value;
 /**
  * A representation of a line in a CDX file.
  */
-public class CdxjLine extends BaseCdxRecord<CdxjLineFormat> {
+public class CdxjLine extends BaseCdxRecord<CdxjLineFormat> implements HasUnparsedData {
 
     final char[] data;
-    Map<FieldName, Value> fields;
 
-    public CdxjLine(final char[] key, final char[] value, CdxjLineFormat format) {
-        super(new CdxRecordKey(key), format);
-        this.data = value;
-    }
+    final int jsonBlockOffset;
 
-    public CdxjLine(final char[] line, final CdxjLineFormat format) {
-        super(getKeyFromLine(line), format);
-        this.data = Arrays.copyOfRange(line, getKey().length() + 1, line.length);
-    }
+    Map<FieldName, Field> fields;
 
     public CdxjLine(final String line, final CdxjLineFormat format) {
         this(line.toCharArray(), format);
     }
 
+    public CdxjLine(final char[] line, final CdxjLineFormat format) {
+        super(getKeyFromLine(line), format);
+        this.data = line;
+        this.jsonBlockOffset = ((CdxjLineRecordKey) getKey()).getUnparsed().length;
+
+//        parseFields();
+    }
+
+//    public CdxjLine(final char[] key, final char[] value, CdxjLineFormat format) {
+//        super(new CdxRecordKey(key), format);
+//        this.data = value;
+//    }
+//
+//    public CdxjLine(final char[] line, final CdxjLineFormat format) {
+//        super(getKeyFromLine(line), format);
+//        this.data = Arrays.copyOfRange(line, getKey().length() + 1, line.length);
+//    }
+//
+//    public CdxjLine(final String line, final CdxjLineFormat format) {
+//        this(line.toCharArray(), format);
+//    }
+
     @Override
     public Value get(FieldName fieldName) {
         parseFields();
-        Value v = fields.get(fieldName);
-        if (v == null) {
+        Field f = fields.get(fieldName);
+        if (f == null) {
             return NullValue.NULL;
         } else {
-            return v;
+            return f.getValue();
         }
     }
 
@@ -65,12 +81,16 @@ public class CdxjLine extends BaseCdxRecord<CdxjLineFormat> {
     @Override
     public Iterator<Field> iterator() {
         parseFields();
-        throw new UnsupportedOperationException("Not supported yet.");
+        return fields.values().iterator();
     }
 
-    void parseFields() {
+    final void parseFields() {
         if (fields == null) {
-            fields = new SimpleJsonParser(data, 0).parseObject();
+            Map<FieldName,Value> parsedFieldMap = new SimpleJsonParser(data, jsonBlockOffset).parseObject();
+            fields = new HashMap<>();
+            for (Map.Entry<FieldName, Value> entry : parsedFieldMap.entrySet()) {
+                fields.put(entry.getKey(), new ImmutableField(entry.getKey(), entry.getValue()));
+            }
         }
     }
 
@@ -100,10 +120,24 @@ public class CdxjLine extends BaseCdxRecord<CdxjLineFormat> {
 //        }
 //        return true;
 //    }
+    /**
+     * Extract the fields before the json block from a CDXJ line.
+     * <p>
+     * @param line the line containing the key
+     * @return a CdxRecordKey with the parsed values
+     */
+    static final CdxRecordKey getKeyFromLine(final char[] line) {
+        int indexOfJsonBlock = indexOf(line, '{', 0);
+        if (indexOfJsonBlock == -1) {
+            throw new IllegalArgumentException("The CDX record '" + new String(line)
+                    + "' cannot be parsed");
+        }
+        return new CdxjLineRecordKey(Arrays.copyOf(line, indexOfJsonBlock - 1));
+    }
 
     @Override
-    public char[] toCharArray() {
-        return toString().toCharArray();
+    public char[] getUnparsed() {
+        return data;
     }
 
     @Override

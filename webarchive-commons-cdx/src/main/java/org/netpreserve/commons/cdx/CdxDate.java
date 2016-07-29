@@ -34,7 +34,7 @@ import java.util.Objects;
  * <p>
  * This class is immutable and thread safe.
  */
-public final class CdxDate {
+public final class CdxDate implements Comparable<CdxDate> {
 
     /**
      * A set of allowed granularities for a date.
@@ -370,4 +370,8 @@ public final class CdxDate {
         return true;
     }
 
+    @Override
+    public int compareTo(CdxDate other) {
+        return this.date.compareTo(other.date);
+    }
 }

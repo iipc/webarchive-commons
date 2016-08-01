@@ -16,11 +16,11 @@
 package org.netpreserve.commons.cdx.formatter;
 
 import org.junit.Test;
-import org.netpreserve.commons.cdx.CdxLine;
-import org.netpreserve.commons.cdx.CdxLineFormat;
+import org.netpreserve.commons.cdx.cdxrecord.CdxLine;
+import org.netpreserve.commons.cdx.cdxrecord.CdxLineFormat;
 import org.netpreserve.commons.cdx.CdxRecord;
-import org.netpreserve.commons.cdx.CdxjLine;
-import org.netpreserve.commons.cdx.CdxjLineFormat;
+import org.netpreserve.commons.cdx.cdxrecord.CdxjLine;
+import org.netpreserve.commons.cdx.cdxrecord.CdxjLineFormat;
 
 import static org.assertj.core.api.Assertions.*;
 

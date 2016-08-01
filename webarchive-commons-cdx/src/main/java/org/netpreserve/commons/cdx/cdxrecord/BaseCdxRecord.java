@@ -13,18 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.netpreserve.commons.cdx;
+package org.netpreserve.commons.cdx.cdxrecord;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+import org.netpreserve.commons.cdx.CdxFormat;
+import org.netpreserve.commons.cdx.CdxRecord;
+import org.netpreserve.commons.cdx.CdxRecordKey;
+import org.netpreserve.commons.cdx.FieldName;
 import org.netpreserve.commons.cdx.json.Value;
 
 /**
  * Base class for implementations of CdxRecord.
  * <p>
- * @param <T>
+ * @param <T> The format type allowed for the implementation of this record.
  */
 public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord<T> {
 
@@ -35,34 +39,20 @@ public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord<T>
     protected boolean modified = false;
 
     /**
-     * Factory method for creating CdxRecords.
+     * Constructs an empty BaseCdxRecord.
      * <p>
-     * @param data a character array containing raw record formatted according to the format. Might be null if format
-     * allows.
-     * @param format a forma for the unparsed CDX data.
-     * @return the newly created record.
-     * @throws IllegalArgumentException if CdxFormat is not recognized by this method.
+     * @param format the format for the raw, possibly unparsed data.
      */
-    public static final CdxRecord create(final char[] data, final CdxFormat format) {
-        if (format instanceof CdxLineFormat) {
-            return new CdxLine(data, (CdxLineFormat) format);
-        } else if (format instanceof CdxjLineFormat) {
-            return new CdxjLine(data, (CdxjLineFormat) format);
-        } else if (format instanceof NonCdxLineFormat) {
-            return new UnconnectedCdxRecord();
-        }
-
-        throw new IllegalArgumentException("Unknow CdxFormat: " + format.getClass());
-    }
-
-    public static final CdxRecord create(final String value, final CdxFormat format) {
-        return create(value.toCharArray(), format);
-    }
-
     public BaseCdxRecord(final T format) {
         this.format = format;
     }
 
+    /**
+     * Constructs a BaseCdxRecord with only the key set.
+     * <p>
+     * @param key the key for this record.
+     * @param format the format for the raw, possibly unparsed data.
+     */
     public BaseCdxRecord(final CdxRecordKey key, final T format) {
         this.format = format;
         this.key = key;
@@ -95,59 +85,6 @@ public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord<T>
     }
 
     /**
-     * Helper method to find the index of a character in a char array.
-     * <p>
-     * @param src the array to search
-     * @param ch the char to look for
-     * @param fromIndex where in the src to start. If &lt;= 0, the beggining of the array is assumed. If &gt;=
-     * src.length, then -1 is returned.
-     * @return the index of the first occurence of ch or -1 if not found.
-     */
-    public static int indexOf(char[] src, char ch, int fromIndex) {
-        final int max = src.length;
-        if (fromIndex < 0) {
-            fromIndex = 0;
-        } else if (fromIndex >= max) {
-            // Note: fromIndex might be near -1>>>1.
-            return -1;
-        }
-
-        final char[] value = src;
-        for (int i = fromIndex; i < max; i++) {
-            if (value[i] == ch) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    /**
-     * Helper method to find the last index of a character in a char array.
-     * <p>
-     * @param src the array to search
-     * @param ch the char to look for
-     * @param fromIndex where in the src to start, searching backwards. If &lt;= 0, the beggining of the array is
-     * assumed. If &gt;= src.length, then -1 is returned.
-     * @return the index of the last occurence of ch or -1 if not found.
-     */
-    public static int lastIndexOf(char[] src, char ch, int fromIndex) {
-        if (fromIndex < 0) {
-            fromIndex = 0;
-        } else if (fromIndex >= src.length) {
-            // Note: fromIndex might be near -1>>>1.
-            return -1;
-        }
-
-        final char[] value = src;
-        for (int i = fromIndex; i >= 0; i--) {
-            if (value[i] == ch) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    /**
      * Helper class for implementing an iterator over a CdxRecord's fields.
      */
     protected abstract class FieldIterator implements Iterator<CdxRecord.Field> {
@@ -159,10 +96,7 @@ public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord<T>
             if (next == null) {
                 next = getNext();
             }
-            if (next == null) {
-                return false;
-            }
-            return true;
+            return next != null;
         }
 
         @Override

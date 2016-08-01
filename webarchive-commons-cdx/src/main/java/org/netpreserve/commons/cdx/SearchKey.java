@@ -15,6 +15,8 @@
  */
 package org.netpreserve.commons.cdx;
 
+import org.netpreserve.commons.util.datetime.DateTimeRange;
+
 import java.nio.ByteBuffer;
 import java.util.function.Predicate;
 
@@ -43,7 +45,7 @@ public class SearchKey implements Cloneable {
 
     private Uri uri;
 
-    private CdxDateRange dateRange;
+    private DateTimeRange dateRange;
 
     private String surtUriFrom;
 
@@ -95,7 +97,7 @@ public class SearchKey implements Cloneable {
         return this;
     }
 
-    public SearchKey dateRange(final CdxDateRange value) {
+    public SearchKey dateRange(final DateTimeRange value) {
         this.dateRange = value;
         return this;
     }
@@ -120,7 +122,7 @@ public class SearchKey implements Cloneable {
         return uriMatchType;
     }
 
-    public CdxDateRange getDateRange() {
+    public DateTimeRange getDateRange() {
         return dateRange;
     }
 

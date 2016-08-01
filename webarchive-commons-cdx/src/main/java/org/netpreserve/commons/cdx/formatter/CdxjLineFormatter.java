@@ -21,7 +21,7 @@ import java.io.Writer;
 import org.netpreserve.commons.cdx.CdxFormat;
 import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.CdxRecordKey;
-import org.netpreserve.commons.cdx.CdxjLineRecordKey;
+import org.netpreserve.commons.cdx.cdxrecord.CdxjLineRecordKey;
 import org.netpreserve.commons.cdx.FieldName;
 
 /**

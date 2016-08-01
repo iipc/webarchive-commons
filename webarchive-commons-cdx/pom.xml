@@ -21,6 +21,11 @@
             <artifactId>webarchive-commons-uri</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.netpreserve.commons</groupId>
+            <artifactId>webarchive-commons-util</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

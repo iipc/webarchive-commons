@@ -21,10 +21,10 @@ import java.util.List;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.netpreserve.commons.cdx.BaseCdxRecord;
 import org.netpreserve.commons.cdx.CdxFormat;
-import org.netpreserve.commons.cdx.CdxLineFormat;
+import org.netpreserve.commons.cdx.cdxrecord.CdxLineFormat;
 import org.netpreserve.commons.cdx.CdxRecord;
+import org.netpreserve.commons.cdx.CdxRecordFactory;
 import org.netpreserve.commons.cdx.FieldName;
 import org.netpreserve.commons.cdx.functions.CollapseFieldProvider.CollapseField;
 
@@ -44,11 +44,11 @@ public class CollapseFieldProviderTest {
     @Test
     public void testApplySubpartOfField() {
         // test with 4 digit timestamp
-        CdxRecord line1 = BaseCdxRecord.create(
+        CdxRecord line1 = CdxRecordFactory.create(
                 "no,dagbladet)/spiller_2519.html 20070908002541", format);
-        CdxRecord line2 = BaseCdxRecord.create(
+        CdxRecord line2 = CdxRecordFactory.create(
                 "no,dagbladet)/spiller_2520.html 20070908002532", format);
-        CdxRecord line3 = BaseCdxRecord.create(
+        CdxRecord line3 = CdxRecordFactory.create(
                 "no,dagbladet)/spiller_2520.html 20080908002532", format);
         CollapseField cf = new CollapseFieldProvider(
                 Collections.singletonList(FieldName.TIMESTAMP + ":4")).newFunction();
@@ -60,9 +60,9 @@ public class CollapseFieldProviderTest {
                 .hasToString("no,dagbladet)/spiller_2520.html 20080908002532");
 
         // test with 12 digit timestamp
-        line1 = BaseCdxRecord.create("no,dagbladet)/spiller_2519.html 20070908002541", format);
-        line2 = BaseCdxRecord.create("no,dagbladet)/spiller_2520.html 20070908002532", format);
-        line3 = BaseCdxRecord.create("no,dagbladet)/spiller_2520.html 20080908002532", format);
+        line1 = CdxRecordFactory.create("no,dagbladet)/spiller_2519.html 20070908002541", format);
+        line2 = CdxRecordFactory.create("no,dagbladet)/spiller_2520.html 20070908002532", format);
+        line3 = CdxRecordFactory.create("no,dagbladet)/spiller_2520.html 20080908002532", format);
         cf = new CollapseFieldProvider(
                 Collections.singletonList(FieldName.TIMESTAMP + ":12")).newFunction();
 
@@ -73,9 +73,9 @@ public class CollapseFieldProviderTest {
                 .hasToString("no,dagbladet)/spiller_2520.html 20080908002532");
 
         // test with 13 digit timestamp
-        line1 = BaseCdxRecord.create("no,dagbladet)/spiller_2519.html 20070908002541", format);
-        line2 = BaseCdxRecord.create("no,dagbladet)/spiller_2520.html 20070908002532", format);
-        line3 = BaseCdxRecord.create("no,dagbladet)/spiller_2520.html 20080908002532", format);
+        line1 = CdxRecordFactory.create("no,dagbladet)/spiller_2519.html 20070908002541", format);
+        line2 = CdxRecordFactory.create("no,dagbladet)/spiller_2520.html 20070908002532", format);
+        line3 = CdxRecordFactory.create("no,dagbladet)/spiller_2520.html 20080908002532", format);
         cf = new CollapseFieldProvider(
                 Collections.singletonList(FieldName.TIMESTAMP + ":13")).newFunction();
 
@@ -87,9 +87,9 @@ public class CollapseFieldProviderTest {
                 .hasToString("no,dagbladet)/spiller_2520.html 20080908002532");
 
         // test with 14 digit timestamp
-        line1 = BaseCdxRecord.create("no,dagbladet)/spiller_2519.html 20070908002541", format);
-        line2 = BaseCdxRecord.create("no,dagbladet)/spiller_2520.html 20070908002532", format);
-        line3 = BaseCdxRecord.create("no,dagbladet)/spiller_2520.html 20080908002532", format);
+        line1 = CdxRecordFactory.create("no,dagbladet)/spiller_2519.html 20070908002541", format);
+        line2 = CdxRecordFactory.create("no,dagbladet)/spiller_2520.html 20070908002532", format);
+        line3 = CdxRecordFactory.create("no,dagbladet)/spiller_2520.html 20080908002532", format);
         cf = new CollapseFieldProvider(
                 Collections.singletonList(FieldName.TIMESTAMP + ":14")).newFunction();
 
@@ -101,9 +101,9 @@ public class CollapseFieldProviderTest {
                 .hasToString("no,dagbladet)/spiller_2520.html 20080908002532");
 
         // test with 18 digit timestamp (larger than timestamp field)
-        line1 = BaseCdxRecord.create("no,dagbladet)/spiller_2519.html 20070908002541", format);
-        line2 = BaseCdxRecord.create("no,dagbladet)/spiller_2520.html 20070908002532", format);
-        line3 = BaseCdxRecord.create("no,dagbladet)/spiller_2520.html 20080908002532", format);
+        line1 = CdxRecordFactory.create("no,dagbladet)/spiller_2519.html 20070908002541", format);
+        line2 = CdxRecordFactory.create("no,dagbladet)/spiller_2520.html 20070908002532", format);
+        line3 = CdxRecordFactory.create("no,dagbladet)/spiller_2520.html 20080908002532", format);
         cf = new CollapseFieldProvider(
                 Collections.singletonList(FieldName.TIMESTAMP + ":18")).newFunction();
 
@@ -117,20 +117,20 @@ public class CollapseFieldProviderTest {
 
     @Test
     public void testApplyTwoFiles() {
-        CdxRecord line11 = BaseCdxRecord.create(
+        CdxRecord line11 = CdxRecordFactory.create(
                 "no,dagbladet)/spiller_2519.html 20070908002541", format);
-        CdxRecord line12 = BaseCdxRecord.create(
+        CdxRecord line12 = CdxRecordFactory.create(
                 "no,dagbladet)/spiller_2520.html 20070908002532", format);
-        CdxRecord line13 = BaseCdxRecord.create(
+        CdxRecord line13 = CdxRecordFactory.create(
                 "no,dagbladet)/spiller_2521.html 20080908002533", format);
 
-        CdxRecord line21 = BaseCdxRecord.create(
+        CdxRecord line21 = CdxRecordFactory.create(
                 "no,dagbladet)/spiller_2519.html 20070908002540", format);
-        CdxRecord line22 = BaseCdxRecord.create(
+        CdxRecord line22 = CdxRecordFactory.create(
                 "no,dagbladet)/spiller_2520.html 20070908002533", format);
-        CdxRecord line23 = BaseCdxRecord.create(
+        CdxRecord line23 = CdxRecordFactory.create(
                 "no,dagbladet)/spiller_2521.html 20080908002534", format);
-        CdxRecord line24 = BaseCdxRecord.create(
+        CdxRecord line24 = CdxRecordFactory.create(
                 "no,dagbladet)/spiller_2522.html 20090908002534", format);
 
         CollapseFieldProvider cfp = new CollapseFieldProvider(Collections
@@ -168,10 +168,10 @@ public class CollapseFieldProviderTest {
 
     @Test
     public void testApplyUrlkey() {
-        CdxRecord line1 = BaseCdxRecord.create("ab 1900", format);
-        CdxRecord line2 = BaseCdxRecord.create("ab 1901", format);
-        CdxRecord line3 = BaseCdxRecord.create("ac 1900", format);
-        CdxRecord line4 = BaseCdxRecord.create("ac 1901", format);
+        CdxRecord line1 = CdxRecordFactory.create("ab 1900", format);
+        CdxRecord line2 = CdxRecordFactory.create("ab 1901", format);
+        CdxRecord line3 = CdxRecordFactory.create("ac 1900", format);
+        CdxRecord line4 = CdxRecordFactory.create("ac 1901", format);
 
         CollapseField cf = new CollapseFieldProvider(toCollapseList(FieldName.URI_KEY.toString()))
                 .newFunction();
@@ -186,10 +186,10 @@ public class CollapseFieldProviderTest {
 
     @Test
     public void testApplyTimestamp() {
-        CdxRecord line1 = BaseCdxRecord.create("ab 1900", format);
-        CdxRecord line2 = BaseCdxRecord.create("ab 1901", format);
-        CdxRecord line3 = BaseCdxRecord.create("ac 1900", format);
-        CdxRecord line4 = BaseCdxRecord.create("ac 1901", format);
+        CdxRecord line1 = CdxRecordFactory.create("ab 1900", format);
+        CdxRecord line2 = CdxRecordFactory.create("ab 1901", format);
+        CdxRecord line3 = CdxRecordFactory.create("ac 1900", format);
+        CdxRecord line4 = CdxRecordFactory.create("ac 1901", format);
 
         CollapseField cf = new CollapseFieldProvider(toCollapseList(FieldName.TIMESTAMP.toString()))
                 .newFunction();
@@ -204,10 +204,10 @@ public class CollapseFieldProviderTest {
 
     @Test
     public void testApplyUrlkeyAndTimestamp() {
-        CdxRecord line1 = BaseCdxRecord.create("ab 1900", format);
-        CdxRecord line2 = BaseCdxRecord.create("ab 1901", format);
-        CdxRecord line3 = BaseCdxRecord.create("ac 1900", format);
-        CdxRecord line4 = BaseCdxRecord.create("ac 1901", format);
+        CdxRecord line1 = CdxRecordFactory.create("ab 1900", format);
+        CdxRecord line2 = CdxRecordFactory.create("ab 1901", format);
+        CdxRecord line3 = CdxRecordFactory.create("ac 1900", format);
+        CdxRecord line4 = CdxRecordFactory.create("ac 1901", format);
 
         CollapseField cf = new CollapseFieldProvider(
                 toCollapseList(FieldName.URI_KEY + "," + FieldName.TIMESTAMP)).newFunction();
@@ -224,10 +224,10 @@ public class CollapseFieldProviderTest {
 
     @Test
     public void testApplyTimestampAndUrlkey() {
-        CdxRecord line1 = BaseCdxRecord.create("ab 1900", format);
-        CdxRecord line2 = BaseCdxRecord.create("ab 1901", format);
-        CdxRecord line3 = BaseCdxRecord.create("ac 1900", format);
-        CdxRecord line4 = BaseCdxRecord.create("ac 1901", format);
+        CdxRecord line1 = CdxRecordFactory.create("ab 1900", format);
+        CdxRecord line2 = CdxRecordFactory.create("ab 1901", format);
+        CdxRecord line3 = CdxRecordFactory.create("ac 1900", format);
+        CdxRecord line4 = CdxRecordFactory.create("ac 1901", format);
 
         CollapseField cf = new CollapseFieldProvider(
                 toCollapseList(FieldName.TIMESTAMP + "," + FieldName.URI_KEY)).newFunction();
@@ -244,10 +244,10 @@ public class CollapseFieldProviderTest {
 
     @Test
     public void testApplyUrlkeyAndTimestampSeparateCollapseFunction() {
-        CdxRecord line1 = BaseCdxRecord.create("ab 1900", format);
-        CdxRecord line2 = BaseCdxRecord.create("ab 1901", format);
-        CdxRecord line3 = BaseCdxRecord.create("ac 1900", format);
-        CdxRecord line4 = BaseCdxRecord.create("ac 1901", format);
+        CdxRecord line1 = CdxRecordFactory.create("ab 1900", format);
+        CdxRecord line2 = CdxRecordFactory.create("ab 1901", format);
+        CdxRecord line3 = CdxRecordFactory.create("ac 1900", format);
+        CdxRecord line4 = CdxRecordFactory.create("ac 1901", format);
 
         CollapseField cf1 = new CollapseFieldProvider(toCollapseList(FieldName.URI_KEY.toString()))
                 .newFunction();
@@ -273,10 +273,10 @@ public class CollapseFieldProviderTest {
 
     @Test
     public void testApplyTimestampAndUrlkeySeparateCollapseFunction() {
-        CdxRecord line1 = BaseCdxRecord.create("ab 1900", format);
-        CdxRecord line2 = BaseCdxRecord.create("ab 1901", format);
-        CdxRecord line3 = BaseCdxRecord.create("ac 1900", format);
-        CdxRecord line4 = BaseCdxRecord.create("ac 1901", format);
+        CdxRecord line1 = CdxRecordFactory.create("ab 1900", format);
+        CdxRecord line2 = CdxRecordFactory.create("ab 1901", format);
+        CdxRecord line3 = CdxRecordFactory.create("ac 1900", format);
+        CdxRecord line4 = CdxRecordFactory.create("ac 1901", format);
 
         CollapseField cf1 = new CollapseFieldProvider(
                 toCollapseList(FieldName.TIMESTAMP.toString())).newFunction();

@@ -22,7 +22,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.junit.Test;
-import org.netpreserve.commons.cdx.CdxLineFormat;
+import org.netpreserve.commons.cdx.cdxrecord.CdxLineFormat;
 import org.netpreserve.commons.cdx.FieldName;
 import org.netpreserve.commons.cdx.SearchKey;
 

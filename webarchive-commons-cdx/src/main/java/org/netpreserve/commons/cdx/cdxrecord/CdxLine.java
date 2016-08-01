@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.netpreserve.commons.cdx;
+package org.netpreserve.commons.cdx.cdxrecord;
 
 import java.util.Arrays;
 import java.util.Iterator;
 
+import org.netpreserve.commons.cdx.CdxRecordKey;
+import org.netpreserve.commons.cdx.FieldName;
+import org.netpreserve.commons.cdx.HasUnparsedData;
 import org.netpreserve.commons.cdx.json.BooleanValue;
 import org.netpreserve.commons.cdx.json.NullValue;
 import org.netpreserve.commons.cdx.json.NumberValue;
@@ -25,9 +28,10 @@ import org.netpreserve.commons.cdx.json.StringValue;
 import org.netpreserve.commons.cdx.json.TimestampValue;
 import org.netpreserve.commons.cdx.json.UriValue;
 import org.netpreserve.commons.cdx.json.Value;
+import org.netpreserve.commons.util.ArrayUtil;
 
 /**
- * A representation of a line in a legacy CDX file.
+ * A CdxRecord constructed from a CDX formatted input line in the legacy CDX format.
  */
 public class CdxLine extends BaseCdxRecord<CdxLineFormat> implements HasUnparsedData {
 
@@ -41,10 +45,22 @@ public class CdxLine extends BaseCdxRecord<CdxLineFormat> implements HasUnparsed
 
     private transient Value[] fieldCache;
 
+    /**
+     * Construct a new CdxLine.
+     *
+     * @param line a string containing the raw data.
+     * @param format the format of the input line.
+     */
     public CdxLine(final String line, final CdxLineFormat format) {
         this(line.toCharArray(), format);
     }
 
+    /**
+     * Construct a new CdxLine.
+     *
+     * @param line a character array containing the raw data.
+     * @param format the format of the input line.
+     */
     public CdxLine(final char[] line, final CdxLineFormat format) {
         super(getKeyFromLine(line), format);
         this.data = line;
@@ -58,10 +74,10 @@ public class CdxLine extends BaseCdxRecord<CdxLineFormat> implements HasUnparsed
     }
 
     /**
-     * Get the field at a certain position in the input line.
+     * Get the field value at a certain position in the input line.
      * <p>
      * @param fieldIndex the index of the field requested
-     * @return the fields value
+     * @return the field's value
      */
     public Value get(int fieldIndex) {
         if (fieldIndex < 0 || fieldIndex >= fieldOffsets.length) {
@@ -70,6 +86,13 @@ public class CdxLine extends BaseCdxRecord<CdxLineFormat> implements HasUnparsed
         return getValue(getCdxFormat().getField(fieldIndex), fieldIndex);
     }
 
+    /**
+     * Get a field value.
+     *
+     * @param name the field name
+     * @param fieldIndex the field index in the input line
+     * @return the field's value
+     */
     private Value getValue(FieldName name, int fieldIndex) {
         if (fieldIndex < 0 || fieldIndex > getCdxFormat().getLength()) {
             return NullValue.NULL;
@@ -191,6 +214,9 @@ public class CdxLine extends BaseCdxRecord<CdxLineFormat> implements HasUnparsed
         };
     }
 
+    /**
+     * Find the positions of the fields in the underlying character array.
+     */
     private void parseFields() {
         int fieldCount = 0;
         int lastIndex = 0;
@@ -200,7 +226,7 @@ public class CdxLine extends BaseCdxRecord<CdxLineFormat> implements HasUnparsed
         fieldLengths = new int[getCdxFormat().getLength()];
 
         do {
-            currIndex = indexOf(data, delimiter, lastIndex);
+            currIndex = ArrayUtil.indexOf(data, delimiter, lastIndex);
             if (currIndex > 0) {
                 fieldOffsets[fieldCount] = lastIndex;
                 fieldLengths[fieldCount] = currIndex - lastIndex;
@@ -221,9 +247,9 @@ public class CdxLine extends BaseCdxRecord<CdxLineFormat> implements HasUnparsed
      * @return a CdxRecordKey with the parsed values
      */
     static final CdxRecordKey getKeyFromLine(final char[] line) {
-        int indexOfSecondField = indexOf(line, ' ', 0);
+        int indexOfSecondField = ArrayUtil.indexOf(line, ' ', 0);
         if (indexOfSecondField > 0) {
-            int indexOfThirdField = indexOf(line, ' ', indexOfSecondField + 1);
+            int indexOfThirdField = ArrayUtil.indexOf(line, ' ', indexOfSecondField + 1);
             if (indexOfThirdField > 0) {
                 return new CdxLineRecordKey(Arrays.copyOf(line, indexOfThirdField));
             } else if (line.length > indexOfSecondField + 1) {
@@ -237,12 +263,8 @@ public class CdxLine extends BaseCdxRecord<CdxLineFormat> implements HasUnparsed
 
     @Override
     public int hashCode() {
-        int hash = 1;
-        char[] array = data;
-        int limit = fieldLengths[0] + fieldLengths[1];
-        for (int i = limit; i >= 0; i--) {
-            hash = 31 * hash + (int) array[i];
-        }
+        int hash = 3;
+        hash = 73 * hash + Arrays.hashCode(this.data);
         return hash;
     }
 

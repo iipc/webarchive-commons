@@ -26,9 +26,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.junit.Test;
-import org.netpreserve.commons.cdx.CdxLine;
+import org.netpreserve.commons.cdx.cdxrecord.CdxLine;
 import org.netpreserve.commons.cdx.functions.Filter;
-import org.netpreserve.commons.cdx.CdxLineFormat;
+import org.netpreserve.commons.cdx.cdxrecord.CdxLineFormat;
 import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.processor.Processor;
 import org.netpreserve.commons.cdx.CdxSource;

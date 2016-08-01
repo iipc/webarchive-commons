@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.netpreserve.commons.cdx.CdxDate;
-import org.netpreserve.commons.cdx.CdxDateRange;
+import org.netpreserve.commons.util.datetime.VariablePrecisionDateTime;
+import org.netpreserve.commons.util.datetime.DateTimeRange;
 import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.CdxSource;
 import org.netpreserve.commons.cdx.FieldName;
@@ -46,7 +46,7 @@ public class ClosestCdxIterator implements CdxIterator {
 
     final CdxIterator backwardIterator;
 
-    final CdxDate timestamp;
+    final VariablePrecisionDateTime timestamp;
 
     CdxRecord nextLine;
 
@@ -54,14 +54,14 @@ public class ClosestCdxIterator implements CdxIterator {
 
     Candidate nextBackwardCandidate;
 
-    public ClosestCdxIterator(CdxSource source, SearchKey key, CdxDate timestamp, List<Processor> processors) {
+    public ClosestCdxIterator(CdxSource source, SearchKey key, VariablePrecisionDateTime timestamp, List<Processor> processors) {
 
         if (key.getMatchType() != SearchKey.UriMatchType.EXACT) {
             throw new IllegalArgumentException("Closest match not allowed for wildcard uri");
         }
 
-        SearchKey forwardKey = key.clone().dateRange(CdxDateRange.start(timestamp));
-        SearchKey backwardKey = key.clone().dateRange(CdxDateRange.end(timestamp));
+        SearchKey forwardKey = key.clone().dateRange(DateTimeRange.start(timestamp));
+        SearchKey backwardKey = key.clone().dateRange(DateTimeRange.end(timestamp));
 
         forwardResult = source.search(forwardKey, processors, false);
         backwardResult = source.search(backwardKey, processors, true);

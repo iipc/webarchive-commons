@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.netpreserve.commons.cdx.CdxFormat;
-import org.netpreserve.commons.cdx.CdxLineFormat;
-import org.netpreserve.commons.cdx.CdxjLineFormat;
+import org.netpreserve.commons.cdx.cdxrecord.CdxLineFormat;
+import org.netpreserve.commons.cdx.cdxrecord.CdxjLineFormat;
 import org.netpreserve.commons.cdx.SearchKey;
 
 /**

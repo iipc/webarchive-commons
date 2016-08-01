@@ -22,12 +22,12 @@ import java.util.Collections;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.netpreserve.commons.cdx.BaseCdxRecord;
-import org.netpreserve.commons.cdx.CdxLine;
+import org.netpreserve.commons.cdx.cdxrecord.CdxLine;
 import org.netpreserve.commons.cdx.cdxsource.CdxIterator;
 import org.netpreserve.commons.cdx.CdxFormat;
-import org.netpreserve.commons.cdx.CdxLineFormat;
+import org.netpreserve.commons.cdx.cdxrecord.CdxLineFormat;
 import org.netpreserve.commons.cdx.CdxRecord;
+import org.netpreserve.commons.cdx.CdxRecordFactory;
 import org.netpreserve.commons.cdx.CdxSource;
 import org.netpreserve.commons.cdx.FieldName;
 import org.netpreserve.commons.cdx.SearchKey;
@@ -89,20 +89,20 @@ public class BiFunctionProcessorTest {
     public void testProcessorIteratorWithCollapse() {
         CdxFormat format = new CdxLineFormat(' ', FieldName.URI_KEY, FieldName.TIMESTAMP);
 
-        CdxRecord line11 = BaseCdxRecord
+        CdxRecord line11 = CdxRecordFactory
                 .create("no,dagbladet)/spiller_2519.html 20070908002541", format);
-        CdxRecord line12 = BaseCdxRecord
+        CdxRecord line12 = CdxRecordFactory
                 .create("no,dagbladet)/spiller_2520.html 20070908002532", format);
-        CdxRecord line13 = BaseCdxRecord
+        CdxRecord line13 = CdxRecordFactory
                 .create("no,dagbladet)/spiller_2521.html 20080908002533", format);
 
-        CdxRecord line21 = BaseCdxRecord
+        CdxRecord line21 = CdxRecordFactory
                 .create("no,dagbladet)/spiller_2519.html 20070908002540", format);
-        CdxRecord line22 = BaseCdxRecord
+        CdxRecord line22 = CdxRecordFactory
                 .create("no,dagbladet)/spiller_2520.html 20070908002533", format);
-        CdxRecord line23 = BaseCdxRecord
+        CdxRecord line23 = CdxRecordFactory
                 .create("no,dagbladet)/spiller_2521.html 20080908002534", format);
-        CdxRecord line24 = BaseCdxRecord
+        CdxRecord line24 = CdxRecordFactory
                 .create("no,dagbladet)/spiller_2522.html 20090908002534", format);
 
         CollapseFieldProvider cf = new CollapseFieldProvider(
@@ -130,10 +130,10 @@ public class BiFunctionProcessorTest {
     public void testProcessorIteratorWithCollapse2() {
         CdxFormat format = new CdxLineFormat(' ', FieldName.URI_KEY, FieldName.TIMESTAMP);
 
-        CdxRecord line1 = BaseCdxRecord.create("ab 00", format);
-        CdxRecord line2 = BaseCdxRecord.create("ab 01", format);
-        CdxRecord line3 = BaseCdxRecord.create("ac 00", format);
-        CdxRecord line4 = BaseCdxRecord.create("ac 01", format);
+        CdxRecord line1 = CdxRecordFactory.create("ab 00", format);
+        CdxRecord line2 = CdxRecordFactory.create("ab 01", format);
+        CdxRecord line3 = CdxRecordFactory.create("ac 00", format);
+        CdxRecord line4 = CdxRecordFactory.create("ac 01", format);
 
         CollapseFieldProvider cf1 = new CollapseFieldProvider(
                 Collections.singletonList(FieldName.URI_KEY.toString()));
@@ -155,10 +155,10 @@ public class BiFunctionProcessorTest {
     public void testProcessorIteratorWithCollapse3() {
         CdxFormat format = new CdxLineFormat(' ', FieldName.URI_KEY, FieldName.TIMESTAMP);
 
-        CdxRecord line1 = BaseCdxRecord.create("ab 00", format);
-        CdxRecord line2 = BaseCdxRecord.create("ab 01", format);
-        CdxRecord line3 = BaseCdxRecord.create("ac 00", format);
-        CdxRecord line4 = BaseCdxRecord.create("ac 01", format);
+        CdxRecord line1 = CdxRecordFactory.create("ab 00", format);
+        CdxRecord line2 = CdxRecordFactory.create("ab 01", format);
+        CdxRecord line3 = CdxRecordFactory.create("ac 00", format);
+        CdxRecord line4 = CdxRecordFactory.create("ac 01", format);
 
         CollapseFieldProvider cf1 = new CollapseFieldProvider(
                 Collections.singletonList(FieldName.URI_KEY.toString()));

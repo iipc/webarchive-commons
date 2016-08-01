@@ -13,21 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.netpreserve.commons.cdx;
+
+package org.netpreserve.commons.cdx.cdxrecord;
+
+import org.netpreserve.commons.cdx.CdxFormat;
 
 /**
- * A format indicating that the CdxRecord is not connected to an unparsed line format.
+ *
  */
-public final class NonCdxLineFormat implements CdxFormat {
-    /**
-     * The single instance of this format.
-     */
-    public static final NonCdxLineFormat FORMAT = new NonCdxLineFormat();
-
-    /**
-     * Private constructor to avoid instantiation.
-     */
-    private NonCdxLineFormat() {
-    }
+public class CdxjLineFormat implements CdxFormat {
+    public static final CdxjLineFormat DEFAULT_CDXJLINE = new CdxjLineFormat();
 
 }

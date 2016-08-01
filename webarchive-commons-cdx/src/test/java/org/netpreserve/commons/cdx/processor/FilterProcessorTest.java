@@ -16,9 +16,9 @@
 package org.netpreserve.commons.cdx.processor;
 
 import org.junit.Test;
-import org.netpreserve.commons.cdx.CdxLine;
+import org.netpreserve.commons.cdx.cdxrecord.CdxLine;
 import org.netpreserve.commons.cdx.cdxsource.CdxIterator;
-import org.netpreserve.commons.cdx.CdxLineFormat;
+import org.netpreserve.commons.cdx.cdxrecord.CdxLineFormat;
 import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.cdxsource.MockCdxIterator;
 import org.netpreserve.commons.cdx.functions.Filter;

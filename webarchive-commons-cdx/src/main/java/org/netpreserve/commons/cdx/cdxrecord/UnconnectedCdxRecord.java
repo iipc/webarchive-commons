@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.netpreserve.commons.cdx;
+package org.netpreserve.commons.cdx.cdxrecord;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.netpreserve.commons.cdx.FieldName;
 import org.netpreserve.commons.cdx.json.NullValue;
 import org.netpreserve.commons.cdx.json.Value;
 

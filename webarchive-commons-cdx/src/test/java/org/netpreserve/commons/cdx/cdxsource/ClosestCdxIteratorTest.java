@@ -22,11 +22,11 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 
 import org.junit.Test;
-import org.netpreserve.commons.cdx.BaseCdxRecord;
-import org.netpreserve.commons.cdx.CdxDate;
+import org.netpreserve.commons.util.datetime.VariablePrecisionDateTime;
 import org.netpreserve.commons.cdx.CdxFormat;
-import org.netpreserve.commons.cdx.CdxLineFormat;
+import org.netpreserve.commons.cdx.cdxrecord.CdxLineFormat;
 import org.netpreserve.commons.cdx.CdxRecord;
+import org.netpreserve.commons.cdx.CdxRecordFactory;
 import org.netpreserve.commons.cdx.CdxSource;
 import org.netpreserve.commons.cdx.SearchKey;
 
@@ -56,32 +56,32 @@ public class ClosestCdxIteratorTest {
             it = cdxSource.search(searchKey, null, false).iterator();
 
             // Test with url not in cdx
-            it = new ClosestCdxIterator(cdxSource, missingUrl, CdxDate.of("20070905173550"), null);
+            it = new ClosestCdxIterator(cdxSource, missingUrl, VariablePrecisionDateTime.of("20070905173550"), null);
             assertThat(it).isEmpty();
 
             // Test with timestamp equal to one of the lines
-            it = new ClosestCdxIterator(cdxSource, searchKey, CdxDate.of("20070905173550"), null);
+            it = new ClosestCdxIterator(cdxSource, searchKey, VariablePrecisionDateTime.of("20070905173550"), null);
             assertThat(it).hasSize(2).usingElementComparator(comparator).containsExactly(
-                    BaseCdxRecord.create(searchKey.getUri() + " 20070905173550", format),
-                    BaseCdxRecord.create(searchKey.getUri() + " 20070822103939", format));
+                    CdxRecordFactory.create(searchKey.getUri() + " 20070905173550", format),
+                    CdxRecordFactory.create(searchKey.getUri() + " 20070822103939", format));
 
             // Test with timestamp in between the lines
-            it = new ClosestCdxIterator(cdxSource, searchKey, CdxDate.of("20070823173549"), null);
+            it = new ClosestCdxIterator(cdxSource, searchKey, VariablePrecisionDateTime.of("20070823173549"), null);
             assertThat(it).hasSize(2).usingElementComparator(comparator).containsExactly(
-                    BaseCdxRecord.create(searchKey.getUri() + " 20070822103939", format),
-                    BaseCdxRecord.create(searchKey.getUri() + " 20070905173550", format));
+                    CdxRecordFactory.create(searchKey.getUri() + " 20070822103939", format),
+                    CdxRecordFactory.create(searchKey.getUri() + " 20070905173550", format));
 
             // Test with timestamp earlier than all the lines
-            it = new ClosestCdxIterator(cdxSource, searchKey, CdxDate.of("20060823173549"), null);
+            it = new ClosestCdxIterator(cdxSource, searchKey, VariablePrecisionDateTime.of("20060823173549"), null);
             assertThat(it).hasSize(2).usingElementComparator(comparator).containsExactly(
-                    BaseCdxRecord.create(searchKey.getUri() + " 20070822103939", format),
-                    BaseCdxRecord.create(searchKey.getUri() + " 20070905173550", format));
+                    CdxRecordFactory.create(searchKey.getUri() + " 20070822103939", format),
+                    CdxRecordFactory.create(searchKey.getUri() + " 20070905173550", format));
 
             // Test with timestamp later than all the lines
-            it = new ClosestCdxIterator(cdxSource, searchKey, CdxDate.of("20090823173549"), null);
+            it = new ClosestCdxIterator(cdxSource, searchKey, VariablePrecisionDateTime.of("20090823173549"), null);
             assertThat(it).hasSize(2).usingElementComparator(comparator).containsExactly(
-                    BaseCdxRecord.create(searchKey.getUri() + " 20070905173550", format),
-                    BaseCdxRecord.create(searchKey.getUri() + " 20070822103939", format));
+                    CdxRecordFactory.create(searchKey.getUri() + " 20070905173550", format),
+                    CdxRecordFactory.create(searchKey.getUri() + " 20070822103939", format));
         }
     }
 
@@ -99,16 +99,16 @@ public class ClosestCdxIteratorTest {
             CdxSource cdxSource = new BlockCdxSource(sourceDescriptor);
             CdxIterator it;
 
-            it = new ClosestCdxIterator(cdxSource, missingUrl, CdxDate.of("20070905173550"), null);
+            it = new ClosestCdxIterator(cdxSource, missingUrl, VariablePrecisionDateTime.of("20070905173550"), null);
             assertThat((Comparable) it.peek()).isNull();
 
-            it = new ClosestCdxIterator(cdxSource, searchKey, CdxDate.of("20070905173550"), null);
+            it = new ClosestCdxIterator(cdxSource, searchKey, VariablePrecisionDateTime.of("20070905173550"), null);
             assertThat((Comparable) it.peek())
-                    .isEqualByComparingTo(BaseCdxRecord.create(searchKey.getUri() + " 20070905173550", format));
+                    .isEqualByComparingTo(CdxRecordFactory.create(searchKey.getUri() + " 20070905173550", format));
 
-            it = new ClosestCdxIterator(cdxSource, searchKey, CdxDate.of("20070823173549"), null);
+            it = new ClosestCdxIterator(cdxSource, searchKey, VariablePrecisionDateTime.of("20070823173549"), null);
             assertThat((Comparable) it.peek())
-                    .isEqualByComparingTo(BaseCdxRecord.create(searchKey.getUri() + " 20070822103939", format));
+                    .isEqualByComparingTo(CdxRecordFactory.create(searchKey.getUri() + " 20070822103939", format));
         }
     }
 
@@ -126,13 +126,13 @@ public class ClosestCdxIteratorTest {
             CdxSource cdxSource = new BlockCdxSource(sourceDescriptor);
             CdxIterator it;
 
-            it = new ClosestCdxIterator(cdxSource, missingUrl, CdxDate.of("20070905173550"), null);
+            it = new ClosestCdxIterator(cdxSource, missingUrl, VariablePrecisionDateTime.of("20070905173550"), null);
             assertThat(it.hasNext()).isFalse();
 
-            it = new ClosestCdxIterator(cdxSource, searchKey, CdxDate.of("20070905173550"), null);
+            it = new ClosestCdxIterator(cdxSource, searchKey, VariablePrecisionDateTime.of("20070905173550"), null);
             assertThat(it.hasNext()).isTrue();
 
-            it = new ClosestCdxIterator(cdxSource, searchKey, CdxDate.of("20070823173549"), null);
+            it = new ClosestCdxIterator(cdxSource, searchKey, VariablePrecisionDateTime.of("20070823173549"), null);
             assertThat(it.hasNext()).isTrue();
         }
     }

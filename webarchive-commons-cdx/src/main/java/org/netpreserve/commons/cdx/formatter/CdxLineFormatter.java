@@ -19,8 +19,8 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.netpreserve.commons.cdx.CdxFormat;
-import org.netpreserve.commons.cdx.CdxLineFormat;
-import org.netpreserve.commons.cdx.CdxLineRecordKey;
+import org.netpreserve.commons.cdx.cdxrecord.CdxLineFormat;
+import org.netpreserve.commons.cdx.cdxrecord.CdxLineRecordKey;
 import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.CdxRecordKey;
 import org.netpreserve.commons.cdx.FieldName;

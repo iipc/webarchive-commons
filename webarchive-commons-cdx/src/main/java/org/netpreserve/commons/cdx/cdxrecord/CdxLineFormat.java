@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.netpreserve.commons.cdx;
+package org.netpreserve.commons.cdx.cdxrecord;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.netpreserve.commons.cdx.CdxFormat;
+import org.netpreserve.commons.cdx.FieldName;
 
 /**
  * A collection of CdxFieldTypes defining a CDX Line format.

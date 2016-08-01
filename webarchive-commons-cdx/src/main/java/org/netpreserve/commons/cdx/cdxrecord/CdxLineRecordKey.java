@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.netpreserve.commons.cdx;
+package org.netpreserve.commons.cdx.cdxrecord;
 
 import java.util.Objects;
 
+import org.netpreserve.commons.cdx.CdxRecordKey;
+import org.netpreserve.commons.cdx.HasUnparsedData;
 import org.netpreserve.commons.cdx.json.StringValue;
 import org.netpreserve.commons.cdx.json.TimestampValue;
 

@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package org.netpreserve.commons.cdx;
+package org.netpreserve.commons.cdx.cdxrecord;
 
+import org.netpreserve.commons.cdx.cdxrecord.CdxLineRecordKey;
 import org.junit.Test;
+import org.netpreserve.commons.cdx.CdxRecordKey;
 
 import static org.assertj.core.api.Assertions.*;
 

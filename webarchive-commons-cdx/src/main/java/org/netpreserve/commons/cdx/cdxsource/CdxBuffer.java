@@ -19,9 +19,10 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-import org.netpreserve.commons.cdx.BaseCdxRecord;
+import org.netpreserve.commons.cdx.cdxrecord.BaseCdxRecord;
 import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.CdxFormat;
+import org.netpreserve.commons.cdx.CdxRecordFactory;
 import org.netpreserve.commons.cdx.SearchKey;
 
 /**
@@ -279,7 +280,7 @@ public class CdxBuffer {
     static CdxRecord createCdxLine(final ByteBuffer byteBuf, final int startOfNextLine,
             final CdxFormat lineFormat) {
 
-        return BaseCdxRecord.create(convertToCharBuffer(byteBuf, startOfNextLine), lineFormat);
+        return CdxRecordFactory.create(convertToCharBuffer(byteBuf, startOfNextLine), lineFormat);
     }
 
     static char[] convertToCharBuffer(final ByteBuffer byteBuf,

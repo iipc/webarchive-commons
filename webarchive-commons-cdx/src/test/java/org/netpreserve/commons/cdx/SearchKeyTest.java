@@ -15,6 +15,9 @@
  */
 package org.netpreserve.commons.cdx;
 
+import org.netpreserve.commons.util.datetime.DateTimeRange;
+import org.netpreserve.commons.util.datetime.VariablePrecisionDateTime;
+
 import java.nio.ByteBuffer;
 
 import org.junit.Test;
@@ -77,7 +80,7 @@ public class SearchKeyTest {
         assertThat(key.included(ByteBuffer.wrap("foo".getBytes()))).isTrue();
 
         // Exact match
-        key = new SearchKey().uri("example.com/foo/index.html").dateRange(CdxDateRange.ofSingleDate(CdxDate.of("20000202")));
+        key = new SearchKey().uri("example.com/foo/index.html").dateRange(DateTimeRange.ofSingleDate(VariablePrecisionDateTime.of("20000202")));
         assertThat(key.included(ByteBuffer.wrap("(com,example,)/foo/index.html 20000202".getBytes()))).isTrue();
         assertThat(key.included(ByteBuffer.wrap("(com,example,)/foo/index.html1".getBytes()))).isFalse();
         key = new SearchKey().uri("http://example.com/foo/index.html");

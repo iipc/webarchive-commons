@@ -18,21 +18,21 @@ package org.netpreserve.commons.cdx.json;
 import java.io.IOException;
 import java.io.Writer;
 
-import org.netpreserve.commons.cdx.CdxDate;
+import org.netpreserve.commons.util.datetime.VariablePrecisionDateTime;
 
 /**
  *
  */
-public final class TimestampValue implements Value<CdxDate>, Comparable<TimestampValue> {
+public final class TimestampValue implements Value<VariablePrecisionDateTime>, Comparable<TimestampValue> {
 
-    private CdxDate value;
+    private VariablePrecisionDateTime value;
     private String unparsed;
 
     private TimestampValue(final String value) {
         this.unparsed = value;
     }
 
-    private TimestampValue(final CdxDate value) {
+    private TimestampValue(final VariablePrecisionDateTime value) {
         this.value = value;
     }
 
@@ -40,7 +40,7 @@ public final class TimestampValue implements Value<CdxDate>, Comparable<Timestam
         return new TimestampValue(String.copyValueOf(src, start, end - start));
     }
 
-    public static TimestampValue valueOf(CdxDate value) {
+    public static TimestampValue valueOf(VariablePrecisionDateTime value) {
         return new TimestampValue(value);
     }
 
@@ -49,9 +49,9 @@ public final class TimestampValue implements Value<CdxDate>, Comparable<Timestam
     }
 
     @Override
-    public CdxDate getValue() {
+    public VariablePrecisionDateTime getValue() {
         if (value == null) {
-            value = CdxDate.of(unparsed);
+            value = VariablePrecisionDateTime.of(unparsed);
         }
         return value;
     }

@@ -19,10 +19,10 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.netpreserve.commons.cdx.CdxFormat;
-import org.netpreserve.commons.cdx.CdxLineFormat;
+import org.netpreserve.commons.cdx.cdxrecord.CdxLineFormat;
 import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.CdxRecordKey;
-import org.netpreserve.commons.cdx.CdxjLineFormat;
+import org.netpreserve.commons.cdx.cdxrecord.CdxjLineFormat;
 import org.netpreserve.commons.cdx.FieldName;
 import org.netpreserve.commons.cdx.HasUnparsedData;
 import org.netpreserve.commons.cdx.SearchResult;

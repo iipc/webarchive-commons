@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.netpreserve.commons.cdx;
+package org.netpreserve.commons.cdx.cdxrecord;
 
 import java.util.Objects;
 
+import org.netpreserve.commons.cdx.CdxRecordKey;
+import org.netpreserve.commons.cdx.HasUnparsedData;
 import org.netpreserve.commons.cdx.json.StringValue;
 import org.netpreserve.commons.cdx.json.TimestampValue;
+import org.netpreserve.commons.util.ArrayUtil;
 
 /**
  * Representation of the key used to lookup records in CDX files.
@@ -104,12 +107,12 @@ public class CdxjLineRecordKey extends CdxRecordKey implements HasUnparsedData {
      */
     private void parse() {
         if (uriKey == null) {
-            int firstDelim = BaseCdxRecord.indexOf(data, ' ', 0);
+            int firstDelim = ArrayUtil.indexOf(data, ' ', 0);
             if (firstDelim > 0) {
                 uriKey = StringValue.valueOf(data, 0, firstDelim);
                 firstDelim++;
 
-                int secondDelim = BaseCdxRecord.indexOf(data, ' ', firstDelim);
+                int secondDelim = ArrayUtil.indexOf(data, ' ', firstDelim);
                 if (secondDelim > 0) {
                     timeStamp = TimestampValue.valueOf(data, firstDelim, secondDelim);
                     recordType = StringValue.valueOf(data, secondDelim + 1, data.length);

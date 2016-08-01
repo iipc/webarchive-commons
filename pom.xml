@@ -26,6 +26,7 @@
         <module>webarchive-commons-core</module>
         <module>webarchive-commons-uri</module>
         <module>webarchive-commons-cdx</module>
+        <module>webarchive-commons-util</module>
     </modules>
 
     <developers>
@@ -66,6 +67,22 @@
         <system>travis-ci</system>
         <url>https://travis-ci.org/iipc/${github.name}</url>
     </ciManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Disable logging of code style violations to console until it is reduced to a manageable number -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${maven.checkstyle.plugin.version}</version>
+                    <configuration>
+                        <logViolationsToConsole>false</logViolationsToConsole>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
     <reporting>
         <plugins>

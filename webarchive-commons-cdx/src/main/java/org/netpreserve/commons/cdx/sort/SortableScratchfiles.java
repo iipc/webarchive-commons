@@ -17,38 +17,40 @@ package org.netpreserve.commons.cdx.sort;
 
 import java.util.NoSuchElementException;
 
+import org.netpreserve.commons.util.ArrayUtil;
+
 /**
- *
+ * Class holding a set of scratch files and sorting them according to the next run in each.
  */
-public class SortableScratchfiles extends HeapSort {
+class SortableScratchfiles {
 
     private final ScratchFile[] files;
 
     int heapSize;
 
-    public SortableScratchfiles(final int size, final ScratchFile... files) {
+    SortableScratchfiles(final int size, final ScratchFile... files) {
         heapSize = size;
         this.files = files;
         nextRun();
     }
-    
+
     public boolean hasMoreInRun() {
         return heapSize > 0;
     }
-    
+
     public final void nextRun() {
         for (int i = 0; i < files.length; i++) {
             if (files[i].isEndOfRun()) {
                 heapSize--;
                 if (heapSize > 0) {
-                    exchange(files, i, heapSize);
+                    ArrayUtil.swap(files, i, heapSize);
                 }
                 files[i].nextRun();
             }
         }
-        heapSort(files, heapSize);
+        ArrayUtil.heapSort(files, 0, heapSize);
     }
-    
+
     public String getNextInRun() {
         if (heapSize == 0) {
             throw new NoSuchElementException();
@@ -56,9 +58,9 @@ public class SortableScratchfiles extends HeapSort {
         String result = files[0].getNext();
         if (files[0].isEndOfRun()) {
             heapSize--;
-            exchange(files, 0, heapSize);
+            ArrayUtil.swap(files, 0, heapSize);
         }
-        heapSort(files, heapSize);
+        ArrayUtil.heapSort(files, 0, heapSize);
         return result;
     }
 

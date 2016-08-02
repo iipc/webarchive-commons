@@ -23,7 +23,20 @@ import java.nio.file.Files;
 import java.util.BitSet;
 
 /**
- *
+ * A sorting algorithm for sorting data possibly not fitting into memory.
+ * <p>
+ * This class uses a polyphase merge sort as described in
+ * <a href="http://www.math-cs.gordon.edu/courses/cs321/lectures/external_sorting.html">http://www.math-cs.gordon.edu/courses/cs321/lectures/external_sorting.html</a>
+ * <p>
+ * Resource usage can be controlled by two parameters:
+ * <ul>
+ * <li> The number of scratch files which constrains how many temporary files will be used. A higher number means
+ * smaller files and a reduced number of iterations at the cost of more file handles used.
+ * <li> The heap size which is the number of lines in the input sorted in memory. A higher number dramatically increases
+ * the speed at the cost of higher memory usage. Since the heap is defined in number of lines, the actual memory
+ * consumption is dependent on the average line size in the input.
+ * </ul>
+ * This class is not safe to use from more than one thread at a time.
  */
 public class PolyphaseMergeSort {
 
@@ -41,6 +54,12 @@ public class PolyphaseMergeSort {
 
     int lastInputFile;
 
+    /**
+     * Construct a new PolyphaseMergeSort instance.
+     * <p>
+     * @param scratchFileCount the number of temporary files
+     * @param heapSize the number of lines of input sorted in memory
+     */
     public PolyphaseMergeSort(final int scratchFileCount, final int heapSize) {
         if (scratchFileCount < 3) {
             throw new IllegalArgumentException("Need at least 3 scratchfiles");
@@ -52,6 +71,14 @@ public class PolyphaseMergeSort {
         this.heapSize = heapSize;
     }
 
+    /**
+     * Execute the sorting.
+     * <p>
+     * This method might be called to sort several data, but only by one thread at a time.
+     * <p>
+     * @param input the data to be sorted
+     * @param output the sorted output
+     */
     public void sort(BufferedReader input, BufferedWriter output) {
         this.input = input;
         this.output = output;
@@ -80,6 +107,9 @@ public class PolyphaseMergeSort {
         closeOutput();
     }
 
+    /**
+     * Create the temporary files.
+     */
     void createScratchFiles() {
         this.scratchFiles = new ScratchFile[scratchFileCount];
         for (int i = 0; i < scratchFileCount; i++) {
@@ -91,12 +121,18 @@ public class PolyphaseMergeSort {
         scratchFiles[scratchFileCount - 1].dummy = 0;
     }
 
+    /**
+     * Delete the temporary files.
+     */
     void deleteScratchFiles() {
         for (ScratchFile sf : scratchFiles) {
             sf.delete();
         }
     }
 
+    /**
+     * Close the output.
+     */
     void closeOutput() {
         try {
             output.close();
@@ -105,6 +141,12 @@ public class PolyphaseMergeSort {
         }
     }
 
+    /**
+     * Copy the content of a temporary file to output.
+     * <p>
+     * @param input the scratch file
+     * @param output the output
+     */
     void copy(ScratchFile input, BufferedWriter output) {
         try (BufferedReader source = Files.newBufferedReader(input.getPath());) {
             long nread = 0L;
@@ -120,32 +162,32 @@ public class PolyphaseMergeSort {
         }
     }
 
+    /**
+     * Read the input an do a first distribution into scratch files.
+     * <p>
+     * @return a bitset where each set bit indicates that the corresponding scratch file contains data.
+     */
     BitSet createInitialRuns() {
         BitSet hasData = new BitSet(scratchFileCount);
         int fileNum = 0;
-        try {
-            ReplacementSelectionHeapSort heap = new ReplacementSelectionHeapSort(heapSize, input);
+        ReplacementSelectionHeapSort heap = new ReplacementSelectionHeapSort(heapSize, input);
 
-            scratchFiles[fileNum].dummy = 0;
-            boolean hasMore = true;
-            while (hasMore) {
-                if (scratchFiles[fileNum].dummy < scratchFiles[fileNum + 1].dummy) {
-                    fileNum++;
-                } else {
-                    if (scratchFiles[fileNum].dummy == 0) {
-                        level++;
-                        int mergesThisLevel = scratchFiles[0].distribution;
-                        computeDistributionAndDummy(mergesThisLevel);
-                    }
-                    fileNum = 0;
+        scratchFiles[fileNum].dummy = 0;
+        boolean hasMore = true;
+        while (hasMore) {
+            if (scratchFiles[fileNum].dummy < scratchFiles[fileNum + 1].dummy) {
+                fileNum++;
+            } else {
+                if (scratchFiles[fileNum].dummy == 0) {
+                    level++;
+                    int mergesThisLevel = scratchFiles[0].distribution;
+                    computeDistributionAndDummy(mergesThisLevel);
                 }
-                hasMore = heap.writeNextRun(scratchFiles[fileNum]);
-                scratchFiles[fileNum].dummy -= 1;
-                hasData.set(fileNum);
+                fileNum = 0;
             }
-
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
+            hasMore = heap.writeNextRun(scratchFiles[fileNum]);
+            scratchFiles[fileNum].dummy -= 1;
+            hasData.set(fileNum);
         }
 
         for (ScratchFile sf : scratchFiles) {

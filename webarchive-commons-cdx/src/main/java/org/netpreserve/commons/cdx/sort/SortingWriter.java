@@ -35,16 +35,16 @@ import java.io.Writer;
  * <ul>
  * <li> The number of scratch files which constrains how many temporary files will be used. A higher number means
  * smaller files and a reduced number of iterations at the cost of more file handles used.
- * <li> The heap size which is the number of lines in the input sorted in memory. A higher number dramatically increases
- * the speed at the cost of higher memory usage. Since the heap is defined in number of lines, the actual memory
- * consumption is dependent on the average line size in the input.
+ * <li> The heap size which is the number of lines in the input sorted in memory. A higher number increases speed at the
+ * cost of higher memory usage. Since the heap is defined in number of lines, the actual memory consumption is dependent
+ * on the average line size in the input.
  * </ul>
  */
 public class SortingWriter extends Writer {
 
     private static final int DEFAULT_SCRATCHFILE_COUNT = 5;
 
-    private static final int DEFAULT_HEAP_SIZE = 10000;
+    private static final int DEFAULT_HEAP_SIZE = 100;
 
     private static final int PIPE_BUFFER_SIZE = 1024 * 8;
 

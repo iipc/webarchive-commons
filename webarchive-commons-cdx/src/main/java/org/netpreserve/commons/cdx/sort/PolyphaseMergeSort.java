@@ -32,9 +32,9 @@ import java.util.BitSet;
  * <ul>
  * <li> The number of scratch files which constrains how many temporary files will be used. A higher number means
  * smaller files and a reduced number of iterations at the cost of more file handles used.
- * <li> The heap size which is the number of lines in the input sorted in memory. A higher number dramatically increases
- * the speed at the cost of higher memory usage. Since the heap is defined in number of lines, the actual memory
- * consumption is dependent on the average line size in the input.
+ * <li> The heap size which is the number of lines in the input sorted in memory. A higher number increases speed at the
+ * cost of higher memory usage. Since the heap is defined in number of lines, the actual memory consumption is dependent
+ * on the average line size in the input.
  * </ul>
  * This class is not safe to use from more than one thread at a time.
  */
@@ -96,7 +96,7 @@ public class PolyphaseMergeSort {
                     inputs[k++] = scratchFiles[j];
                 }
             }
-            SortableScratchfiles sortedInputs = new SortableScratchfiles(inputs.length, inputs);
+            SortableScratchfiles sortedInputs = new SortableScratchfiles(inputs);
             scratchFiles[lastInputFile].distribution++;
             merge(sortedInputs, lastInputFile, -1);
         } else {
@@ -213,7 +213,7 @@ public class PolyphaseMergeSort {
                     inputs[k++] = scratchFiles[j];
                 }
             }
-            SortableScratchfiles sortedInputs = new SortableScratchfiles(inputs.length, inputs);
+            SortableScratchfiles sortedInputs = new SortableScratchfiles(inputs);
 
             if (i < level - 1) {
                 merge(sortedInputs, 1, mergeInto);

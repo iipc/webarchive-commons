@@ -26,41 +26,43 @@ class SortableScratchfiles {
 
     private final ScratchFile[] files;
 
-    int heapSize;
+    int size;
 
-    SortableScratchfiles(final int size, final ScratchFile... files) {
-        heapSize = size;
+    SortableScratchfiles(final ScratchFile... files) {
+        size = files.length;
         this.files = files;
         nextRun();
     }
 
     public boolean hasMoreInRun() {
-        return heapSize > 0;
+        return size > 0;
     }
 
     public final void nextRun() {
         for (int i = 0; i < files.length; i++) {
             if (files[i].isEndOfRun()) {
-                heapSize--;
-                if (heapSize > 0) {
-                    ArrayUtil.swap(files, i, heapSize);
+                size--;
+                if (size > 0) {
+                    ArrayUtil.swap(files, i, size);
                 }
                 files[i].nextRun();
             }
         }
-        ArrayUtil.heapSort(files, 0, heapSize);
+        if (size > 0) {
+            ArrayUtil.heapSort(files, 0, size);
+        }
     }
 
     public String getNextInRun() {
-        if (heapSize == 0) {
+        if (size == 0) {
             throw new NoSuchElementException();
         }
         String result = files[0].getNext();
         if (files[0].isEndOfRun()) {
-            heapSize--;
-            ArrayUtil.swap(files, 0, heapSize);
+            size--;
+            ArrayUtil.swap(files, 0, size);
         }
-        ArrayUtil.heapSort(files, 0, heapSize);
+        ArrayUtil.heapSort(files, 0, size);
         return result;
     }
 

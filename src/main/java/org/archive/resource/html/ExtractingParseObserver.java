@@ -21,7 +21,7 @@ public class ExtractingParseObserver implements ParseObserver {
 	boolean inTitle = false;
 
 	protected static String cssUrlPatString = 
-		"url\\s*\\(\\s*([\\\\\"']*.+?[\\\\\"']*)\\s*\\)";
+		"url\\s*\\(\\s*((?:\\\\?[\"'])?.+?(?:\\\\?[\"'])?)\\s*\\)";
 	protected static String cssImportNoUrlPatString = 
 		"@import\\s+(('[^']+')|(\"[^\"]+\")|(\\('[^']+'\\))|(\\(\"[^\"]+\"\\))|(\\([^)]+\\))|([a-z0-9_.:/\\\\-]+))\\s*;";
 

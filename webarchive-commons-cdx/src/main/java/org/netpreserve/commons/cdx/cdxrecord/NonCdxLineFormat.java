@@ -21,6 +21,7 @@ import org.netpreserve.commons.cdx.CdxFormat;
  * A format indicating that the CdxRecord is not connected to an unparsed line format.
  */
 public final class NonCdxLineFormat implements CdxFormat {
+
     /**
      * The single instance of this format.
      */
@@ -30,6 +31,16 @@ public final class NonCdxLineFormat implements CdxFormat {
      * Private constructor to avoid instantiation.
      */
     private NonCdxLineFormat() {
+    }
+
+    @Override
+    public String getFileSuffix() {
+        return null;
+    }
+
+    @Override
+    public String getFileHeader() {
+        return null;
     }
 
 }

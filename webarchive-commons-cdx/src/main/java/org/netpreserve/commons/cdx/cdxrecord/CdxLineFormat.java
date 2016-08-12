@@ -23,7 +23,7 @@ import org.netpreserve.commons.cdx.CdxFormat;
 import org.netpreserve.commons.cdx.FieldName;
 
 /**
- * A collection of CdxFieldTypes defining a CDX Line format.
+ * A collection of CdxFieldTypes defining a legacy style CDX Line format.
  */
 public class CdxLineFormat implements CdxFormat {
 
@@ -97,8 +97,8 @@ public class CdxLineFormat implements CdxFormat {
     /**
      * Constructs a new CdxLineSchema from a list of field names.
      * <p>
-     * The field names are allowed to be one letter codes, long name representation for those codes
-     * or user defined custom field names.
+     * The field names are allowed to be one letter codes, long name representation for those codes or user defined
+     * custom field names.
      * <p>
      * @param delimiter the delimiter between the fields used in CDX line representation
      * @param fieldNames the field names
@@ -178,6 +178,20 @@ public class CdxLineFormat implements CdxFormat {
      */
     public char getDelimiter() {
         return delimiter;
+    }
+
+    @Override
+    public String getFileSuffix() {
+        return "cdx";
+    }
+
+    @Override
+    public String getFileHeader() {
+        StringBuilder sb = new StringBuilder(delimiter + "CDX");
+        for (FieldName name : fields) {
+            sb.append(" ").append(name.getCode());
+        }
+        return sb.toString();
     }
 
 }

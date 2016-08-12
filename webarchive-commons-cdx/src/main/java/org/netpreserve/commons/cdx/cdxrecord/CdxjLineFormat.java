@@ -13,15 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.netpreserve.commons.cdx.cdxrecord;
 
 import org.netpreserve.commons.cdx.CdxFormat;
 
 /**
- *
+ * The OpenWayback CDXJ format v1.0.
  */
 public class CdxjLineFormat implements CdxFormat {
+
     public static final CdxjLineFormat DEFAULT_CDXJLINE = new CdxjLineFormat();
+
+    @Override
+    public String getFileSuffix() {
+        return "cdxj";
+    }
+
+    @Override
+    public String getFileHeader() {
+        return "!OpenWayback-CDXJ 1.0";
+    }
 
 }

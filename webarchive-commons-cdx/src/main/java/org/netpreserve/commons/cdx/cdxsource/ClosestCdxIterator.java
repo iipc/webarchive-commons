@@ -15,22 +15,15 @@
  */
 package org.netpreserve.commons.cdx.cdxsource;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import org.netpreserve.commons.util.datetime.VariablePrecisionDateTime;
 import org.netpreserve.commons.util.datetime.DateTimeRange;
 import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.CdxSource;
-import org.netpreserve.commons.cdx.FieldName;
 import org.netpreserve.commons.cdx.SearchKey;
 import org.netpreserve.commons.cdx.SearchResult;
-import org.netpreserve.commons.cdx.json.TimestampValue;
 import org.netpreserve.commons.cdx.processor.Processor;
 
 /**
@@ -132,17 +125,6 @@ public class ClosestCdxIterator implements CdxIterator {
     public void remove() {
         throw new UnsupportedOperationException();
     }
-
-//    private static long timestampStringToSeconds(String timestamp) {
-//        try {
-//            DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.ENGLISH);
-//            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-//
-//            return dateFormat.parse(timestamp).getTime() / 1000;
-//        } catch (ParseException ex) {
-//            throw new RuntimeException(ex);
-//        }
-//    }
 
     private class Candidate {
 

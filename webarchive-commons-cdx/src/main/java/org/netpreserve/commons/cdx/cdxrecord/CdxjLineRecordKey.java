@@ -107,20 +107,29 @@ public class CdxjLineRecordKey extends CdxRecordKey implements HasUnparsedData {
      */
     private void parse() {
         if (uriKey == null) {
-            int firstDelim = ArrayUtil.indexOf(data, ' ', 0);
-            if (firstDelim > 0) {
-                uriKey = StringValue.valueOf(data, 0, firstDelim);
-                firstDelim++;
+            try {
+                int firstDelim = ArrayUtil.indexOf(data, ' ', 0);
+                if (firstDelim > 0) {
+                    uriKey = StringValue.valueOf(data, 0, firstDelim);
+                    firstDelim++;
 
-                int secondDelim = ArrayUtil.indexOf(data, ' ', firstDelim);
-                if (secondDelim > 0) {
-                    timeStamp = TimestampValue.valueOf(data, firstDelim, secondDelim);
-                    recordType = StringValue.valueOf(data, secondDelim + 1, data.length);
-                    return;
+                    int secondDelim = ArrayUtil.indexOf(data, ' ', firstDelim);
+                    if (secondDelim > 0) {
+                        timeStamp = TimestampValue.valueOf(data, firstDelim, secondDelim);
+                        recordType = StringValue.valueOf(data, secondDelim + 1, data.length);
+                        return;
+                    } else {
+                        throw new IllegalArgumentException("The CDX record key '" + new String(data)
+                                + "' is missing the record-type field");
+                    }
+                } else {
+                    throw new IllegalArgumentException("The CDX record key '" + new String(data)
+                            + "' is missing the timestamp and record-type field");
                 }
+            } catch (ArrayIndexOutOfBoundsException e) {
+                throw new IllegalArgumentException("The CDX record key '" + new String(data)
+                        + "' cannot be parsed", e);
             }
-            throw new IllegalArgumentException("The CDX record key '" + new String(data)
-                    + "' cannot be parsed");
         }
     }
 

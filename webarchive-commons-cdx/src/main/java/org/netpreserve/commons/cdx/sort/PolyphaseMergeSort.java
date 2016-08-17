@@ -40,8 +40,6 @@ import java.util.BitSet;
  */
 public class PolyphaseMergeSort {
 
-    BufferedReader input;
-
     BufferedWriter output;
 
     final int scratchFileCount;
@@ -80,10 +78,21 @@ public class PolyphaseMergeSort {
      * @param output the sorted output
      */
     public void sort(BufferedReader input, BufferedWriter output) {
-        this.input = input;
+        ReplacementSelectionHeapSort sortingHeap = new SortingReaderSource(heapSize, input);
+        sort(sortingHeap, output);
+    }
+
+    public void sort(CloseableStringQueue input, BufferedWriter output) {
+        ReplacementSelectionHeapSort sortingHeap = new SortingQueueSource(heapSize, input);
+        sort(sortingHeap, output);
+    }
+
+    public void sort(ReplacementSelectionHeapSort inputHeap, BufferedWriter output) {
         this.output = output;
         createScratchFiles();
-        BitSet hasData = createInitialRuns();
+
+        BitSet hasData = createInitialRuns(inputHeap);
+
         if (hasData.cardinality() == 1) {
             // Special case where in-memory sorting created just one run.
             copy(scratchFiles[lastInputFile], output);
@@ -97,9 +106,10 @@ public class PolyphaseMergeSort {
                 }
             }
             SortableScratchfiles sortedInputs = new SortableScratchfiles(inputs);
-            scratchFiles[lastInputFile].distribution++;
+            sortedInputs.nextRun();
             merge(sortedInputs, lastInputFile, -1);
         } else {
+            // The normal case
             mergeSort();
         }
 
@@ -167,13 +177,14 @@ public class PolyphaseMergeSort {
      * <p>
      * @return a bitset where each set bit indicates that the corresponding scratch file contains data.
      */
-    BitSet createInitialRuns() {
+    BitSet createInitialRuns(ReplacementSelectionHeapSort inputHeap) {
         BitSet hasData = new BitSet(scratchFileCount);
         int fileNum = 0;
-        ReplacementSelectionHeapSort heap = new ReplacementSelectionHeapSort(heapSize, input);
 
         scratchFiles[fileNum].dummy = 0;
-        boolean hasMore = true;
+        boolean hasMore = inputHeap.writeNextRun(scratchFiles[fileNum]);
+        hasData.set(fileNum);
+        
         while (hasMore) {
             if (scratchFiles[fileNum].dummy < scratchFiles[fileNum + 1].dummy) {
                 fileNum++;
@@ -185,7 +196,7 @@ public class PolyphaseMergeSort {
                 }
                 fileNum = 0;
             }
-            hasMore = heap.writeNextRun(scratchFiles[fileNum]);
+            hasMore = inputHeap.writeNextRun(scratchFiles[fileNum]);
             scratchFiles[fileNum].dummy -= 1;
             hasData.set(fileNum);
         }
@@ -199,11 +210,15 @@ public class PolyphaseMergeSort {
     }
 
     void mergeSort() {
-        int mergeInto = -1;
-        for (int i = 1; i < level; i++) {
+        int mergeInto;
+        for (int i = 1; i <= level; i++) {
             mergeInto = scratchFileCount - ((i % scratchFileCount));
             if (mergeInto >= scratchFileCount) {
                 mergeInto = 0;
+            }
+            lastInputFile = mergeInto - 1;
+            if (lastInputFile < 0) {
+                lastInputFile = scratchFileCount - 1;
             }
 
             ScratchFile[] inputs = new ScratchFile[scratchFileCount - 1];
@@ -215,13 +230,10 @@ public class PolyphaseMergeSort {
             }
             SortableScratchfiles sortedInputs = new SortableScratchfiles(inputs);
 
-            if (i < level - 1) {
-                merge(sortedInputs, 1, mergeInto);
-
-                lastInputFile = mergeInto;
-                computeDistributionAndDummy(level - i);
+            if (i < level) {
+                merge(sortedInputs, lastInputFile, mergeInto);
             } else {
-                merge(sortedInputs, 1, -1);
+                merge(sortedInputs, lastInputFile, -1);
             }
         }
 
@@ -231,27 +243,26 @@ public class PolyphaseMergeSort {
     }
 
     private void merge(SortableScratchfiles inputs, int lastInputFile, int outputFile) {
-        for (int j = 1; j < scratchFiles[lastInputFile].distribution; j++) {
 
-            // if (dummy[] > 0 for all input files) {
-            boolean allDummiesGreaterThanZero = true;
-            for (ScratchFile sf : inputs.getFiles()) {
-                if (sf.dummy == 0) {
-                    allDummiesGreaterThanZero = false;
-                    break;
-                }
-            }
+        // Handle the cases where all inputs have dummies
+        if (outputFile >= 0) {
+            int dummyRuns = inputs.getAndRemoveNumberOfCommonDummies();
+            scratchFiles[outputFile].dummy += dummyRuns;
+            scratchFiles[outputFile].distribution += dummyRuns;
+        }
+        int runsToProcess = scratchFiles[lastInputFile].distribution;
 
+        inputs.nextRun();
+
+        for (int j = 0; j < runsToProcess; j++) {
             // If outputFile is set to -1 then this is the final merge
             // and we write to final destination instead of scratchfile.
             if (outputFile >= 0) {
-                if (allDummiesGreaterThanZero) {
-                    scratchFiles[outputFile].dummy += 1;
-                }
 
                 while (inputs.hasMoreInRun()) {
                     scratchFiles[outputFile].write(inputs.getNextInRun());
                 }
+                scratchFiles[outputFile].distribution++;
             } else {
                 while (inputs.hasMoreInRun()) {
                     try {
@@ -269,7 +280,7 @@ public class PolyphaseMergeSort {
     private void computeDistributionAndDummy(int mergesThisLevel) {
         for (int i = 0; i < scratchFileCount - 1; i++) {
             scratchFiles[i].dummy = mergesThisLevel + scratchFiles[i + 1].distribution - scratchFiles[i].distribution;
-            scratchFiles[i].distribution += scratchFiles[i].dummy;
+            scratchFiles[i].distribution = mergesThisLevel + scratchFiles[i + 1].distribution;
         }
     }
 

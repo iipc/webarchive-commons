@@ -15,10 +15,6 @@
  */
 package org.netpreserve.commons.cdx.sort;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-
 import org.netpreserve.commons.util.ArrayUtil;
 
 /**
@@ -31,9 +27,7 @@ import org.netpreserve.commons.util.ArrayUtil;
  * fitting in the current run is written. The heap size is restored to contain all the lines outside the heap and it is
  * ready for a new call to writeNextRun.
  */
-class ReplacementSelectionHeapSort {
-
-    private final BufferedReader input;
+abstract class ReplacementSelectionHeapSort {
 
     private final String[] data;
 
@@ -47,21 +41,19 @@ class ReplacementSelectionHeapSort {
      * @param size the number of lines in the heap
      * @param input the source for new lines
      */
-    ReplacementSelectionHeapSort(final int size, final BufferedReader input) {
+    ReplacementSelectionHeapSort(final int size) {
         heapSize = size;
         notHeapSize = 0;
         data = new String[size];
-        this.input = input;
-        fillHeap();
     }
 
     /**
      * Initially fill the heap from the input source.
      */
-    private void fillHeap() {
+    protected void fillHeap() {
         int i = 0;
         while (i < heapSize) {
-            String record = readNextNonEmpty();
+            String record = readNext();
             if (record == null) {
                 heapSize = i;
                 break;
@@ -75,9 +67,9 @@ class ReplacementSelectionHeapSort {
 
     /**
      * Write the next run.
-     *
+     * <p>
      * See the class description for what it does.
-     *
+     * <p>
      * @param out the scratch file to write this run to
      * @return false if no more data i.e. writeNextRun should not be called anymore
      */
@@ -85,7 +77,7 @@ class ReplacementSelectionHeapSort {
         while (heapSize > 0) {
             out.write(data[0]);
 
-            String record = readNextNonEmpty();
+            String record = readNext();
             if (record == null) {
                 // No more input ......
                 for (int i = 1; i < heapSize; i++) {
@@ -123,7 +115,7 @@ class ReplacementSelectionHeapSort {
                 ArrayUtil.heapSort(data, 0, heapSize);
             }
         }
-        return true;
+        return heapSize > 0;
     }
 
     /**
@@ -131,16 +123,6 @@ class ReplacementSelectionHeapSort {
      * <p>
      * @return the next non-empty line from the input source
      */
-    private String readNextNonEmpty() {
-        try {
-            String record = input.readLine();
-            while ("".equals(record)) {
-                record = input.readLine();
-            }
-            return record;
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
-        }
-    }
+    protected abstract String readNext();
 
 }

@@ -17,13 +17,8 @@ package org.netpreserve.commons.cdx.sort;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.junit.Test;
 
@@ -47,20 +42,39 @@ public class PolyphaseMergeSortTest {
      * Test of createInitialRuns method, of class PolyphaseMergeSort.
      */
     @Test
-    public void testCreateInitialRuns() throws IOException {
-        BufferedReader input = new BufferedReader(new StringReader("B\nD\nE\nC\nF\nA\nG\nZ\nX\nH\nI\nO\nN\nL\nJ\nK\nL"));
+    public void testCreateInitialRuns() {
+        BufferedReader input = new BufferedReader(
+                new StringReader("B\nD\nE\nC\nF\nA\nG\nZ\nX\nH\nI\nO\nN\nL\nJ\nK\nL"));
         pms = new PolyphaseMergeSort(3, 3);
         pms.createScratchFiles();
-        pms.input = input;
-        pms.createInitialRuns();
+        ReplacementSelectionHeapSort inputHeap = new SortingReaderSource(pms.heapSize, input);
+        pms.createInitialRuns(inputHeap);
 
-        assertThat(pms.scratchFiles[0]).hasFieldOrPropertyWithValue("distribution", 3);
+        assertThat(pms.scratchFiles[0]).hasFieldOrPropertyWithValue("distribution", 2);
         assertThat(pms.scratchFiles[0]).hasFieldOrPropertyWithValue("dummy", 0);
-        assertThat(pms.scratchFiles[0].getPath()).hasContent("A\nH\nI\nL\nN\nO\nJ\nK\nL");
+        assertThat(pms.scratchFiles[0].getPath()).hasContent("B\nC\nD\nE\nF\nG\nX\nZ\nJ\nK\nL");
 
-        assertThat(pms.scratchFiles[1]).hasFieldOrPropertyWithValue("distribution", 2);
+        assertThat(pms.scratchFiles[1]).hasFieldOrPropertyWithValue("distribution", 1);
+        assertThat(pms.scratchFiles[1]).hasFieldOrPropertyWithValue("dummy", 0);
+        assertThat(pms.scratchFiles[1].getPath()).hasContent("A\nH\nI\nL\nN\nO");
+
+        assertThat(pms.scratchFiles[2]).hasFieldOrPropertyWithValue("distribution", 0);
+        assertThat(pms.scratchFiles[2]).hasFieldOrPropertyWithValue("dummy", 0);
+
+
+        input = new BufferedReader(new StringReader("Z\nY\nX\nW\nV\nU\nT\nS\nR\nQ\nP\nO\nN\nM\nL\nK\nJ\nI\nH\nG\n"
+                + "F\nE\nD\nC\nB\nA\n9\n8\n7\n6\n5\n4\n3\n2\n"));
+        inputHeap = new SortingReaderSource(pms.heapSize, input);
+        pms.createScratchFiles();
+        pms.createInitialRuns(inputHeap);
+        assertThat(pms.scratchFiles[0]).hasFieldOrPropertyWithValue("distribution", 8);
+        assertThat(pms.scratchFiles[0]).hasFieldOrPropertyWithValue("dummy", 0);
+        assertThat(pms.scratchFiles[0].getPath()).hasContent(
+                "X\nY\nZ\nR\nS\nT\nO\nP\nQ\nI\nJ\nK\nF\nG\nH\n9\nA\nB\n6\n7\n8\n2");
+
+        assertThat(pms.scratchFiles[1]).hasFieldOrPropertyWithValue("distribution", 5);
         assertThat(pms.scratchFiles[1]).hasFieldOrPropertyWithValue("dummy", 1);
-        assertThat(pms.scratchFiles[1].getPath()).hasContent("B\nC\nD\nE\nF\nG\nX\nZ");
+        assertThat(pms.scratchFiles[1].getPath()).hasContent("U\nV\nW\nL\nM\nN\nC\nD\nE\n3\n4\n5");
 
         assertThat(pms.scratchFiles[2]).hasFieldOrPropertyWithValue("distribution", 0);
         assertThat(pms.scratchFiles[2]).hasFieldOrPropertyWithValue("dummy", 0);
@@ -70,20 +84,61 @@ public class PolyphaseMergeSortTest {
      * Test of mergeSort method, of class PolyphaseMergeSort.
      */
     @Test
-    public void testMergeSort() throws IOException {
-        BufferedReader input = new BufferedReader(new StringReader("B\nD\nE\nC\nF\nA\nG\nZ\nX\nH\nI\nO\nN\nL\nJ\nK\nL"));
+    public void testMergeSort1() {
+        BufferedReader input = new BufferedReader(
+                new StringReader("B\nD\nE\nC\nF\nA\nG\nZ\nX\nH\nI\nO\nN\nL\nJ\nK\nL"));
         StringWriter writer = new StringWriter();
         BufferedWriter output = new BufferedWriter(writer);
 
         pms = new PolyphaseMergeSort(3, 3);
         pms.createScratchFiles();
-        pms.input = input;
         pms.output = output;
-        pms.createInitialRuns();
+        ReplacementSelectionHeapSort inputHeap = new SortingReaderSource(pms.heapSize, input);
+        pms.createInitialRuns(inputHeap);
         pms.mergeSort();
         pms.closeOutput();
 
         assertThat(writer).hasToString("A\nB\nC\nD\nE\nF\nG\nH\nI\nJ\nK\nL\nL\nN\nO\nX\nZ\n");
+    }
+
+    @Test
+    public void testMergeSort2() {
+        BufferedReader input = new BufferedReader(
+                new StringReader("Z\nY\nX\nW\nV\nU\nT\nS\nR\nQ\nP\nO\nN\nM\nL\nK\nJ\nI\nH\nG\nF\nE\nD\nC\nB\nA\n"
+                        + "9\n8\n7\n6\n5\n4\n3\n2\n"));
+        StringWriter writer = new StringWriter();
+        BufferedWriter output = new BufferedWriter(writer);
+
+        pms = new PolyphaseMergeSort(4, 2);
+        pms.createScratchFiles();
+        pms.output = output;
+        ReplacementSelectionHeapSort inputHeap = new SortingReaderSource(pms.heapSize, input);
+        pms.createInitialRuns(inputHeap);
+        pms.mergeSort();
+        pms.closeOutput();
+
+        assertThat(writer).hasToString("2\n3\n4\n5\n6\n7\n8\n9\nA\nB\nC\nD\nE\nF\nG\nH\nI\nJ\nK\nL\nM\nN\nO\nP\nQ\n"
+                + "R\nS\nT\nU\nV\nW\nX\nY\nZ\n");
+    }
+
+    @Test
+    public void testMergeSort3() {
+        BufferedReader input = new BufferedReader(
+                new StringReader("Z\nY\nX\nW\nV\nU\nT\nS\nR\nQ\nP\nO\nN\nM\nL\nK\nJ\nI\nH\nG\nF\nE\nD\nC\nB\nA\n"
+                        + "9\n8\n7\n6\n5\n4\n3\n2\n1\n"));
+        StringWriter writer = new StringWriter();
+        BufferedWriter output = new BufferedWriter(writer);
+
+        pms = new PolyphaseMergeSort(4, 2);
+        pms.createScratchFiles();
+        pms.output = output;
+        ReplacementSelectionHeapSort inputHeap = new SortingReaderSource(pms.heapSize, input);
+        pms.createInitialRuns(inputHeap);
+        pms.mergeSort();
+        pms.closeOutput();
+
+        assertThat(writer).hasToString("1\n2\n3\n4\n5\n6\n7\n8\n9\nA\nB\nC\nD\nE\nF\nG\nH\nI\nJ\nK\nL\nM\nN\nO\nP\nQ\n"
+                + "R\nS\nT\nU\nV\nW\nX\nY\nZ\n");
     }
 
     /**
@@ -117,18 +172,12 @@ public class PolyphaseMergeSortTest {
         pms = new PolyphaseMergeSort(5, 3);
         pms.sort(input, output);
         assertThat(writer).hasToString(expected);
-    }
 
-    @Test
-    public void testSortFile() throws URISyntaxException, IOException {
-        String fileName = "cdxfile3.cdx";
-        Path inputPath = Paths.get(ClassLoader.getSystemResource(fileName).toURI());
-        Path outputPath = Paths.get("target", "sort", fileName);
-        Files.createDirectories(outputPath.getParent());
-
-        BufferedReader input = Files.newBufferedReader(inputPath);
-        BufferedWriter output = Files.newBufferedWriter(outputPath);
-        pms = new PolyphaseMergeSort(3, 3);
+        input = new BufferedReader(new StringReader(""));
+        writer = new StringWriter();
+        output = new BufferedWriter(writer);
+        pms = new PolyphaseMergeSort(5, 3);
         pms.sort(input, output);
+        assertThat(writer).hasToString("");
     }
 }

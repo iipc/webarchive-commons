@@ -33,12 +33,15 @@ class ScratchFile implements Comparable<ScratchFile> {
     private boolean endOfRun = false;
     private boolean endOfFile = false;
     private String next;
-    int distribution = 1;
-    int dummy = 1;
+    int distribution;
+    int dummy;
 
     ScratchFile(int fileNum) {
         try {
             this.file = Files.createTempFile("sort-" + fileNum + "-", null);
+            file.toFile().deleteOnExit();
+            distribution = 1;
+            dummy = 1;
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }
@@ -74,18 +77,16 @@ class ScratchFile implements Comparable<ScratchFile> {
 
     public String getNext() {
         try {
-            if (in == null) {
-                peek();
-            }
-
-            String result = next;
+            String result = peek();
             next = in.readLine();
             if (next == null) {
                 endOfRun = true;
                 endOfFile = true;
+                distribution--;
                 close();
             } else if (result != null && result.compareTo(next) > 0) {
                 endOfRun = true;
+                distribution--;
             }
             return result;
         } catch (IOException ex) {
@@ -93,12 +94,17 @@ class ScratchFile implements Comparable<ScratchFile> {
         }
     }
 
-    public boolean nextRun() {
-        if (next != null) {
-            endOfRun = false;
-            return true;
+    public void nextRun() {
+        endOfRun = false;
+        if (dummy > 0) {
+            dummy--;
+            distribution--;
+            endOfRun = true;
+        } else {
+            if (peek() == null) {
+                endOfRun = true;
+            }
         }
-        return false;
     }
 
     public boolean isEndOfRun() {
@@ -120,6 +126,7 @@ class ScratchFile implements Comparable<ScratchFile> {
 
             out.write(record);
             out.write("\n");
+            out.flush();
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }

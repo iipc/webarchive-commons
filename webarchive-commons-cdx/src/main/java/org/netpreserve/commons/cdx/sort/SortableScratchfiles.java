@@ -31,7 +31,22 @@ class SortableScratchfiles {
     SortableScratchfiles(final ScratchFile... files) {
         size = files.length;
         this.files = files;
-        nextRun();
+    }
+
+    public int getAndRemoveNumberOfCommonDummies() {
+        int lowestDummyCount = Integer.MAX_VALUE;
+        for (ScratchFile sf : files) {
+            if (sf.dummy < lowestDummyCount) {
+                lowestDummyCount = sf.dummy;
+            }
+        }
+        if (lowestDummyCount > 0) {
+            for (ScratchFile sf : files) {
+                sf.dummy -= lowestDummyCount;
+                sf.distribution -= lowestDummyCount;
+            }
+        }
+        return lowestDummyCount;
     }
 
     public boolean hasMoreInRun() {
@@ -39,13 +54,16 @@ class SortableScratchfiles {
     }
 
     public final void nextRun() {
-        for (int i = 0; i < files.length; i++) {
+        size = files.length;
+
+        for (int i = 0; i < size; i++) {
+            files[i].nextRun();
             if (files[i].isEndOfRun()) {
                 size--;
-                if (size > 0) {
+                if (size > i) {
                     ArrayUtil.swap(files, i, size);
+                    i--;
                 }
-                files[i].nextRun();
             }
         }
         if (size > 0) {

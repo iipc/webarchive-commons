@@ -32,7 +32,7 @@ import org.netpreserve.commons.cdx.CdxSource;
 import org.netpreserve.commons.cdx.FieldName;
 import org.netpreserve.commons.cdx.SearchKey;
 import org.netpreserve.commons.cdx.SearchResult;
-import org.netpreserve.commons.cdx.SourceDescriptorFactory;
+import org.netpreserve.commons.cdx.CdxSourceFactory;
 import org.netpreserve.commons.cdx.cdxsource.BlockCdxSource;
 import org.netpreserve.commons.cdx.cdxsource.MockCdxIterator;
 import org.netpreserve.commons.cdx.cdxsource.MultiCdxIterator;
@@ -188,11 +188,9 @@ public class BiFunctionProcessorTest {
         processors.add(fp);
         fp.addFunctionProvider(cf);
 
-        SourceDescriptor sd = SourceDescriptorFactory.getDescriptor("cdxfile",
-                ClassLoader.getSystemResource("cdxfile3.cdx").toURI(), null);
+        CdxSource cdxSource = CdxSourceFactory.getCdxSource("cdxfile:src/test/resources/cdxfile3.cdx");
 
         SearchKey key = new SearchKey();
-        CdxSource cdxSource = new BlockCdxSource(sd);
         SearchResult result = cdxSource.search(key, processors, false);
 
 //        assertThat(result).hasSize(113);
@@ -224,10 +222,8 @@ public class BiFunctionProcessorTest {
         processors.add(fp);
         fp.addFunctionProvider(cf);
 
-        CdxSource cdxSource1 = new BlockCdxSource(SourceDescriptorFactory.getDescriptor("cdxfile",
-                ClassLoader.getSystemResource("cdxfile4.cdx").toURI(), null));
-        CdxSource cdxSource2 = new BlockCdxSource(SourceDescriptorFactory.getDescriptor("cdxfile",
-                ClassLoader.getSystemResource("cdxfile5.cdx").toURI(), null));
+        CdxSource cdxSource1 = CdxSourceFactory.getCdxSource("cdxfile:src/test/resources/cdxfile4.cdx");
+        CdxSource cdxSource2 = CdxSourceFactory.getCdxSource("cdxfile:src/test/resources/cdxfile5.cdx");
 
         SearchKey key = new SearchKey();
         MultiCdxSource cdxSource = new MultiCdxSource(cdxSource1, cdxSource2);
@@ -246,7 +242,7 @@ public class BiFunctionProcessorTest {
         processors.add(fp);
         fp.addFunctionProvider(cf);
 
-//        sd = SourceDescriptorFactory.getDescriptor("cdxfile",
+//        sd = CdxSourceFactory.getDescriptor("cdxfile",
 //                ClassLoader.getSystemResource("cdxfile3.cdx").toURI(), null);
 //
 //        cdxSource = new BlockCdxSource(sd);

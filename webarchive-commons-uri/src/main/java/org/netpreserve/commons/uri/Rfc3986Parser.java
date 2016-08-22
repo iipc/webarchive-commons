@@ -538,7 +538,7 @@ public class Rfc3986Parser {
         registryName = preCheckRegistryName(registryName);
 
         if (builder.config.isSchemeBasedNormalization()) {
-            if (SchemeParams.forName(builder.scheme).punycodedHost) {
+            if (Schemes.forName(builder.scheme).punycodedHost) {
                 // apply IDN-punycoding, as necessary
                 try {
                     builder.host = IDN.toASCII(registryName, IDN.USE_STD3_ASCII_RULES);
@@ -596,7 +596,7 @@ public class Rfc3986Parser {
 
         // Normalize known port numbers
         if (builder.config.isSchemeBasedNormalization() && builder.port != -1) {
-            if (builder.port == SchemeParams.forName(builder.scheme).defaultPort) {
+            if (builder.port == Schemes.forName(builder.scheme).defaultPort) {
                 builder.port = -1;
             }
         }

@@ -20,8 +20,8 @@ import org.netpreserve.commons.uri.normalization.CheckLongEnough;
 import org.netpreserve.commons.uri.normalization.InsertCommonSchemesForSchemelessUri;
 import org.netpreserve.commons.uri.normalization.LaxTrimming;
 import org.netpreserve.commons.uri.normalization.OptimisticDnsScheme;
-import org.netpreserve.commons.uri.normalization.QueryNormalizers;
 import org.netpreserve.commons.uri.normalization.StripErrorneousExtraSlashes;
+import org.netpreserve.commons.uri.normalization.StripSessionId;
 import org.netpreserve.commons.uri.normalization.StripTrailingEscapedSpaceOnAuthority;
 import org.netpreserve.commons.uri.normalization.StripSlashesAtEndOfPath;
 import org.netpreserve.commons.uri.normalization.StripWwwN;
@@ -103,7 +103,7 @@ public final class Configurations {
             .addNormalizer(new LaxTrimming())
             .addNormalizer(new AllLowerCase())
             .addNormalizer(new StripWwwN())
-            .addNormalizer(new QueryNormalizers())
+            .addNormalizer(new StripSessionId())
             .addNormalizer(new StripErrorneousExtraSlashes())
             .addNormalizer(new StripSlashesAtEndOfPath())
             .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
@@ -131,7 +131,7 @@ public final class Configurations {
             .addNormalizer(new LaxTrimming())
             .addNormalizer(new AllLowerCase())
             .addNormalizer(new StripWwwN())
-            .addNormalizer(new QueryNormalizers())
+            .addNormalizer(new StripSessionId())
             .addNormalizer(new StripErrorneousExtraSlashes())
             .addNormalizer(new StripSlashesAtEndOfPath())
             .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())

@@ -15,18 +15,33 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
-import java.util.List;
-import java.util.SortedMap;
+import java.util.Set;
+
+import org.netpreserve.commons.uri.ParsedQuery;
+import org.netpreserve.commons.uri.PostParseNormalizer;
+import org.netpreserve.commons.uri.UriBuilder;
+
+import static org.netpreserve.commons.uri.Schemes.HTTP;
+import static org.netpreserve.commons.uri.Schemes.HTTPS;
+import static org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer.immutableSetOf;
 
 /**
- *
+ * Strip common session id parameters from query.
  */
-public class StripSessionId implements QueryNormalizers.QueryNormalizer {
+public class StripSessionId extends SchemeBasedNormalizer implements PostParseNormalizer {
+
+    private static final Set<String> SUPPORTED_SCHEMES = immutableSetOf(HTTP.name, HTTPS.name);
 
     @Override
-    public void normalize(SortedMap<String, List<String>> queries) {
-        queries.remove("jsessionid");
-        queries.remove("phpsessionid");
+    public void normalize(UriBuilder builder) {
+        ParsedQuery parsedQuery = builder.parsedQuery();
+        parsedQuery.remove("jsessionid");
+        parsedQuery.remove("phpsessionid");
+        builder.parsedQuery(parsedQuery);
     }
 
+    @Override
+    public Set<String> getSupportedSchemes() {
+        return SUPPORTED_SCHEMES;
+    }
 }

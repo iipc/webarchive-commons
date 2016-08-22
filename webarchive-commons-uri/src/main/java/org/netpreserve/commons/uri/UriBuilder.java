@@ -15,7 +15,6 @@
  */
 package org.netpreserve.commons.uri;
 
-
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -23,16 +22,6 @@ import java.nio.charset.StandardCharsets;
  *
  */
 public final class UriBuilder {
-
-    public static final String SCHEME_HTTP = "http";
-
-    public static final String SCHEME_HTTPS = "https";
-
-    public static final String SCHEME_FTP = "ftp";
-
-    public static final String SCHEME_FTPS = "ftps";
-
-    public static final String SCHEME_DNS = "dns";
 
     public static final String ESCAPED_SPACE = "%20";
 
@@ -53,6 +42,8 @@ public final class UriBuilder {
     String path;
 
     String query;
+
+    ParsedQuery parsedQuery;
 
     String fragment;
 
@@ -118,6 +109,7 @@ public final class UriBuilder {
         this.port = uri.port;
         this.path = uri.path;
         this.query = uri.query;
+        this.parsedQuery = uri.parsedQuery;
         this.fragment = uri.fragment;
         this.isRegName = uri.isRegName;
         this.isIPv4address = uri.isIPv4address;
@@ -164,6 +156,13 @@ public final class UriBuilder {
         if (query == null) {
             throw new UriException("Illegal query: " + value);
         }
+        parsedQuery = null;
+        return this;
+    }
+
+    public UriBuilder parsedQuery(final ParsedQuery value) {
+        query(parsedQuery.toString());
+        parsedQuery = value;
         return this;
     }
 
@@ -201,6 +200,13 @@ public final class UriBuilder {
 
     public String query() {
         return query;
+    }
+
+    public ParsedQuery parsedQuery() {
+        if (parsedQuery == null) {
+            parsedQuery = new ParsedQuery(query);
+        }
+        return parsedQuery;
     }
 
     public String fragment() {

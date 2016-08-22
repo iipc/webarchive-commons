@@ -20,8 +20,8 @@ import java.util.Set;
 import org.netpreserve.commons.uri.PostParseNormalizer;
 import org.netpreserve.commons.uri.UriBuilder;
 
-import static org.netpreserve.commons.uri.UriBuilder.SCHEME_HTTP;
-import static org.netpreserve.commons.uri.UriBuilder.SCHEME_HTTPS;
+import static org.netpreserve.commons.uri.Schemes.HTTP;
+import static org.netpreserve.commons.uri.Schemes.HTTPS;
 import static org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer.immutableSetOf;
 
 /**
@@ -29,7 +29,7 @@ import static org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer.im
  */
 public class StripWwwN extends SchemeBasedNormalizer implements PostParseNormalizer {
 
-    private static final Set<String> SUPPORTED_SCHEMES = immutableSetOf(SCHEME_HTTP, SCHEME_HTTPS);
+    private static final Set<String> SUPPORTED_SCHEMES = immutableSetOf(HTTP.name, HTTPS.name);
 
     @Override
     public void normalize(UriBuilder builder) {

@@ -22,43 +22,49 @@ import java.util.Objects;
 /**
  *
  */
-public final class SchemeParams {
-    public static final SchemeParams UNDEFINED = new SchemeParams(null, -1, false);
-    public static final SchemeParams HTTP = new SchemeParams("http", 80, true);
-    public static final SchemeParams HTTPS = new SchemeParams("https", 443, true);
+public final class Schemes {
+    public static final Schemes UNDEFINED = new Schemes(null, -1, false);
+    public static final Schemes HTTP = new Schemes("http", 80, true);
+    public static final Schemes HTTPS = new Schemes("https", 443, true);
+    public static final Schemes FTP = new Schemes("ftp", 21, true);
+    public static final Schemes FTPS = new Schemes("ftps", 990, true);
+    public static final Schemes DNS = new Schemes("dns", 53, false);
 
-    private static final Map<String, SchemeParams> SCHEME_MAP;
+    private static final Map<String, Schemes> SCHEME_MAP;
     static {
         SCHEME_MAP = new HashMap<>();
 
         SCHEME_MAP.put(HTTP.name, HTTP);
         SCHEME_MAP.put(HTTPS.name, HTTPS);
+        SCHEME_MAP.put(FTP.name, FTP);
+        SCHEME_MAP.put(FTPS.name, FTPS);
+        SCHEME_MAP.put(DNS.name, DNS);
     }
 
     public final String name;
     public final int defaultPort;
     public final boolean punycodedHost;
 
-    private SchemeParams(final String name, final int defaultPort, boolean punycodedHost) {
+    private Schemes(final String name, final int defaultPort, boolean punycodedHost) {
         this.name = name != null ? name.intern() : null;
         this.defaultPort = defaultPort;
         this.punycodedHost = punycodedHost;
     }
 
-    public static SchemeParams forName(String name) {
+    public static Schemes forName(String name) {
         if (name == null) {
             return UNDEFINED;
         }
 
-        SchemeParams result = SCHEME_MAP.get(name.toLowerCase());
+        Schemes result = SCHEME_MAP.get(name.toLowerCase());
         if (result == null) {
             result = UNDEFINED;
         }
         return result;
     }
 
-    public static boolean isType(String scheme, SchemeParams... type) {
-        for (SchemeParams sd : type) {
+    public static boolean isType(String scheme, Schemes... type) {
+        for (Schemes sd : type) {
             if (sd.name.equals(scheme)) {
                 return true;
             }
@@ -68,7 +74,7 @@ public final class SchemeParams {
 
     @Override
     public String toString() {
-        return "SchemeDefaults{" + name + '}';
+        return name;
     }
 
     @Override
@@ -86,7 +92,7 @@ public final class SchemeParams {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final SchemeParams other = (SchemeParams) obj;
+        final Schemes other = (Schemes) obj;
         if (!Objects.equals(this.name, other.name)) {
             return false;
         }

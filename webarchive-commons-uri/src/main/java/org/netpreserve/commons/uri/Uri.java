@@ -53,6 +53,8 @@ public class Uri {
 
     final UriFormat defaultFormat;
 
+    transient ParsedQuery parsedQuery;
+
     private transient String toStringCache;
 
     Uri(final UriBuilder uriBuilder) {
@@ -65,6 +67,7 @@ public class Uri {
         this.port = uriBuilder.port;
         this.path = uriBuilder.path;
         this.query = uriBuilder.query;
+        this.parsedQuery = uriBuilder.parsedQuery;
         this.fragment = uriBuilder.fragment;
         this.isRegName = uriBuilder.isRegName;
         this.isIPv4address = uriBuilder.isIPv4address;
@@ -103,7 +106,7 @@ public class Uri {
     }
 
     public String getDecodedHost() {
-        if (SchemeParams.forName(scheme).punycodedHost) {
+        if (Schemes.forName(scheme).punycodedHost) {
             return IDN.toUnicode(host);
         }
         return decode(host);
@@ -115,7 +118,7 @@ public class Uri {
 
     public int getDecodedPort() {
         if (port == -1) {
-            return SchemeParams.forName(scheme).defaultPort;
+            return Schemes.forName(scheme).defaultPort;
         } else {
             return port;
         }
@@ -135,6 +138,13 @@ public class Uri {
 
     public String getQuery() {
         return query;
+    }
+
+    public ParsedQuery getParsedQuery() {
+        if (parsedQuery == null) {
+            parsedQuery = new ParsedQuery(query);
+        }
+        return parsedQuery;
     }
 
     public String getFragment() {

@@ -20,12 +20,12 @@ import java.util.Set;
 import org.netpreserve.commons.uri.PostParseNormalizer;
 import org.netpreserve.commons.uri.UriBuilder;
 
-import static org.netpreserve.commons.uri.UriBuilder.SCHEME_DNS;
+import static org.netpreserve.commons.uri.Schemes.DNS;
 import static org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer.immutableSetOf;
 
 public class OptimisticDnsScheme extends SchemeBasedNormalizer implements PostParseNormalizer {
 
-    private static final Set<String> SUPPORTED_SCHEMES = immutableSetOf(SCHEME_DNS);
+    private static final Set<String> SUPPORTED_SCHEMES = immutableSetOf(DNS.name);
 
     @Override
     public void normalize(UriBuilder builder) {

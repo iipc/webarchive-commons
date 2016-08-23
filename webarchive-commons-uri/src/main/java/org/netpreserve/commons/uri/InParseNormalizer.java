@@ -13,19 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.netpreserve.commons.uri;
 
 /**
- *
+ * A Normalizer which hooks into the parsing process.
+ * <p>
+ * An InParseNormalizer might modify the state of the parsing process while parsing. For example it can infer a standard
+ * scheme (e.g. http) for schemeless URI's which in turn might influence how the rest of the URI is parsed.
  */
 public interface InParseNormalizer extends Normalizer {
+
+    /**
+     * Hook into the parsing process before the Authority is parsed.
+     * <p>
+     * @param parserState the parserState to manipulate
+     */
     default void preParseAuthority(Rfc3986Parser.ParserState parserState) {
 
     }
 
+    /**
+     * Hook into the parsing process after the Authority is parsed.
+     * <p>
+     * @param parserState the parserState to manipulate
+     */
     default void postParseAuthority(Rfc3986Parser.ParserState parserState) {
-        
+
     }
 
 }

@@ -16,9 +16,23 @@
 package org.netpreserve.commons.uri;
 
 /**
- *
+ * A normalizer which is executed after the Uri is parsed into a UriBuilder.
+ * <p>
+ * URI's processed by a PostParseNormalizer are already parsed into their components. That means they are valid URI's
+ * according to the rules specified in {@link UriBuilderConfig}. The type of normalization done by implementations of a
+ * PostParseNormalizer is to reduce the number of invariants, not to fix broken URI's. Examples could be sorting the
+ * query parameters and removing session id's.
  */
 public interface PostParseNormalizer extends Normalizer {
 
+    /**
+     * Normalize a parsed URI.
+     * <p>
+     * The URI is already parsed into its components. That means it is a valid URI according to the rules specified in
+     * {@link UriBuilderConfig}.
+     * <p>
+     * @param builder the parsed URI to normalize. The UriBuilder is normalized in place
+     */
     void normalize(UriBuilder builder);
+
 }

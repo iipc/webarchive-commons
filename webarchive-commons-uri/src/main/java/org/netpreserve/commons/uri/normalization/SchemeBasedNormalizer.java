@@ -24,10 +24,15 @@ import org.netpreserve.commons.uri.Normalizer;
 import org.netpreserve.commons.uri.UriBuilder;
 
 /**
- *
+ * Normalizers implementing this interface is executed only for the Schemes they claim to support.
  */
 public abstract class SchemeBasedNormalizer implements Normalizer {
 
+    /**
+     * Get a set of strings with the scheme names this normalizer supports.
+     * <p>
+     * @return the supported schemes
+     */
     public abstract Set<String> getSupportedSchemes();
 
     @Override
@@ -43,6 +48,14 @@ public abstract class SchemeBasedNormalizer implements Normalizer {
         return false;
     }
 
+    /**
+     * Helper method for creating a static immutable set of strings.
+     * <p>
+     * This can be used by subclasses to create the set of supported schemes.
+     * <p>
+     * @param values the list of strings
+     * @return a set containing the submitted strings
+     */
     protected final static Set<String> immutableSetOf(String... values) {
         return Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(values)));
     }

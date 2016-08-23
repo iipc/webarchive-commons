@@ -13,14 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.netpreserve.commons.uri;
 
 /**
- * A Normalizer can be added to the Uri parsing process.
+ * A Normalizer that can be added to the Uri parsing process.
  */
 public interface Normalizer {
+
+    /**
+     * Gives the Normalizer an opportunity to decide if this Normalizer should be run for the submitted builder.
+     * <p>
+     * @param builder the builder to check
+     * @return true if this normalizer should be used for this builder.
+     */
     default boolean validFor(UriBuilder builder) {
         return true;
     }
+
 }

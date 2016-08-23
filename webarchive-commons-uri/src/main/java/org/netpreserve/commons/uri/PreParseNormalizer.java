@@ -16,8 +16,19 @@
 package org.netpreserve.commons.uri;
 
 /**
- *
+ * A normalizer which is executed before the Uri is parsed into a UriBuilder.
+ * <p>
+ * URI's processed by a PreParseNormalizer are not parsed into their components. Implementations of PreParseNormalizer
+ * then has the opportunity to fix broken URI's. For example remove angle brackets around a URI.
  */
 public interface PreParseNormalizer extends Normalizer {
+
+    /**
+     * Normalize a URI string before it is parsed.
+     * <p>
+     * @param uriString the URI string to normalize
+     * @return the normalized string
+     */
     String normalize(String uriString);
+
 }

@@ -17,9 +17,14 @@ package org.netpreserve.commons.uri;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer;
+import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
 /**
- *
+ * Class for build instances of {@link Uri}.
  */
 public final class UriBuilder {
 
@@ -93,7 +98,9 @@ public final class UriBuilder {
 
     public UriBuilder uri(String uriString) {
         for (PreParseNormalizer normalizer : config.getPreParseNormalizers()) {
-            uriString = normalizer.normalize(uriString);
+            if (normalizer.validFor(this)) {
+                uriString = normalizer.normalize(uriString);
+            }
         }
 
         config.getParser().parseUri(this, uriString, 0);
@@ -239,38 +246,6 @@ public final class UriBuilder {
         return uri;
     }
 
-    public String trimHostnameDots(String src) {
-        int len = src.length();
-        int st = 0;
-        int i = 0;
-        int removed = 0;
-        char[] value = src.toCharArray();
-
-        while ((st < len) && (value[st] == '.')) {
-            st++;
-        }
-
-        i = st;
-        while (++i < len) {
-            if (removed > 0) {
-                value[i - removed] = value[i];
-            }
-            if (value[i] == '.' && value[i - 1 - removed] == '.') {
-                removed++;
-            }
-        }
-
-        while ((st < len) && (value[len - 1] == '.')) {
-            len--;
-        }
-
-        if (st > 0 || removed > 0 || len < src.length()) {
-            return new String(value, st, len - removed);
-        } else {
-            return src;
-        }
-    }
-
     public UriBuilder resolve(UriBuilder relative) throws UriException {
         if (authority != null) {
             parser().decomposeAuthority(this, authority);
@@ -291,6 +266,50 @@ public final class UriBuilder {
 
         resolve(uri);
         return this;
+    }
+
+    /**
+     * Get description of all the normalizations configured.
+     * <p>
+     * @return the list of normalization descriptions
+     */
+    public List<NormalizationDescription> getNormalizationDescriptions() {
+        List<NormalizationDescription> descriptions = new ArrayList<>();
+
+        for (Normalizer normalizer : config.getPreParseNormalizers()) {
+            addNormalizationDescription(normalizer, descriptions);
+        }
+
+        config.getParser().describeNormalization(descriptions);
+
+        for (Normalizer normalizer : config.getInParseNormalizers()) {
+            addNormalizationDescription(normalizer, descriptions);
+        }
+
+        for (Normalizer normalizer : config.getPostParseNormalizers()) {
+            addNormalizationDescription(normalizer, descriptions);
+        }
+
+        return descriptions;
+    }
+
+    private void addNormalizationDescription(Normalizer normalizer, List<NormalizationDescription> descriptions) {
+        if (normalizer instanceof SchemeBasedNormalizer) {
+            if (config.isSchemeBasedNormalization()) {
+                normalizer.describeNormalization(descriptions);
+            }
+        } else {
+            normalizer.describeNormalization(descriptions);
+        }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("UriBuilder configured with these normalizations:");
+        for (NormalizationDescription desc : getNormalizationDescriptions()) {
+            sb.append("\n").append(desc.toString("  "));
+        }
+        return sb.toString();
     }
 
 }

@@ -15,20 +15,21 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
+import java.util.List;
 import java.util.Set;
 
 import org.netpreserve.commons.uri.PostParseNormalizer;
 import org.netpreserve.commons.uri.UriBuilder;
+import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
 import static org.netpreserve.commons.uri.Schemes.HTTP;
 import static org.netpreserve.commons.uri.Schemes.HTTPS;
 
 /**
- * Normalizer for skipping errorneous extra slashes.
+ * Normalizer for skipping extra slashes in path.
  *
  * Skips:
  * <ul>
- *   <li>extra slashes at start of authority</li>
  *   <li>double slashes in path</li>
  *   <li>slashs at end of path</li>
  * </ul>
@@ -50,6 +51,14 @@ public class StripSlashesAtEndOfPath extends SchemeBasedNormalizer implements Po
     @Override
     public Set<String> getSupportedSchemes() {
         return SUPPORTED_SCHEMES;
+    }
+
+    @Override
+    public void describeNormalization(List<NormalizationDescription> descriptions) {
+        descriptions.add(NormalizationDescription.builder(StripSlashesAtEndOfPath.class)
+                .name("Strip slashes in path")
+                .description("Strips double slashes in path and slash at end of path.")
+                .build());
     }
 
 }

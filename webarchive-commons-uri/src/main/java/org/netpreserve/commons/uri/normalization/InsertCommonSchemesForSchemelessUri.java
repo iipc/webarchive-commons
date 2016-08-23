@@ -15,8 +15,11 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
+import java.util.List;
+
 import org.netpreserve.commons.uri.InParseNormalizer;
 import org.netpreserve.commons.uri.Rfc3986Parser;
+import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
 /**
  * Try to make a Uri absolute like the browsers do.
@@ -39,6 +42,15 @@ public class InsertCommonSchemesForSchemelessUri implements InParseNormalizer {
                 parserState.setHasAuthority(true);
             }
         }
+    }
+
+    @Override
+    public void describeNormalization(List<NormalizationDescription> descriptions) {
+        descriptions.add(NormalizationDescription.builder(InsertCommonSchemesForSchemelessUri.class)
+                .name("Insert common schemes for schemeless URI")
+                .description("Mimics common browser behavior by adding file schema for uri's starting with '/'"
+                        + " and http schema for others.")
+                .build());
     }
 
 }

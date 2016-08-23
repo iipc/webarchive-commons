@@ -15,10 +15,12 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
+import java.util.List;
 import java.util.Set;
 
 import org.netpreserve.commons.uri.PostParseNormalizer;
 import org.netpreserve.commons.uri.UriBuilder;
+import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
 import static org.netpreserve.commons.uri.Schemes.DNS;
 import static org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer.immutableSetOf;
@@ -42,6 +44,15 @@ public class OptimisticDnsScheme extends SchemeBasedNormalizer implements PostPa
     @Override
     public Set<String> getSupportedSchemes() {
         return SUPPORTED_SCHEMES;
+    }
+
+    @Override
+    public void describeNormalization(List<NormalizationDescription> descriptions) {
+        descriptions.add(NormalizationDescription.builder(OptimisticDnsScheme.class)
+                .name("Optimistic DNS scheme")
+                .description("If dns host is found in the authority, the path is removed. "
+                        + "If dns host is found in the path, it is moved to the authority.")
+                .build());
     }
 
 }

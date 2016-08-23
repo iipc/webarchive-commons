@@ -15,10 +15,12 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
+import java.util.List;
 import java.util.Set;
 
 import org.netpreserve.commons.uri.InParseNormalizer;
 import org.netpreserve.commons.uri.Rfc3986Parser;
+import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
 import static org.netpreserve.commons.uri.Schemes.HTTP;
 import static org.netpreserve.commons.uri.Schemes.HTTPS;
@@ -26,12 +28,7 @@ import static org.netpreserve.commons.uri.Schemes.HTTPS;
 /**
  * Normalizer for skipping errorneous extra slashes.
  *
- * Skips:
- * <ul>
- *   <li>extra slashes at start of authority</li>
- *   <li>double slashes in path</li>
- *   <li>slashs at end of path</li>
- * </ul>
+ * Skips extra slashes at start of authority
  */
 public class StripErrorneousExtraSlashes extends SchemeBasedNormalizer implements InParseNormalizer {
 
@@ -58,6 +55,14 @@ public class StripErrorneousExtraSlashes extends SchemeBasedNormalizer implement
     @Override
     public Set<String> getSupportedSchemes() {
         return SUPPORTED_SCHEMES;
+    }
+
+    @Override
+    public void describeNormalization(List<NormalizationDescription> descriptions) {
+        descriptions.add(NormalizationDescription.builder(StripErrorneousExtraSlashes.class)
+                .name("Strip errorneous extra slashes")
+                .description("Skips extra slashes at start of authority.")
+                .build());
     }
 
 }

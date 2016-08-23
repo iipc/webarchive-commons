@@ -15,16 +15,25 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
+import java.util.List;
 import java.util.Set;
 
 import org.netpreserve.commons.uri.PostParseNormalizer;
 import org.netpreserve.commons.uri.UriException;
 import org.netpreserve.commons.uri.UriBuilder;
+import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
 import static org.netpreserve.commons.uri.Schemes.HTTP;
 import static org.netpreserve.commons.uri.Schemes.HTTPS;
 import static org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer.immutableSetOf;
 
+/**
+ * Check if the URI is long enough to be valid.
+ *
+ * The check is only done for URI's with http and https schemes.
+ *
+ * This isn't really a normalizer since it will throw an exception instead of fixing the URI.
+ */
 public class CheckLongEnough extends SchemeBasedNormalizer implements PostParseNormalizer {
     private static final Set<String> SUPPORTED_SCHEMES = immutableSetOf(HTTP.name, HTTPS.name);
 
@@ -39,6 +48,11 @@ public class CheckLongEnough extends SchemeBasedNormalizer implements PostParseN
     @Override
     public Set<String> getSupportedSchemes() {
         return SUPPORTED_SCHEMES;
+    }
+
+    @Override
+    public void describeNormalization(List<NormalizationDescription> descriptions) {
+        // No description is added because this normalizer doesn't normalize, but throws an exception.
     }
 
 }

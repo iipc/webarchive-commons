@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.netpreserve.commons.uri.normalization.report;
 
 /**
- *
+ * An example of a URI before and after normalization.
  */
 public class NormalizationExample {
+
     private final String uri;
+
     private final String normalizedUri;
 
     public static class Builder {
@@ -47,6 +48,7 @@ public class NormalizationExample {
         }
 
     }
+
     public static NormalizationExample.Builder builder() {
         return new NormalizationExample.Builder();
     }
@@ -55,5 +57,10 @@ public class NormalizationExample {
         this.uri = uri;
         this.normalizedUri = normalizedUri;
     }
-    
+
+    @Override
+    public String toString() {
+        return "URI: '" + uri + "' => '" + normalizedUri + "'";
+    }
+
 }

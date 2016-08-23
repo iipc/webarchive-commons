@@ -15,10 +15,12 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
+import java.util.List;
 import java.util.Set;
 
 import org.netpreserve.commons.uri.PostParseNormalizer;
 import org.netpreserve.commons.uri.UriBuilder;
+import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
 import static org.netpreserve.commons.uri.Schemes.HTTP;
 import static org.netpreserve.commons.uri.Schemes.HTTPS;
@@ -39,6 +41,14 @@ public class StripWww extends SchemeBasedNormalizer implements PostParseNormaliz
     @Override
     public Set<String> getSupportedSchemes() {
         return SUPPORTED_SCHEMES;
+    }
+
+    @Override
+    public void describeNormalization(List<NormalizationDescription> descriptions) {
+        descriptions.add(NormalizationDescription.builder(StripWww.class)
+                .name("Strip www")
+                .description("Strips www from host part of authority.")
+                .build());
     }
 
 }

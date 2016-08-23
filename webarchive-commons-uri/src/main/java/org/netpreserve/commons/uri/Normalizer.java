@@ -15,6 +15,10 @@
  */
 package org.netpreserve.commons.uri;
 
+import java.util.List;
+
+import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
+
 /**
  * A Normalizer that can be added to the Uri parsing process.
  */
@@ -29,5 +33,12 @@ public interface Normalizer {
     default boolean validFor(UriBuilder builder) {
         return true;
     }
+
+    /**
+     * Add a human readable description of the normalization done by this class.
+     * <p>
+     * @param descriptions A list of descriptions which this class can add its own descriptions to.
+     */
+    void describeNormalization(List<NormalizationDescription> descriptions);
 
 }

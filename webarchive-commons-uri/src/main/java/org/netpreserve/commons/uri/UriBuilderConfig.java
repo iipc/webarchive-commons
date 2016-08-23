@@ -57,9 +57,8 @@ public final class UriBuilderConfig {
     private final UriFormat defaultFormat;
 
     /**
-     * Create a new builder for UriBuilderConfig initialized with sensible
-     * defaults for parsing valid Uri's.
-     *
+     * Create a new builder for UriBuilderConfig initialized with sensible defaults for parsing valid Uri's.
+     * <p>
      * @return the builder
      */
     public static ConfigBuilder newBuilder() {
@@ -67,9 +66,8 @@ public final class UriBuilderConfig {
     }
 
     /**
-     * Create a new builder for UriBuilderConfig initialized with this
-     * UriBuilderConfig.
-     *
+     * Create a new builder for UriBuilderConfig initialized with this UriBuilderConfig.
+     * <p>
      * @return the builder
      */
     public ConfigBuilder toBuilder() {
@@ -343,5 +341,6 @@ public final class UriBuilderConfig {
         public UriBuilderConfig build() {
             return new UriBuilderConfig(this);
         }
+
     }
 }

@@ -15,8 +15,11 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
+import java.util.List;
+
 import org.netpreserve.commons.uri.InParseNormalizer;
 import org.netpreserve.commons.uri.Rfc3986Parser;
+import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
 import static org.netpreserve.commons.uri.UriBuilder.ESCAPED_SPACE;
 
@@ -33,6 +36,14 @@ public class StripTrailingEscapedSpaceOnAuthority implements InParseNormalizer {
             authority = authority.substring(0, authority.length() - 3);
         }
         parserState.setAuthority(authority);
+    }
+
+    @Override
+    public void describeNormalization(List<NormalizationDescription> descriptions) {
+        descriptions.add(NormalizationDescription.builder(StripTrailingEscapedSpaceOnAuthority.class)
+                .name("Strip trailing escaped space on authority")
+                .description("Removes escaped space i.e. %20, from end of authority.")
+                .build());
     }
 
 }

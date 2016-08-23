@@ -20,6 +20,9 @@ import java.net.IDN;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.BitSet;
+import java.util.List;
+
+import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
 /**
  *
@@ -42,7 +45,6 @@ public class Rfc3986Parser {
     protected static final BitSet DIGIT = new BitSet(256);
 
     // Static initializer for DIGIT
-
     static {
         for (int i = '0'; i <= '9'; i++) {
             DIGIT.set(i);
@@ -59,7 +61,6 @@ public class Rfc3986Parser {
     protected static final BitSet ALPHA = new BitSet(256);
 
     // Static initializer for ALPHA
-
     static {
         for (int i = 'a'; i <= 'z'; i++) {
             ALPHA.set(i);
@@ -80,7 +81,6 @@ public class Rfc3986Parser {
     protected static final BitSet HEX = new BitSet(256);
 
     // Static initializer for HEX
-
     static {
         HEX.or(DIGIT);
         for (int i = 'a'; i <= 'f'; i++) {
@@ -97,7 +97,6 @@ public class Rfc3986Parser {
     public static final BitSet GEN_DELIMS = new BitSet(256);
 
     // Static initializer for GEN_DELIMS
-
     static {
         GEN_DELIMS.set(':');
         GEN_DELIMS.set('/');
@@ -114,7 +113,6 @@ public class Rfc3986Parser {
     public static final BitSet SUB_DELIMS = new BitSet(256);
 
     // Static initializer for GEN_DELIMS
-
     static {
         SUB_DELIMS.set('!');
         SUB_DELIMS.set('$');
@@ -139,7 +137,6 @@ public class Rfc3986Parser {
     protected static final BitSet UNRESERVED = new BitSet(256);
 
     // Static initializer for UNRESERVED
-
     static {
         UNRESERVED.or(ALPHA);
         UNRESERVED.or(DIGIT);
@@ -159,7 +156,6 @@ public class Rfc3986Parser {
     protected static final BitSet RESERVED = new BitSet(256);
 
     // Static initializer for RESERVED
-
     static {
         RESERVED.or(GEN_DELIMS);
         RESERVED.or(SUB_DELIMS);
@@ -176,7 +172,6 @@ public class Rfc3986Parser {
     protected static final BitSet PCHAR = new BitSet(256);
 
     // Static initializer for PCHAR
-
     static {
         PCHAR.or(UNRESERVED);
         PCHAR.set('%');
@@ -195,7 +190,6 @@ public class Rfc3986Parser {
     protected static final BitSet SCHEME = new BitSet(256);
 
     // Static initializer for SCHEME
-
     static {
         SCHEME.or(ALPHA);
         SCHEME.or(DIGIT);
@@ -210,7 +204,6 @@ public class Rfc3986Parser {
     protected static final BitSet REGISTRY_NAME = new BitSet(256);
 
     // Static initializer for PATH
-
     static {
         REGISTRY_NAME.or(UNRESERVED);
         REGISTRY_NAME.set('%');
@@ -223,7 +216,6 @@ public class Rfc3986Parser {
     protected static final BitSet PATH = new BitSet(256);
 
     // Static initializer for PATH
-
     static {
         PATH.or(PCHAR);
         PATH.set('/');
@@ -235,7 +227,6 @@ public class Rfc3986Parser {
     protected static final BitSet QUERY = new BitSet(256);
 
     // Static initializer for QUERY
-
     static {
         QUERY.or(PCHAR);
         QUERY.set('/');
@@ -248,7 +239,6 @@ public class Rfc3986Parser {
     protected static final BitSet FRAGMENT = new BitSet(256);
 
     // Static initializer for FRAGMENT
-
     static {
         FRAGMENT.or(PCHAR);
         FRAGMENT.set('/');
@@ -335,6 +325,7 @@ public class Rfc3986Parser {
         public boolean uriHasAtLeastMoreChararcters(int minChars) {
             return uri.length() > offset + minChars;
         }
+
     }
 
     void parseUri(UriBuilder builder, String uri, int offset) {
@@ -807,6 +798,18 @@ public class Rfc3986Parser {
             return null;
         }
         return new String(encode(urlsafe, str.getBytes(charset)), StandardCharsets.US_ASCII);
+    }
+
+    /**
+     * Add a human readable description of the normalization done by this class.
+     * <p>
+     * @param descriptions A list of descriptions which this class can add its own descriptions to.
+     */
+    public void describeNormalization(List<NormalizationDescription> descriptions) {
+        descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
+                .name("Missing")
+                .description("The description of normalization done by the parser is missing")
+                .build());
     }
 
 }

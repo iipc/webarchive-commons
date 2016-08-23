@@ -676,6 +676,10 @@ public class Rfc3986Parser {
      * @return if true, it's the correct URI character sequence
      */
     String validateAndNormalize(UriBuilder builder, String component, int from, int to, BitSet generous) {
+        if (component == null) {
+            return null;
+        }
+
         // validate each component by generous characters
         if (to == -1) {
             to = component.length();

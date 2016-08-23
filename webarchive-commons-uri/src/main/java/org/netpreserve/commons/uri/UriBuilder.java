@@ -159,9 +159,10 @@ public final class UriBuilder {
     }
 
     public UriBuilder query(final String value) {
-        query = config.getParser().validateQuery(this, value, 0, -1);
-        if (query == null) {
-            throw new UriException("Illegal query: " + value);
+        if (value == null) {
+            query = null;
+        } else {
+            query = config.getParser().validateQuery(this, value, 0, -1);
         }
         parsedQuery = null;
         return this;

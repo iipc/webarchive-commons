@@ -43,7 +43,7 @@ public abstract class CdxSourceFactory {
      * Initialize Factory.
      */
     private void init() {
-        LOG.info("CdxSourceFactory for scheme '" + getSupportedScheme() + "' loaded");
+        LOG.info("Loaded CDX Source Factory for scheme '" + getSupportedScheme() + "'");
     }
 
     /**
@@ -55,13 +55,16 @@ public abstract class CdxSourceFactory {
      */
     public static final CdxSource getCdxSource(String identifier) {
         Uri uri = UriBuilder.strictUriBuilder().uri(identifier).build();
-        String scheme = Objects.requireNonNull(uri.getScheme(), "Cdx source identifier must start with a scheme");
+        String scheme = Objects.requireNonNull(uri.getScheme(), "CDX Source Identifier must start with a scheme");
 
         for (CdxSourceFactory csf : SERVICE_LOADER) {
             if (scheme.equalsIgnoreCase(csf.getSupportedScheme())) {
                 return csf.createCdxSource(uri);
             }
         }
+
+        LOG.warn("No CDX Source Factory found for schema '{}'", scheme);
+
         return null;
     }
 

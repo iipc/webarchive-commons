@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.netpreserve.commons.uri;
 
 /**
  *
  */
 public final class UriFormat {
+
     final boolean surtEncoding;
 
     final boolean ignoreScheme;
@@ -37,6 +37,10 @@ public final class UriFormat {
     final boolean ignoreQuery;
 
     final boolean ignoreFragment;
+
+    final boolean decodeHost;
+
+    final boolean decodePath;
 
     public static final class Builder {
 
@@ -57,6 +61,10 @@ public final class UriFormat {
         private boolean ignoreQuery;
 
         private boolean ignoreFragment;
+
+        private boolean decodeHost;
+
+        private boolean decodePath;
 
         private Builder() {
         }
@@ -110,10 +118,36 @@ public final class UriFormat {
             return new UriFormat(this);
         }
 
+        public Builder decodeHost(final boolean value) {
+            this.decodeHost = value;
+            return this;
+        }
+
+        public Builder decodePath(final boolean value) {
+            this.decodePath = value;
+            return this;
+        }
     }
 
     public static UriFormat.Builder builder() {
         return new UriFormat.Builder();
+    }
+
+    public static UriFormat.Builder builder(UriFormat format) {
+        Builder formatBuilder = new UriFormat.Builder();
+        formatBuilder.surtEncoding = format.surtEncoding;
+        formatBuilder.ignoreScheme = format.ignoreScheme;
+        formatBuilder.ignoreAuthority = format.ignoreAuthority;
+        formatBuilder.ignoreUserInfo = format.ignoreUserInfo;
+        formatBuilder.ignoreHost = format.ignoreHost;
+        formatBuilder.ignorePort = format.ignorePort;
+        formatBuilder.ignorePath = format.ignorePath;
+        formatBuilder.ignoreQuery = format.ignoreQuery;
+        formatBuilder.ignoreFragment = format.ignoreFragment;
+        formatBuilder.decodeHost = format.decodeHost;
+        formatBuilder.decodePath = format.decodePath;
+
+        return formatBuilder;
     }
 
     private UriFormat(final Builder formatBuilder) {
@@ -126,6 +160,8 @@ public final class UriFormat {
         this.ignorePath = formatBuilder.ignorePath;
         this.ignoreQuery = formatBuilder.ignoreQuery;
         this.ignoreFragment = formatBuilder.ignoreFragment;
+        this.decodeHost = formatBuilder.decodeHost;
+        this.decodePath = formatBuilder.decodePath;
     }
 
 }

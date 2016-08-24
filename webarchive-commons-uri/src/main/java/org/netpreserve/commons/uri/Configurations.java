@@ -15,7 +15,6 @@
  */
 package org.netpreserve.commons.uri;
 
-import org.netpreserve.commons.uri.normalization.AllLowerCase;
 import org.netpreserve.commons.uri.normalization.CheckLongEnough;
 import org.netpreserve.commons.uri.normalization.InsertCommonSchemesForSchemelessUri;
 import org.netpreserve.commons.uri.normalization.LaxTrimming;
@@ -50,7 +49,8 @@ public final class Configurations {
             .surtEncoding(true)
             .ignoreScheme(true)
             .ignoreUserInfo(true)
-            .ignoreFragment(true).build();
+            .ignoreFragment(true)
+            .decodeHost(true).build();
 
     public static final UriBuilderConfig STRICT_URI = UriBuilderConfig.newBuilder()
             .parser(Configurations.STRICT_PARSER)
@@ -101,7 +101,6 @@ public final class Configurations {
             .maxUrlLength(2083)
             .defaultFormat(Configurations.CANONICALIZED_URI_FORMAT)
             .addNormalizer(new LaxTrimming())
-            .addNormalizer(new AllLowerCase())
             .addNormalizer(new StripWwwN())
             .addNormalizer(new StripSessionId())
             .addNormalizer(new StripErrorneousExtraSlashes())
@@ -129,7 +128,6 @@ public final class Configurations {
             .maxUrlLength(2083)
             .defaultFormat(Configurations.SURT_KEY_FORMAT)
             .addNormalizer(new LaxTrimming())
-            .addNormalizer(new AllLowerCase())
             .addNormalizer(new StripWwwN())
             .addNormalizer(new StripSessionId())
             .addNormalizer(new StripErrorneousExtraSlashes())

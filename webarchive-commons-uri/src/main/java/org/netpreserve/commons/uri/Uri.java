@@ -193,20 +193,22 @@ public class Uri {
     @Override
     public String toString() {
         if (toStringCache == null) {
-            toStringCache = toCustomString(defaultFormat, false);
+            toStringCache = toCustomString(defaultFormat);
         }
         return toStringCache;
     }
 
     public String toDecodedString() {
-        return toCustomString(defaultFormat, true);
+        UriFormat format;
+        if (defaultFormat.decodeHost && defaultFormat.decodePath) {
+            format = defaultFormat;
+        } else {
+            format = UriFormat.builder(defaultFormat).decodeHost(true).decodePath(true).build();
+        }
+        return toCustomString(format);
     }
 
     public String toCustomString(UriFormat format) {
-        return toCustomString(format, false);
-    }
-
-    public String toCustomString(UriFormat format, boolean decode) {
         try {
             StringBuilder buf = new StringBuilder();
 
@@ -222,14 +224,14 @@ public class Uri {
                 if (format.surtEncoding) {
                     toSurtAuthority(buf, format);
                 } else if ((format.ignoreUserInfo && userinfo != null)
-                        || (host != null && (format.ignoreHost || decode))
+                        || (host != null && (format.ignoreHost || format.decodeHost))
                         || (format.ignorePort && port != -1)) {
 
                     if (!format.ignoreUserInfo && userinfo != null) {
                         buf.append(userinfo).append('@');
                     }
                     if (!format.ignoreHost && host != null) {
-                        if (decode) {
+                        if (format.decodeHost) {
                             buf.append(getDecodedHost());
                         } else {
                             buf.append(host);
@@ -245,7 +247,7 @@ public class Uri {
 
             if (!format.ignorePath && path != null) {
                 if (!path.isEmpty()) {
-                    if (decode) {
+                    if (format.decodePath) {
                         buf.append(getDecodedPath());
                     } else {
                         buf.append(path);

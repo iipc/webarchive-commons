@@ -19,6 +19,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer;
 import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
@@ -97,6 +98,7 @@ public final class UriBuilder {
     }
 
     public UriBuilder uri(String uriString) {
+        Objects.requireNonNull(uriString, "URI cannot be null");
         for (PreParseNormalizer normalizer : config.getPreParseNormalizers()) {
             if (normalizer.validFor(this)) {
                 uriString = normalizer.normalize(uriString);

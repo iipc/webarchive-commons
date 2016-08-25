@@ -16,7 +16,7 @@
 package org.netpreserve.commons.uri;
 
 /**
- *
+ * A format describing how to convert a Uri into a String.
  */
 public final class UriFormat {
 
@@ -42,6 +42,9 @@ public final class UriFormat {
 
     final boolean decodePath;
 
+    /**
+     * Builder for UriFormat.
+     */
     public static final class Builder {
 
         private boolean surtEncoding;
@@ -66,90 +69,185 @@ public final class UriFormat {
 
         private boolean decodePath;
 
+        /**
+         * This class should not be constructed directly. Use UriFormat.builder() instead.
+         */
         private Builder() {
         }
 
+        /**
+         * Use SURT encoding.
+         * <p>
+         * @param value true if SURT encoding should be used.
+         * @return this builder for method call chaining
+         */
         public Builder surtEncoding(final boolean value) {
             this.surtEncoding = value;
             return this;
         }
 
+        /**
+         * Ignore Scheme in output.
+         * <p>
+         * @param value true if Scheme should be ignored.
+         * @return this builder for method call chaining
+         */
         public Builder ignoreScheme(final boolean value) {
             this.ignoreScheme = value;
             return this;
         }
 
+        /**
+         * Ignore Authority in output.
+         * <p>
+         * @param value true if Authority should be ignored.
+         * @return this builder for method call chaining
+         */
         public Builder ignoreAuthority(final boolean value) {
             this.ignoreAuthority = value;
             return this;
         }
 
+        /**
+         * Ignore UserInfo in output.
+         * <p>
+         * @param value true if UserInfo should be ignored.
+         * @return this builder for method call chaining
+         */
         public Builder ignoreUserInfo(final boolean value) {
             this.ignoreUserInfo = value;
             return this;
         }
 
+        /**
+         * Ignore Host in output.
+         * <p>
+         * @param value true if Host should be ignored.
+         * @return this builder for method call chaining
+         */
         public Builder ignoreHost(final boolean value) {
             this.ignoreHost = value;
             return this;
         }
 
+        /**
+         * Ignore Port in output.
+         * <p>
+         * @param value true if Port should be ignored.
+         * @return this builder for method call chaining
+         */
         public Builder ignorePort(final boolean value) {
             this.ignorePort = value;
             return this;
         }
 
+        /**
+         * Ignore Path in output.
+         * <p>
+         * @param value true if Path should be ignored.
+         * @return this builder for method call chaining
+         */
         public Builder ignorePath(final boolean value) {
             this.ignorePath = value;
             return this;
         }
 
+        /**
+         * Ignore Query in output.
+         * <p>
+         * @param value true if Query should be ignored.
+         * @return this builder for method call chaining
+         */
         public Builder ignoreQuery(final boolean value) {
             this.ignoreQuery = value;
             return this;
         }
 
+        /**
+         * Ignore Fragment in output.
+         * <p>
+         * @param value true if Fragment should be ignored.
+         * @return this builder for method call chaining
+         */
         public Builder ignoreFragment(final boolean value) {
             this.ignoreFragment = value;
             return this;
         }
 
-        public UriFormat build() {
-            return new UriFormat(this);
-        }
-
+        /**
+         * Decode the Host in output.
+         * <p>
+         * If the host is an IDN, it could be puny encoded or contain international characters in UTF-8. The default is
+         * to puny encode. Setting this value to true decodes the host into UTF-8.
+         * <p>
+         * @param value true if Host should be decoded to UTF-8.
+         * @return this builder for method call chaining
+         */
         public Builder decodeHost(final boolean value) {
             this.decodeHost = value;
             return this;
         }
 
+        /**
+         * Decode any percent encoded characters.
+         *
+         * @param value true if the path should be decoded.
+         * @return this builder for method call chaining
+         */
         public Builder decodePath(final boolean value) {
             this.decodePath = value;
             return this;
         }
+
+        /**
+         * Create a UriFormat from this builder.
+         * <p>
+         * @return the newly created UriFormat.
+         */
+        public UriFormat build() {
+            return new UriFormat(this);
+        }
+
     }
 
+    /**
+     * Create a new builder for UriFormat.
+     * <p>
+     * @return the new builder
+     */
     public static UriFormat.Builder builder() {
         return new UriFormat.Builder();
     }
 
-    public static UriFormat.Builder builder(UriFormat format) {
+    /**
+     * Create a new builder for UriFormat initialized with this UriFormat.
+     * <p>
+     * @return the new builder
+     */
+    public UriFormat.Builder toBuilder() {
         Builder formatBuilder = new UriFormat.Builder();
-        formatBuilder.surtEncoding = format.surtEncoding;
-        formatBuilder.ignoreScheme = format.ignoreScheme;
-        formatBuilder.ignoreAuthority = format.ignoreAuthority;
-        formatBuilder.ignoreUserInfo = format.ignoreUserInfo;
-        formatBuilder.ignoreHost = format.ignoreHost;
-        formatBuilder.ignorePort = format.ignorePort;
-        formatBuilder.ignorePath = format.ignorePath;
-        formatBuilder.ignoreQuery = format.ignoreQuery;
-        formatBuilder.ignoreFragment = format.ignoreFragment;
-        formatBuilder.decodeHost = format.decodeHost;
-        formatBuilder.decodePath = format.decodePath;
+        formatBuilder.surtEncoding = surtEncoding;
+        formatBuilder.ignoreScheme = ignoreScheme;
+        formatBuilder.ignoreAuthority = ignoreAuthority;
+        formatBuilder.ignoreUserInfo = ignoreUserInfo;
+        formatBuilder.ignoreHost = ignoreHost;
+        formatBuilder.ignorePort = ignorePort;
+        formatBuilder.ignorePath = ignorePath;
+        formatBuilder.ignoreQuery = ignoreQuery;
+        formatBuilder.ignoreFragment = ignoreFragment;
+        formatBuilder.decodeHost = decodeHost;
+        formatBuilder.decodePath = decodePath;
 
         return formatBuilder;
     }
 
+    /**
+     * Create a UriFormat from a builder.
+     * <p>
+     * This constructor is private since formats should be created by a builder.
+     * <p>
+     * @param formatBuilder the builder
+     */
     private UriFormat(final Builder formatBuilder) {
         this.surtEncoding = formatBuilder.surtEncoding;
         this.ignoreScheme = formatBuilder.ignoreScheme;

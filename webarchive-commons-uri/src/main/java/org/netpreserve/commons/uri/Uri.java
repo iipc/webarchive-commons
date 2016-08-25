@@ -203,7 +203,7 @@ public class Uri {
         if (defaultFormat.decodeHost && defaultFormat.decodePath) {
             format = defaultFormat;
         } else {
-            format = UriFormat.builder(defaultFormat).decodeHost(true).decodePath(true).build();
+            format = defaultFormat.toBuilder().decodeHost(true).decodePath(true).build();
         }
         return toCustomString(format);
     }

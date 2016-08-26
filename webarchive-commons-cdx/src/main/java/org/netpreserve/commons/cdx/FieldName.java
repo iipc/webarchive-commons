@@ -165,6 +165,38 @@ public final class FieldName {
     public static final FieldName RECORD_ID = forNameAndType("rid", Type.STRING);
 
     /**
+     * Record Concurrent To.
+     * <p>
+     * The record ID of another record that the current record is considered to be ‘concurrent’ to. See further WARC
+     * chapter 5.7 (WARC-Concurrent-To).
+     */
+    public static final FieldName RECORD_CONCURRENT_TO = forNameAndType("rct", Type.STRING);
+
+    /**
+     * Revisit Original URI.
+     * <p>
+     * Only valid for records of type revisit. Contains the URI of the record that this record is considered a revisit
+     * of.
+     */
+    public static final FieldName REVISIT_ORIGINAL_URI = forNameAndType("rou", Type.URI);
+
+    /**
+     * Revisit Original Date.
+     * <p>
+     * Only valid for records of type revisit. Contains the timestamp of the record that this record is considered a
+     * revisit of.
+     */
+    public static final FieldName REVISIT_ORIGINAL_DATE = forNameAndType("rod", Type.TIMESTAMP);
+
+    /**
+     * Revisit Original record ID.
+     * <p>
+     * Only valid for records of type revisit. Contains the record ID of the record that this record is considered a
+     * revisit of.
+     */
+    public static final FieldName REVISIT_ORIGINAL_ID = forNameAndType("roi", Type.STRING);
+
+    /**
      * Reference used to fetch the record.
      */
     public static final FieldName RESOURCE_REF = forNameAndType("ref", Type.URI);

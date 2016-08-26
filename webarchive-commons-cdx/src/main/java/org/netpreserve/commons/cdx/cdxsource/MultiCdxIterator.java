@@ -41,8 +41,7 @@ public class MultiCdxIterator implements CdxIterator {
     /**
      * Constructs a new MultiCdxIterator from an array of CdxIterators.
      * <p>
-     * @param parallel true if source iterators should be running in separate threads to achieve
-     * parallel processing.
+     * @param parallel true if source iterators should be running in separate threads to achieve parallel processing.
      * @param reverse if true the result list will be sorted in descending order
      * @param iterators the CdxIterators to use as sources.
      */
@@ -57,7 +56,7 @@ public class MultiCdxIterator implements CdxIterator {
                 for (int i = 0; i < len; i++) {
                     CdxIterator iter = new IteratorTask(iterators[i]);
                     if (iter.peek() != null) {
-                        this.iterators[i] = iter;
+                        this.iterators[count] = iter;
                         count++;
                     } else {
                         iter.close();
@@ -68,7 +67,7 @@ public class MultiCdxIterator implements CdxIterator {
             for (int i = 0; i < len; i++) {
                 CdxIterator iter = iterators[i];
                 if (iter.peek() != null) {
-                    this.iterators[i] = iter;
+                    this.iterators[count] = iter;
                     count++;
                 } else {
                     iter.close();
@@ -76,7 +75,7 @@ public class MultiCdxIterator implements CdxIterator {
             }
         }
 
-        Arrays.sort(this.iterators, iteratorComparator);
+        Arrays.sort(this.iterators, 0, count, iteratorComparator);
     }
 
     @Override
@@ -99,7 +98,7 @@ public class MultiCdxIterator implements CdxIterator {
                     }
                 }
                 if (current != null) {
-                    iterators[iterators.length - 1] = current;
+                    iterators[count - 1] = current;
                 }
             }
             return result;
@@ -160,19 +159,15 @@ public class MultiCdxIterator implements CdxIterator {
             this.iterator = iterator;
             this.queue = new ArrayBlockingQueue<>(8);
 
-            future = executorService.submit(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        while (iterator.hasNext()) {
-                            queue.put(iterator.next());
-                        }
-                        hasMore = false;
-                    } catch (InterruptedException ex) {
-                        hasMore = false;
+            future = executorService.submit(() -> {
+                try {
+                    while (iterator.hasNext()) {
+                        queue.put(iterator.next());
                     }
+                    hasMore = false;
+                } catch (InterruptedException ex) {
+                    hasMore = false;
                 }
-
             });
         }
 
@@ -210,8 +205,7 @@ public class MultiCdxIterator implements CdxIterator {
         }
 
         /**
-         * Helper method for getting the next item from the queue. Waiting if necessary for one to
-         * become available.
+         * Helper method for getting the next item from the queue. Waiting if necessary for one to become available.
          */
         private void getNext() {
             while (next == null && (hasMore || !queue.isEmpty())) {

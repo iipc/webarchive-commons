@@ -15,7 +15,6 @@
  */
 package org.netpreserve.commons.cdx.processor;
 
-
 import org.netpreserve.commons.cdx.functions.Function;
 import org.netpreserve.commons.cdx.cdxsource.CdxIterator;
 import org.netpreserve.commons.cdx.CdxRecord;
@@ -69,8 +68,8 @@ public abstract class AbstractProcessorIterator<T extends Function> implements C
     }
 
     /**
-     * Returns the next element in the iteration without advancing the iteration, according to the
-     * contract of {@link PeekingIterator#peek()}.
+     * Returns the next element in the iteration without advancing the iteration, according to the contract of
+     * {@link PeekingIterator#peek()}.
      * <p>
      * @return the next element
      */
@@ -107,11 +106,13 @@ public abstract class AbstractProcessorIterator<T extends Function> implements C
     }
 
     /**
-     * Implementations of {@link #computeNext} <b>must</b> invoke this method when there are no
-     * elements left in the iteration.
+     * Signal end of data.
      * <p>
-     * @return {@code null}; a convenience so your {@code computeNext} implementation can use the
-     * simple statement {@code return endOfData();}
+     * Implementations of {@link #computeNext} <b>must</b> invoke this method when there are no elements left in the
+     * iteration.
+     * <p>
+     * @return {@code null}; a convenience so your {@code computeNext} implementation can use the simple statement
+     * {@code return endOfData();}
      */
     protected final CdxRecord endOfData() {
         state = State.DONE;

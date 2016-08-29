@@ -15,7 +15,7 @@
  */
 package org.netpreserve.commons.cdx.sort;
 
-import org.netpreserve.commons.util.ArrayUtil;
+import java.util.Arrays;
 
 /**
  * Internal class used for sorting.
@@ -33,7 +33,7 @@ abstract class ReplacementSelectionHeapSort {
 
     int heapSize;
 
-    int notHeapSize;
+    int takePtr;
 
     /**
      * Create a new ReplacementSelectionHeapSort.
@@ -43,7 +43,6 @@ abstract class ReplacementSelectionHeapSort {
      */
     ReplacementSelectionHeapSort(final int size) {
         heapSize = size;
-        notHeapSize = 0;
         data = new String[size];
     }
 
@@ -62,7 +61,7 @@ abstract class ReplacementSelectionHeapSort {
             i++;
         }
 
-        ArrayUtil.heapSort(data, 0, heapSize);
+        Arrays.parallelSort(data, 0, heapSize);
     }
 
     /**
@@ -75,44 +74,48 @@ abstract class ReplacementSelectionHeapSort {
      */
     public boolean writeNextRun(ScratchFile out) {
         while (heapSize > 0) {
-            out.write(data[0]);
+            out.write(data[takePtr]);
 
             String record = readNext();
             if (record == null) {
                 // No more input ......
-                for (int i = 1; i < heapSize; i++) {
+                for (int i = takePtr + 1; i < takePtr + heapSize; i++) {
                     out.write(data[i]);
                 }
                 // No more space on heap -> end of run
-                if (notHeapSize > 0) {
-                    for (int i = 0; i < notHeapSize; i++) {
-                        data[i] = data[i + heapSize];
-                    }
-                    heapSize = notHeapSize;
-                    notHeapSize = 0;
-                    ArrayUtil.heapSort(data, 0, heapSize);
+                if (takePtr > 0) {
+                    heapSize = takePtr;
+                    takePtr = 0;
                     break;
-                } else {
-                    return false;
                 }
+                return false;
             } else {
-                if (record.compareTo(data[0]) < 0) {
+                if (record.compareTo(data[takePtr]) < 0) {
+                    // Does not fit into current run
                     heapSize--;
-                    notHeapSize++;
-                    ArrayUtil.swap(data, 0, heapSize);
-                    data[heapSize] = record;
+                    takePtr++;
+
+                    // Insert into right place in next run
+                    int insertPt = Math.abs(Arrays.binarySearch(data, 0, takePtr - 1, record)) - 1;
+                    for (int i = takePtr - 1; i > insertPt; i--) {
+                        data[i] = data[i - 1];
+                    }
+                    data[insertPt] = record;
 
                     if (heapSize == 0) {
                         // No more space on heap -> end of run
-                        heapSize = notHeapSize;
-                        notHeapSize = 0;
-                        ArrayUtil.heapSort(data, 0, heapSize);
+                        heapSize = takePtr;
+                        takePtr = 0;
                         break;
                     }
                 } else {
-                    data[0] = record;
+                    // Insert into right place in current run
+                    int insertPt = Math.abs(Arrays.binarySearch(data, takePtr, takePtr + heapSize, record)) - 2;
+                    for (int i = takePtr; i < insertPt; i++) {
+                        data[i] = data[i + 1];
+                    }
+                    data[insertPt] = record;
                 }
-                ArrayUtil.heapSort(data, 0, heapSize);
             }
         }
         return heapSize > 0;

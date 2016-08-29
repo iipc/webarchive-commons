@@ -16,6 +16,7 @@
 package org.netpreserve.commons.cdx.cdxrecord;
 
 import org.netpreserve.commons.cdx.CdxFormat;
+import org.netpreserve.commons.util.datetime.DateFormat;
 
 /**
  * A format indicating that the CdxRecord is not connected to an unparsed line format.
@@ -41,6 +42,11 @@ public final class NonCdxLineFormat implements CdxFormat {
     @Override
     public String getFileHeader() {
         return null;
+    }
+
+    @Override
+    public DateFormat getKeyDateFormat() {
+        return DateFormat.WARC;
     }
 
 }

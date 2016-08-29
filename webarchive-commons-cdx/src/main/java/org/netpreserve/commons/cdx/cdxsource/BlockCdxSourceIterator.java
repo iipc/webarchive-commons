@@ -42,7 +42,6 @@ public class BlockCdxSourceIterator implements CdxIterator {
 //    final byte[] startFilter;
 //
 //    final byte[] endFilter;
-
     final SearchKey key;
 
     boolean eof = false;
@@ -69,7 +68,6 @@ public class BlockCdxSourceIterator implements CdxIterator {
 //        } else {
 //            this.endFilter = endKey.getBytes();
 //        }
-
         this.blockIterator = blockIterator;
 
         this.key = key;
@@ -88,6 +86,11 @@ public class BlockCdxSourceIterator implements CdxIterator {
         fillBuffer();
         skipLines();
         return this;
+    }
+
+    @Override
+    public CdxIterator limit(long maxSize) {
+        return new SizeLimitingCdxIterator(this, maxSize);
     }
 
     /**
@@ -202,8 +205,8 @@ public class BlockCdxSourceIterator implements CdxIterator {
     /**
      * Read the next line of cdx data.
      * <p>
-     * This method delegates to the buffer to read the next line. This method takes care of loading
-     * the next buffer if end of current buffer was reached.
+     * This method delegates to the buffer to read the next line. This method takes care of loading the next buffer if
+     * end of current buffer was reached.
      * <p>
      * @return the next line or null if end of result set
      */
@@ -223,8 +226,8 @@ public class BlockCdxSourceIterator implements CdxIterator {
     /**
      * Read the next line of cdx data ensuring the line is within the requested range.
      * <p>
-     * This method delegates to the buffer to read the next line. This method takes care of loading
-     * the next buffer if end of current buffer was reached.
+     * This method delegates to the buffer to read the next line. This method takes care of loading the next buffer if
+     * end of current buffer was reached.
      * <p>
      * @return the next line or null if end of result set
      */

@@ -26,7 +26,9 @@ import org.netpreserve.commons.cdx.SearchKey;
 public class ReverseCdxBuffer extends CdxBuffer {
 
     /**
-     * End of buffer. Actually reached the beginning of buffer since we are going backwards.
+     * End of buffer.
+     * <p>
+     * Actually reached the beginning of buffer since we are going backwards.
      */
     private boolean eob;
 
@@ -88,13 +90,8 @@ public class ReverseCdxBuffer extends CdxBuffer {
 
     @Override
     boolean skipLines() {
-//        if (firstFilter == null) {
-//            return true;
-//        }
-
         byteBuf.mark();
-        while (!key.included(byteBuf)) {
-//        while (includableByFilter(firstFilter)) {
+        while (!key.included(byteBuf, lineFormat)) {
             byteBuf.reset();
             skipLF();
             endOfLine = byteBuf.position();

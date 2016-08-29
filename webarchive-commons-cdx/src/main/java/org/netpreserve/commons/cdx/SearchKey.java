@@ -190,7 +190,7 @@ public class SearchKey implements Cloneable {
         return false;
     }
 
-    public boolean included(final ByteBuffer byteBuf) {
+    public boolean included(final ByteBuffer byteBuf, CdxFormat format) {
         switch (uriMatchType) {
             case ALL:
                 return true;
@@ -199,12 +199,15 @@ public class SearchKey implements Cloneable {
                 if (compareToFilter(byteBuf, uri.toString().getBytes()) == 0) {
                     if (dateRange != null && nextField(byteBuf) && byteBuf.hasRemaining()) {
                         if (dateRange.hasStartDate() && dateRange.hasEndDate()) {
-                            return between(byteBuf, dateRange.getStart().toHeritrixDateString().getBytes(), dateRange
-                                    .getEnd().toHeritrixDateString().getBytes());
+                            String startDate = dateRange.getStart().toFormattedString(format.getKeyDateFormat());
+                            String endDate = dateRange.getEnd().toFormattedString(format.getKeyDateFormat());
+                            return between(byteBuf, startDate.getBytes(), endDate.getBytes());
                         } else if (dateRange.hasStartDate()) {
-                            return compareToFilter(byteBuf, dateRange.getStart().toHeritrixDateString().getBytes()) >= 0;
+                            String startDate = dateRange.getStart().toFormattedString(format.getKeyDateFormat());
+                            return compareToFilter(byteBuf, startDate.getBytes()) >= 0;
                         } else {
-                            return compareToFilter(byteBuf, dateRange.getEnd().toHeritrixDateString().getBytes()) < 0;
+                            String endDate = dateRange.getEnd().toFormattedString(format.getKeyDateFormat());
+                            return compareToFilter(byteBuf, endDate.getBytes()) < 0;
                         }
                     }
                     return true;

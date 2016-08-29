@@ -18,6 +18,7 @@ package org.netpreserve.commons.cdx.processor;
 import org.netpreserve.commons.cdx.functions.Function;
 import org.netpreserve.commons.cdx.cdxsource.CdxIterator;
 import org.netpreserve.commons.cdx.CdxRecord;
+import org.netpreserve.commons.cdx.cdxsource.SizeLimitingCdxIterator;
 
 public abstract class AbstractProcessorIterator<T extends Function> implements CdxIterator {
 
@@ -83,6 +84,11 @@ public abstract class AbstractProcessorIterator<T extends Function> implements C
             return null;
         }
         return next;
+    }
+
+    @Override
+    public CdxIterator limit(long maxSize) {
+        return new SizeLimitingCdxIterator(this, maxSize);
     }
 
     @Override

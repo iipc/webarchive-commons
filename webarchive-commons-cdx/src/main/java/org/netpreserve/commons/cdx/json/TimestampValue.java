@@ -18,6 +18,7 @@ package org.netpreserve.commons.cdx.json;
 import java.io.IOException;
 import java.io.Writer;
 
+import org.netpreserve.commons.util.datetime.DateFormat;
 import org.netpreserve.commons.util.datetime.VariablePrecisionDateTime;
 
 /**
@@ -67,7 +68,7 @@ public final class TimestampValue implements Value<VariablePrecisionDateTime>, C
     @Override
     public void toJson(Writer out) throws IOException {
         out.write('\"');
-        out.write(getValue().toWarcDateString());
+        out.write(getValue().toFormattedString(DateFormat.WARC));
         out.write('\"');
     }
 

@@ -15,6 +15,8 @@
  */
 package org.netpreserve.commons.cdx;
 
+import org.netpreserve.commons.util.datetime.DateFormat;
+
 /**
  * Information specific to a cdx format.
  */
@@ -38,4 +40,10 @@ public interface CdxFormat {
      */
     String getFileHeader();
 
+    /**
+     * Get the format used for dates in the key.
+     *
+     * @return the key date format
+     */
+    DateFormat getKeyDateFormat();
 }

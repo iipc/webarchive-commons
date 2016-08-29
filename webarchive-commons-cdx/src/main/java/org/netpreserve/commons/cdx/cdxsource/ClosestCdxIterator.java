@@ -27,7 +27,7 @@ import org.netpreserve.commons.cdx.SearchResult;
 import org.netpreserve.commons.cdx.processor.Processor;
 
 /**
- * An iterator over a CdxSource with CdxLines sorted by distance to a timestamp.
+ * An iterator over a CdxSource with CdxLines sorted by distance to a timeStamp.
  */
 public class ClosestCdxIterator implements CdxIterator {
 
@@ -39,7 +39,7 @@ public class ClosestCdxIterator implements CdxIterator {
 
     final CdxIterator backwardIterator;
 
-    final VariablePrecisionDateTime timestamp;
+    final VariablePrecisionDateTime timeStamp;
 
     CdxRecord nextLine;
 
@@ -47,21 +47,30 @@ public class ClosestCdxIterator implements CdxIterator {
 
     Candidate nextBackwardCandidate;
 
-    public ClosestCdxIterator(CdxSource source, SearchKey key, VariablePrecisionDateTime timestamp, List<Processor> processors) {
+    /**
+     * Construct a new ClosestCdxIterator.
+     * <p>
+     * @param source the CdxSource to wrap
+     * @param key the key containing the Uri to search for
+     * @param timeStamp the timeStamp to sort around
+     * @param processors processors to apply before sorting, might be empty
+     */
+    public ClosestCdxIterator(CdxSource source, SearchKey key, VariablePrecisionDateTime timeStamp,
+            List<Processor> processors) {
 
         if (key.getMatchType() != SearchKey.UriMatchType.EXACT) {
             throw new IllegalArgumentException("Closest match not allowed for wildcard uri");
         }
 
-        SearchKey forwardKey = key.clone().dateRange(DateTimeRange.start(timestamp));
-        SearchKey backwardKey = key.clone().dateRange(DateTimeRange.end(timestamp));
+        SearchKey forwardKey = key.clone().dateRange(DateTimeRange.start(timeStamp));
+        SearchKey backwardKey = key.clone().dateRange(DateTimeRange.end(timeStamp));
 
         forwardResult = source.search(forwardKey, processors, false);
         backwardResult = source.search(backwardKey, processors, true);
 
         forwardIterator = forwardResult.iterator();
         backwardIterator = backwardResult.iterator();
-        this.timestamp = timestamp;
+        this.timeStamp = timeStamp;
     }
 
     @Override
@@ -114,6 +123,11 @@ public class ClosestCdxIterator implements CdxIterator {
     }
 
     @Override
+    public CdxIterator limit(long maxSize) {
+        return new SizeLimitingCdxIterator(this, maxSize);
+    }
+
+    @Override
     public void close() {
         forwardIterator.close();
         forwardResult.close();
@@ -126,22 +140,43 @@ public class ClosestCdxIterator implements CdxIterator {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * A candidate for the next value.
+     * <p>
+     * These are chosen based on distance to the time stamp
+     */
     private class Candidate {
 
         final CdxRecord line;
 
         final Duration distance;
 
+        /**
+         * Construct a new candidate.
+         * <p>
+         * @param line the CdxRecord to be turned into a Candidate
+         */
         Candidate(CdxRecord line) {
             this.line = line;
-            this.distance = line.getKey().getTimeStamp().getValue().distanceTo(timestamp);
+            this.distance = line.getKey().getTimeStamp().getValue().distanceTo(timeStamp);
         }
 
+        /**
+         * Compare distances.
+         * <p>
+         * @param o the candidate to compare this to
+         * @return true if this has greater distance than o
+         */
         public boolean greaterDistanceThan(Candidate o) {
             if (o == null) {
                 return false;
             }
             return distance.compareTo(o.distance) > 0;
+        }
+
+        @Override
+        public String toString() {
+            return "Candidate{" + "line=" + line.getKey() + ", distance=" + distance + '}';
         }
 
     }

@@ -26,6 +26,7 @@ import org.netpreserve.commons.cdx.cdxrecord.CdxjLineFormat;
 import org.netpreserve.commons.cdx.FieldName;
 import org.netpreserve.commons.cdx.HasUnparsedData;
 import org.netpreserve.commons.cdx.SearchResult;
+import org.netpreserve.commons.cdx.cdxrecord.NonCdxLineFormat;
 import org.netpreserve.commons.cdx.json.NullValue;
 import org.netpreserve.commons.cdx.json.StringValue;
 import org.netpreserve.commons.cdx.json.TimestampValue;
@@ -56,6 +57,11 @@ public class CdxRecordFormatter {
         } else {
             throw new IllegalArgumentException("No formatter for format: " + format.getClass());
         }
+    }
+
+    public CdxRecordFormatter(CdxFormatter formatter) {
+        this.format = NonCdxLineFormat.FORMAT;
+        this.formatter = formatter;
     }
 
     public String format(final CdxRecord record) {

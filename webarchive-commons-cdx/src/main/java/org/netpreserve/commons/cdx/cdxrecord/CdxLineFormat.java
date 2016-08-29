@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.netpreserve.commons.cdx.CdxFormat;
 import org.netpreserve.commons.cdx.FieldName;
+import org.netpreserve.commons.util.datetime.DateFormat;
 
 /**
  * A collection of CdxFieldTypes defining a legacy style CDX Line format.
@@ -192,6 +193,11 @@ public class CdxLineFormat implements CdxFormat {
             sb.append(" ").append(name.getCode());
         }
         return sb.toString();
+    }
+
+    @Override
+    public DateFormat getKeyDateFormat() {
+        return DateFormat.HERITRIX;
     }
 
 }

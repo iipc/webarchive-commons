@@ -16,6 +16,7 @@
 package org.netpreserve.commons.cdx.functions;
 
 import org.netpreserve.commons.cdx.CdxRecord;
+import org.netpreserve.commons.util.datetime.DateFormat;
 
 /**
  * A filter restricting the date range for a result.
@@ -39,7 +40,7 @@ public class FromToFilter implements Filter {
 
     @Override
     public boolean include(CdxRecord line) {
-        String dateField = line.getKey().getTimeStamp().getValue().toHeritrixDateString();
+        String dateField = line.getKey().getTimeStamp().getValue().toFormattedString(DateFormat.HERITRIX);
         return dateField.compareTo(from) >= 0 && dateField.compareTo(to) <= 0;
     }
 

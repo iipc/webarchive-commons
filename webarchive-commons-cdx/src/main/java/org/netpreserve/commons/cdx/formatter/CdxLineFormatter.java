@@ -47,7 +47,7 @@ public class CdxLineFormatter implements CdxFormatter {
         } else {
             out.write(key.getUriKey().getValue());
             out.write(' ');
-            out.write(key.getTimeStamp().getValue().toHeritrixDateString());
+            out.write(key.getTimeStamp().getValue().toFormattedString(format.getKeyDateFormat()));
         }
 
         for (int i = 2; i < format.getLength(); i++) {

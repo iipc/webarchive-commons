@@ -15,6 +15,7 @@
  */
 package org.netpreserve.commons.cdx.json;
 
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -124,7 +125,7 @@ public class SimpleJsonParser {
         }
         switch (src[currentIdx]) {
             case '"':
-                checkLegalType(fieldName, FieldName.Type.STRING, FieldName.Type.URI);
+                checkLegalType(fieldName, FieldName.Type.STRING, FieldName.Type.URI, FieldName.Type.TIMESTAMP);
                 StringValue val = parseString();
                 switch (fieldName.getType()) {
                     case URI:
@@ -164,7 +165,8 @@ public class SimpleJsonParser {
                 return;
             }
         }
-        throw new IllegalArgumentException("Illegal value found for " + fieldName);
+        throw new IllegalArgumentException("Illegal value type found for field '" + fieldName + "', was: "
+                + fieldName.getType() + ", allowed types are: " + Arrays.toString(legalTypes));
     }
 
     private StringValue parseString() {

@@ -117,6 +117,11 @@ public class MultiCdxIterator implements CdxIterator {
     }
 
     @Override
+    public CdxIterator limit(long maxSize) {
+        return new SizeLimitingCdxIterator(this, maxSize);
+    }
+
+    @Override
     public void close() {
         for (CdxIterator iter : iterators) {
             if (iter != null) {
@@ -189,6 +194,11 @@ public class MultiCdxIterator implements CdxIterator {
         @Override
         public boolean hasNext() {
             return peek() != null;
+        }
+
+        @Override
+        public CdxIterator limit(long maxSize) {
+            throw new UnsupportedOperationException();
         }
 
         @Override

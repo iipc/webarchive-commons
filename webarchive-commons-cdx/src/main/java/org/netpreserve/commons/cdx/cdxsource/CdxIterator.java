@@ -57,4 +57,5 @@ public interface CdxIterator extends Iterator<CdxRecord>, AutoCloseable {
     @Override
     void close();
 
+    CdxIterator limit(long maxSize);
 }

@@ -72,6 +72,11 @@ public class MockCdxIterator implements CdxIterator {
             return null;
         }
     }
+    
+    @Override
+    public CdxIterator limit(long maxSize) {
+        return new SizeLimitingCdxIterator(this, maxSize);
+    }
 
     @Override
     public void close() {

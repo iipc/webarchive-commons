@@ -16,6 +16,7 @@
 package org.netpreserve.commons.cdx.cdxrecord;
 
 import org.netpreserve.commons.cdx.CdxFormat;
+import org.netpreserve.commons.util.datetime.DateFormat;
 
 /**
  * The OpenWayback CDXJ format v1.0.
@@ -32,6 +33,11 @@ public class CdxjLineFormat implements CdxFormat {
     @Override
     public String getFileHeader() {
         return "!OpenWayback-CDXJ 1.0";
+    }
+
+    @Override
+    public DateFormat getKeyDateFormat() {
+        return DateFormat.WARC;
     }
 
 }

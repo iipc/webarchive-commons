@@ -33,4 +33,6 @@ public interface SearchResult extends Iterable<CdxRecord>, AutoCloseable {
     @Override
     void close();
 
+    SearchResult limit(long maxSize);
+
 }

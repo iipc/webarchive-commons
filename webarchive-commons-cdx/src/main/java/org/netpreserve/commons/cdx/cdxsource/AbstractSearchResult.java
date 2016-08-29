@@ -22,8 +22,8 @@ import org.netpreserve.commons.cdx.SearchResult;
 /**
  * Base implementation of {@link SearchResult}.
  * <p>
- * An instance of this class keeps a weak reference to all iterators created from it. If an instance
- * of this class is closed, all of its iterators not already garbage collected will also be closed.
+ * An instance of this class keeps a weak reference to all iterators created from it. If an instance of this class is
+ * closed, all of its iterators not already garbage collected will also be closed.
  */
 public abstract class AbstractSearchResult implements SearchResult {
 
@@ -38,6 +38,11 @@ public abstract class AbstractSearchResult implements SearchResult {
         CdxIterator iter = newIterator();
         iterators.put(iter, null);
         return iter;
+    }
+
+    @Override
+    public SearchResult limit(long maxSize) {
+        return new SizeLimitingSearchResult(this, maxSize);
     }
 
     @Override

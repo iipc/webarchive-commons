@@ -41,14 +41,14 @@ public final class DateTimeRange {
     private DateTimeRange(VariablePrecisionDateTime startDate, VariablePrecisionDateTime endDate) {
         if (startDate != null) {
             this.dateStart = new VariablePrecisionDateTime(startDate.getDate(),
-                    VariablePrecisionDateTime.Granularity.NANOSECOND);
+                    Granularity.NANOSECOND);
         } else {
             this.dateStart = null;
         }
 
         if (endDate != null) {
             this.dateEnd = new VariablePrecisionDateTime(endDate.getDate(),
-                    VariablePrecisionDateTime.Granularity.NANOSECOND);
+                    Granularity.NANOSECOND);
         } else {
             this.dateEnd = null;
         }
@@ -220,6 +220,11 @@ public final class DateTimeRange {
      */
     public VariablePrecisionDateTime getEnd() {
         return dateEnd;
+    }
+
+    @Override
+    public String toString() {
+        return "DateTimeRange{" + "dateStart=" + dateStart + ", dateEnd=" + dateEnd + '}';
     }
 
 }

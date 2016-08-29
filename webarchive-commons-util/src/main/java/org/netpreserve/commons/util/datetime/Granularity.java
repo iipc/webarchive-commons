@@ -1,0 +1,52 @@
+/*
+ * Copyright 2016 The International Internet Preservation Consortium.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.netpreserve.commons.util.datetime;
+
+/**
+ * A set of allowed granularities for a date.
+ */
+public enum Granularity {
+
+    /**
+     * A date with only the year known.
+     */
+    YEAR,
+    /**
+     * A date with only the year and month known.
+     */
+    MONTH,
+    /**
+     * A date with only the year, month and day known.
+     */
+    DAY,
+    /**
+     * A date with only the year, month, day and hour known.
+     */
+    HOUR,
+    /**
+     * A date with only the year, month, day, hour and minute known.
+     */
+    MINUTE,
+    /**
+     * A date with only the year, month, day, hour, minute and second known.
+     */
+    SECOND,
+    /**
+     * A date with the highest possible precision.
+     */
+    NANOSECOND;
+
+}

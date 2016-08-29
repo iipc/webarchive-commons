@@ -37,42 +37,6 @@ import java.util.Objects;
 public final class VariablePrecisionDateTime implements Comparable<VariablePrecisionDateTime> {
 
     /**
-     * A set of allowed granularities for a date.
-     */
-    public enum Granularity {
-
-        /**
-         * A date with only the year known.
-         */
-        YEAR,
-        /**
-         * A date with only the year and month known.
-         */
-        MONTH,
-        /**
-         * A date with only the year, month and day known.
-         */
-        DAY,
-        /**
-         * A date with only the year, month, day and hour known.
-         */
-        HOUR,
-        /**
-         * A date with only the year, month, day, hour and minute known.
-         */
-        MINUTE,
-        /**
-         * A date with only the year, month, day, hour, minute and second known.
-         */
-        SECOND,
-        /**
-         * A date with the highest possible precision.
-         */
-        NANOSECOND;
-
-    }
-
-    /**
      * Format for parsing WARC date syntax.
      */
     private static final DateTimeFormatter WARC_DATE_PARSE_FORMAT = new DateTimeFormatterBuilder()
@@ -111,43 +75,6 @@ public final class VariablePrecisionDateTime implements Comparable<VariablePreci
             .toFormatter(Locale.ENGLISH);
 
     /**
-     * Array of formats for formatting dates of different granularities allowed in the WARC date format.
-     */
-    private static final DateTimeFormatter[] WARC_DATE_OUTPUT_FORMAT;
-
-    static {
-        WARC_DATE_OUTPUT_FORMAT = new DateTimeFormatter[Granularity.values().length];
-
-        DateTimeFormatterBuilder warcDateBuilder = new DateTimeFormatterBuilder()
-                .appendValue(ChronoField.YEAR, 4);
-        WARC_DATE_OUTPUT_FORMAT[Granularity.YEAR.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
-
-        warcDateBuilder.appendLiteral('-')
-                .appendValue(ChronoField.MONTH_OF_YEAR, 2);
-        WARC_DATE_OUTPUT_FORMAT[Granularity.MONTH.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
-
-        warcDateBuilder.appendLiteral('-')
-                .appendValue(ChronoField.DAY_OF_MONTH, 2);
-        WARC_DATE_OUTPUT_FORMAT[Granularity.DAY.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
-
-        warcDateBuilder.appendLiteral('T')
-                .appendValue(ChronoField.HOUR_OF_DAY, 2);
-        WARC_DATE_OUTPUT_FORMAT[Granularity.HOUR.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
-
-        warcDateBuilder.appendLiteral(':')
-                .appendValue(ChronoField.MINUTE_OF_HOUR, 2);
-        WARC_DATE_OUTPUT_FORMAT[Granularity.MINUTE.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
-
-        warcDateBuilder.appendLiteral(':')
-                .appendValue(ChronoField.SECOND_OF_MINUTE, 2);
-        WARC_DATE_OUTPUT_FORMAT[Granularity.SECOND.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
-
-        warcDateBuilder.appendFraction(ChronoField.NANO_OF_SECOND, 9, 9, true)
-                .appendOffsetId();
-        WARC_DATE_OUTPUT_FORMAT[Granularity.NANOSECOND.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
-    }
-
-    /**
      * Format for parsing Heritrix date syntax.
      */
     private static final DateTimeFormatter HERITRIX_DATE_PARSE_FORMAT = new DateTimeFormatterBuilder()
@@ -176,37 +103,6 @@ public final class VariablePrecisionDateTime implements Comparable<VariablePreci
             .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
             .parseDefaulting(ChronoField.NANO_OF_SECOND, 0)
             .toFormatter(Locale.ENGLISH);
-
-    /**
-     * Array of formats for formatting dates of different granularities allowed in the Heritrix date format.
-     */
-    private static final DateTimeFormatter[] HERITRIX_DATE_OUTPUT_FORMAT;
-
-    static {
-        HERITRIX_DATE_OUTPUT_FORMAT = new DateTimeFormatter[Granularity.values().length];
-
-        DateTimeFormatterBuilder warcDateBuilder = new DateTimeFormatterBuilder()
-                .appendValue(ChronoField.YEAR, 4);
-        HERITRIX_DATE_OUTPUT_FORMAT[Granularity.YEAR.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
-
-        warcDateBuilder.appendValue(ChronoField.MONTH_OF_YEAR, 2);
-        HERITRIX_DATE_OUTPUT_FORMAT[Granularity.MONTH.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
-
-        warcDateBuilder.appendValue(ChronoField.DAY_OF_MONTH, 2);
-        HERITRIX_DATE_OUTPUT_FORMAT[Granularity.DAY.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
-
-        warcDateBuilder.appendValue(ChronoField.HOUR_OF_DAY, 2);
-        HERITRIX_DATE_OUTPUT_FORMAT[Granularity.HOUR.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
-
-        warcDateBuilder.appendValue(ChronoField.MINUTE_OF_HOUR, 2);
-        HERITRIX_DATE_OUTPUT_FORMAT[Granularity.MINUTE.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
-
-        warcDateBuilder.appendValue(ChronoField.SECOND_OF_MINUTE, 2);
-        HERITRIX_DATE_OUTPUT_FORMAT[Granularity.SECOND.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
-
-        warcDateBuilder.appendFraction(ChronoField.NANO_OF_SECOND, 9, 9, false);
-        HERITRIX_DATE_OUTPUT_FORMAT[Granularity.NANOSECOND.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
-    }
 
     final OffsetDateTime date;
 
@@ -322,21 +218,13 @@ public final class VariablePrecisionDateTime implements Comparable<VariablePreci
     }
 
     /**
-     * Get the date formatted as a WARC date.
+     * Get the date formatted according to a format.
      * <p>
+     * @param format the format to use
      * @return the formatted string.
      */
-    public String toWarcDateString() {
-        return WARC_DATE_OUTPUT_FORMAT[granularity.ordinal()].format(date);
-    }
-
-    /**
-     * Get the date formatted as a Heritrix date.
-     * <p>
-     * @return the formatted string.
-     */
-    public String toHeritrixDateString() {
-        return HERITRIX_DATE_OUTPUT_FORMAT[granularity.ordinal()].format(date);
+    public String toFormattedString(DateFormat format) {
+        return Objects.requireNonNull(format, "Format cannot be null").format(this);
     }
 
     @Override

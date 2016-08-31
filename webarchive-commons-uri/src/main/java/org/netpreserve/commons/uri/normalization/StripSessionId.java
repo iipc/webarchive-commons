@@ -36,9 +36,9 @@ public class StripSessionId extends SchemeBasedNormalizer implements PostParseNo
 
     @Override
     public void normalize(UriBuilder builder) {
-        ParsedQuery parsedQuery = builder.parsedQuery();
-        parsedQuery.remove("jsessionid");
-        parsedQuery.remove("phpsessionid");
+        ParsedQuery parsedQuery = builder.parsedQuery()
+                .remove("jsessionid")
+                .remove("phpsessionid");
         builder.parsedQuery(parsedQuery);
     }
 

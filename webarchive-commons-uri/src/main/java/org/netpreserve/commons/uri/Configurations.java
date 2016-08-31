@@ -15,6 +15,7 @@
  */
 package org.netpreserve.commons.uri;
 
+import org.netpreserve.commons.uri.normalization.AllLowerCase;
 import org.netpreserve.commons.uri.normalization.CheckLongEnough;
 import org.netpreserve.commons.uri.normalization.InsertCommonSchemesForSchemelessUri;
 import org.netpreserve.commons.uri.normalization.LaxTrimming;
@@ -52,6 +53,14 @@ public final class Configurations {
             .ignoreFragment(true)
             .decodeHost(true).build();
 
+    public static final UriFormat LEGACY_SURT_KEY_FORMAT = UriFormat.builder()
+            .surtEncoding(true)
+            .ignoreScheme(true)
+            .ignoreUserInfo(true)
+            .ignoreFragment(true)
+            .decodeHost(false)
+            .surtEncoder(new LegacyWaybackSurtEncoder()).build();
+
     public static final UriBuilderConfig STRICT_URI = UriBuilderConfig.newBuilder()
             .parser(Configurations.STRICT_PARSER)
             .referenceResolver(Configurations.REFERENCE_RESOLVER)
@@ -75,7 +84,7 @@ public final class Configurations {
             .pathSegmentNormalization(true)
             .schemeBasedNormalization(true)
             .encodeIllegalCharacters(true)
-             // Consider URIs too long for IE as illegal.
+            // Consider URIs too long for IE as illegal.
             .maxUrlLength(2083)
             .defaultFormat(Configurations.USABLE_URI_FORMAT)
             .addNormalizer(new LaxTrimming())
@@ -86,8 +95,8 @@ public final class Configurations {
             .addNormalizer(new CheckLongEnough())
             .build();
 
-    public static final UriBuilderConfig CANONICALIZED_URI =
-            UriBuilderConfig.newBuilder()
+    public static final UriBuilderConfig CANONICALIZED_URI
+            = UriBuilderConfig.newBuilder()
             .parser(Configurations.LAX_PARSER)
             .referenceResolver(Configurations.REFERENCE_RESOLVER)
             .requireAbsoluteUri(true)
@@ -97,7 +106,7 @@ public final class Configurations {
             .pathSegmentNormalization(true)
             .schemeBasedNormalization(true)
             .encodeIllegalCharacters(true)
-             // Consider URIs too long for IE as illegal.
+            // Consider URIs too long for IE as illegal.
             .maxUrlLength(2083)
             .defaultFormat(Configurations.CANONICALIZED_URI_FORMAT)
             .addNormalizer(new LaxTrimming())
@@ -108,13 +117,13 @@ public final class Configurations {
             .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
             .addNormalizer(new OptimisticDnsScheme())
             .addNormalizer(new CheckLongEnough())
-//            .addNormalizer(new StripSessionIDs());
-//            .addNormalizer(new StripSessionCFIDs());
-//            .addNormalizer(new FixupQueryString());
+            //            .addNormalizer(new StripSessionIDs());
+            //            .addNormalizer(new StripSessionCFIDs());
+            //            .addNormalizer(new FixupQueryString());
             .build();
 
-    public static final UriBuilderConfig SURT_KEY =
-            UriBuilderConfig.newBuilder()
+    public static final UriBuilderConfig SURT_KEY
+            = UriBuilderConfig.newBuilder()
             .parser(Configurations.LAX_PARSER)
             .referenceResolver(Configurations.REFERENCE_RESOLVER)
             .requireAbsoluteUri(true)
@@ -124,7 +133,7 @@ public final class Configurations {
             .pathSegmentNormalization(true)
             .schemeBasedNormalization(true)
             .encodeIllegalCharacters(true)
-             // Consider URIs too long for IE as illegal.
+            // Consider URIs too long for IE as illegal.
             .maxUrlLength(2083)
             .defaultFormat(Configurations.SURT_KEY_FORMAT)
             .addNormalizer(new LaxTrimming())
@@ -136,9 +145,38 @@ public final class Configurations {
             .addNormalizer(new InsertCommonSchemesForSchemelessUri())
             .addNormalizer(new OptimisticDnsScheme())
             .addNormalizer(new CheckLongEnough())
-//            .addNormalizer(new StripSessionIDs());
-//            .addNormalizer(new StripSessionCFIDs());
-//            .addNormalizer(new FixupQueryString());
+            //            .addNormalizer(new StripSessionIDs());
+            //            .addNormalizer(new StripSessionCFIDs());
+            //            .addNormalizer(new FixupQueryString());
+            .build();
+
+    public static final UriBuilderConfig LEGACY_SURT_KEY
+            = UriBuilderConfig.newBuilder()
+            .parser(Configurations.LAX_PARSER)
+            .referenceResolver(Configurations.REFERENCE_RESOLVER)
+            .requireAbsoluteUri(true)
+            .strictReferenceResolution(false)
+            .caseNormalization(true)
+            .percentEncodingNormalization(true)
+            .pathSegmentNormalization(true)
+            .schemeBasedNormalization(true)
+            .encodeIllegalCharacters(true)
+            // Consider URIs too long for IE as illegal.
+            .maxUrlLength(2083)
+            .defaultFormat(Configurations.LEGACY_SURT_KEY_FORMAT)
+            .addNormalizer(new LaxTrimming())
+            .addNormalizer(new AllLowerCase())
+            .addNormalizer(new StripWwwN())
+            .addNormalizer(new StripSessionId())
+            .addNormalizer(new StripErrorneousExtraSlashes())
+            .addNormalizer(new StripSlashesAtEndOfPath())
+            .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
+            .addNormalizer(new InsertCommonSchemesForSchemelessUri())
+            .addNormalizer(new OptimisticDnsScheme())
+            .addNormalizer(new CheckLongEnough())
+            //            .addNormalizer(new StripSessionIDs());
+            //            .addNormalizer(new StripSessionCFIDs());
+            //            .addNormalizer(new FixupQueryString());
             .build();
 
     private Configurations() {

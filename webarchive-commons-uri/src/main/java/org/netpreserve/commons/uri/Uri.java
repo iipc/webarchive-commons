@@ -222,7 +222,7 @@ public class Uri {
                     buf.append("//");
                 }
                 if (format.surtEncoding) {
-                    toSurtAuthority(buf, format);
+                    format.surtEncoder.encode(buf, this, format);
                 } else if ((format.ignoreUserInfo && userinfo != null)
                         || (host != null && (format.ignoreHost || format.decodeHost))
                         || (format.ignorePort && port != -1)) {
@@ -269,38 +269,6 @@ public class Uri {
         } catch (UriException ex) {
             throw new RuntimeException(ex);
         }
-    }
-
-    private void toSurtAuthority(StringBuilder buf, UriFormat format) {
-        buf.append("(");
-
-        if (!format.ignoreHost && host != null) {
-            if (isRegName) {
-                // other hostname match: do reverse
-                int hostSegEnd = host.length();
-                for (int i = hostSegEnd; i >= 0; i--) {
-                    if (i > 0 && host.charAt(i - 1) != '.') {
-                        continue;
-                    }
-                    buf.append(host, i, hostSegEnd); // rev getHost segment
-                    buf.append(',');     // ','
-                    hostSegEnd = i - 1;
-                }
-            } else {
-                buf.append(host);
-            }
-        }
-
-        if (!format.ignorePort && port != -1) {
-            buf.append(':').append(port);
-        }
-
-        if (!format.ignoreUserInfo && userinfo != null) {
-            buf.append('@');
-            buf.append(userinfo);
-        }
-
-        buf.append(')');
     }
 
     @Override

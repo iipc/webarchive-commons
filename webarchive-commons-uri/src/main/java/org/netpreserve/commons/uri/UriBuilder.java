@@ -171,7 +171,7 @@ public final class UriBuilder {
     }
 
     public UriBuilder parsedQuery(final ParsedQuery value) {
-        query(parsedQuery.toString());
+        query(value.toString());
         parsedQuery = value;
         return this;
     }

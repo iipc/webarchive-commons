@@ -20,6 +20,8 @@ package org.netpreserve.commons.uri;
  */
 public final class UriFormat {
 
+    private static final SurtEncoder DEFAULT_ENCODER = new StrictSurtEncoder();
+
     final boolean surtEncoding;
 
     final boolean ignoreScheme;
@@ -41,6 +43,8 @@ public final class UriFormat {
     final boolean decodeHost;
 
     final boolean decodePath;
+
+    final SurtEncoder surtEncoder;
 
     /**
      * Builder for UriFormat.
@@ -69,8 +73,11 @@ public final class UriFormat {
 
         private boolean decodePath;
 
+        private SurtEncoder surtEncoder;
+
         /**
-         * This class should not be constructed directly. Use UriFormat.builder() instead.
+         * This class should not be constructed directly. Use
+         * UriFormat.builder() instead.
          */
         private Builder() {
         }
@@ -83,6 +90,19 @@ public final class UriFormat {
          */
         public Builder surtEncoding(final boolean value) {
             this.surtEncoding = value;
+            return this;
+        }
+
+        /**
+         * Set the SurtEncoder implementation used when surtEncoding is set.
+         * <p>
+         * If no encoder is set, {@link StrictSurtEncoder} is used.
+         * <p>
+         * @param value the SurtEncoder to use.
+         * @return this builder for method call chaining
+         */
+        public Builder surtEncoder(final SurtEncoder value) {
+            this.surtEncoder = value;
             return this;
         }
 
@@ -177,8 +197,9 @@ public final class UriFormat {
         /**
          * Decode the Host in output.
          * <p>
-         * If the host is an IDN, it could be puny encoded or contain international characters in UTF-8. The default is
-         * to puny encode. Setting this value to true decodes the host into UTF-8.
+         * If the host is an IDN, it could be puny encoded or contain
+         * international characters in UTF-8. The default is to puny encode.
+         * Setting this value to true decodes the host into UTF-8.
          * <p>
          * @param value true if Host should be decoded to UTF-8.
          * @return this builder for method call chaining
@@ -237,6 +258,7 @@ public final class UriFormat {
         formatBuilder.ignoreFragment = ignoreFragment;
         formatBuilder.decodeHost = decodeHost;
         formatBuilder.decodePath = decodePath;
+        formatBuilder.surtEncoder = surtEncoder;
 
         return formatBuilder;
     }
@@ -260,6 +282,11 @@ public final class UriFormat {
         this.ignoreFragment = formatBuilder.ignoreFragment;
         this.decodeHost = formatBuilder.decodeHost;
         this.decodePath = formatBuilder.decodePath;
+        if (formatBuilder.surtEncoder != null) {
+            this.surtEncoder = formatBuilder.surtEncoder;
+        } else {
+            this.surtEncoder = DEFAULT_ENCODER;
+        }
     }
 
 }

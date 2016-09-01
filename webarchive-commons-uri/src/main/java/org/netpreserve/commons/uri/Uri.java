@@ -124,6 +124,10 @@ public class Uri {
         }
     }
 
+    public String getFormattedAuthority() {
+        return formatAuthority(defaultFormat, new StringBuilder()).toString();
+    }
+
     public String getAuthority() {
         return authority;
     }
@@ -221,28 +225,8 @@ public class Uri {
                 if (!format.ignoreScheme && scheme != null) {
                     buf.append("//");
                 }
-                if (format.surtEncoding) {
-                    format.surtEncoder.encode(buf, this, format);
-                } else if ((format.ignoreUserInfo && userinfo != null)
-                        || (host != null && (format.ignoreHost || format.decodeHost))
-                        || (format.ignorePort && port != -1)) {
 
-                    if (!format.ignoreUserInfo && userinfo != null) {
-                        buf.append(userinfo).append('@');
-                    }
-                    if (!format.ignoreHost && host != null) {
-                        if (format.decodeHost) {
-                            buf.append(getDecodedHost());
-                        } else {
-                            buf.append(host);
-                        }
-                    }
-                    if (!format.ignorePort && port >= 0) {
-                        buf.append(':').append(port);
-                    }
-                } else {
-                    buf.append(authority);
-                }
+                formatAuthority(format, buf);
             }
 
             if (!format.ignorePath && path != null) {
@@ -269,6 +253,33 @@ public class Uri {
         } catch (UriException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    private StringBuilder formatAuthority(UriFormat format, StringBuilder buf) {
+        if (format.surtEncoding) {
+            format.surtEncoder.encode(buf, this, format);
+        } else if ((format.ignoreUserInfo && userinfo != null)
+                || (host != null && (format.ignoreHost || format.decodeHost))
+                || (format.ignorePort && port != -1)) {
+
+            if (!format.ignoreUserInfo && userinfo != null) {
+                buf.append(userinfo).append('@');
+            }
+            if (!format.ignoreHost && host != null) {
+                if (format.decodeHost) {
+                    buf.append(getDecodedHost());
+                } else {
+                    buf.append(host);
+                }
+            }
+            if (!format.ignorePort && port >= 0) {
+                buf.append(':').append(port);
+            }
+        } else {
+            buf.append(authority);
+        }
+
+        return buf;
     }
 
     @Override

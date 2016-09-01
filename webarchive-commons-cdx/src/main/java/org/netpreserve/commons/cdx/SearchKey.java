@@ -29,7 +29,7 @@ import org.netpreserve.commons.uri.normalization.StripSlashesAtEndOfPath;
 /**
  * An instance of this class can determine if a CdxRecord is within scope for a search.
  */
-public class SearchKey {
+public final class SearchKey {
 
     public enum UriMatchType {
 
@@ -60,40 +60,26 @@ public class SearchKey {
     }
 
     public SearchKey(final String uri) {
-        this(uri, null, null, null, null, null, null, true);
+        this(uri.trim(), null, null, null, detectMatchType(uri.trim()), null, null, true);
     }
 
     public SearchKey(final String uri, final DateTimeRange dateRange) {
-        this(uri, dateRange, null, null, null, null, null, true);
+        this(uri.trim(), dateRange, null, null, detectMatchType(uri.trim()), null, null, true);
     }
 
     private SearchKey(String uri, DateTimeRange dateRange, String fromUri, String toUri,
             UriMatchType uriMatchType, CdxFormat cdxFormat, Uri parsedUri, boolean parseUri) {
 
         if (parseUri && uri != null && cdxFormat != null) {
-            String tmpUri = uri.trim();
-            UriMatchType tmpMatchType = UriMatchType.ALL;
-
-            if (tmpUri.startsWith("*")) {
-                tmpMatchType = UriMatchType.HOST;
-                tmpUri = tmpUri.substring(1);
-            }
-
-            if (tmpUri.endsWith("*")) {
-                if (tmpMatchType == UriMatchType.HOST) {
-                    throw new IllegalArgumentException("Only prefix or postfix wildcard is allowed");
-                }
-                tmpMatchType = UriMatchType.PATH;
-                tmpUri = tmpUri.substring(0, tmpUri.length() - 1);
-            }
-
-            if (tmpMatchType == UriMatchType.ALL) {
-                tmpMatchType = UriMatchType.EXACT;
-            }
-
             UriBuilderConfig uriBuilderConfig = cdxFormat.getKeyUriFormat();
 
-            if (tmpMatchType == UriMatchType.PATH) {
+            if (uriMatchType == UriMatchType.HOST) {
+                uri = uri.substring(1);
+            }
+
+            if (uriMatchType == UriMatchType.PATH) {
+                uri = uri.substring(0, uri.length() - 1);
+
                 // If match type is PATH, we need to keep ending slashes because we removed the final '*'.
                 UriBuilderConfig.ConfigBuilder builder = uriBuilderConfig.toBuilder();
                 builder.getPostParseNormalizers().removeIf(new Predicate<PostParseNormalizer>() {
@@ -106,9 +92,9 @@ public class SearchKey {
                 uriBuilderConfig = builder.build();
             }
 
-            this.uriString = tmpUri;
-            this.uriMatchType = tmpMatchType;
-            this.parsedUri = UriBuilder.builder(uriBuilderConfig).uri(tmpUri).build();
+            this.uriString = uri;
+            this.uriMatchType = uriMatchType;
+            this.parsedUri = UriBuilder.builder(uriBuilderConfig).uri(uri).build();
 
         } else {
             this.uriString = uri;
@@ -123,7 +109,9 @@ public class SearchKey {
     }
 
     public SearchKey uri(final String uri) {
-        return new SearchKey(uri, dateRange, fromUriString, toUriString, uriMatchType, cdxFormat, parsedUri, true);
+        String tmpUri = uri.trim();
+        UriMatchType tmpMatchType = detectMatchType(tmpUri);
+        return new SearchKey(tmpUri, dateRange, fromUriString, toUriString, tmpMatchType, cdxFormat, parsedUri, true);
     }
 
     public SearchKey dateRange(final DateTimeRange dateRange) {
@@ -494,6 +482,27 @@ public class SearchKey {
      */
     final boolean isLf(int c) {
         return c == '\n' || c == '\r';
+    }
+
+    private static UriMatchType detectMatchType(String uri) {
+        UriMatchType matchType = UriMatchType.ALL;
+
+        if (uri.startsWith("*")) {
+            matchType = UriMatchType.HOST;
+        }
+
+        if (uri.endsWith("*")) {
+            if (matchType == UriMatchType.HOST) {
+                throw new IllegalArgumentException("Only prefix or postfix wildcard is allowed");
+            }
+            matchType = UriMatchType.PATH;
+        }
+
+        if (matchType == UriMatchType.ALL) {
+            matchType = UriMatchType.EXACT;
+        }
+
+        return matchType;
     }
 
 }

@@ -31,7 +31,6 @@ import org.netpreserve.commons.cdx.json.NullValue;
 import org.netpreserve.commons.cdx.json.StringValue;
 import org.netpreserve.commons.cdx.json.TimestampValue;
 import org.netpreserve.commons.cdx.json.Value;
-import org.netpreserve.commons.uri.Configurations;
 import org.netpreserve.commons.uri.Uri;
 import org.netpreserve.commons.uri.UriBuilder;
 
@@ -125,7 +124,7 @@ public class CdxRecordFormatter {
      * @return the created key.
      */
     CdxRecordKey createKey(CdxRecord record) {
-        Uri surt = UriBuilder.builder(Configurations.SURT_KEY)
+        Uri surt = UriBuilder.builder(format.getKeyUriFormat())
                 .uri(record.get(FieldName.ORIGINAL_URI).toString()).build();
 
         Value timeStamp = record.get(FieldName.TIMESTAMP);

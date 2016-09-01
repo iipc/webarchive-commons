@@ -82,7 +82,6 @@ public class CdxRecordFormatterTest {
     @Test
     public void testFormatTwoArguments() {
         String legacyKey = "no,dagbladet)/premier2000/spiller_2519.html 20070908002541";
-        String newKey = "(no,dagbladet,)/premier2000/spiller_2519.html 20070908002541";
         String cdxjKey = "(no,dagbladet,)/premier2000/spiller_2519.html 2007-09-08T00:25:41 response";
 
         String cdx11String = " http://www.dagbladet.no/premier2000/spiller_2519.html text/html 404 "
@@ -102,17 +101,17 @@ public class CdxRecordFormatterTest {
         CdxRecord cdxjRecord = new CdxjLine(legacyKey + " response" + cdxjString, CdxjLineFormat.DEFAULT_CDXJLINE);
 
         CdxRecordFormatter formatter = new CdxRecordFormatter(CdxLineFormat.CDX11LINE);
-        assertThat(formatter.format(cdx11Record, true)).isEqualTo(newKey + cdx11String);
-        assertThat(formatter.format(cdx09Record, true)).isEqualTo(newKey
+        assertThat(formatter.format(cdx11Record, true)).isEqualTo(legacyKey + cdx11String);
+        assertThat(formatter.format(cdx09Record, true)).isEqualTo(legacyKey
                 + " http://www.dagbladet.no/premier2000/spiller_2519.html text/html 404 "
                 + "4GYIEA43CYREJWAD2NSGSIWYVGXJNGB7 - - - 68224437 "
                 + "IAH-20070907235053-00459-heritrix.arc.gz");
-        assertThat(formatter.format(cdxjRecord, true)).isEqualTo(newKey + cdx11String);
+        assertThat(formatter.format(cdxjRecord, true)).isEqualTo(legacyKey + cdx11String);
 
         formatter = new CdxRecordFormatter(CdxLineFormat.CDX09LINE);
-        assertThat(formatter.format(cdx11Record, true)).isEqualTo(newKey + cdx09String);
-        assertThat(formatter.format(cdx09Record, true)).isEqualTo(newKey + cdx09String);
-        assertThat(formatter.format(cdxjRecord, true)).isEqualTo(newKey + cdx09String);
+        assertThat(formatter.format(cdx11Record, true)).isEqualTo(legacyKey + cdx09String);
+        assertThat(formatter.format(cdx09Record, true)).isEqualTo(legacyKey + cdx09String);
+        assertThat(formatter.format(cdxjRecord, true)).isEqualTo(legacyKey + cdx09String);
 
         formatter = new CdxRecordFormatter(CdxjLineFormat.DEFAULT_CDXJLINE);
         assertThat(formatter.format(cdx11Record, true)).isEqualTo(cdxjKey + cdxjString);

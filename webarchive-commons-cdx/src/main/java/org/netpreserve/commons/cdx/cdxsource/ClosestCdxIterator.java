@@ -62,8 +62,8 @@ public class ClosestCdxIterator implements CdxIterator {
             throw new IllegalArgumentException("Closest match not allowed for wildcard uri");
         }
 
-        SearchKey forwardKey = key.clone().dateRange(DateTimeRange.start(timeStamp));
-        SearchKey backwardKey = key.clone().dateRange(DateTimeRange.end(timeStamp));
+        SearchKey forwardKey = key.dateRange(DateTimeRange.start(timeStamp));
+        SearchKey backwardKey = key.dateRange(DateTimeRange.end(timeStamp));
 
         forwardResult = source.search(forwardKey, processors, false);
         backwardResult = source.search(backwardKey, processors, true);

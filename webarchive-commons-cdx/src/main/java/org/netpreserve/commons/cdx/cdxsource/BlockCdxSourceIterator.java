@@ -39,10 +39,7 @@ public class BlockCdxSourceIterator implements CdxIterator {
 
     final ExecutorService executorService = CdxSourceExecutorService.getInstance();
 
-//    final byte[] startFilter;
-//
-//    final byte[] endFilter;
-    final SearchKey key;
+    final SearchKey searchKey;
 
     boolean eof = false;
 
@@ -53,24 +50,13 @@ public class BlockCdxSourceIterator implements CdxIterator {
     CdxRecord nextLine = null;
 
     public BlockCdxSourceIterator(final SourceDescriptor sourceDescriptor,
-            final Iterator<SourceBlock> blockIterator, final SearchKey key) {
+            final Iterator<SourceBlock> blockIterator, final SearchKey searchKey) {
 
         this.sourceDescriptor = sourceDescriptor;
 
-//        if (startKey == null || startKey.isEmpty()) {
-//            this.startFilter = null;
-//        } else {
-//            this.startFilter = startKey.getBytes();
-//        }
-//
-//        if (endKey == null || endKey.isEmpty()) {
-//            this.endFilter = null;
-//        } else {
-//            this.endFilter = endKey.getBytes();
-//        }
         this.blockIterator = blockIterator;
 
-        this.key = key;
+        this.searchKey = searchKey;
 
     }
 
@@ -82,7 +68,7 @@ public class BlockCdxSourceIterator implements CdxIterator {
      * @return this iterator for easy chaining
      */
     BlockCdxSourceIterator init() {
-        cdxBuffer = new CdxBuffer(sourceDescriptor.getInputFormat(), key);
+        cdxBuffer = new CdxBuffer(searchKey);
         fillBuffer();
         skipLines();
         return this;

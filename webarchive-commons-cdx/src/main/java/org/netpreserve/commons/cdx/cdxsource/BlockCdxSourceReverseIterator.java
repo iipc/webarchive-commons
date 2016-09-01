@@ -33,13 +33,13 @@ public class BlockCdxSourceReverseIterator extends BlockCdxSourceIterator {
      * @param endKey the range end (exclusive)
      */
     public BlockCdxSourceReverseIterator(final SourceDescriptor sourceDescriptor,
-            final Iterator<SourceBlock> blockIterator, final SearchKey key) {
-        super(sourceDescriptor, blockIterator, key);
+            final Iterator<SourceBlock> blockIterator, final SearchKey searchKey) {
+        super(sourceDescriptor, blockIterator, searchKey);
     }
 
     @Override
     BlockCdxSourceIterator init() {
-        cdxBuffer = new ReverseCdxBuffer(sourceDescriptor.getInputFormat(), key);
+        cdxBuffer = new ReverseCdxBuffer(searchKey);
         fillBuffer();
         skipLines();
         return this;

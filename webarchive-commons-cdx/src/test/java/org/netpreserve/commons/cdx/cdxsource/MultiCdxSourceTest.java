@@ -107,7 +107,7 @@ public class MultiCdxSourceTest {
 
 //        String startKey = "be,halten)";
 //        String toKey = "ch,";
-        SearchKey key = new SearchKey().surtUriFrom("(be,halten,)").surtUriTo("(ch,");
+        SearchKey key = new SearchKey().surtUriFrom("be,halten)").surtUriTo("ch,");
 
         SearchResult result1 = cdxFile1.search(key, null, false);
         assertThat(result1).hasSize(15);
@@ -152,7 +152,7 @@ public class MultiCdxSourceTest {
 
 //        String startKey = "be,halten)";
 //        String toKey = "ch,";
-        SearchKey key = new SearchKey().surtUriFrom("(be,halten,)").surtUriTo("(ch,");
+        SearchKey key = new SearchKey().surtUriFrom("be,halten)").surtUriTo("ch,");
 
         FieldRegexFilter f = new FieldRegexFilter(Collections.singletonList("!hsc:200"));
         Processor<Filter> fp = new FilterProcessor().addFunction(f);

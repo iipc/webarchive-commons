@@ -15,6 +15,7 @@
  */
 package org.netpreserve.commons.cdx;
 
+import org.netpreserve.commons.uri.UriBuilderConfig;
 import org.netpreserve.commons.util.datetime.DateFormat;
 
 /**
@@ -41,9 +42,17 @@ public interface CdxFormat {
     String getFileHeader();
 
     /**
+     * Get the format used for Uris in the key.
+     * <p>
+     * @return the key uri format
+     */
+    UriBuilderConfig getKeyUriFormat();
+
+    /**
      * Get the format used for dates in the key.
-     *
+     * <p>
      * @return the key date format
      */
     DateFormat getKeyDateFormat();
+
 }

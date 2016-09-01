@@ -16,6 +16,8 @@
 package org.netpreserve.commons.cdx.cdxrecord;
 
 import org.netpreserve.commons.cdx.CdxFormat;
+import org.netpreserve.commons.uri.Configurations;
+import org.netpreserve.commons.uri.UriBuilderConfig;
 import org.netpreserve.commons.util.datetime.DateFormat;
 
 /**
@@ -47,6 +49,11 @@ public final class NonCdxLineFormat implements CdxFormat {
     @Override
     public DateFormat getKeyDateFormat() {
         return DateFormat.WARC;
+    }
+
+    @Override
+    public UriBuilderConfig getKeyUriFormat() {
+        return Configurations.SURT_KEY;
     }
 
 }

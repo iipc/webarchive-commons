@@ -20,18 +20,16 @@ import org.netpreserve.commons.util.datetime.DateTimeRange;
 import java.nio.ByteBuffer;
 import java.util.function.Predicate;
 
-import org.netpreserve.commons.uri.Configurations;
 import org.netpreserve.commons.uri.PostParseNormalizer;
 import org.netpreserve.commons.uri.Uri;
 import org.netpreserve.commons.uri.UriBuilder;
 import org.netpreserve.commons.uri.UriBuilderConfig;
-import org.netpreserve.commons.uri.UriFormat;
 import org.netpreserve.commons.uri.normalization.StripSlashesAtEndOfPath;
 
 /**
  * An instance of this class can determine if a CdxRecord is within scope for a search.
  */
-public class SearchKey implements Cloneable {
+public class SearchKey {
 
     public enum UriMatchType {
 
@@ -43,79 +41,120 @@ public class SearchKey implements Cloneable {
 
     }
 
-    private Uri uri;
+    private final String uriString;
 
-    private DateTimeRange dateRange;
+    private final DateTimeRange dateRange;
 
-    private String surtUriFrom;
+    private final String fromUriString;
 
-    private String surtUriTo;
+    private final String toUriString;
 
-    private UriMatchType uriMatchType = UriMatchType.ALL;
+    private final UriMatchType uriMatchType;
 
-    private UriFormat SURT_HOST_FORMAT = UriFormat.builder()
-            .surtEncoding(true)
-            .ignoreScheme(true)
-            .ignoreUserInfo(true)
-            .ignorePort(true)
-            .ignorePath(true)
-            .ignoreFragment(true)
-            .build();
+    private final CdxFormat cdxFormat;
 
-    public SearchKey uri(final String value) {
-        String uriString = value.trim();
+    private final Uri parsedUri;
 
-        if (uriString.startsWith("*")) {
-            uriMatchType = UriMatchType.HOST;
-            uriString = uriString.substring(1);
-        }
+    public SearchKey() {
+        this(null, null, null, null, UriMatchType.ALL, null, null, false);
+    }
 
-        if (uriString.endsWith("*")) {
-            if (uriMatchType == UriMatchType.HOST) {
-                throw new IllegalArgumentException("Only prefix or postfix wildcard is allowed");
+    public SearchKey(final String uri) {
+        this(uri, null, null, null, null, null, null, true);
+    }
+
+    public SearchKey(final String uri, final DateTimeRange dateRange) {
+        this(uri, dateRange, null, null, null, null, null, true);
+    }
+
+    private SearchKey(String uri, DateTimeRange dateRange, String fromUri, String toUri,
+            UriMatchType uriMatchType, CdxFormat cdxFormat, Uri parsedUri, boolean parseUri) {
+
+        if (parseUri && uri != null && cdxFormat != null) {
+            String tmpUri = uri.trim();
+            UriMatchType tmpMatchType = UriMatchType.ALL;
+
+            if (tmpUri.startsWith("*")) {
+                tmpMatchType = UriMatchType.HOST;
+                tmpUri = tmpUri.substring(1);
             }
-            uriMatchType = UriMatchType.PATH;
-            uriString = uriString.substring(0, uriString.length() - 1);
-            UriBuilderConfig.ConfigBuilder b = Configurations.SURT_KEY.toBuilder();
-            b.getPostParseNormalizers().removeIf(new Predicate<PostParseNormalizer>() {
-                @Override
-                public boolean test(PostParseNormalizer t) {
-                    return StripSlashesAtEndOfPath.class.isInstance(t);
+
+            if (tmpUri.endsWith("*")) {
+                if (tmpMatchType == UriMatchType.HOST) {
+                    throw new IllegalArgumentException("Only prefix or postfix wildcard is allowed");
                 }
+                tmpMatchType = UriMatchType.PATH;
+                tmpUri = tmpUri.substring(0, tmpUri.length() - 1);
+            }
 
-            });
-            this.uri = UriBuilder.builder(b.build()).uri(uriString).build();
-            return this;
+            if (tmpMatchType == UriMatchType.ALL) {
+                tmpMatchType = UriMatchType.EXACT;
+            }
+
+            UriBuilderConfig uriBuilderConfig = cdxFormat.getKeyUriFormat();
+
+            if (tmpMatchType == UriMatchType.PATH) {
+                // If match type is PATH, we need to keep ending slashes because we removed the final '*'.
+                UriBuilderConfig.ConfigBuilder builder = uriBuilderConfig.toBuilder();
+                builder.getPostParseNormalizers().removeIf(new Predicate<PostParseNormalizer>() {
+                    @Override
+                    public boolean test(PostParseNormalizer t) {
+                        return StripSlashesAtEndOfPath.class.isInstance(t);
+                    }
+
+                });
+                uriBuilderConfig = builder.build();
+            }
+
+            this.uriString = tmpUri;
+            this.uriMatchType = tmpMatchType;
+            this.parsedUri = UriBuilder.builder(uriBuilderConfig).uri(tmpUri).build();
+
+        } else {
+            this.uriString = uri;
+            this.uriMatchType = uriMatchType;
+            this.parsedUri = parsedUri;
         }
 
-        if (uriMatchType == UriMatchType.ALL) {
-            uriMatchType = UriMatchType.EXACT;
-        }
-
-        this.uri = UriBuilder.builder(Configurations.SURT_KEY).uri(uriString).build();
-
-        return this;
+        this.cdxFormat = cdxFormat;
+        this.dateRange = dateRange;
+        this.fromUriString = fromUri;
+        this.toUriString = toUri;
     }
 
-    public SearchKey dateRange(final DateTimeRange value) {
-        this.dateRange = value;
-        return this;
+    public SearchKey uri(final String uri) {
+        return new SearchKey(uri, dateRange, fromUriString, toUriString, uriMatchType, cdxFormat, parsedUri, true);
     }
 
-    public SearchKey surtUriFrom(final String value) {
-        uriMatchType = UriMatchType.RANGE;
-        this.surtUriFrom = value;
-        return this;
+    public SearchKey dateRange(final DateTimeRange dateRange) {
+        return new SearchKey(uriString, dateRange, fromUriString, toUriString, uriMatchType, cdxFormat, parsedUri,
+                false);
     }
 
-    public SearchKey surtUriTo(final String value) {
-        uriMatchType = UriMatchType.RANGE;
-        this.surtUriTo = value;
-        return this;
+    public SearchKey surtUriFrom(final String fromUri) {
+        return new SearchKey(uriString, dateRange, fromUri, toUriString, UriMatchType.RANGE, cdxFormat, parsedUri,
+                false);
+    }
+
+    public SearchKey surtUriTo(final String toUri) {
+        return new SearchKey(uriString, dateRange, fromUriString, toUri, UriMatchType.RANGE, cdxFormat, parsedUri,
+                false);
+    }
+
+    public SearchKey cdxFormat(final CdxFormat format) {
+        return new SearchKey(uriString, dateRange, fromUriString, toUriString, uriMatchType, format, parsedUri, true);
     }
 
     public Uri getUri() {
-        return uri;
+        if (cdxFormat == null) {
+            throw new IllegalStateException("Cannot get parsed URI when CdxFormat is not set");
+        }
+
+        if (parsedUri == null) {
+            throw new IllegalStateException("Cannot get parsed URI when uri is not set");
+        }
+
+        return parsedUri;
     }
 
     public UriMatchType getMatchType() {
@@ -126,6 +165,10 @@ public class SearchKey implements Cloneable {
         return dateRange;
     }
 
+    public CdxFormat getCdxFormat() {
+        return cdxFormat;
+    }
+
     public boolean isBefore(final String keyToTest) {
         switch (uriMatchType) {
             case ALL:
@@ -133,13 +176,13 @@ public class SearchKey implements Cloneable {
 
             case EXACT:
             case PATH:
-                if (keyToTest.compareTo(uri.toString()) < 0) {
+                if (keyToTest.compareTo(getUri().toString()) < 0) {
                     return true;
                 }
                 break;
 
             case HOST:
-                String surtHost = uri.toCustomString(SURT_HOST_FORMAT);
+                String surtHost = getUri().getFormattedAuthority();
                 surtHost = surtHost.substring(0, surtHost.length() - 1);
                 if (keyToTest.compareTo(surtHost) < 0) {
                     return true;
@@ -147,7 +190,7 @@ public class SearchKey implements Cloneable {
                 break;
 
             case RANGE:
-                if ((surtUriFrom != null && keyToTest.compareTo(surtUriFrom) < 0)) {
+                if ((fromUriString != null && keyToTest.compareTo(fromUriString) < 0)) {
                     return true;
                 }
                 break;
@@ -161,19 +204,19 @@ public class SearchKey implements Cloneable {
                 return true;
 
             case EXACT:
-                if (uri.toString().equals(keyToTest)) {
+                if (getUri().toString().equals(keyToTest)) {
                     return true;
                 }
                 break;
 
             case PATH:
-                if (keyToTest.startsWith(uri.toString())) {
+                if (keyToTest.startsWith(getUri().toString())) {
                     return true;
                 }
                 break;
 
             case HOST:
-                String surtHost = uri.toCustomString(SURT_HOST_FORMAT);
+                String surtHost = getUri().getFormattedAuthority();
                 surtHost = surtHost.substring(0, surtHost.length() - 1);
                 if (keyToTest.startsWith(surtHost)) {
                     return true;
@@ -181,8 +224,8 @@ public class SearchKey implements Cloneable {
                 break;
 
             case RANGE:
-                if ((surtUriFrom == null || surtUriFrom.compareTo(keyToTest) <= 0)
-                        && (surtUriTo == null || surtUriTo.compareTo(keyToTest) > 0)) {
+                if ((fromUriString == null || fromUriString.compareTo(keyToTest) <= 0)
+                        && (toUriString == null || toUriString.compareTo(keyToTest) > 0)) {
                     return true;
                 }
                 break;
@@ -190,23 +233,23 @@ public class SearchKey implements Cloneable {
         return false;
     }
 
-    public boolean included(final ByteBuffer byteBuf, CdxFormat format) {
+    public boolean included(final ByteBuffer byteBuf) {
         switch (uriMatchType) {
             case ALL:
                 return true;
 
             case EXACT:
-                if (compareToFilter(byteBuf, uri.toString().getBytes()) == 0) {
+                if (compareToFilter(byteBuf, getUri().toString().getBytes()) == 0) {
                     if (dateRange != null && nextField(byteBuf) && byteBuf.hasRemaining()) {
                         if (dateRange.hasStartDate() && dateRange.hasEndDate()) {
-                            String startDate = dateRange.getStart().toFormattedString(format.getKeyDateFormat());
-                            String endDate = dateRange.getEnd().toFormattedString(format.getKeyDateFormat());
+                            String startDate = dateRange.getStart().toFormattedString(cdxFormat.getKeyDateFormat());
+                            String endDate = dateRange.getEnd().toFormattedString(cdxFormat.getKeyDateFormat());
                             return between(byteBuf, startDate.getBytes(), endDate.getBytes());
                         } else if (dateRange.hasStartDate()) {
-                            String startDate = dateRange.getStart().toFormattedString(format.getKeyDateFormat());
+                            String startDate = dateRange.getStart().toFormattedString(cdxFormat.getKeyDateFormat());
                             return compareToFilter(byteBuf, startDate.getBytes()) >= 0;
                         } else {
-                            String endDate = dateRange.getEnd().toFormattedString(format.getKeyDateFormat());
+                            String endDate = dateRange.getEnd().toFormattedString(cdxFormat.getKeyDateFormat());
                             return compareToFilter(byteBuf, endDate.getBytes()) < 0;
                         }
                     }
@@ -215,13 +258,13 @@ public class SearchKey implements Cloneable {
                 break;
 
             case PATH:
-                if (startsWith(byteBuf, uri.toString().getBytes())) {
+                if (startsWith(byteBuf, getUri().toString().getBytes())) {
                     return true;
                 }
                 break;
 
             case HOST:
-                String surtHost = uri.toCustomString(SURT_HOST_FORMAT);
+                String surtHost = getUri().getFormattedAuthority();
                 surtHost = surtHost.substring(0, surtHost.length() - 1);
                 if (startsWith(byteBuf, surtHost.getBytes())) {
                     return true;
@@ -229,7 +272,7 @@ public class SearchKey implements Cloneable {
                 break;
 
             case RANGE:
-                if (between(byteBuf, surtUriFrom.getBytes(), surtUriTo.getBytes())) {
+                if (between(byteBuf, fromUriString.getBytes(), toUriString.getBytes())) {
                     return true;
                 }
                 break;
@@ -394,8 +437,6 @@ public class SearchKey implements Cloneable {
         } else {
             while (byteBuf.hasRemaining() && (compareToStartFilter == 0 || compareToEndFilter == 0)) {
                 byte c = byteBuf.get();
-                System.out.print((char) c);
-                System.out.println(" -- SF: " + compareToStartFilter + ", EF: " + compareToEndFilter);
 
                 if (k < startFilterLength) {
                     if (compareToStartFilter == 0) {
@@ -453,15 +494,6 @@ public class SearchKey implements Cloneable {
      */
     final boolean isLf(int c) {
         return c == '\n' || c == '\r';
-    }
-
-    @Override
-    public SearchKey clone() {
-        try {
-            return (SearchKey) super.clone();
-        } catch (CloneNotSupportedException ex) {
-            throw new RuntimeException(ex);
-        }
     }
 
 }

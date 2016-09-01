@@ -37,7 +37,8 @@ public class BlockCdxSource implements CdxSource {
     }
 
     @Override
-    public SearchResult search(final SearchKey key, final List<Processor> processors, final boolean reverse) {
+    public SearchResult search(final SearchKey searchKey, final List<Processor> processors, final boolean reverse) {
+        SearchKey key = searchKey.cdxFormat(sourceDescriptor.getInputFormat());
 
         return new AbstractSearchResult() {
             final List<SourceBlock> blocks = sourceDescriptor.calculateBlocks(key);
@@ -96,11 +97,13 @@ public class BlockCdxSource implements CdxSource {
     }
 
     @Override
-    public long count(final SearchKey key) {
+    public long count(final SearchKey searchKey) {
+        SearchKey key = searchKey.cdxFormat(sourceDescriptor.getInputFormat());
+
         final List<SourceBlock> blocks = sourceDescriptor.calculateBlocks(key);
 
-        BlockCdxSourceLineCounter counter = new BlockCdxSourceLineCounter(sourceDescriptor,
-                blocks.iterator(), key).init();
+        BlockCdxSourceLineCounter counter = new BlockCdxSourceLineCounter(
+                sourceDescriptor, blocks.iterator(), key).init();
 
         return counter.count();
     }

@@ -107,7 +107,7 @@ public class CdxjLine extends BaseCdxRecord<CdxjLineFormat> implements HasUnpars
         int indexOfJsonBlock = ArrayUtil.indexOf(line, '{', 0);
         if (indexOfJsonBlock == -1) {
             throw new IllegalArgumentException("The CDX record '" + new String(line)
-                    + "' cannot be parsed");
+                    + "' cannot be parsed: JSON block is missing");
         }
         return new CdxjLineRecordKey(Arrays.copyOf(line, indexOfJsonBlock - 1));
     }

@@ -47,9 +47,9 @@ public class CdxFileDescriptorTest {
 
         CdxFileDescriptor meta = new CdxFileDescriptor(path);
 
-        SourceBlock expectedBlock1 = new SourceBlock("(as,hotel,)/robots.txt", 27, 437992);
+        SourceBlock expectedBlock1 = new SourceBlock("as,hotel)/robots.txt", 27, 434660);
 
-        SearchKey key = new SearchKey().surtUriFrom("(ac,").surtUriTo("(biz,");
+        SearchKey key = new SearchKey().surtUriFrom("ac,").surtUriTo("biz,");
         List<SourceBlock> blocks = meta.calculateBlocks(key);
 
         assertThat(blocks)

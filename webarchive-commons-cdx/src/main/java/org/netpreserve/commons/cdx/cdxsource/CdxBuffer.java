@@ -35,9 +35,9 @@ public class CdxBuffer {
 
     final SearchKey key;
 
-    public CdxBuffer(final CdxFormat lineFormat, final SearchKey key) {
+    public CdxBuffer(final SearchKey key) {
 
-        this.lineFormat = Objects.requireNonNull(lineFormat);
+        this.lineFormat = Objects.requireNonNull(key.getCdxFormat());
         this.key = key;
     }
 
@@ -142,7 +142,7 @@ public class CdxBuffer {
     CdxRecord readLineCheckingFilter() {
         byteBuf.mark();
         if (hasRemaining()) {
-            if (key.included(byteBuf, lineFormat)) {
+            if (key.included(byteBuf)) {
                 CdxRecord cdxLine = createCdxLine(byteBuf, getEndOfLinePosition(), lineFormat);
                 moveToNextLine();
                 return cdxLine;
@@ -227,7 +227,7 @@ public class CdxBuffer {
     boolean skipLines() {
         while (byteBuf.hasRemaining()) {
             byteBuf.mark();
-            if (!key.included(byteBuf, lineFormat)) {
+            if (!key.included(byteBuf)) {
                 skipToEndOfLine();
                 skipLF();
             } else {
@@ -253,7 +253,7 @@ public class CdxBuffer {
     int countLinesCheckingFilter() {
         int count = 0;
         while (byteBuf.hasRemaining()) {
-            if (key.included(byteBuf, lineFormat)) {
+            if (key.included(byteBuf)) {
                 skipToEndOfLine();
                 skipLF();
                 count++;

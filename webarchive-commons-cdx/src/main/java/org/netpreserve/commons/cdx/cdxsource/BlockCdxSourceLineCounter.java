@@ -26,13 +26,13 @@ import org.netpreserve.commons.cdx.SearchKey;
 public class BlockCdxSourceLineCounter extends BlockCdxSourceIterator {
 
     public BlockCdxSourceLineCounter(SourceDescriptor sourceDescriptor,
-            Iterator<SourceBlock> blockIterator, SearchKey key) {
-        super(sourceDescriptor, blockIterator, key);
+            Iterator<SourceBlock> blockIterator, SearchKey searchKey) {
+        super(sourceDescriptor, blockIterator, searchKey);
     }
 
     @Override
     BlockCdxSourceLineCounter init() {
-        cdxBuffer = new CdxBuffer(sourceDescriptor.getInputFormat(), key);
+        cdxBuffer = new CdxBuffer(searchKey);
         return this;
     }
 

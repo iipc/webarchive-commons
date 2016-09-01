@@ -34,8 +34,8 @@ public class ReverseCdxBuffer extends CdxBuffer {
 
     private int endOfLine;
 
-    public ReverseCdxBuffer(final CdxFormat lineFormat, final SearchKey key) {
-        super(lineFormat, key);
+    public ReverseCdxBuffer(final SearchKey searchKey) {
+        super(searchKey);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class ReverseCdxBuffer extends CdxBuffer {
     @Override
     boolean skipLines() {
         byteBuf.mark();
-        while (!key.included(byteBuf, lineFormat)) {
+        while (!key.included(byteBuf)) {
             byteBuf.reset();
             skipLF();
             endOfLine = byteBuf.position();

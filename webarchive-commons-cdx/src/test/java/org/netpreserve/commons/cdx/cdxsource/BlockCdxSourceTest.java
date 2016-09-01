@@ -68,8 +68,8 @@ public class BlockCdxSourceTest {
 
             SearchResult result = cdxSource.search(key, null, false);
             assertThat(result).hasSize(expectedSize).usingElementComparator(comparator)
-                    .startsWith(new CdxLine("(as,hotel,)/robots.txt 20070821143246", format))
-                    .endsWith(new CdxLine("(com,imrworldwide,server-no,)/cgi-bin/count?http://www.nrk"
+                    .startsWith(new CdxLine("as,hotel)/robots.txt 20070821143246", format))
+                    .endsWith(new CdxLine("com,imrworldwide,server-no)/cgi-bin/count?http://www.nrk"
                                     + ".no/kanal/nrk_mpetre/1386661.html 20070825090945", format));
 
             // Collect result and reverse the order for the reversed test
@@ -105,8 +105,8 @@ public class BlockCdxSourceTest {
 
             SearchResult result = cdxSource.search(key, null, false);
             assertThat(result).hasSize(expectedSize).usingElementComparator(comparator)
-                    .startsWith(new CdxLine("(as,hotel,)/robots.txt 20070821143246", format))
-                    .endsWith(new CdxLine("(com,imrworldwide,server-no,)/cgi-bin/count?http://www.nrk"
+                    .startsWith(new CdxLine("as,hotel)/robots.txt 20070821143246", format))
+                    .endsWith(new CdxLine("com,imrworldwide,server-no)/cgi-bin/count?http://www.nrk"
                                     + ".no/kanal/nrk_mpetre/1386661.html 20070825090945", format));
 
             // Collect result and reverse the order for the reversed test
@@ -143,8 +143,8 @@ public class BlockCdxSourceTest {
 
             SearchResult result = cdxSource.search(key, null, false);
             assertThat(result).hasSize(expectedSize).usingElementComparator(comparator)
-                    .startsWith(new CdxLine("(no,vg,)/din_verden/assets/images/himmel.gif 20070822103939", format))
-                    .endsWith(new CdxLine("(no,vg,)/din_verden/assets/images/himmel.gif 20070905173550", format));
+                    .startsWith(new CdxLine("no,vg)/din_verden/assets/images/himmel.gif 20070822103939", format))
+                    .endsWith(new CdxLine("no,vg)/din_verden/assets/images/himmel.gif 20070905173550", format));
 
             // Collect result and reverse the order for the reversed test
             List<CdxRecord> resultSet = new ArrayList<>();
@@ -176,24 +176,24 @@ public class BlockCdxSourceTest {
 
 //            String startKey = "be,halten)";
 //            String toKey = "ch,";
-            SearchKey key = new SearchKey().surtUriFrom("(be,halten,)").surtUriTo("(ch,");
+            SearchKey key = new SearchKey().surtUriFrom("be,halten)").surtUriTo("ch,");
 
             List<CdxLine> expectedResult = new ArrayList<>();
-            expectedResult.add(new CdxLine("(be,halten,) 20070821143342", format));
-            expectedResult.add(new CdxLine("(be,your-counter,)/robots.txt 20070821133445", format));
-            expectedResult.add(new CdxLine("(biz,dataparty-mn,www,) 20070821170230", format));
-            expectedResult.add(new CdxLine("(biz,ggs,)/ 20070821185057", format));
-            expectedResult.add(new CdxLine("(biz,ggs,)/images/1-2.png 20070823215132", format));
-            expectedResult.add(new CdxLine("(biz,ggs,)/images/2-1.png 20070823215138", format));
-            expectedResult.add(new CdxLine("(biz,ggs,)/images/3-2.png 20070823215152", format));
-            expectedResult.add(new CdxLine("(biz,ggs,)/images/4-1.png 20070823215148", format));
-            expectedResult.add(new CdxLine("(biz,ggs,)/images/left_blue.jpg 20070823215146", format));
-            expectedResult.add(new CdxLine("(biz,ggs,)/images/top_blue.jpg 20070823215136", format));
-            expectedResult.add(new CdxLine("(biz,ggs,)/images/white_bullet.gif 20070823215134", format));
-            expectedResult.add(new CdxLine("(biz,ggs,)/images/white_tab.gif 20070823215150", format));
-            expectedResult.add(new CdxLine("(biz,ggs,)/menu.js 20070823215145", format));
-            expectedResult.add(new CdxLine("(biz,ggs,)/new.css 20070823215140", format));
-            expectedResult.add(new CdxLine("(biz,ggs,www,) 20070823215128", format));
+            expectedResult.add(new CdxLine("be,halten) 20070821143342", format));
+            expectedResult.add(new CdxLine("be,your-counter)/robots.txt 20070821133445", format));
+            expectedResult.add(new CdxLine("biz,dataparty-mn,www) 20070821170230", format));
+            expectedResult.add(new CdxLine("biz,ggs)/ 20070821185057", format));
+            expectedResult.add(new CdxLine("biz,ggs)/images/1-2.png 20070823215132", format));
+            expectedResult.add(new CdxLine("biz,ggs)/images/2-1.png 20070823215138", format));
+            expectedResult.add(new CdxLine("biz,ggs)/images/3-2.png 20070823215152", format));
+            expectedResult.add(new CdxLine("biz,ggs)/images/4-1.png 20070823215148", format));
+            expectedResult.add(new CdxLine("biz,ggs)/images/left_blue.jpg 20070823215146", format));
+            expectedResult.add(new CdxLine("biz,ggs)/images/top_blue.jpg 20070823215136", format));
+            expectedResult.add(new CdxLine("biz,ggs)/images/white_bullet.gif 20070823215134", format));
+            expectedResult.add(new CdxLine("biz,ggs)/images/white_tab.gif 20070823215150", format));
+            expectedResult.add(new CdxLine("biz,ggs)/menu.js 20070823215145", format));
+            expectedResult.add(new CdxLine("biz,ggs)/new.css 20070823215140", format));
+            expectedResult.add(new CdxLine("biz,ggs,www) 20070823215128", format));
 
             SearchResult result = cdxSource.search(key, null, false);
             assertThat(result).hasSize(15)
@@ -224,13 +224,13 @@ public class BlockCdxSourceTest {
 
         try (CdxSource cdxSource = new BlockCdxSource(sourceDescriptor);) {
 
-            SearchKey key = new SearchKey().surtUriFrom("(be,halten,)").surtUriTo("(ch,");
+            SearchKey key = new SearchKey().surtUriFrom("be,halten)").surtUriTo("ch,");
 
             FieldRegexFilter f = new FieldRegexFilter(Collections.singletonList("!hsc:200"));
             Processor<Filter> fp = new FilterProcessor().addFunction(f);
             List filters = Collections.singletonList(fp);
 
-            CdxRecord expected = new CdxLine("(be,your-counter,)/robots.txt 20070821133445", format);
+            CdxRecord expected = new CdxLine("be,your-counter)/robots.txt 20070821133445", format);
             SearchResult result = cdxSource.search(key, filters, false);
             assertThat(result).hasSize(1)
                     .usingElementComparator(comparator).containsExactly(expected);
@@ -251,7 +251,7 @@ public class BlockCdxSourceTest {
 
 //            String startKey = "be,halten)";
 //            String toKey = "ch,";
-            SearchKey key = new SearchKey().surtUriFrom("(be,halten,)").surtUriTo("(ch,");
+            SearchKey key = new SearchKey().surtUriFrom("be,halten)").surtUriTo("ch,");
 
             long count = cdxSource.count(key);
             assertThat(count).isEqualTo(15);

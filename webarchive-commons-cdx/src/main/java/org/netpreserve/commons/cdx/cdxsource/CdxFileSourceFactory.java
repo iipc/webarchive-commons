@@ -113,6 +113,7 @@ public class CdxFileSourceFactory extends CdxSourceFactory {
         // The sourcePath is a directory, add all files in directory and return.
         if (Files.isDirectory(sourcePath)) {
             try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(sourcePath)) {
+                LOG.info("Adding all files in '{}' as cdx sources", sourcePath.toAbsolutePath());
                 for (Path file : dirStream) {
                     if (Files.isRegularFile(file)) {
                         files.add(file);
@@ -155,7 +156,7 @@ public class CdxFileSourceFactory extends CdxSourceFactory {
                 throw new UncheckedIOException(ex);
             }
         } else {
-            LOG.warn("Could not find file: {}", sourcePath);
+            LOG.warn("Could not find file: {}", sourcePath.toAbsolutePath());
             return files;
         }
         return files;

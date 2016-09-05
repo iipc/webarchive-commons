@@ -25,13 +25,12 @@ import org.netpreserve.commons.cdx.CdxRecord;
  * The CdxIterator differs from the general contract of {@link Iterator} in two ways:
  * <ul>
  * <li>CdxIterator is not allowed to have null values.</li>
- * <li>CdxIterator should never throw {@link java.util.NoSuchElementException}. Instead null is
- * returned to indicate end of iteration.</li>
+ * <li>CdxIterator should never throw {@link java.util.NoSuchElementException}. Instead null is returned to indicate end
+ * of iteration.</li>
  * </ul>
  * <p>
- * Even though this class implements a close method. Users of the class should normally not need to
- * close it (but it is harmless to do so,) because the Iterable creating the iterator should
- * normally do it for you.
+ * Even though this class implements a close method. Users of the class should normally not need to close it (but it is
+ * harmless to do so,) because the Iterable creating the iterator should normally do it for you.
  */
 public interface CdxIterator extends Iterator<CdxRecord>, AutoCloseable {
 
@@ -50,12 +49,18 @@ public interface CdxIterator extends Iterator<CdxRecord>, AutoCloseable {
      * Calls to {@code peek()} does not change the state of the iteration.
      * <p>
      * @return the next element in the iteration or null if there are no more elements.
-     * {@link #hasNext()}
      */
     CdxRecord peek();
 
     @Override
     void close();
 
+    /**
+     * Return a new CdxIterator which cuts off the iteration after a certain limit.
+     * <p>
+     * @param maxSize the maximum number of records to return
+     * @return the new size limiting iterator
+     */
     CdxIterator limit(long maxSize);
+
 }

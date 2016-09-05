@@ -108,12 +108,12 @@ public class CdxjLineRecordKey extends CdxRecordKey implements HasUnparsedData {
     private void parse() {
         if (uriKey == null) {
             try {
-                int firstDelim = ArrayUtil.indexOf(data, ' ', 0);
+                int firstDelim = ArrayUtil.indexOf(data, 0, ' ');
                 if (firstDelim > 0) {
                     uriKey = StringValue.valueOf(data, 0, firstDelim);
                     firstDelim++;
 
-                    int secondDelim = ArrayUtil.indexOf(data, ' ', firstDelim);
+                    int secondDelim = ArrayUtil.indexOf(data, firstDelim, ' ');
                     if (secondDelim > 0) {
                         timeStamp = TimestampValue.valueOf(data, firstDelim, secondDelim);
                         recordType = StringValue.valueOf(data, secondDelim + 1, data.length);

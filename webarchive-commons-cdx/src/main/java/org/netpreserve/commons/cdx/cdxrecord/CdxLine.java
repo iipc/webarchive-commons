@@ -226,7 +226,7 @@ public class CdxLine extends BaseCdxRecord<CdxLineFormat> implements HasUnparsed
         fieldLengths = new int[getCdxFormat().getLength()];
 
         do {
-            currIndex = ArrayUtil.indexOf(data, delimiter, lastIndex);
+            currIndex = ArrayUtil.indexOf(data, lastIndex, delimiter);
             if (currIndex > 0) {
                 fieldOffsets[fieldCount] = lastIndex;
                 fieldLengths[fieldCount] = currIndex - lastIndex;
@@ -247,9 +247,9 @@ public class CdxLine extends BaseCdxRecord<CdxLineFormat> implements HasUnparsed
      * @return a CdxRecordKey with the parsed values
      */
     static final CdxRecordKey getKeyFromLine(final char[] line) {
-        int indexOfSecondField = ArrayUtil.indexOf(line, ' ', 0);
+        int indexOfSecondField = ArrayUtil.indexOf(line, 0, ' ');
         if (indexOfSecondField > 0) {
-            int indexOfThirdField = ArrayUtil.indexOf(line, ' ', indexOfSecondField + 1);
+            int indexOfThirdField = ArrayUtil.indexOf(line, indexOfSecondField + 1, ' ');
             if (indexOfThirdField > 0) {
                 return new CdxLineRecordKey(Arrays.copyOf(line, indexOfThirdField));
             } else if (line.length > indexOfSecondField + 1) {

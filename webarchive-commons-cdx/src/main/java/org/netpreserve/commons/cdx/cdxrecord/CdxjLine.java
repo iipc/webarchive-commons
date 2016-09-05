@@ -41,7 +41,7 @@ public class CdxjLine extends BaseCdxRecord<CdxjLineFormat> implements HasUnpars
 
     /**
      * Construct a new CdxjLine.
-     *
+     * <p>
      * @param line a string containing the raw data.
      * @param format the format of the input line.
      */
@@ -51,7 +51,7 @@ public class CdxjLine extends BaseCdxRecord<CdxjLineFormat> implements HasUnpars
 
     /**
      * Construct a new CdxjLine.
-     *
+     * <p>
      * @param line a character array containing the raw data.
      * @param format the format of the input line.
      */
@@ -89,7 +89,7 @@ public class CdxjLine extends BaseCdxRecord<CdxjLineFormat> implements HasUnpars
      */
     final void parseFields() {
         if (fields == null) {
-            Map<FieldName,Value> parsedFieldMap = new SimpleJsonParser(data, jsonBlockOffset).parseObject();
+            Map<FieldName, Value> parsedFieldMap = new SimpleJsonParser(data, jsonBlockOffset).parseObject();
             fields = new HashMap<>();
             for (Map.Entry<FieldName, Value> entry : parsedFieldMap.entrySet()) {
                 fields.put(entry.getKey(), new ImmutableField(entry.getKey(), entry.getValue()));
@@ -104,7 +104,7 @@ public class CdxjLine extends BaseCdxRecord<CdxjLineFormat> implements HasUnpars
      * @return a CdxRecordKey with the parsed values
      */
     static final CdxRecordKey getKeyFromLine(final char[] line) {
-        int indexOfJsonBlock = ArrayUtil.indexOf(line, '{', 0);
+        int indexOfJsonBlock = ArrayUtil.indexOf(line, 0, ' ', '{') + 1;
         if (indexOfJsonBlock == -1) {
             throw new IllegalArgumentException("The CDX record '" + new String(line)
                     + "' cannot be parsed: JSON block is missing");
@@ -119,7 +119,8 @@ public class CdxjLine extends BaseCdxRecord<CdxjLineFormat> implements HasUnpars
 
     @Override
     public String toString() {
-        return getKey().toString() + ' ' + String.copyValueOf(data);
+        return getKey().toString() + ' '
+                + String.copyValueOf(data, jsonBlockOffset, data.length - jsonBlockOffset).trim();
     }
 
     @Override

@@ -27,15 +27,14 @@ public final class ArrayUtil {
     }
 
     /**
-     * Helper method to find the index of a character in a char array.
+     * Helper method to find the index of a character or characters in a char array.
      * <p>
      * @param src the array to search
-     * @param ch the char to look for
      * @param fromIndex where in the src to start. If &lt;= 0, the beggining of the array is assumed. If &gt;=
-     * src.length, then -1 is returned.
+     * @param ch the char(s) to look for src.length, then -1 is returned.
      * @return the index of the first occurence of ch or -1 if not found.
      */
-    public static int indexOf(char[] src, char ch, int fromIndex) {
+    public static int indexOf(char[] src, int fromIndex, char... ch) {
         final int max = src.length;
         if (fromIndex < 0) {
             fromIndex = 0;
@@ -46,23 +45,37 @@ public final class ArrayUtil {
 
         final char[] value = src;
         for (int i = fromIndex; i < max; i++) {
-            if (value[i] == ch) {
-                return i;
+            if (value[i] == ch[0]) {
+                /* Found first character, now look at the rest */
+                if (i + ch.length <= max) {
+                    int j = i + 1;
+                    int end = j + ch.length - 1;
+                    for (int k = 1; j < end; j++, k++) {
+                        if (value[j] != ch[k]) {
+                            break;
+                        }
+                    }
+
+                    if (j == end) {
+                        /* Found whole string. */
+                        return i;
+                    }
+                }
             }
         }
         return -1;
     }
 
     /**
-     * Helper method to find the last index of a character in a char array.
+     * Helper method to find the last index of a character or characters in a char array.
      * <p>
      * @param src the array to search
-     * @param ch the char to look for
-     * @param fromIndex where in the src to start, searching backwards. If = 0, the beggining of the array is
-     * assumed. If &lt; 0, the end of the array is assumed. If &gt;= src.length, then -1 is returned.
+     * @param ch the char(s) to look for
+     * @param fromIndex where in the src to start, searching backwards. If = 0, the beggining of the array is assumed.
+     * If &lt; 0, the end of the array is assumed. If &gt;= src.length, then -1 is returned.
      * @return the index of the last occurence of ch or -1 if not found.
      */
-    public static int lastIndexOf(char[] src, char ch, int fromIndex) {
+    public static int lastIndexOf(char[] src, int fromIndex, char... ch) {
         if (fromIndex < 0) {
             fromIndex = src.length - 1;
         } else if (fromIndex >= src.length) {
@@ -72,8 +85,22 @@ public final class ArrayUtil {
 
         final char[] value = src;
         for (int i = fromIndex; i >= 0; i--) {
-            if (value[i] == ch) {
-                return i;
+            if (value[i] == ch[0]) {
+                /* Found first character, now look at the rest */
+                if (i + ch.length <= src.length) {
+                    int j = i + 1;
+                    int end = j + ch.length - 1;
+                    for (int k = 1; j < end; j++, k++) {
+                        if (value[j] != ch[k]) {
+                            break;
+                        }
+                    }
+
+                    if (j == end) {
+                        /* Found whole string. */
+                        return i;
+                    }
+                }
             }
         }
         return -1;

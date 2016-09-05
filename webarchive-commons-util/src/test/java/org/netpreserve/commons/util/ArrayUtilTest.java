@@ -30,9 +30,13 @@ public class ArrayUtilTest {
     @Test
     public void testIndexOf() {
         char[] array = new char[]{'g', 'a', 'c', 'b', 'a', 'l', 'm', 'a'};
-        assertThat(ArrayUtil.indexOf(array, 'a', 0)).isEqualTo(1);
-        assertThat(ArrayUtil.indexOf(array, 'a', 1)).isEqualTo(1);
-        assertThat(ArrayUtil.indexOf(array, 'a', 2)).isEqualTo(4);
+        assertThat(ArrayUtil.indexOf(array, 0, 'a')).isEqualTo(1);
+        assertThat(ArrayUtil.indexOf(array, 1, 'a')).isEqualTo(1);
+        assertThat(ArrayUtil.indexOf(array, 2, 'a')).isEqualTo(4);
+
+        assertThat(ArrayUtil.indexOf(array, 0, 'a', 'c')).isEqualTo(1);
+        assertThat(ArrayUtil.indexOf(array, 0, 'a', 'l')).isEqualTo(4);
+        assertThat(ArrayUtil.indexOf(array, 0, 'a', 'm')).isEqualTo(-1);
     }
 
     /**
@@ -40,12 +44,16 @@ public class ArrayUtilTest {
      */
     @Test
     public void testLastIndexOf() {
-        char[] array = new char[]{'g', 'a', 'c', 'b', 'a', 'l', 'm', 'a'};
-        assertThat(ArrayUtil.lastIndexOf(array, 'a', 0)).isEqualTo(-1);
-        assertThat(ArrayUtil.lastIndexOf(array, 'a', 1)).isEqualTo(1);
-        assertThat(ArrayUtil.lastIndexOf(array, 'a', array.length - 1)).isEqualTo(7);
-        assertThat(ArrayUtil.lastIndexOf(array, 'a', array.length - 2)).isEqualTo(4);
-        assertThat(ArrayUtil.lastIndexOf(array, 'a', -1)).isEqualTo(7);
+        char[] array = new char[]{'g', 'a', 'c', 'b', 'a', 'l', 'm', 'a', 'c'};
+        assertThat(ArrayUtil.lastIndexOf(array, 0, 'a')).isEqualTo(-1);
+        assertThat(ArrayUtil.lastIndexOf(array, 1, 'a')).isEqualTo(1);
+        assertThat(ArrayUtil.lastIndexOf(array, array.length - 1, 'a')).isEqualTo(7);
+        assertThat(ArrayUtil.lastIndexOf(array, array.length - 3, 'a')).isEqualTo(4);
+        assertThat(ArrayUtil.lastIndexOf(array, -1, 'a')).isEqualTo(7);
+
+        assertThat(ArrayUtil.lastIndexOf(array, -1, 'a', 'c')).isEqualTo(7);
+        assertThat(ArrayUtil.lastIndexOf(array, -1, 'a', 'l')).isEqualTo(4);
+        assertThat(ArrayUtil.lastIndexOf(array, -1, 'a', 'm')).isEqualTo(-1);
     }
 
     /**

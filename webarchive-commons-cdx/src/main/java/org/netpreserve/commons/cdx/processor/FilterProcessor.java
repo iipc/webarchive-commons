@@ -20,12 +20,15 @@ import java.util.List;
 import org.netpreserve.commons.cdx.functions.Filter;
 import org.netpreserve.commons.cdx.cdxsource.CdxIterator;
 import org.netpreserve.commons.cdx.CdxRecord;
+import org.netpreserve.commons.cdx.HasUnparsedData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * Processor taking a set of {@link Filter}'s and returning only those CDX lines matching all of the
- * filters.
+ * Processor taking a set of {@link Filter}'s and returning only those CDX lines matching all of the filters.
  */
 public class FilterProcessor extends AbstractProcessor<Filter> {
+    private static final Logger LOG = LoggerFactory.getLogger(FilterProcessor.class);
 
     @Override
     public CdxIterator processorIterator(CdxIterator wrappedIterator) {
@@ -42,7 +45,19 @@ public class FilterProcessor extends AbstractProcessor<Filter> {
                     CdxRecord input = wrappedCdxIterator.next();
                     boolean include = true;
                     for (Filter filter : filters) {
-                        if (!filter.include(input)) {
+                        try {
+                            if (!filter.include(input)) {
+                                include = false;
+                                break;
+                            }
+                        } catch (Exception e) {
+                            // An error was thrown while fetching the next CdxRecord. Log a warning and skip to next.
+                            if (input instanceof HasUnparsedData) {
+                                LOG.warn("Error while processing: '"
+                                        + String.valueOf(((HasUnparsedData) input).getUnparsed()) + "', skipping", e);
+                            } else {
+                                LOG.warn("Error while processing a record, skipping", e);
+                            }
                             include = false;
                             break;
                         }

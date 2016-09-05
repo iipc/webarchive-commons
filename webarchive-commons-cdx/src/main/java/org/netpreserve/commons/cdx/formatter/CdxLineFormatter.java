@@ -72,7 +72,13 @@ public class CdxLineFormatter implements CdxFormatter {
             if (value == NullValue.NULL) {
                 out.write('-');
             } else {
-                out.write(value.toString());
+                // The legacy cdx format doesn't accept spaces in fields.
+                // For fields containing spaces we strip of everything after first space.
+                String v = value.toString();
+                if (v.contains(" ")) {
+                    v = v.substring(0, v.indexOf(' '));
+                }
+                out.write(v);
             }
         }
     }

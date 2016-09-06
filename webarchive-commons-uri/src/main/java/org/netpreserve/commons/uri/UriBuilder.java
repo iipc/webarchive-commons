@@ -68,18 +68,61 @@ public final class UriBuilder {
         this.charset = config.getCharset();
     }
 
+    /**
+     * Creates a new UriBuilder.
+     * <p>
+     * The builder is configured with a user submitted {@link UriBuilderConfig}.
+     * <p>
+     * @param config the configuration used by the returned builder
+     * @return the newly created builder.
+     */
     public static UriBuilder builder(UriBuilderConfig config) {
         return new UriBuilder(config);
     }
 
+    /**
+     * Creates a new UriBuilder.
+     * <p>
+     * The builder is configured to behave as the UsableUri used in Heritrix.
+     * <p>
+     * @return the newly created builder.
+     */
     public static UriBuilder usableUriBuilder() {
         return builder(Configurations.USABLE_URI);
     }
 
+    /**
+     * Creates a new UriBuilder.
+     * <p>
+     * The builder is configured to only allow URI's which conforms to the RFC 3986. It does little normalizing. The
+     * normalizing done is not altering semantics. It normalizes case in places where the URI is case insensitive. Path
+     * is normalized for constructs like '{@code foo/../bar/.}'.
+     * <p>
+     * @return the newly created builder.
+     */
     public static UriBuilder strictUriBuilder() {
         return builder(Configurations.STRICT_URI);
     }
 
+    /**
+     * Creates a new UriBuilder.
+     * <p>
+     * The builder is configured to be forgiving. It Normalizes some illegal characters, but otherwise tries to accept
+     * the URI as it is as much as possible.
+     * <p>
+     * @return the newly created builder.
+     */
+    public static UriBuilder laxUriBuilder() {
+        return builder(Configurations.STRICT_URI);
+    }
+
+    /**
+     * Creates a new UriBuilder.
+     * <p>
+     * The builder is configured with the standard normalizations used in OpenWayback.
+     * <p>
+     * @return the newly created builder.
+     */
     public static UriBuilder canonicalizedUriBuilder() {
         return builder(Configurations.CANONICALIZED_URI);
     }

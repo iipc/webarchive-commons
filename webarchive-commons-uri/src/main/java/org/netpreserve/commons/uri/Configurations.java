@@ -74,6 +74,30 @@ public final class Configurations {
             .defaultFormat(Configurations.DEFAULT_FORMAT)
             .build();
 
+    /**
+     * A forgiving URI config.
+     * <p>
+     * Normalizes some illegal characters, but otherwise tries to accept the URI as it is as much as possible.
+     */
+    public static final UriBuilderConfig LAX_URI = UriBuilderConfig.newBuilder()
+            .parser(Configurations.LAX_PARSER)
+            .referenceResolver(Configurations.REFERENCE_RESOLVER)
+            .requireAbsoluteUri(false)
+            .strictReferenceResolution(false)
+            .caseNormalization(true)
+            .percentEncodingNormalization(true)
+            .pathSegmentNormalization(true)
+            .schemeBasedNormalization(true)
+            .encodeIllegalCharacters(true)
+            .defaultFormat(Configurations.DEFAULT_FORMAT)
+            .addNormalizer(new LaxTrimming())
+            .addNormalizer(new StripErrorneousExtraSlashes())
+            .addNormalizer(new StripSlashesAtEndOfPath())
+            .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
+            .addNormalizer(new OptimisticDnsScheme())
+            .addNormalizer(new CheckLongEnough())
+            .build();
+
     public static final UriBuilderConfig USABLE_URI = UriBuilderConfig.newBuilder()
             .parser(Configurations.LAX_PARSER)
             .referenceResolver(Configurations.REFERENCE_RESOLVER)

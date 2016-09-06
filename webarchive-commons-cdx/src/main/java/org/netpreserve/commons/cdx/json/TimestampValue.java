@@ -52,7 +52,7 @@ public final class TimestampValue implements Value<VariablePrecisionDateTime>, C
     @Override
     public VariablePrecisionDateTime getValue() {
         if (value == null) {
-            value = VariablePrecisionDateTime.of(unparsed);
+            value = VariablePrecisionDateTime.valueOf(unparsed);
         }
         return value;
     }

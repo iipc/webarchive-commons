@@ -84,7 +84,7 @@ public class SearchKeyTest {
 
         // Exact match
         key = new SearchKey("example.com/foo/index.html", SearchKey.UriMatchType.EXACT,
-                DateTimeRange.ofSingleDate(VariablePrecisionDateTime.of("20000202"))).cdxFormat(format);
+                DateTimeRange.ofSingleDate(VariablePrecisionDateTime.valueOf("20000202"))).cdxFormat(format);
         assertThat(key.included(ByteBuffer.wrap("com,example)/foo/index.html 20000202".getBytes()))).isTrue();
         assertThat(key.included(ByteBuffer.wrap("com,example)/foo/index.html1".getBytes()))).isFalse();
         key = new SearchKey().uri("http://example.com/foo/index.html").cdxFormat(format);

@@ -58,7 +58,7 @@ public class CdxjLineRecordKeyTest {
     public void testGetTimeStamp() {
         String keyString = "(no,vg,)/ 20070904150410 request";
         CdxjLineRecordKey key = new CdxjLineRecordKey(keyString);
-        assertThat(key.getTimeStamp().getValue()).isEqualTo(VariablePrecisionDateTime.of("2007-09-04T15:04:10"));
+        assertThat(key.getTimeStamp().getValue()).isEqualTo(VariablePrecisionDateTime.valueOf("2007-09-04T15:04:10"));
     }
 
     /**

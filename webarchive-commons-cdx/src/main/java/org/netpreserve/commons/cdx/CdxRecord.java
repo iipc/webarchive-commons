@@ -22,19 +22,18 @@ import org.netpreserve.commons.cdx.json.Value;
 /**
  * A CDX record.
  * <p>
- * @param <T> The format of the raw data this record is read from. If no such raw data exist, a format of
- * {@link NonCdxLineFormat} should be used.
  */
-public interface CdxRecord<T extends CdxFormat> extends
+public interface CdxRecord extends
         Comparable<CdxRecord>, Iterable<CdxRecord.Field> {
 
     /**
      * Get the format of the raw data connected to this record.
      * <p>
+     * @param <T> The type of format supported by this CdxRecord
      * @return The format of the raw data this record is read from or {@link NonCdxLineFormat}, if no such raw data
      * exist.
      */
-    T getCdxFormat();
+     <T extends CdxFormat> T getCdxFormat();
 
     /**
      * Get the key for this record.
@@ -62,10 +61,11 @@ public interface CdxRecord<T extends CdxFormat> extends
     /**
      * Get a named field.
      * <p>
+     * @param <T> The Java type encapsulated by the field value
      * @param fieldName the name of the requested field
      * @return the field value
      */
-    Value get(FieldName fieldName);
+    <T> Value<T> get(FieldName<T> fieldName);
 
     /**
      * Returns true if this record contains a value for the specified field name.
@@ -99,15 +99,16 @@ public interface CdxRecord<T extends CdxFormat> extends
 
     /**
      * A combination of field name and value used for the field iterator.
+     * @param <T> the Java type encapsulated by this field
      */
-    interface Field {
+    interface Field<T> {
 
         /**
          * Get the field name.
          * <p>
          * @return the FieldName object. Never null.
          */
-        FieldName getFieldName();
+        FieldName<T> getFieldName();
 
         /**
          * Get the value.
@@ -117,7 +118,7 @@ public interface CdxRecord<T extends CdxFormat> extends
          * <p>
          * @return the Value object. Never null.
          */
-        Value getValue();
+        Value<T> getValue();
 
     }
 }

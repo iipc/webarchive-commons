@@ -17,7 +17,6 @@ package org.netpreserve.commons.cdx.cdxrecord;
 
 import java.util.Arrays;
 import java.util.Iterator;
-
 import org.netpreserve.commons.cdx.CdxRecordKey;
 import org.netpreserve.commons.cdx.FieldName;
 import org.netpreserve.commons.cdx.HasUnparsedData;
@@ -28,7 +27,9 @@ import org.netpreserve.commons.cdx.json.StringValue;
 import org.netpreserve.commons.cdx.json.TimestampValue;
 import org.netpreserve.commons.cdx.json.UriValue;
 import org.netpreserve.commons.cdx.json.Value;
+import org.netpreserve.commons.uri.Uri;
 import org.netpreserve.commons.util.ArrayUtil;
+import org.netpreserve.commons.util.datetime.VariablePrecisionDateTime;
 
 /**
  * A CdxRecord constructed from a CDX formatted input line in the legacy CDX format.
@@ -69,7 +70,7 @@ public class CdxLine extends BaseCdxRecord<CdxLineFormat> implements HasUnparsed
     }
 
     @Override
-    public Value get(FieldName fieldName) {
+    public <V> Value<V> get(FieldName<V> fieldName) {
         return getValue(fieldName, getCdxFormat().indexOf(fieldName));
     }
 
@@ -109,31 +110,23 @@ public class CdxLine extends BaseCdxRecord<CdxLineFormat> implements HasUnparsed
         if (data[fieldOffsets[fieldIndex]] == EMPTY_FIELD_VALUE) {
             result = NullValue.NULL;
         } else {
-            switch (name.getType()) {
-                case STRING:
-                case ANY:
+            if (name.getType() == String.class || name.getType() == Object.class) {
                     result = StringValue.valueOf(data, fieldOffsets[fieldIndex],
                             fieldOffsets[fieldIndex] + fieldLengths[fieldIndex]);
-                    break;
-                case NUMBER:
+            } else if (name.getType() == Number.class) {
                     result = NumberValue.valueOf(data, fieldOffsets[fieldIndex],
                             fieldOffsets[fieldIndex] + fieldLengths[fieldIndex]);
-                    break;
-                case URI:
+            } else if (name.getType() == Uri.class) {
                     result = UriValue.valueOf(data, fieldOffsets[fieldIndex],
                             fieldOffsets[fieldIndex] + fieldLengths[fieldIndex]);
-                    break;
-                case BOOLEAN:
+            } else if (name.getType() == Boolean.class) {
                     result = BooleanValue.valueOf(data, fieldOffsets[fieldIndex],
                             fieldOffsets[fieldIndex] + fieldLengths[fieldIndex]);
-                    break;
-                case TIMESTAMP:
+            } else if (name.getType() == VariablePrecisionDateTime.class) {
                     result = TimestampValue.valueOf(data, fieldOffsets[fieldIndex],
                             fieldOffsets[fieldIndex] + fieldLengths[fieldIndex]);
-                    break;
-                default:
-                    result = NullValue.NULL;
-                    break;
+            } else {
+                result = NullValue.NULL;
             }
         }
         fieldCache[fieldIndex] = result;
@@ -273,14 +266,13 @@ public class CdxLine extends BaseCdxRecord<CdxLineFormat> implements HasUnparsed
         if (obj == null) {
             return false;
         }
+
         if (getClass() != obj.getClass()) {
             return false;
         }
+
         final CdxLine other = (CdxLine) obj;
-        if (!Arrays.equals(this.data, other.data)) {
-            return false;
-        }
-        return true;
+        return Arrays.equals(this.data, other.data);
     }
 
 }

@@ -25,7 +25,7 @@ import org.netpreserve.commons.cdx.cdxrecord.CdxjLineRecordKey;
 import org.netpreserve.commons.cdx.FieldName;
 
 /**
- *
+ * Formats a cdx record in the cdxj format.
  */
 public class CdxjLineFormatter implements CdxFormatter {
 
@@ -36,7 +36,7 @@ public class CdxjLineFormatter implements CdxFormatter {
     private static final char[] FIELD_NAME_END = "\":".toCharArray();
 
     @Override
-    public void format(final Writer out, final CdxRecord<? extends CdxFormat> record,
+    public void format(final Writer out, final CdxRecord record,
             final CdxFormat outputFormat) throws IOException {
 
         CdxRecordKey key = record.getKey();

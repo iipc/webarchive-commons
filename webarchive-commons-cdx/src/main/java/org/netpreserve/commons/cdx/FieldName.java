@@ -18,22 +18,20 @@ package org.netpreserve.commons.cdx;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import org.netpreserve.commons.uri.Uri;
+import org.netpreserve.commons.util.datetime.VariablePrecisionDateTime;
 
 /**
  * Representation of a field name.
+ * <p>
+ * A field can have both a name and a code. The code is used to support the legacy cdx format
+ * and the name is used as json keys in the cdxj format.
+ * <p>
+ * This class also contains static definitions for the most commonly used fields.
+ * <p>
+ * @param <T> the Java type allowed for this field
  */
-public final class FieldName {
-
-    public enum Type {
-
-        STRING,
-        NUMBER,
-        BOOLEAN,
-        URI,
-        TIMESTAMP,
-        ANY
-
-    }
+public final class FieldName<T extends Object> {
 
     private static final Map<String, FieldName> FIELDS_BY_NAME = new HashMap<>();
 
@@ -44,21 +42,21 @@ public final class FieldName {
      * <p>
      * Code 'M' in legacy CDX format
      */
-    public static final FieldName ROBOT_FLAGS = forNameAndCode("robotflags", 'M');
+    public static final FieldName<String> ROBOT_FLAGS = forNameAndCode("robotflags", 'M');
 
     /**
      * A searchable version of the URI.
      * <p>
      * Code 'N' in legacy CDX format
      */
-    public static final FieldName URI_KEY = forNameAndCodeAndType("ssu", 'N', Type.STRING);
+    public static final FieldName<String> URI_KEY = forNameAndCodeAndType("ssu", 'N', String.class);
 
     /**
      * Language string.
      * <p>
      * Code 'Q' in legacy CDX format
      */
-    public static final FieldName LANGUAGE = forNameAndCode("lang", 'Q');
+    public static final FieldName<String> LANGUAGE = forNameAndCode("lang", 'Q');
 
     /**
      * Payload Length.
@@ -66,14 +64,14 @@ public final class FieldName {
      * The length of the payload (uncompressed). The exact meaning will vary by content type, but the common case is the
      * length of the document, excluding any HTTP headers in a HTTP response record.
      */
-    public static final FieldName PAYLOAD_LENGTH = forNameAndType("ple", Type.NUMBER);
+    public static final FieldName<Number> PAYLOAD_LENGTH = forNameAndType("ple", Number.class);
 
     /**
      * Content Length.
      * <p>
      * The length of the content (uncompressed), ignoring WARC headers, but including any HTTP headers or similar.
      */
-    public static final FieldName CONTENT_LENGTH = forNameAndType("cle", Type.NUMBER);
+    public static final FieldName<Number> CONTENT_LENGTH = forNameAndType("cle", Number.class);
 
     /**
      * Record length.
@@ -83,42 +81,42 @@ public final class FieldName {
      * <p>
      * Code 'S' in legacy CDX format
      */
-    public static final FieldName RECORD_LENGTH = forNameAndCodeAndType("rle", 'S', Type.NUMBER);
+    public static final FieldName<Number> RECORD_LENGTH = forNameAndCodeAndType("rle", 'S', Number.class);
 
     /**
      * ARC/WARC file offset.
      * <p>
      * Code 'V' in legacy CDX format
      */
-    public static final FieldName OFFSET = forNameAndCodeAndType("offset", 'V', Type.NUMBER);
+    public static final FieldName<Number> OFFSET = forNameAndCodeAndType("offset", 'V', Number.class);
 
     /**
      * Original Url.
      * <p>
      * Code 'a' in legacy CDX format
      */
-    public static final FieldName ORIGINAL_URI = forNameAndCodeAndType("uri", 'a', Type.URI);
+    public static final FieldName<Uri> ORIGINAL_URI = forNameAndCodeAndType("uri", 'a', Uri.class);
 
     /**
      * Timestamp.
      * <p>
      * Code 'b' in legacy CDX format
      */
-    public static final FieldName TIMESTAMP = forNameAndCodeAndType("sts", 'b', Type.TIMESTAMP);
+    public static final FieldName<VariablePrecisionDateTime> TIMESTAMP = forNameAndCodeAndType("sts", 'b', VariablePrecisionDateTime.class);
 
     /**
      * File name.
      * <p>
      * Code 'g' in legacy CDX format
      */
-    public static final FieldName FILENAME = forNameAndCodeAndType("filename", 'g', Type.STRING);
+    public static final FieldName<String> FILENAME = forNameAndCodeAndType("filename", 'g', String.class);
 
     /**
      * New style checksum.
      * <p>
      * Code 'k' in legacy CDX format
      */
-    public static final FieldName DIGEST = forNameAndCodeAndType("digest", 'k', Type.STRING);
+    public static final FieldName<String> DIGEST = forNameAndCodeAndType("digest", 'k', String.class);
 
     /**
      * A Base32 encoded SHA-1 digest of the payload.
@@ -127,7 +125,7 @@ public final class FieldName {
      * algorithm prefix (e.g. sha-1) is not included in this field.
      * <p>
      */
-    public static final FieldName PAYLOAD_DIGEST = forNameAndType("sha", Type.STRING);
+    public static final FieldName<String> PAYLOAD_DIGEST = forNameAndType("sha", String.class);
 
     /**
      * Media Content Type (MIME type).
@@ -138,14 +136,14 @@ public final class FieldName {
      * <p>
      * Code 'm' in legacy CDX format
      */
-    public static final FieldName CONTENT_TYPE = forNameAndCodeAndType("mct", 'm', Type.STRING);
+    public static final FieldName<String> CONTENT_TYPE = forNameAndCodeAndType("mct", 'm', String.class);
 
     /**
      * Redirect.
      * <p>
      * Code 'r' in legacy CDX format
      */
-    public static final FieldName REDIRECT = forNameAndCode("redirect", 'r');
+    public static final FieldName<String> REDIRECT = forNameAndCode("redirect", 'r');
 
     /**
      * HTTP Status Code.
@@ -154,7 +152,7 @@ public final class FieldName {
      * <p>
      * Code 's' in legacy CDX format
      */
-    public static final FieldName RESPONSE_CODE = forNameAndCodeAndType("hsc", 's', Type.NUMBER);
+    public static final FieldName<Number> RESPONSE_CODE = forNameAndCodeAndType("hsc", 's', Number.class);
 
     /**
      * Record ID.
@@ -162,7 +160,7 @@ public final class FieldName {
      * Typically WARC-Record-ID or equivalent if not using WARCs. In a mixed environment, you should ensure that record
      * ID is unique.
      */
-    public static final FieldName RECORD_ID = forNameAndType("rid", Type.STRING);
+    public static final FieldName<String> RECORD_ID = forNameAndType("rid", String.class);
 
     /**
      * Record Concurrent To.
@@ -170,7 +168,7 @@ public final class FieldName {
      * The record ID of another record that the current record is considered to be ‘concurrent’ to. See further WARC
      * chapter 5.7 (WARC-Concurrent-To).
      */
-    public static final FieldName RECORD_CONCURRENT_TO = forNameAndType("rct", Type.STRING);
+    public static final FieldName<String> RECORD_CONCURRENT_TO = forNameAndType("rct", String.class);
 
     /**
      * Revisit Original URI.
@@ -178,7 +176,7 @@ public final class FieldName {
      * Only valid for records of type revisit. Contains the URI of the record that this record is considered a revisit
      * of.
      */
-    public static final FieldName REVISIT_ORIGINAL_URI = forNameAndType("rou", Type.URI);
+    public static final FieldName<Uri> REVISIT_ORIGINAL_URI = forNameAndType("rou", Uri.class);
 
     /**
      * Revisit Original Date.
@@ -186,7 +184,7 @@ public final class FieldName {
      * Only valid for records of type revisit. Contains the timestamp of the record that this record is considered a
      * revisit of.
      */
-    public static final FieldName REVISIT_ORIGINAL_DATE = forNameAndType("rod", Type.TIMESTAMP);
+    public static final FieldName<VariablePrecisionDateTime> REVISIT_ORIGINAL_DATE = forNameAndType("rod", VariablePrecisionDateTime.class);
 
     /**
      * Revisit Original record ID.
@@ -194,17 +192,17 @@ public final class FieldName {
      * Only valid for records of type revisit. Contains the record ID of the record that this record is considered a
      * revisit of.
      */
-    public static final FieldName REVISIT_ORIGINAL_ID = forNameAndType("roi", Type.STRING);
+    public static final FieldName<String> REVISIT_ORIGINAL_ID = forNameAndType("roi", String.class);
 
     /**
      * Reference used to fetch the record.
      */
-    public static final FieldName RESOURCE_REF = forNameAndType("ref", Type.URI);
+    public static final FieldName<Uri> RESOURCE_REF = forNameAndType("ref", Uri.class);
 
     /**
      * Comment.
      */
-    public static final FieldName COMMENT = forNameAndCode("comment", '#');
+    public static final FieldName<String> COMMENT = forNameAndCode("comment", '#');
 
     /**
      * Record type.
@@ -222,46 +220,46 @@ public final class FieldName {
      * body is equal to that of another record.</li>
      * </ul>
      */
-    public static final FieldName RECORD_TYPE = forNameAndType("srt", Type.STRING);
+    public static final FieldName<String> RECORD_TYPE = forNameAndType("srt", String.class);
 
     private final String name;
 
     private final char code;
 
-    private final Type type;
+    private final T type;
 
-    private FieldName(String name, char code, Type type) {
+    private FieldName(String name, char code, T type) {
         this.name = Objects.requireNonNull(name);
         this.code = code;
         this.type = Objects.requireNonNull(type);
     }
 
-    public static FieldName forName(String name) {
+    public static <T> FieldName<T> forName(String name) {
         FieldName field = FIELDS_BY_NAME.get(name);
         if (field == null) {
-            field = new FieldName(name, '?', Type.ANY);
+            field = new FieldName(name, '?', Object.class);
             FIELDS_BY_NAME.put(name, field);
         }
         return field;
     }
 
-    public static FieldName forCode(char code) {
-        FieldName field = FIELDS_BY_CODE.get(code);
+    public static <T> FieldName<T> forCode(char code) {
+        FieldName<T> field = FIELDS_BY_CODE.get(code);
         if (field == null) {
             throw new IllegalArgumentException("Illegal field code: " + code);
         }
         return field;
     }
 
-    private static FieldName forNameAndCode(String name, char code) {
-        return forNameAndCodeAndType(name, code, Type.STRING);
+    private static FieldName<String> forNameAndCode(String name, char code) {
+        return forNameAndCodeAndType(name, code, String.class);
     }
 
-    private static FieldName forNameAndType(String name, Type type) {
+    private static <T> FieldName<T> forNameAndType(String name, Class<T> type) {
         return forNameAndCodeAndType(name, '?', type);
     }
 
-    private static FieldName forNameAndCodeAndType(String name, char code, Type type) {
+    private static <T> FieldName<T> forNameAndCodeAndType(String name, char code, Class<T> type) {
         FieldName field = FIELDS_BY_NAME.get(name);
         if (field == null) {
             field = new FieldName(name, code, type);
@@ -279,7 +277,7 @@ public final class FieldName {
         return code;
     }
 
-    public Type getType() {
+    public T getType() {
         return type;
     }
 
@@ -304,14 +302,13 @@ public final class FieldName {
         if (obj == null) {
             return false;
         }
+        
         if (getClass() != obj.getClass()) {
             return false;
         }
+        
         final FieldName other = (FieldName) obj;
-        if (!Objects.equals(this.name, other.name)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this.name, other.name);
     }
 
 }

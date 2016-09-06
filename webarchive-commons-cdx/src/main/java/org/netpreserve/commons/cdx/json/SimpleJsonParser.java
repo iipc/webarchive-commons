@@ -21,6 +21,8 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 import org.netpreserve.commons.cdx.FieldName;
+import org.netpreserve.commons.uri.Uri;
+import org.netpreserve.commons.util.datetime.VariablePrecisionDateTime;
 
 /**
  *
@@ -125,42 +127,41 @@ public class SimpleJsonParser {
         }
         switch (src[currentIdx]) {
             case '"':
-                checkLegalType(fieldName, FieldName.Type.STRING, FieldName.Type.URI, FieldName.Type.TIMESTAMP);
+                checkLegalType(fieldName, String.class, Uri.class, VariablePrecisionDateTime.class);
                 StringValue val = parseString();
-                switch (fieldName.getType()) {
-                    case URI:
-                        return UriValue.valueOf(val.getValue());
-                    case TIMESTAMP:
-                        return TimestampValue.valueOf(val.getValue());
-                    default:
-                        return val;
+                if (fieldName.getType() == Uri.class) {
+                    return UriValue.valueOf(val.getValue());
                 }
+                if (fieldName.getType() == VariablePrecisionDateTime.class) {
+                    return TimestampValue.valueOf(val.getValue());
+                }
+                return val;
             case '[':
-                checkLegalType(fieldName, FieldName.Type.STRING);
+                checkLegalType(fieldName, String.class);
                 return parseUnparsedArray();
             case '{':
-                checkLegalType(fieldName, FieldName.Type.STRING);
+                checkLegalType(fieldName, String.class);
                 return parseUnparsedObject();
             case 't':
-                checkLegalType(fieldName, FieldName.Type.BOOLEAN);
+                checkLegalType(fieldName, Boolean.class);
                 return parseTrue();
             case 'f':
-                checkLegalType(fieldName, FieldName.Type.BOOLEAN);
+                checkLegalType(fieldName, Boolean.class);
                 return parseFalse();
             case 'n':
                 return parseNull();
             default:
-                checkLegalType(fieldName, FieldName.Type.NUMBER);
+                checkLegalType(fieldName, Number.class);
                 return parseNumber();
         }
     }
 
-    private void checkLegalType(FieldName fieldName, FieldName.Type... legalTypes) throws IllegalArgumentException {
-        if (fieldName.getType() == FieldName.Type.ANY) {
+    private void checkLegalType(FieldName fieldName, Class... legalTypes) throws IllegalArgumentException {
+        if (fieldName.getType() == Object.class) {
             return;
         }
 
-        for (FieldName.Type t : legalTypes) {
+        for (Class t : legalTypes) {
             if (t == fieldName.getType()) {
                 return;
             }

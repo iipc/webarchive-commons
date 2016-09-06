@@ -31,12 +31,12 @@ import org.netpreserve.commons.cdx.json.Value;
 import org.netpreserve.commons.uri.Uri;
 
 /**
- *
+ * Formats a CdxRecord in the Legacy cdx format.
  */
 public class CdxLineFormatter implements CdxFormatter {
 
     @Override
-    public void format(final Writer out, final CdxRecord<? extends CdxFormat> record,
+    public void format(final Writer out, final CdxRecord record,
             final CdxFormat outputFormat) throws IOException {
 
         CdxLineFormat format = (CdxLineFormat) outputFormat;
@@ -56,12 +56,12 @@ public class CdxLineFormatter implements CdxFormatter {
 
             if (value == NullValue.NULL) {
                 if (fieldName == FieldName.FILENAME) {
-                    Uri locator = ((Uri) record.get(FieldName.RESOURCE_REF).getValue());
+                    Uri locator = record.get(FieldName.RESOURCE_REF).getValue();
                     if ("warcfile".equals(locator.getScheme())) {
                         value = StringValue.valueOf(locator.getPath());
                     }
                 } else if (fieldName == FieldName.OFFSET) {
-                    Uri locator = ((Uri) record.get(FieldName.RESOURCE_REF).getValue());
+                    Uri locator = record.get(FieldName.RESOURCE_REF).getValue();
                     if ("warcfile".equals(locator.getScheme())) {
                         value = NumberValue.valueOf(locator.getFragment());
                     }

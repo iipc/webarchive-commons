@@ -17,16 +17,22 @@ package org.netpreserve.commons.cdx.formatter;
 
 import java.io.IOException;
 import java.io.Writer;
-
 import org.netpreserve.commons.cdx.CdxFormat;
 import org.netpreserve.commons.cdx.CdxRecord;
 
 /**
- *
+ * Serializes a CDX record to a Writer.
  */
 public interface CdxFormatter {
 
-    void format(final Writer out, final CdxRecord<? extends CdxFormat> record,
+    /**
+     * Format a CDX record.
+     * @param out the {@link Writer} to write the record to
+     * @param record the record to format
+     * @param outputFormat the format definition describe the serialized format
+     * @throws IOException is thrown if the underlying IO throws an exception
+     */
+    void format(final Writer out, final CdxRecord record,
             final CdxFormat outputFormat) throws IOException;
 
 }

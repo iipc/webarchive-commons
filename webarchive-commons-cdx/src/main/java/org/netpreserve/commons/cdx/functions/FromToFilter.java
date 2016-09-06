@@ -16,32 +16,27 @@
 package org.netpreserve.commons.cdx.functions;
 
 import org.netpreserve.commons.cdx.CdxRecord;
-import org.netpreserve.commons.util.datetime.DateFormat;
+import org.netpreserve.commons.util.datetime.DateTimeRange;
 
 /**
  * A filter restricting the date range for a result.
  */
 public class FromToFilter implements Filter {
 
-    final String from;
-
-    final String to;
+    final DateTimeRange dateTimeRange;
 
     /**
      * Constructs a new date range filter.
      * <p>
-     * @param from the earliest date or null if starting from the beginning.
-     * @param to the last date or null if getting to the end.
+     * @param dateTimeRange the date range to compare to
      */
-    public FromToFilter(final String from, final String to) {
-        this.from = from;
-        this.to = to;
+    public FromToFilter(final DateTimeRange dateTimeRange) {
+        this.dateTimeRange = dateTimeRange;
     }
 
     @Override
     public boolean include(CdxRecord line) {
-        String dateField = line.getKey().getTimeStamp().getValue().toFormattedString(DateFormat.HERITRIX);
-        return dateField.compareTo(from) >= 0 && dateField.compareTo(to) <= 0;
+        return dateTimeRange.contains(line.getKey().getTimeStamp().getValue());
     }
 
 }

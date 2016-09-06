@@ -123,9 +123,9 @@ public class CdxRecordFormatter {
      * @param record the record to create a key for.
      * @return the created key.
      */
-    CdxRecordKey createKey(CdxRecord record) {
+    CdxRecordKey createKey(final CdxRecord record) {
         Uri surt = UriBuilder.builder(format.getKeyUriFormat())
-                .uri(record.get(FieldName.ORIGINAL_URI).toString()).build();
+                .uri(record.get(FieldName.ORIGINAL_URI).getValue()).build();
 
         Value timeStamp = record.get(FieldName.TIMESTAMP);
         if (timeStamp instanceof NullValue) {

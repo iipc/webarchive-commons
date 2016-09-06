@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.netpreserve.commons.cdx.FieldName;
 import org.netpreserve.commons.cdx.json.NullValue;
+import org.netpreserve.commons.cdx.json.StringValue;
 import org.netpreserve.commons.cdx.json.Value;
 
 /**
@@ -61,6 +62,7 @@ public class UnconnectedCdxRecord extends BaseCdxRecord<NonCdxLineFormat> {
             return this;
         }
         fields.put(fieldName, new ImmutableField(fieldName, value));
+        fields.put(fieldName, new ImmutableField(FieldName.CONTENT_LENGTH, StringValue.valueOf("")));
         return this;
     }
 

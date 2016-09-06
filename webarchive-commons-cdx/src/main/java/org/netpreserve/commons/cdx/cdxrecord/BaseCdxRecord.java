@@ -28,9 +28,10 @@ import org.netpreserve.commons.cdx.json.Value;
 /**
  * Base class for implementations of CdxRecord.
  * <p>
- * @param <T> The format type allowed for the implementation of this record.
+ * @param <T> The format of the raw data this record is read from. If no such
+ * raw data exist, a format of {@link NonCdxLineFormat} should be used.
  */
-public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord<T> {
+public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord {
 
     private final T format;
 
@@ -128,12 +129,13 @@ public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord<T>
 
     /**
      * An immutable implementation of the {@link Field} interface.
+     * @param <T> the Java type encapsulated by this field
      */
-    protected static class ImmutableField implements Field {
+    protected static class ImmutableField<T> implements Field<T> {
 
-        private final FieldName name;
+        private final FieldName<T> name;
 
-        private final Value value;
+        private final Value<T> value;
 
         /**
          * Constructs an immutable field.
@@ -141,18 +143,18 @@ public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord<T>
          * @param name the field name
          * @param value the value
          */
-        public ImmutableField(FieldName name, Value value) {
+        public ImmutableField(FieldName<T> name, Value<T> value) {
             this.name = Objects.requireNonNull(name);
             this.value = Objects.requireNonNull(value);
         }
 
         @Override
-        public FieldName getFieldName() {
+        public FieldName<T> getFieldName() {
             return name;
         }
 
         @Override
-        public Value getValue() {
+        public Value<T> getValue() {
             return value;
         }
 

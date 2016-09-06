@@ -19,9 +19,13 @@ import java.io.IOException;
 import java.io.Writer;
 
 /**
- *
+ * A representation of a null value.
+ * <p>
+ * This class encapsulate a null value so that it still can have a Java type.
+ * <p>
+ * @param <T> The Java type for this null value.
  */
-public final class NullValue implements Value<Object> {
+public final class NullValue<T> implements Value<T> {
 
     public static final NullValue NULL = new NullValue();
 
@@ -29,7 +33,7 @@ public final class NullValue implements Value<Object> {
     }
 
     @Override
-    public Object getValue() {
+    public T getValue() {
         return null;
     }
 

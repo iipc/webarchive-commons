@@ -62,7 +62,7 @@ public class CdxjLine extends BaseCdxRecord<CdxjLineFormat> implements HasUnpars
     }
 
     @Override
-    public Value get(FieldName fieldName) {
+    public <T> Value<T> get(FieldName<T> fieldName) {
         parseFields();
         Field f = fields.get(fieldName);
         if (f == null) {

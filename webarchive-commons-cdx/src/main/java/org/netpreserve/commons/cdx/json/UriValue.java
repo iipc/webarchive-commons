@@ -52,7 +52,7 @@ public final class UriValue implements Value<Uri> {
     @Override
     public Uri getValue() {
         if (value == null) {
-            value = UriBuilder.usableUriBuilder().uri(unparsed).build();
+            value = UriBuilder.laxUriBuilder().uri(unparsed).build();
         }
         return value;
     }

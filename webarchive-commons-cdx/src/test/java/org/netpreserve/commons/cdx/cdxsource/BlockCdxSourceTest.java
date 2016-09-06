@@ -176,7 +176,6 @@ public class BlockCdxSourceTest {
 
         try (CdxSource cdxSource = new BlockCdxSource(sourceDescriptor);) {
 
-            System.out.println(UriBuilder.builder(Configurations.LEGACY_SURT_KEY).uri("http://www.halten.be").build().toString());
             SearchKey key = new SearchKey().uriRange("halten.be", "ch");
 
             List<CdxLine> expectedResult = new ArrayList<>();

@@ -28,7 +28,7 @@ public class DateTimeRangeTest {
      * Test of ofSingleDate method, of class DateTimeRange.
      */
     @Test
-    public void testFromSingleDate_CdxDate() {
+    public void testOfSingleDate() {
         DateTimeRange date;
         date = DateTimeRange.ofSingleDate(VariablePrecisionDateTime.valueOf("2000"));
         assertThat(date.getStart().toFormattedString(DateFormat.WARC)).isEqualTo("2000-01-01T00:00:00.000000000Z");
@@ -80,41 +80,6 @@ public class DateTimeRangeTest {
     }
 
     /**
-     * Test of between method, of class DateTimeRange.
-     */
-    @Test
-    public void testFromDates_CdxDate_CdxDate() {
-    }
-
-    /**
-     * Test of start method, of class DateTimeRange.
-     */
-    @Test
-    public void testFrom_CdxDate() {
-    }
-
-    /**
-     * Test of end method, of class DateTimeRange.
-     */
-    @Test
-    public void testTo_CdxDate() {
-    }
-
-    /**
-     * Test of hasStartDate method, of class DateTimeRange.
-     */
-    @Test
-    public void testHasFromDate() {
-    }
-
-    /**
-     * Test of hasEndDate method, of class DateTimeRange.
-     */
-    @Test
-    public void testHasToDate() {
-    }
-
-    /**
      * Test of ofRangeExpression method, of class DateTimeRange.
      */
     @Test
@@ -143,5 +108,41 @@ public class DateTimeRangeTest {
         date = DateTimeRange.ofRangeExpression("");
         assertThat(date.getStart()).isNull();
         assertThat(date.getEnd()).isNull();
+    }
+
+    /**
+     * Test of contains method, of class DateTimeRange.
+     */
+    @Test
+    public void testContains() {
+        DateTimeRange date;
+        date = DateTimeRange.ofRangeExpression("2007-01-01");
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-01"))).isTrue();
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-01T13:14"))).isTrue();
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-02"))).isFalse();
+
+        date = DateTimeRange.ofRangeExpression("2007-01-01;2007-01-03");
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-01"))).isTrue();
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-01T13:14"))).isTrue();
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-02"))).isTrue();
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-03"))).isFalse();
+
+        date = DateTimeRange.ofRangeExpression("2007-01-02;");
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-01"))).isFalse();
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-01T13:14"))).isFalse();
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-02"))).isTrue();
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-03"))).isTrue();
+
+        date = DateTimeRange.ofRangeExpression(";2007-01-02");
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-01"))).isTrue();
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-01T13:14"))).isTrue();
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-02"))).isFalse();
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-03"))).isFalse();
+
+        date = DateTimeRange.ofRangeExpression(null);
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-01"))).isTrue();
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-01T13:14"))).isTrue();
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-02"))).isTrue();
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-03"))).isTrue();
     }
 }

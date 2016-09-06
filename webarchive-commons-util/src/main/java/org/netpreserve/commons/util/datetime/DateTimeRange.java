@@ -193,8 +193,8 @@ public final class DateTimeRange {
      * <p>
      * The date range expression consists of one or two dates separated by '{@code ,}' or '{@code ;}'. The dates can be
      * in any format supported by {@link VariablePrecisionDateTime}. An expression starting or ending with a '{@code ,}'
-     * or '{@code ;}' is an open ended date. If there is only one date and no separators, it is treated the same way as {@link #ofSingleDate(java.lang.String)
-     * }.
+     * or '{@code ;}' is an open ended date. If there is only one date and no separators, it is treated the same way as
+     * {@link #ofSingleDate(java.lang.String)}.
      * <p>
      * Examples:
      * <ul>
@@ -273,6 +273,26 @@ public final class DateTimeRange {
      */
     public VariablePrecisionDateTime getEnd() {
         return dateEnd;
+    }
+
+    /**
+     * Check if a {@link VariablePrecisionDateTime} is within the limits of this range.
+     * <p>
+     * @param timestamp the timestamp to check
+     * @return true if within limits
+     */
+    public boolean contains(VariablePrecisionDateTime timestamp) {
+        if (hasStartDateOrEndDate()) {
+            if (hasStartDate() && hasEndDate()) {
+                return (timestamp.compareTo(getStart()) >= 0) && (timestamp.compareTo(getEnd()) < 0);
+            } else if (hasStartDate()) {
+                return timestamp.compareTo(getStart()) >= 0;
+            } else {
+                return timestamp.compareTo(getEnd()) < 0;
+            }
+        } else {
+            return true;
+        }
     }
 
     @Override

@@ -66,6 +66,15 @@ public class CdxjLine extends BaseCdxRecord<CdxjLineFormat> implements HasUnpars
         parseFields();
         Field f = fields.get(fieldName);
         if (f == null) {
+            if (fieldName == FieldName.URI_KEY) {
+                return (Value<T>) getKey().getUriKey();
+            }
+            if (fieldName == FieldName.TIMESTAMP) {
+                return (Value<T>) getKey().getTimeStamp();
+            }
+            if (fieldName == FieldName.RECORD_TYPE) {
+                return (Value<T>) getKey().getRecordType();
+            }
             return NullValue.NULL;
         } else {
             return f.getValue();

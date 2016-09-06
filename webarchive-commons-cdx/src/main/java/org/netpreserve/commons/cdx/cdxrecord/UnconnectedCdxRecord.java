@@ -41,9 +41,20 @@ public class UnconnectedCdxRecord extends BaseCdxRecord<NonCdxLineFormat> {
     }
 
     @Override
-    public Value get(FieldName fieldName) {
+    public <T> Value<T> get(FieldName<T> fieldName) {
         Field f = fields.get(fieldName);
         if (f == null) {
+            if (getKey() != null) {
+                if (fieldName == FieldName.URI_KEY) {
+                    return (Value<T>) getKey().getUriKey();
+                }
+                if (fieldName == FieldName.TIMESTAMP) {
+                    return (Value<T>) getKey().getTimeStamp();
+                }
+                if (fieldName == FieldName.RECORD_TYPE) {
+                    return (Value<T>) getKey().getRecordType();
+                }
+            }
             return NullValue.NULL;
         } else {
             return f.getValue();

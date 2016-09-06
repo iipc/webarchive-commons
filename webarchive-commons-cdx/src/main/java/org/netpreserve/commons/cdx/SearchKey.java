@@ -232,7 +232,8 @@ public final class SearchKey {
 
             case EXACT:
                 if (compareToFilter(byteBuf, getUri().toString().getBytes()) == 0) {
-                    if (dateRange != null && nextField(byteBuf) && byteBuf.hasRemaining()) {
+                    if (dateRange != null && dateRange.hasStartDateOrEndDate()
+                            && nextField(byteBuf) && byteBuf.hasRemaining()) {
                         if (dateRange.hasStartDate() && dateRange.hasEndDate()) {
                             String startDate = dateRange.getStart().toFormattedString(cdxFormat.getKeyDateFormat());
                             String endDate = dateRange.getEnd().toFormattedString(cdxFormat.getKeyDateFormat());

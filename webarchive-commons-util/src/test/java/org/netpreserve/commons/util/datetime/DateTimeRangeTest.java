@@ -30,49 +30,49 @@ public class DateTimeRangeTest {
     @Test
     public void testFromSingleDate_CdxDate() {
         DateTimeRange date;
-        date = DateTimeRange.ofSingleDate(VariablePrecisionDateTime.of("2000"));
+        date = DateTimeRange.ofSingleDate(VariablePrecisionDateTime.valueOf("2000"));
         assertThat(date.getStart().toFormattedString(DateFormat.WARC)).isEqualTo("2000-01-01T00:00:00.000000000Z");
         assertThat(date.getEnd().toFormattedString(DateFormat.WARC)).isEqualTo("2001-01-01T00:00:00.000000000Z");
         assertThat(date.getStart().toFormattedString(DateFormat.HERITRIX)).isEqualTo("20000101000000000000000");
         assertThat(date.getEnd().toFormattedString(DateFormat.HERITRIX)).isEqualTo("20010101000000000000000");
 
-        date = DateTimeRange.ofSingleDate(VariablePrecisionDateTime.of("2000-02"));
+        date = DateTimeRange.ofSingleDate(VariablePrecisionDateTime.valueOf("2000-02"));
         assertThat(date.getStart().toFormattedString(DateFormat.WARC)).isEqualTo("2000-02-01T00:00:00.000000000Z");
         assertThat(date.getEnd().toFormattedString(DateFormat.WARC)).isEqualTo("2000-03-01T00:00:00.000000000Z");
         assertThat(date.getStart().toFormattedString(DateFormat.HERITRIX)).isEqualTo("20000201000000000000000");
         assertThat(date.getEnd().toFormattedString(DateFormat.HERITRIX)).isEqualTo("20000301000000000000000");
 
-        date = DateTimeRange.ofSingleDate(VariablePrecisionDateTime.of("2000-02-02"));
+        date = DateTimeRange.ofSingleDate(VariablePrecisionDateTime.valueOf("2000-02-02"));
         assertThat(date.getStart().toFormattedString(DateFormat.WARC)).isEqualTo("2000-02-02T00:00:00.000000000Z");
         assertThat(date.getEnd().toFormattedString(DateFormat.WARC)).isEqualTo("2000-02-03T00:00:00.000000000Z");
         assertThat(date.getStart().toFormattedString(DateFormat.HERITRIX)).isEqualTo("20000202000000000000000");
         assertThat(date.getEnd().toFormattedString(DateFormat.HERITRIX)).isEqualTo("20000203000000000000000");
 
-        date = DateTimeRange.ofSingleDate(VariablePrecisionDateTime.of("2000-02-02T03"));
+        date = DateTimeRange.ofSingleDate(VariablePrecisionDateTime.valueOf("2000-02-02T03"));
         assertThat(date.getStart().toFormattedString(DateFormat.WARC)).isEqualTo("2000-02-02T03:00:00.000000000Z");
         assertThat(date.getEnd().toFormattedString(DateFormat.WARC)).isEqualTo("2000-02-02T04:00:00.000000000Z");
         assertThat(date.getStart().toFormattedString(DateFormat.HERITRIX)).isEqualTo("20000202030000000000000");
         assertThat(date.getEnd().toFormattedString(DateFormat.HERITRIX)).isEqualTo("20000202040000000000000");
 
-        date = DateTimeRange.ofSingleDate(VariablePrecisionDateTime.of("2000-02-02T03:13"));
+        date = DateTimeRange.ofSingleDate(VariablePrecisionDateTime.valueOf("2000-02-02T03:13"));
         assertThat(date.getStart().toFormattedString(DateFormat.WARC)).isEqualTo("2000-02-02T03:13:00.000000000Z");
         assertThat(date.getEnd().toFormattedString(DateFormat.WARC)).isEqualTo("2000-02-02T03:14:00.000000000Z");
         assertThat(date.getStart().toFormattedString(DateFormat.HERITRIX)).isEqualTo("20000202031300000000000");
         assertThat(date.getEnd().toFormattedString(DateFormat.HERITRIX)).isEqualTo("20000202031400000000000");
 
-        date = DateTimeRange.ofSingleDate(VariablePrecisionDateTime.of("2000-02-02T03:13:20"));
+        date = DateTimeRange.ofSingleDate(VariablePrecisionDateTime.valueOf("2000-02-02T03:13:20"));
         assertThat(date.getStart().toFormattedString(DateFormat.WARC)).isEqualTo("2000-02-02T03:13:20.000000000Z");
         assertThat(date.getEnd().toFormattedString(DateFormat.WARC)).isEqualTo("2000-02-02T03:13:21.000000000Z");
         assertThat(date.getStart().toFormattedString(DateFormat.HERITRIX)).isEqualTo("20000202031320000000000");
         assertThat(date.getEnd().toFormattedString(DateFormat.HERITRIX)).isEqualTo("20000202031321000000000");
 
-        date = DateTimeRange.ofSingleDate(VariablePrecisionDateTime.of("2000-02-02T03:13:20Z"));
+        date = DateTimeRange.ofSingleDate(VariablePrecisionDateTime.valueOf("2000-02-02T03:13:20Z"));
         assertThat(date.getStart().toFormattedString(DateFormat.WARC)).isEqualTo("2000-02-02T03:13:20.000000000Z");
         assertThat(date.getEnd().toFormattedString(DateFormat.WARC)).isEqualTo("2000-02-02T03:13:21.000000000Z");
         assertThat(date.getStart().toFormattedString(DateFormat.HERITRIX)).isEqualTo("20000202031320000000000");
         assertThat(date.getEnd().toFormattedString(DateFormat.HERITRIX)).isEqualTo("20000202031321000000000");
 
-        date = DateTimeRange.ofSingleDate(VariablePrecisionDateTime.of("2000-02-02T03:13:20.001Z"));
+        date = DateTimeRange.ofSingleDate(VariablePrecisionDateTime.valueOf("2000-02-02T03:13:20.001Z"));
         assertThat(date.getStart().toFormattedString(DateFormat.WARC)).isEqualTo("2000-02-02T03:13:20.001000000Z");
         assertThat(date.getEnd().toFormattedString(DateFormat.WARC)).isEqualTo("2000-02-02T03:13:20.001000001Z");
         assertThat(date.getStart().toFormattedString(DateFormat.HERITRIX)).isEqualTo("20000202031320001000000");
@@ -114,4 +114,34 @@ public class DateTimeRangeTest {
     public void testHasToDate() {
     }
 
+    /**
+     * Test of ofRangeExpression method, of class DateTimeRange.
+     */
+    @Test
+    public void testOfRangeExpression() {
+        DateTimeRange date;
+        date = DateTimeRange.ofRangeExpression("2007");
+        assertThat(date.getStart().toFormattedString(DateFormat.WARC)).isEqualTo("2007-01-01T00:00:00.000000000Z");
+        assertThat(date.getEnd().toFormattedString(DateFormat.WARC)).isEqualTo("2008-01-01T00:00:00.000000000Z");
+
+        date = DateTimeRange.ofRangeExpression("2007;2009");
+        assertThat(date.getStart().toFormattedString(DateFormat.WARC)).isEqualTo("2007-01-01T00:00:00.000000000Z");
+        assertThat(date.getEnd().toFormattedString(DateFormat.WARC)).isEqualTo("2009-01-01T00:00:00.000000000Z");
+
+        date = DateTimeRange.ofRangeExpression("2007;");
+        assertThat(date.getStart().toFormattedString(DateFormat.WARC)).isEqualTo("2007-01-01T00:00:00.000000000Z");
+        assertThat(date.getEnd()).isNull();
+
+        date = DateTimeRange.ofRangeExpression(";2009");
+        assertThat(date.getStart()).isNull();
+        assertThat(date.getEnd().toFormattedString(DateFormat.WARC)).isEqualTo("2009-01-01T00:00:00.000000000Z");
+
+        date = DateTimeRange.ofRangeExpression(null);
+        assertThat(date.getStart()).isNull();
+        assertThat(date.getEnd()).isNull();
+
+        date = DateTimeRange.ofRangeExpression("");
+        assertThat(date.getStart()).isNull();
+        assertThat(date.getEnd()).isNull();
+    }
 }

@@ -30,40 +30,40 @@ public class VariablePrecisionDateTimeTest {
      * Test of of method, of class VariablePrecisionDateTimeTest.
      */
     @Test
-    public void testOf() {
+    public void testValueOf() {
         VariablePrecisionDateTime warcDate;
         VariablePrecisionDateTime heritrixDate;
 
-        warcDate = VariablePrecisionDateTime.of("2016-12");
-        heritrixDate = VariablePrecisionDateTime.of("201612");
+        warcDate = VariablePrecisionDateTime.valueOf("2016-12");
+        heritrixDate = VariablePrecisionDateTime.valueOf("201612");
         assertThat(warcDate)
                 .isEqualTo(heritrixDate)
                 .hasFieldOrPropertyWithValue("date", OffsetDateTime.parse("2016-12-01T00:00Z"))
                 .hasFieldOrPropertyWithValue("granularity", Granularity.MONTH);
 
-        warcDate = VariablePrecisionDateTime.of("2016-12-01T12:13:54.335Z");
-        heritrixDate = VariablePrecisionDateTime.of("20161201121354335");
+        warcDate = VariablePrecisionDateTime.valueOf("2016-12-01T12:13:54.335Z");
+        heritrixDate = VariablePrecisionDateTime.valueOf("20161201121354335");
         assertThat(warcDate)
                 .isEqualTo(heritrixDate)
                 .hasFieldOrPropertyWithValue("date", OffsetDateTime.parse("2016-12-01T12:13:54.335Z"))
                 .hasFieldOrPropertyWithValue("granularity", Granularity.NANOSECOND);
 
-        warcDate = VariablePrecisionDateTime.of("2016-12-01T12");
-        heritrixDate = VariablePrecisionDateTime.of("2016120112");
+        warcDate = VariablePrecisionDateTime.valueOf("2016-12-01T12");
+        heritrixDate = VariablePrecisionDateTime.valueOf("2016120112");
         assertThat(warcDate)
                 .isEqualTo(heritrixDate)
                 .hasFieldOrPropertyWithValue("date", OffsetDateTime.parse("2016-12-01T12:00Z"))
                 .hasFieldOrPropertyWithValue("granularity", Granularity.HOUR);
 
-        warcDate = VariablePrecisionDateTime.of("2016-12-01T12:13Z");
-        heritrixDate = VariablePrecisionDateTime.of("201612011213");
+        warcDate = VariablePrecisionDateTime.valueOf("2016-12-01T12:13Z");
+        heritrixDate = VariablePrecisionDateTime.valueOf("201612011213");
         assertThat(warcDate)
                 .isEqualTo(heritrixDate)
                 .hasFieldOrPropertyWithValue("date", OffsetDateTime.parse("2016-12-01T12:13Z"))
                 .hasFieldOrPropertyWithValue("granularity", Granularity.MINUTE);
 
-        warcDate = VariablePrecisionDateTime.of("2016-12-01T12:13:00Z");
-        heritrixDate = VariablePrecisionDateTime.of("20161201121300");
+        warcDate = VariablePrecisionDateTime.valueOf("2016-12-01T12:13:00Z");
+        heritrixDate = VariablePrecisionDateTime.valueOf("20161201121300");
         assertThat(warcDate)
                 .isEqualTo(heritrixDate)
                 .hasFieldOrPropertyWithValue("date", OffsetDateTime.parse("2016-12-01T12:13Z"))

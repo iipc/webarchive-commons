@@ -40,15 +40,13 @@ public final class DateTimeRange {
      */
     private DateTimeRange(VariablePrecisionDateTime startDate, VariablePrecisionDateTime endDate) {
         if (startDate != null) {
-            this.dateStart = new VariablePrecisionDateTime(startDate.getDate(),
-                    Granularity.NANOSECOND);
+            this.dateStart = new VariablePrecisionDateTime(startDate.getDate(), Granularity.NANOSECOND);
         } else {
             this.dateStart = null;
         }
 
         if (endDate != null) {
-            this.dateEnd = new VariablePrecisionDateTime(endDate.getDate(),
-                    Granularity.NANOSECOND);
+            this.dateEnd = new VariablePrecisionDateTime(endDate.getDate(), Granularity.NANOSECOND);
         } else {
             this.dateEnd = null;
         }
@@ -137,7 +135,7 @@ public final class DateTimeRange {
      * @see #ofSingleDate(org.netpreserve.commons.cdx.CdxDate)
      */
     public static DateTimeRange ofSingleDate(String date) {
-        return DateTimeRange.ofSingleDate(VariablePrecisionDateTime.of(date));
+        return DateTimeRange.ofSingleDate(VariablePrecisionDateTime.valueOf(date));
     }
 
     /**
@@ -152,8 +150,18 @@ public final class DateTimeRange {
      * @see #between(org.netpreserve.commons.cdx.CdxDate, org.netpreserve.commons.cdx.CdxDate)
      */
     public static DateTimeRange between(String startDateInclusive, String endDateExclusive) {
-        return DateTimeRange.between(VariablePrecisionDateTime.of(startDateInclusive), VariablePrecisionDateTime
-                .of(endDateExclusive));
+        VariablePrecisionDateTime start = null;
+        VariablePrecisionDateTime end = null;
+
+        if (startDateInclusive != null && !startDateInclusive.isEmpty()) {
+            start = VariablePrecisionDateTime.valueOf(startDateInclusive);
+        }
+
+        if (endDateExclusive != null && !endDateExclusive.isEmpty()) {
+            end = VariablePrecisionDateTime.valueOf(endDateExclusive);
+        }
+
+        return DateTimeRange.between(start, end);
     }
 
     /**
@@ -165,7 +173,7 @@ public final class DateTimeRange {
      * @return the immutable date range, not null.
      */
     public static DateTimeRange start(String startDateInclusive) {
-        return DateTimeRange.start(VariablePrecisionDateTime.of(startDateInclusive));
+        return DateTimeRange.start(VariablePrecisionDateTime.valueOf(startDateInclusive));
     }
 
     /**
@@ -177,7 +185,41 @@ public final class DateTimeRange {
      * @return the immutable date range, not null.
      */
     public static DateTimeRange end(String endDateExclusive) {
-        return DateTimeRange.end(VariablePrecisionDateTime.of(endDateExclusive));
+        return DateTimeRange.end(VariablePrecisionDateTime.valueOf(endDateExclusive));
+    }
+
+    /**
+     * Obtain a date range from date range expression.
+     * <p>
+     * The date range expression consists of one or two dates separated by '{@code ,}' or '{@code ;}'. The dates can be
+     * in any format supported by {@link VariablePrecisionDateTime}. An expression starting or ending with a '{@code ,}'
+     * or '{@code ;}' is an open ended date. If there is only one date and no separators, it is treated the same way as {@link #ofSingleDate(java.lang.String)
+     * }.
+     * <p>
+     * Examples:
+     * <ul>
+     * <li>'{@code 2007-04}' - a range starting at 2007-04-01 (inclusive) and ending on 2007-05-01 (exclusive).
+     * <li>'{@code 2007-04;2007-05}' - a range starting at 2007-04-01 (inclusive) and ending on 2007-05-01 (exclusive).
+     * <li>'{@code 2007-04;}' - a range starting at 2007-04-01 (inclusive) with no end.
+     * <li>'{@code ;2007-04}' - a range consisting of every date before 2007-04-01 (exclusive).
+     * <li>'' (empty or null) - a range consisting of every possible date.
+     * </ul>
+     * <p>
+     * @param exp the date range expression
+     * @return the immutable date range, not null.
+     */
+    public static DateTimeRange ofRangeExpression(String exp) {
+        if (exp == null || exp.isEmpty()) {
+            return new DateTimeRange(null, null);
+        }
+
+        String[] dates = exp.split("[,;]", 2);
+
+        if (dates.length == 1) {
+            return ofSingleDate(dates[0]);
+        } else {
+            return between(dates[0], dates[1]);
+        }
     }
 
     /**
@@ -200,6 +242,17 @@ public final class DateTimeRange {
      */
     public boolean hasEndDate() {
         return dateEnd != null;
+    }
+
+    /**
+     * Check if this date range has a start or end date.
+     * <p>
+     * A date range without a start or end date is considered a date range including all possible dates.
+     * <p>
+     * @return true if start date or end date is set.
+     */
+    public boolean hasStartDateOrEndDate() {
+        return dateStart != null || dateEnd != null;
     }
 
     /**

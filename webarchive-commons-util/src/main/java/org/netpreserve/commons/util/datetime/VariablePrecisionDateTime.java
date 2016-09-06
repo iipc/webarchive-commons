@@ -128,7 +128,7 @@ public final class VariablePrecisionDateTime implements Comparable<VariablePreci
      * @return the parsed VariablePrecisionDateTime, not null.
      * @throws DateTimeParseException if the date cannot be parsed.
      */
-    public static VariablePrecisionDateTime of(String dateString) {
+    public static VariablePrecisionDateTime valueOf(String dateString) {
         String[] tokens = dateString.split("[-T:\\.Z]");
 
         if (tokens.length == 1 && tokens[0].length() > 4) {

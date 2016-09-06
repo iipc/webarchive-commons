@@ -80,9 +80,6 @@ public class MultiCdxSourceTest {
         Collections.reverse(resultSet);
 
         SearchResult resultTotalReverse = cdxSource.search(key, null, true);
-//        for (CdxRecord r : resultTotalReverse) {
-//            System.out.println(r);
-//        }
         assertThat(resultTotalReverse).hasSize(1666 + 1888).containsExactlyElementsOf(resultSet);
     }
 
@@ -105,9 +102,7 @@ public class MultiCdxSourceTest {
         CdxSource cdxFile1 = new BlockCdxSource(sourceDescriptor1);
         CdxSource cdxFile2 = new BlockCdxSource(sourceDescriptor2);
 
-//        String startKey = "be,halten)";
-//        String toKey = "ch,";
-        SearchKey key = new SearchKey().surtUriFrom("be,halten)").surtUriTo("ch,");
+        SearchKey key = new SearchKey().uriRange("halten.be", "ch");
 
         SearchResult result1 = cdxFile1.search(key, null, false);
         assertThat(result1).hasSize(15);
@@ -150,9 +145,7 @@ public class MultiCdxSourceTest {
         CdxSource cdxFile1 = new BlockCdxSource(sourceDescriptor1);
         CdxSource cdxFile2 = new BlockCdxSource(sourceDescriptor2);
 
-//        String startKey = "be,halten)";
-//        String toKey = "ch,";
-        SearchKey key = new SearchKey().surtUriFrom("be,halten)").surtUriTo("ch,");
+        SearchKey key = new SearchKey().uriRange("halten.be", "ch");
 
         FieldRegexFilter f = new FieldRegexFilter(Collections.singletonList("!hsc:200"));
         Processor<Filter> fp = new FilterProcessor().addFunction(f);

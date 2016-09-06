@@ -47,9 +47,9 @@ public class CdxFileDescriptorTest {
 
         CdxFileDescriptor meta = new CdxFileDescriptor(path);
 
-        SourceBlock expectedBlock1 = new SourceBlock("as,hotel)/robots.txt", 27, 434660);
+        SourceBlock expectedBlock1 = new SourceBlock("as,hotel)/robots.txt", 27, 434755);
 
-        SearchKey key = new SearchKey().surtUriFrom("ac,").surtUriTo("biz,");
+        SearchKey key = new SearchKey().uriRange("ac", "biz").cdxFormat(meta.getInputFormat());
         List<SourceBlock> blocks = meta.calculateBlocks(key);
 
         assertThat(blocks)
@@ -59,7 +59,7 @@ public class CdxFileDescriptorTest {
         // Test with small file
         path = Paths.get(ClassLoader.getSystemResource("cdxfile3.cdx").toURI());
         meta = new CdxFileDescriptor(path);
-        blocks = meta.calculateBlocks(new SearchKey());
+        blocks = meta.calculateBlocks(new SearchKey().cdxFormat(meta.getInputFormat()));
 
         assertThat(blocks)
                 .hasSize(1);

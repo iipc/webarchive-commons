@@ -36,6 +36,8 @@ import org.netpreserve.commons.cdx.SearchKey;
 import org.netpreserve.commons.cdx.functions.FieldRegexFilter;
 import org.netpreserve.commons.cdx.SearchResult;
 import org.netpreserve.commons.cdx.processor.FilterProcessor;
+import org.netpreserve.commons.uri.Configurations;
+import org.netpreserve.commons.uri.UriBuilder;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -174,14 +176,13 @@ public class BlockCdxSourceTest {
 
         try (CdxSource cdxSource = new BlockCdxSource(sourceDescriptor);) {
 
-//            String startKey = "be,halten)";
-//            String toKey = "ch,";
-            SearchKey key = new SearchKey().surtUriFrom("be,halten)").surtUriTo("ch,");
+            System.out.println(UriBuilder.builder(Configurations.LEGACY_SURT_KEY).uri("http://www.halten.be").build().toString());
+            SearchKey key = new SearchKey().uriRange("halten.be", "ch");
 
             List<CdxLine> expectedResult = new ArrayList<>();
-            expectedResult.add(new CdxLine("be,halten) 20070821143342", format));
+            expectedResult.add(new CdxLine("be,halten)/ 20070821143342", format));
             expectedResult.add(new CdxLine("be,your-counter)/robots.txt 20070821133445", format));
-            expectedResult.add(new CdxLine("biz,dataparty-mn,www) 20070821170230", format));
+            expectedResult.add(new CdxLine("biz,dataparty-mn,www)/ 20070821170230", format));
             expectedResult.add(new CdxLine("biz,ggs)/ 20070821185057", format));
             expectedResult.add(new CdxLine("biz,ggs)/images/1-2.png 20070823215132", format));
             expectedResult.add(new CdxLine("biz,ggs)/images/2-1.png 20070823215138", format));
@@ -193,7 +194,7 @@ public class BlockCdxSourceTest {
             expectedResult.add(new CdxLine("biz,ggs)/images/white_tab.gif 20070823215150", format));
             expectedResult.add(new CdxLine("biz,ggs)/menu.js 20070823215145", format));
             expectedResult.add(new CdxLine("biz,ggs)/new.css 20070823215140", format));
-            expectedResult.add(new CdxLine("biz,ggs,www) 20070823215128", format));
+            expectedResult.add(new CdxLine("biz,ggs,www)/ 20070823215128", format));
 
             SearchResult result = cdxSource.search(key, null, false);
             assertThat(result).hasSize(15)
@@ -224,7 +225,7 @@ public class BlockCdxSourceTest {
 
         try (CdxSource cdxSource = new BlockCdxSource(sourceDescriptor);) {
 
-            SearchKey key = new SearchKey().surtUriFrom("be,halten)").surtUriTo("ch,");
+            SearchKey key = new SearchKey().uriRange("halten.be", "ch");
 
             FieldRegexFilter f = new FieldRegexFilter(Collections.singletonList("!hsc:200"));
             Processor<Filter> fp = new FilterProcessor().addFunction(f);
@@ -249,9 +250,7 @@ public class BlockCdxSourceTest {
 
         try (CdxSource cdxSource = new BlockCdxSource(sourceDescriptor);) {
 
-//            String startKey = "be,halten)";
-//            String toKey = "ch,";
-            SearchKey key = new SearchKey().surtUriFrom("be,halten)").surtUriTo("ch,");
+            SearchKey key = new SearchKey().uriRange("halten.be", "ch");
 
             long count = cdxSource.count(key);
             assertThat(count).isEqualTo(15);

@@ -44,8 +44,8 @@ public class SearchKeyTest {
         assertThat(key.included("com,example)/foo/index.html")).isTrue();
         assertThat(key.included("com,example)/foo/index.html1")).isFalse();
 
-        // Path wildcard match
-        key = new SearchKey().uri("example.com/foo/*").cdxFormat(format);
+        // Path wildcard match (i.e. example.com/foo/*)
+        key = new SearchKey().uri("example.com/foo/", SearchKey.UriMatchType.PATH).cdxFormat(format);
         assertThat(key.included("com,example)/fool/")).isFalse();
         assertThat(key.included("com,example)/foo/")).isTrue();
         assertThat(key.included("com,example)/foo/index.html")).isTrue();
@@ -53,20 +53,20 @@ public class SearchKeyTest {
         assertThat(key.included("com,example)/fo/")).isFalse();
         assertThat(key.included("com,example,host)/foo/index.html")).isFalse();
 
-        // Host wildcard match
-        key = new SearchKey().uri("*example.com/foo/index.html").cdxFormat(format);
+        // Host wildcard match  (i.e. *example.com/foo/index.html)
+        key = new SearchKey().uri("example.com/foo/index.html", SearchKey.UriMatchType.HOST).cdxFormat(format);
         assertThat(key.included("com,example)/foo/index.html")).isTrue();
 //        assertThat(key.included("com,example)/foo/index.html1")).isFalse();
         assertThat(key.included("com,example,host)/foo/index.html")).isTrue();
 //        assertThat(key.included("com,example,host)/foo/index.html1")).isFalse();
 
         // Range match
-        key = new SearchKey().surtUriFrom("be,halten)").surtUriTo("ch").cdxFormat(format);
+        key = new SearchKey().uriRange("halten.be", "ch").cdxFormat(format);
         assertThat(key.included("com,example)/foo/index.html")).isFalse();
-        assertThat(key.included("be)")).isFalse();
-        assertThat(key.included("be,halten)")).isTrue();
-        assertThat(key.included("cg)")).isTrue();
-        assertThat(key.included("ch)")).isFalse();
+        assertThat(key.included("be)/")).isFalse();
+        assertThat(key.included("be,halten)/")).isTrue();
+        assertThat(key.included("cg)/")).isTrue();
+        assertThat(key.included("ch)/")).isFalse();
         assertThat(key.included("be,your-counter)/robots.txt")).isTrue();
 
         key = new SearchKey().uri("åå.jalla.øx.com/foo/index.html").cdxFormat(format);
@@ -83,7 +83,7 @@ public class SearchKeyTest {
         assertThat(key.included(ByteBuffer.wrap("foo".getBytes()))).isTrue();
 
         // Exact match
-        key = new SearchKey("example.com/foo/index.html",
+        key = new SearchKey("example.com/foo/index.html", SearchKey.UriMatchType.EXACT,
                 DateTimeRange.ofSingleDate(VariablePrecisionDateTime.of("20000202"))).cdxFormat(format);
         assertThat(key.included(ByteBuffer.wrap("com,example)/foo/index.html 20000202".getBytes()))).isTrue();
         assertThat(key.included(ByteBuffer.wrap("com,example)/foo/index.html1".getBytes()))).isFalse();
@@ -91,8 +91,8 @@ public class SearchKeyTest {
         assertThat(key.included(ByteBuffer.wrap("com,example)/foo/index.html".getBytes()))).isTrue();
         assertThat(key.included(ByteBuffer.wrap("com,example)/foo/index.html1".getBytes()))).isFalse();
 
-        // Path wildcard match
-        key = new SearchKey().uri("example.com/foo/*").cdxFormat(format);
+        // Path wildcard match (i.e. example.com/foo/*)
+        key = new SearchKey().uri("example.com/foo/", SearchKey.UriMatchType.PATH).cdxFormat(format);
         assertThat(key.included(ByteBuffer.wrap("com,example)/fool/".getBytes()))).isFalse();
         assertThat(key.included(ByteBuffer.wrap("com,example)/foo/".getBytes()))).isTrue();
         assertThat(key.included(ByteBuffer.wrap("com,example)/foo/index.html".getBytes()))).isTrue();
@@ -100,20 +100,20 @@ public class SearchKeyTest {
         assertThat(key.included(ByteBuffer.wrap("com,example)/fo/".getBytes()))).isFalse();
         assertThat(key.included(ByteBuffer.wrap("com,example,host)/foo/index.html".getBytes()))).isFalse();
 
-        // Host wildcard match
-        key = new SearchKey().uri("*example.com/foo/index.html").cdxFormat(format);
+        // Host wildcard match (i.e. *example.com/foo/index.html)
+        key = new SearchKey().uri("example.com/foo/index.html", SearchKey.UriMatchType.HOST).cdxFormat(format);
         assertThat(key.included(ByteBuffer.wrap("com,example)/foo/index.html".getBytes()))).isTrue();
 //        assertThat(key.included(ByteBuffer.wrap("com,example)/foo/index.html1")).isFalse();
         assertThat(key.included(ByteBuffer.wrap("com,example,host)/foo/index.html".getBytes()))).isTrue();
 //        assertThat(key.included(ByteBuffer.wrap("com,example,host)/foo/index.html1")).isFalse();
 
         // Range match
-        key = new SearchKey().surtUriFrom("be,halten)").surtUriTo("ch").cdxFormat(format);
+        key = new SearchKey().uriRange("halten.be", "ch").cdxFormat(format);
         assertThat(key.included(ByteBuffer.wrap("com,example)/foo/index.html".getBytes()))).isFalse();
-        assertThat(key.included(ByteBuffer.wrap("be)".getBytes()))).isFalse();
-        assertThat(key.included(ByteBuffer.wrap("be,halten)".getBytes()))).isTrue();
-        assertThat(key.included(ByteBuffer.wrap("cg)".getBytes()))).isTrue();
-        assertThat(key.included(ByteBuffer.wrap("ch)".getBytes()))).isFalse();
+        assertThat(key.included(ByteBuffer.wrap("be)/".getBytes()))).isFalse();
+        assertThat(key.included(ByteBuffer.wrap("be,halten)/".getBytes()))).isTrue();
+        assertThat(key.included(ByteBuffer.wrap("cg)/".getBytes()))).isTrue();
+        assertThat(key.included(ByteBuffer.wrap("ch)/".getBytes()))).isFalse();
         assertThat(key.included(ByteBuffer.wrap("be,your-counter)/robots.txt".getBytes()))).isTrue();
 
         key = new SearchKey().uri("åå.jalla.øx.com/foo/index.html").cdxFormat(format);

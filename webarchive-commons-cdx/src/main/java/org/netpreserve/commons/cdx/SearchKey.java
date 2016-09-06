@@ -41,96 +41,88 @@ public final class SearchKey {
 
     }
 
-    private final String uriString;
+    private final String primaryUriString;
 
     private final DateTimeRange dateRange;
 
-    private final String fromUriString;
-
-    private final String toUriString;
+    private final String secondaryUriString;
 
     private final UriMatchType uriMatchType;
 
     private final CdxFormat cdxFormat;
 
-    private final Uri parsedUri;
+    private final Uri parsedPrimaryUri;
+
+    private final Uri parsedSecondaryUri;
 
     public SearchKey() {
-        this(null, null, null, null, UriMatchType.ALL, null, null, false);
+        this(null, null, null, null, null, UriMatchType.ALL, null, false);
     }
 
-    public SearchKey(final String uri) {
-        this(uri.trim(), null, null, null, detectMatchType(uri.trim()), null, null, true);
+    public SearchKey(final String uri, final UriMatchType matchType) {
+        this(uri.trim(), null, null, null, null, matchType, null, true);
     }
 
-    public SearchKey(final String uri, final DateTimeRange dateRange) {
-        this(uri.trim(), dateRange, null, null, detectMatchType(uri.trim()), null, null, true);
+    public SearchKey(final String uri, final UriMatchType matchType, final DateTimeRange dateRange) {
+        this(uri.trim(), null, null, null, dateRange, matchType, null, true);
     }
 
-    private SearchKey(String uri, DateTimeRange dateRange, String fromUri, String toUri,
-            UriMatchType uriMatchType, CdxFormat cdxFormat, Uri parsedUri, boolean parseUri) {
+    private SearchKey(String primaryUri, Uri parsedPrimaryUri, String secondaryUri, Uri parsedSecondaryUri,
+            DateTimeRange dateRange, UriMatchType uriMatchType, CdxFormat cdxFormat, boolean parseUri) {
 
-        if (parseUri && uri != null && cdxFormat != null) {
+        if (parseUri && cdxFormat != null) {
+
             UriBuilderConfig uriBuilderConfig = cdxFormat.getKeyUriFormat();
+            if (parsedPrimaryUri == null && primaryUri != null) {
+                if (uriMatchType == UriMatchType.PATH) {
+                    // If match type is PATH, we need to keep ending slashes because we removed the final '*'.
+                    UriBuilderConfig.ConfigBuilder builder = uriBuilderConfig.toBuilder();
+                    builder.getPostParseNormalizers().removeIf(new Predicate<PostParseNormalizer>() {
+                        @Override
+                        public boolean test(PostParseNormalizer t) {
+                            return StripSlashesAtEndOfPath.class.isInstance(t);
+                        }
 
-            if (uriMatchType == UriMatchType.HOST) {
-                uri = uri.substring(1);
+                    });
+                    uriBuilderConfig = builder.build();
+                }
+
+                parsedPrimaryUri = UriBuilder.builder(uriBuilderConfig).uri(primaryUri).build();
             }
-
-            if (uriMatchType == UriMatchType.PATH) {
-                uri = uri.substring(0, uri.length() - 1);
-
-                // If match type is PATH, we need to keep ending slashes because we removed the final '*'.
-                UriBuilderConfig.ConfigBuilder builder = uriBuilderConfig.toBuilder();
-                builder.getPostParseNormalizers().removeIf(new Predicate<PostParseNormalizer>() {
-                    @Override
-                    public boolean test(PostParseNormalizer t) {
-                        return StripSlashesAtEndOfPath.class.isInstance(t);
-                    }
-
-                });
-                uriBuilderConfig = builder.build();
+            if (parsedSecondaryUri == null && secondaryUri != null) {
+                parsedSecondaryUri = UriBuilder.builder(uriBuilderConfig).uri(secondaryUri).build();
             }
-
-            this.uriString = uri;
-            this.uriMatchType = uriMatchType;
-            this.parsedUri = UriBuilder.builder(uriBuilderConfig).uri(uri).build();
-
-        } else {
-            this.uriString = uri;
-            this.uriMatchType = uriMatchType;
-            this.parsedUri = parsedUri;
         }
 
+        this.primaryUriString = primaryUri;
+        this.parsedPrimaryUri = parsedPrimaryUri;
+        this.secondaryUriString = secondaryUri;
+        this.parsedSecondaryUri = parsedSecondaryUri;
+        this.uriMatchType = uriMatchType;
         this.cdxFormat = cdxFormat;
         this.dateRange = dateRange;
-        this.fromUriString = fromUri;
-        this.toUriString = toUri;
     }
 
     public SearchKey uri(final String uri) {
-        String tmpUri = uri.trim();
-        UriMatchType tmpMatchType = detectMatchType(tmpUri);
-        return new SearchKey(tmpUri, dateRange, fromUriString, toUriString, tmpMatchType, cdxFormat, parsedUri, true);
+        return uri(uri, UriMatchType.EXACT);
+    }
+
+    public SearchKey uri(final String uri, final UriMatchType matchType) {
+        return new SearchKey(uri.trim(), null, null, null, dateRange, matchType, cdxFormat, true);
     }
 
     public SearchKey dateRange(final DateTimeRange dateRange) {
-        return new SearchKey(uriString, dateRange, fromUriString, toUriString, uriMatchType, cdxFormat, parsedUri,
-                false);
+        return new SearchKey(primaryUriString, parsedPrimaryUri, secondaryUriString, parsedSecondaryUri, dateRange,
+                uriMatchType, cdxFormat, false);
     }
 
-    public SearchKey surtUriFrom(final String fromUri) {
-        return new SearchKey(uriString, dateRange, fromUri, toUriString, UriMatchType.RANGE, cdxFormat, parsedUri,
-                false);
-    }
-
-    public SearchKey surtUriTo(final String toUri) {
-        return new SearchKey(uriString, dateRange, fromUriString, toUri, UriMatchType.RANGE, cdxFormat, parsedUri,
-                false);
+    public SearchKey uriRange(final String fromUri, final String toUri) {
+        return new SearchKey(fromUri.trim(), null, toUri.trim(), null, dateRange,
+                UriMatchType.RANGE, cdxFormat, true);
     }
 
     public SearchKey cdxFormat(final CdxFormat format) {
-        return new SearchKey(uriString, dateRange, fromUriString, toUriString, uriMatchType, format, parsedUri, true);
+        return new SearchKey(primaryUriString, null, secondaryUriString, null, dateRange, uriMatchType, format, true);
     }
 
     public Uri getUri() {
@@ -138,11 +130,11 @@ public final class SearchKey {
             throw new IllegalStateException("Cannot get parsed URI when CdxFormat is not set");
         }
 
-        if (parsedUri == null) {
+        if (parsedPrimaryUri == null) {
             throw new IllegalStateException("Cannot get parsed URI when uri is not set");
         }
 
-        return parsedUri;
+        return parsedPrimaryUri;
     }
 
     public UriMatchType getMatchType() {
@@ -158,6 +150,10 @@ public final class SearchKey {
     }
 
     public boolean isBefore(final String keyToTest) {
+        if (cdxFormat == null) {
+            throw new IllegalStateException("CdxFormat must be set");
+        }
+
         switch (uriMatchType) {
             case ALL:
                 return false;
@@ -178,7 +174,7 @@ public final class SearchKey {
                 break;
 
             case RANGE:
-                if ((fromUriString != null && keyToTest.compareTo(fromUriString) < 0)) {
+                if ((parsedPrimaryUri != null && keyToTest.compareTo(parsedPrimaryUri.toString()) < 0)) {
                     return true;
                 }
                 break;
@@ -187,6 +183,10 @@ public final class SearchKey {
     }
 
     public boolean included(final String keyToTest) {
+        if (cdxFormat == null) {
+            throw new IllegalStateException("CdxFormat must be set");
+        }
+
         switch (uriMatchType) {
             case ALL:
                 return true;
@@ -212,8 +212,8 @@ public final class SearchKey {
                 break;
 
             case RANGE:
-                if ((fromUriString == null || fromUriString.compareTo(keyToTest) <= 0)
-                        && (toUriString == null || toUriString.compareTo(keyToTest) > 0)) {
+                if ((parsedPrimaryUri == null || parsedPrimaryUri.toString().compareTo(keyToTest) <= 0)
+                        && (parsedSecondaryUri == null || parsedSecondaryUri.toString().compareTo(keyToTest) > 0)) {
                     return true;
                 }
                 break;
@@ -222,6 +222,10 @@ public final class SearchKey {
     }
 
     public boolean included(final ByteBuffer byteBuf) {
+        if (cdxFormat == null) {
+            throw new IllegalStateException("CdxFormat must be set");
+        }
+
         switch (uriMatchType) {
             case ALL:
                 return true;
@@ -260,15 +264,30 @@ public final class SearchKey {
                 break;
 
             case RANGE:
-                if (between(byteBuf, fromUriString.getBytes(), toUriString.getBytes())) {
+                if (parsedPrimaryUri == null && parsedSecondaryUri == null) {
                     return true;
                 }
-                break;
+
+                if (parsedPrimaryUri != null && parsedSecondaryUri != null) {
+                    return between(byteBuf, parsedPrimaryUri.toString().getBytes(),
+                            parsedSecondaryUri.toString().getBytes());
+                } else if (parsedPrimaryUri != null) {
+                    return compareToFilter(byteBuf, parsedPrimaryUri.toString().getBytes()) >= 0;
+                } else {
+                    return compareToFilter(byteBuf, parsedSecondaryUri.toString().getBytes()) < 0;
+                }
+
+            default:
+                return false;
         }
         return false;
     }
 
     final boolean startsWith(final ByteBuffer byteBuf, final byte[] filter) {
+        if (cdxFormat == null) {
+            throw new IllegalStateException("CdxFormat must be set");
+        }
+
         int filterLength = filter.length;
 
         int k = 0;
@@ -313,13 +332,17 @@ public final class SearchKey {
     }
 
     /**
-     * Compare line starting at current position end a filter.
+     * Compare line starting at current position to a filter.
      * <p>
-     * @param filter the filter end compare
+     * @param filter the filter to compare
      * @return negative number if filter is before current line, zero if equal, and positive number if filter is after
      * current line
      */
     final int compareToFilter(final ByteBuffer byteBuf, final byte[] filter) {
+        if (cdxFormat == null) {
+            throw new IllegalStateException("CdxFormat must be set");
+        }
+
         int filterLength = filter.length;
 
         int k = 0;
@@ -372,6 +395,10 @@ public final class SearchKey {
     }
 
     final boolean between(final ByteBuffer byteBuf, final byte[] startFilter, final byte[] endFilter) {
+        if (cdxFormat == null) {
+            throw new IllegalStateException("CdxFormat must be set");
+        }
+
         // < 0: excluded, 0: undecided (still parsing), > 0: included
         int compareToStartFilter = 0;
         int compareToEndFilter = 0;
@@ -482,27 +509,6 @@ public final class SearchKey {
      */
     final boolean isLf(int c) {
         return c == '\n' || c == '\r';
-    }
-
-    private static UriMatchType detectMatchType(String uri) {
-        UriMatchType matchType = UriMatchType.ALL;
-
-        if (uri.startsWith("*")) {
-            matchType = UriMatchType.HOST;
-        }
-
-        if (uri.endsWith("*")) {
-            if (matchType == UriMatchType.HOST) {
-                throw new IllegalArgumentException("Only prefix or postfix wildcard is allowed");
-            }
-            matchType = UriMatchType.PATH;
-        }
-
-        if (matchType == UriMatchType.ALL) {
-            matchType = UriMatchType.EXACT;
-        }
-
-        return matchType;
     }
 
 }

@@ -158,5 +158,10 @@ public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord {
             return value;
         }
 
+        @Override
+        public String toString() {
+            return "\"" + name + "\"=" + value.toJson();
+        }
+
     }
 }

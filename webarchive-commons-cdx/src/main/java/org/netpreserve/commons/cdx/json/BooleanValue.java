@@ -67,17 +67,4 @@ public final class BooleanValue implements Value<Boolean> {
         out.write(value.toString());
     }
 
-//    private BooleanValue check(char[] src, int start, int end) {
-//        int length = end - start;
-//        if (length == 4 && src.length - start >= 4) {
-//            for (int i = 0; i < TRUE_VALUE_LC.length; i++) {
-//                if (src[start + i] != TRUE_VALUE_LC[i]) {
-//                    return FALSE;
-//                }
-//            }
-//        } else {
-//            return FALSE;
-//        }
-//        return TRUE;
-//    }
 }

@@ -16,10 +16,13 @@
 package org.netpreserve.commons.cdx.json;
 
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.UncheckedIOException;
 import java.io.Writer;
 
 /**
  *
+ * @param <T> The Java type encapsulated by this value
  */
 public interface Value<T> {
 
@@ -27,4 +30,13 @@ public interface Value<T> {
 
     T getValue();
 
+    default String toJson() {
+        try {
+            StringWriter sw = new StringWriter();
+            toJson(sw);
+            return sw.toString();
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+    }
 }

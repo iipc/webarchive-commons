@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.netpreserve.commons.cdx.FieldName;
 import org.netpreserve.commons.cdx.json.NullValue;
-import org.netpreserve.commons.cdx.json.StringValue;
 import org.netpreserve.commons.cdx.json.Value;
 
 /**
@@ -66,14 +65,14 @@ public class UnconnectedCdxRecord extends BaseCdxRecord<NonCdxLineFormat> {
      * <p>
      * @param fieldName the name of the field.
      * @param value the value for the field.
+     * @param <T> The Java type encapsulated by the field value
      * @return returns this object for the convenience of chaining method calls.
      */
-    public UnconnectedCdxRecord set(FieldName fieldName, Value value) {
+    public <T> UnconnectedCdxRecord set(FieldName<T> fieldName, Value<T> value) {
         if (value.getValue() == null) {
             return this;
         }
         fields.put(fieldName, new ImmutableField(fieldName, value));
-        fields.put(fieldName, new ImmutableField(FieldName.CONTENT_LENGTH, StringValue.valueOf("")));
         return this;
     }
 
@@ -85,6 +84,21 @@ public class UnconnectedCdxRecord extends BaseCdxRecord<NonCdxLineFormat> {
     @Override
     public Iterator<Field> iterator() {
         return fields.values().iterator();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("{");
+        boolean notFirst = false;
+        for (Field f : fields.values()) {
+            if (notFirst) {
+                sb.append(", ");
+            } else {
+                notFirst = true;
+            }
+            sb.append(f);
+        }
+        return sb.append("}").toString();
     }
 
 }

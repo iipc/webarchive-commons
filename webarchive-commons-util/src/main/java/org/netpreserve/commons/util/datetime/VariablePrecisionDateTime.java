@@ -24,6 +24,8 @@ import java.time.temporal.ChronoField;
 import java.util.Locale;
 import java.util.Objects;
 
+import static java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME;
+
 /**
  * A representation of a date.
  * <p>
@@ -122,13 +124,18 @@ public final class VariablePrecisionDateTime implements Comparable<VariablePreci
     /**
      * Obtains an instance of VariablePrecisionDateTime from a text string.
      * <p>
-     * The string must represent a valid date-time in one of WARC or Heritrix date formats.
+     * The string must represent a valid date-time in one of WARC, RFC 1123 or Heritrix date formats.
      * <p>
-     * @param dateString in WARC or Heritrix date formats.
+     * @param dateString in WARC, RFC 1123 or Heritrix date formats.
      * @return the parsed VariablePrecisionDateTime, not null.
      * @throws DateTimeParseException if the date cannot be parsed.
      */
     public static VariablePrecisionDateTime valueOf(String dateString) {
+        if (Character.isAlphabetic(dateString.codePointAt(0))) {
+            return new VariablePrecisionDateTime(
+                    OffsetDateTime.parse(dateString, RFC_1123_DATE_TIME), Granularity.SECOND);
+        }
+
         String[] tokens = dateString.split("[-T:\\.Z]");
 
         if (tokens.length == 1 && tokens[0].length() > 4) {
@@ -229,7 +236,7 @@ public final class VariablePrecisionDateTime implements Comparable<VariablePreci
 
     @Override
     public String toString() {
-        return "CdxDate{" + "date=" + date + ", granularity=" + granularity + '}';
+        return "VaribalePrecisionDateTime{" + "date=" + date + ", granularity=" + granularity + '}';
     }
 
     @Override

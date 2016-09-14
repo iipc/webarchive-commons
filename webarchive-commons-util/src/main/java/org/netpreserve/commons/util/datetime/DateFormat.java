@@ -32,7 +32,11 @@ public enum DateFormat {
     /**
      * A format as used in Heritrix.
      */
-    HERITRIX(buildHeritrixFormatters());
+    HERITRIX(buildHeritrixFormatters()),
+    /**
+     * A format as defined in RFC 1123 and used by the Memento protocol.
+     */
+    RFC1123(buildRfc1123Formatters());
 
     private final DateTimeFormatter[] formatters;
 
@@ -127,6 +131,26 @@ public enum DateFormat {
         heritrixFormats[Granularity.NANOSECOND.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
 
         return heritrixFormats;
+    }
+
+    /**
+     * Create array of formatters for formatting dates of different granularities allowed in RFC 1123 date format.
+     * <p>
+     * Since RFC 1123 doesn't allow different granularities, the dates are formatted as the rest of the date/time values
+     * are null for granularities corser than SECOND.
+     * <p>
+     * @return an array with a formatter for each legal granularity
+     */
+    private static DateTimeFormatter[] buildRfc1123Formatters() {
+        DateTimeFormatter[] rfc1123Formats;
+
+        rfc1123Formats = new DateTimeFormatter[Granularity.values().length];
+
+        for (int i = 0; i < rfc1123Formats.length; i++) {
+            rfc1123Formats[i] = DateTimeFormatter.RFC_1123_DATE_TIME;
+        }
+
+        return rfc1123Formats;
     }
 
 }

@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class CloseableStringQueue extends ArrayBlockingQueue<String> implements Closeable {
+
     private boolean endOfInput = false;
 
     public CloseableStringQueue(int capacity) {
@@ -38,6 +39,16 @@ public class CloseableStringQueue extends ArrayBlockingQueue<String> implements 
             }
         }
         return null;
+    }
+
+    @Override
+    public void put(String value) throws InterruptedException {
+        while (!endOfInput) {
+            if (super.offer(value, 5, TimeUnit.SECONDS)) {
+                return;
+            }
+        }
+        throw new IllegalStateException("Queue is closed");
     }
 
     @Override

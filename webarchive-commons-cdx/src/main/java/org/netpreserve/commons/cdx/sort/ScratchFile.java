@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Representation of a temporary file used for polyphase merge sorting.
@@ -38,7 +39,9 @@ class ScratchFile implements Comparable<ScratchFile> {
 
     ScratchFile(int fileNum) {
         try {
-            this.file = Files.createTempFile("sort-" + fileNum + "-", null);
+            // Reading java.io.tmpdir ourselves to be sure we don't get a cached value;
+            Path tmpDir = Paths.get(System.getProperty("java.io.tmpdir"));
+            this.file = Files.createTempFile(tmpDir, "sort-" + fileNum + "-", null);
             file.toFile().deleteOnExit();
             distribution = 1;
             dummy = 1;

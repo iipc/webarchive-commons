@@ -184,7 +184,7 @@ public class PolyphaseMergeSort {
         scratchFiles[fileNum].dummy = 0;
         boolean hasMore = inputHeap.writeNextRun(scratchFiles[fileNum]);
         hasData.set(fileNum);
-        
+
         while (hasMore) {
             if (scratchFiles[fileNum].dummy < scratchFiles[fileNum + 1].dummy) {
                 fileNum++;

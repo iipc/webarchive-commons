@@ -113,7 +113,7 @@ public final class UriBuilder {
      * @return the newly created builder.
      */
     public static UriBuilder laxUriBuilder() {
-        return builder(Configurations.STRICT_URI);
+        return builder(Configurations.LAX_URI);
     }
 
     /**

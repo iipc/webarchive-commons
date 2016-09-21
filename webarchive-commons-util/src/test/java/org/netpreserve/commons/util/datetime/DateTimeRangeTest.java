@@ -144,5 +144,10 @@ public class DateTimeRangeTest {
         assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-01T13:14"))).isTrue();
         assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-02"))).isTrue();
         assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-01-03"))).isTrue();
+
+        date = DateTimeRange.ofRangeExpression("2007-08-21T13:41:20,2008");
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-08-21T13:41:20"))).isTrue();
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-08-21T13:41:21"))).isTrue();
+        assertThat(date.contains(VariablePrecisionDateTime.valueOf("2007-08-21T13:41:19"))).isFalse();
     }
 }

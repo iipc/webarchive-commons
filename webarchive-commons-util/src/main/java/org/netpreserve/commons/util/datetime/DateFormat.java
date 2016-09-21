@@ -79,19 +79,58 @@ public enum DateFormat {
                 .appendValue(ChronoField.DAY_OF_MONTH, 2);
         warcFormats[Granularity.DAY.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
 
-        warcDateBuilder.appendLiteral('T')
-                .appendValue(ChronoField.HOUR_OF_DAY, 2);
+        warcDateBuilder = new DateTimeFormatterBuilder()
+                .appendValue(ChronoField.YEAR, 4)
+                .appendLiteral('-')
+                .appendValue(ChronoField.MONTH_OF_YEAR, 2)
+                .appendLiteral('-')
+                .appendValue(ChronoField.DAY_OF_MONTH, 2)
+                .appendLiteral('T')
+                .appendValue(ChronoField.HOUR_OF_DAY, 2)
+                .appendOffsetId();
         warcFormats[Granularity.HOUR.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
 
-        warcDateBuilder.appendLiteral(':')
-                .appendValue(ChronoField.MINUTE_OF_HOUR, 2);
+        warcDateBuilder = new DateTimeFormatterBuilder()
+                .appendValue(ChronoField.YEAR, 4)
+                .appendLiteral('-')
+                .appendValue(ChronoField.MONTH_OF_YEAR, 2)
+                .appendLiteral('-')
+                .appendValue(ChronoField.DAY_OF_MONTH, 2)
+                .appendLiteral('T')
+                .appendValue(ChronoField.HOUR_OF_DAY, 2)
+                .appendLiteral(':')
+                .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+                .appendOffsetId();
         warcFormats[Granularity.MINUTE.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
 
-        warcDateBuilder.appendLiteral(':')
-                .appendValue(ChronoField.SECOND_OF_MINUTE, 2);
+        warcDateBuilder = new DateTimeFormatterBuilder()
+                .appendValue(ChronoField.YEAR, 4)
+                .appendLiteral('-')
+                .appendValue(ChronoField.MONTH_OF_YEAR, 2)
+                .appendLiteral('-')
+                .appendValue(ChronoField.DAY_OF_MONTH, 2)
+                .appendLiteral('T')
+                .appendValue(ChronoField.HOUR_OF_DAY, 2)
+                .appendLiteral(':')
+                .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+                .appendLiteral(':')
+                .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+                .appendOffsetId();
         warcFormats[Granularity.SECOND.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
 
-        warcDateBuilder.appendFraction(ChronoField.NANO_OF_SECOND, 9, 9, true)
+        warcDateBuilder = new DateTimeFormatterBuilder()
+                .appendValue(ChronoField.YEAR, 4)
+                .appendLiteral('-')
+                .appendValue(ChronoField.MONTH_OF_YEAR, 2)
+                .appendLiteral('-')
+                .appendValue(ChronoField.DAY_OF_MONTH, 2)
+                .appendLiteral('T')
+                .appendValue(ChronoField.HOUR_OF_DAY, 2)
+                .appendLiteral(':')
+                .appendValue(ChronoField.MINUTE_OF_HOUR, 2)
+                .appendLiteral(':')
+                .appendValue(ChronoField.SECOND_OF_MINUTE, 2)
+                .appendFraction(ChronoField.NANO_OF_SECOND, 9, 9, true)
                 .appendOffsetId();
         warcFormats[Granularity.NANOSECOND.ordinal()] = warcDateBuilder.toFormatter(Locale.ENGLISH);
 

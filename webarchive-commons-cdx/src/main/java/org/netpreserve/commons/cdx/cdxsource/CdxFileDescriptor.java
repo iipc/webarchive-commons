@@ -35,7 +35,7 @@ public class CdxFileDescriptor implements SourceDescriptor {
 
     private static final int BUFFER_SIZE = 1024 * 1024 * 16;
 
-    private static final int BLOCK_SIZE = 1024 * 128;
+    private static final long BLOCK_SIZE = 1024 * 512;
 
     final FileChannel channel;
 
@@ -43,7 +43,7 @@ public class CdxFileDescriptor implements SourceDescriptor {
 
     final long channelSize;
 
-    final ArrayList<SourceBlock> blocks;
+    final SourceBlock blocks[];
 
     /**
      * Constructor for creating metadata for å file.
@@ -59,7 +59,7 @@ public class CdxFileDescriptor implements SourceDescriptor {
         this.channel = FileChannel.open(path, StandardOpenOption.READ);
         this.channelSize = channel.size();
         int blockCount = Math.max((int) (this.channelSize / BLOCK_SIZE), 1);
-        this.blocks = new ArrayList<>(blockCount);
+        ArrayList<SourceBlock> blockList = new ArrayList<>(blockCount);
 
         ByteBuffer inBuf = ByteBuffer.allocate(1024 * 8);
         SourceBlock prevBlock = null;
@@ -97,7 +97,7 @@ public class CdxFileDescriptor implements SourceDescriptor {
             SourceBlock block = new SourceBlock(new String(inBuf.array(), lineOffset, fieldLength),
                     fileOffset, 0);
 
-            blocks.add(block);
+            blockList.add(block);
             if (prevBlock != null) {
                 prevBlock.length = (int) (block.offset - prevBlock.offset);
             }
@@ -105,6 +105,8 @@ public class CdxFileDescriptor implements SourceDescriptor {
         }
 
         prevBlock.length = (int) (channelSize - prevBlock.offset);
+
+        this.blocks = blockList.toArray(new SourceBlock[0]);
 
         populateBlockLineCount();
     }
@@ -136,11 +138,11 @@ public class CdxFileDescriptor implements SourceDescriptor {
 
         int firstIdx = findFirstBlockIndex(key);
 
-        SourceBlock block = blocks.get(firstIdx).clone();
+        SourceBlock block = blocks[firstIdx].clone();
         result.add(block);
 
-        for (int i = firstIdx + 1; i < blocks.size(); i++) {
-            SourceBlock nextBlock = blocks.get(i);
+        for (int i = firstIdx + 1; i < blocks.length; i++) {
+            SourceBlock nextBlock = blocks[i];
 
             // Merge blocks if they are smaller than BUFFER_SIZE
             if (block.length + nextBlock.length < BUFFER_SIZE) {
@@ -176,8 +178,8 @@ public class CdxFileDescriptor implements SourceDescriptor {
      * @return index of first block matching fromKey.
      */
     private int findFirstBlockIndex(SearchKey key) {
-        for (int i = 0; i < blocks.size(); i++) {
-            if (!key.isBefore(blocks.get(i).key)) {
+        for (int i = 0; i < blocks.length; i++) {
+            if (!key.isBefore(blocks[i].key)) {
                 if (i == 0) {
                     return 0;
                 } else {
@@ -185,7 +187,7 @@ public class CdxFileDescriptor implements SourceDescriptor {
                 }
             }
         }
-        return blocks.size() - 1;
+        return blocks.length - 1;
     }
 
     /**

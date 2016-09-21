@@ -52,6 +52,10 @@ public class CdxFileSourceFactoryTest {
         sourceIdentifier = UriBuilder.strictUriBuilder().uri("cdxfile:src/test/resources/foo.cdxj").build();
         cdxSource = instance.createCdxSource(sourceIdentifier);
         assertThat(cdxSource).isNull();
+
+        sourceIdentifier = UriBuilder.strictUriBuilder().uri("cdxfile:src/test/resources/notcdx.cdx").build();
+        cdxSource = instance.createCdxSource(sourceIdentifier);
+        assertThat(cdxSource).isNull();
     }
 
     /**

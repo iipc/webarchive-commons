@@ -51,7 +51,7 @@ public abstract class CdxSourceFactory {
      * <p>
      * @param identifier a string formatted as a URI with schema identifying the factory to use and the remaining is
      * then understood by that factory.
-     * @return a matching source descriptor or null if none could be found
+     * @return a matching {@link CdsxSource} descriptor or null if none could be found
      */
     public static final CdxSource getCdxSource(String identifier) {
         Uri uri = UriBuilder.strictUriBuilder().uri(identifier).build();

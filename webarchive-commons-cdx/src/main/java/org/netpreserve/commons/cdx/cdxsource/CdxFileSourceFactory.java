@@ -61,26 +61,35 @@ public class CdxFileSourceFactory extends CdxSourceFactory {
             return null;
         }
 
-        try {
-            CdxSource cdxSource;
-            switch (files.size()) {
-                case 0:
-                    cdxSource = null;
-                    break;
-                case 1:
+        CdxSource cdxSource;
+        switch (files.size()) {
+            case 0:
+                cdxSource = null;
+                break;
+            case 1:
+                try {
                     cdxSource = new BlockCdxSource(new CdxFileDescriptor(files.get(0)));
-                    break;
-                default:
-                    cdxSource = new MultiCdxSource();
-                    for (Path file : files) {
+                    LOG.info("Added file '{}' as a cdx source", files.get(0).toAbsolutePath());
+                } catch (Exception ex) {
+                    LOG.warn("Could not create CDX Source from '{}'. Cause: {}:{}", files.get(0).toAbsolutePath(),
+                            ex.getClass().getName(), ex.getLocalizedMessage());
+                    return null;
+                }
+                break;
+            default:
+                cdxSource = new MultiCdxSource();
+                for (Path file : files) {
+                    try {
                         ((MultiCdxSource) cdxSource).addSource(new BlockCdxSource(new CdxFileDescriptor(file)));
+                        LOG.info("Added file '{}' as a cdx source", files.get(0).toAbsolutePath());
+                    } catch (Exception ex) {
+                        LOG.warn("Could not create CDX Source from '{}'. Cause: {}:{}", file.toAbsolutePath(),
+                                ex.getClass().getName(), ex.getLocalizedMessage());
                     }
-                    break;
-            }
-            return cdxSource;
-        } catch (IOException ex) {
-            throw new UncheckedIOException(ex);
+                }
+                break;
         }
+        return cdxSource;
     }
 
     /**
@@ -106,7 +115,6 @@ public class CdxFileSourceFactory extends CdxSourceFactory {
         // The sourcePath is a regular file, add it and return.
         if (Files.isRegularFile(sourcePath)) {
             files.add(sourcePath);
-            LOG.info("Adding file '{}' as a cdx source", sourcePath);
             return files;
         }
 
@@ -117,7 +125,6 @@ public class CdxFileSourceFactory extends CdxSourceFactory {
                 for (Path file : dirStream) {
                     if (Files.isRegularFile(file)) {
                         files.add(file);
-                        LOG.info("Adding file '{}' as a cdx source", file);
                     }
                 }
             } catch (IOException ex) {
@@ -141,7 +148,6 @@ public class CdxFileSourceFactory extends CdxSourceFactory {
                 for (Path file : dirStream) {
                     if (Files.isRegularFile(file)) {
                         files.add(file);
-                        LOG.info("Adding file '{}' as a cdx source", file);
                     } else {
                         if (nameIdx < sourcePath.getNameCount()) {
                             Path resolvedPath = file.resolve(sourcePath.subpath(nameIdx, sourcePath.getNameCount()));

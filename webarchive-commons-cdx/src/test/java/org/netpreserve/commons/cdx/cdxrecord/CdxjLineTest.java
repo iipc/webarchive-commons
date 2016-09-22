@@ -33,7 +33,7 @@ public class CdxjLineTest {
     @Test
     public void testGet() {
         CdxjLineFormat format = new CdxjLineFormat();
-        String keyString = "(no,dagbladet,www,)/premier2000/spiller_2519.html 2007-08-21T18:35:28 response";
+        String keyString = "(no,dagbladet,www,)/premier2000/spiller_2519.html 2007-08-21T18:35:28Z response";
         String valueString = "{\"uri\":\"http://www.dagbladet.no/premier2000/spiller_2519.html\","
                 + "\"mct\":\"text/html\",\"hsc\":404,"
                 + "\"sha\":\"4GYIEA43CYREJWAD2NSGSIWYVGXJNGB7\",\"rle\":1506,"
@@ -45,7 +45,7 @@ public class CdxjLineTest {
         assertThat(record.get(FieldName.URI_KEY).getValue())
                 .isEqualTo("(no,dagbladet,www,)/premier2000/spiller_2519.html");
         assertThat(record.get(FieldName.TIMESTAMP).getValue().toFormattedString(DateFormat.WARC))
-                .isEqualTo("2007-08-21T18:35:28");
+                .isEqualTo("2007-08-21T18:35:28Z");
         assertThat(record.get(FieldName.RECORD_TYPE).getValue()).isEqualTo("response");
         assertThat(record.get(FieldName.ORIGINAL_URI).getValue().toString())
                 .isEqualTo("http://www.dagbladet.no/premier2000/spiller_2519.html");
@@ -59,7 +59,7 @@ public class CdxjLineTest {
         keyString = "(com,akerkvaerner,)/internet/templates/normalarticlepage.aspx"
                 + "?nrcachehint=nomodifyguest&nrmode=published&nrnodeguid={bca68cf3-e218-41f4-b76e-c9be540ee25f}"
                 + "&nroriginalurl=/internet/investorrelations/financereports/annualreports/annualreport2006.htm"
-                + " 2007-08-23T21:51:21 response";
+                + " 2007-08-23T21:51:21Z response";
         valueString = "{\"hsc\":200,\"ple\":19231,"
                 + "\"uri\":\"http://www.akerkvaerner.com/internet/Templates/NormalArticlePage.aspx"
                 + "?NRMODE=Published&NRORIGINALURL=%2fInternet%2fInvestorRelations%2fFinanceReports%2fAnnualreports"
@@ -76,7 +76,7 @@ public class CdxjLineTest {
                         + "?nrcachehint=nomodifyguest&nrmode=published&nrnodeguid={bca68cf3-e218-41f4-b76e-c9be540ee25f}"
                         + "&nroriginalurl=/internet/investorrelations/financereports/annualreports/annualreport2006.htm");
         assertThat(record.get(FieldName.TIMESTAMP).getValue().toFormattedString(DateFormat.WARC))
-                .isEqualTo("2007-08-23T21:51:21");
+                .isEqualTo("2007-08-23T21:51:21Z");
         assertThat(record.get(FieldName.RECORD_TYPE).getValue()).isEqualTo("response");
         assertThat(record.get(FieldName.CONTENT_TYPE).getValue()).isEqualTo("text/html; charset=utf-8");
         assertThat(record.get(FieldName.RESPONSE_CODE).getValue().intValue()).isEqualTo(200);
@@ -91,7 +91,7 @@ public class CdxjLineTest {
     @Test
     public void testGetUnparsed() {
         CdxjLineFormat format = new CdxjLineFormat();
-        String keyString = "(no,dagbladet,www,)/premier2000/spiller_2519.html 2007-08-21T18:35:28 response";
+        String keyString = "(no,dagbladet,www,)/premier2000/spiller_2519.html 2007-08-21T18:35:28Z response";
         String valueString = "{\"uri\":\"http://www.dagbladet.no/premier2000/spiller_2519.html\","
                 + "\"mct\":\"text/html\",\"hsc\":404,"
                 + "\"sha\":\"4GYIEA43CYREJWAD2NSGSIWYVGXJNGB7\",\"rle\":1506,"
@@ -109,7 +109,7 @@ public class CdxjLineTest {
         keyString = "(com,akerkvaerner,)/internet/templates/normalarticlepage.aspx"
                 + "?nrcachehint=nomodifyguest&nrmode=published&nrnodeguid={bca68cf3-e218-41f4-b76e-c9be540ee25f}"
                 + "&nroriginalurl=/internet/investorrelations/financereports/annualreports/annualreport2006.htm"
-                + " 2007-08-23T21:51:21 response";
+                + " 2007-08-23T21:51:21Z response";
         valueString = "{\"hsc\":200,\"ple\":19231,"
                 + "\"uri\":\"http://www.akerkvaerner.com/internet/Templates/NormalArticlePage.aspx"
                 + "?NRMODE=Published&NRORIGINALURL=%2fInternet%2fInvestorRelations%2fFinanceReports%2fAnnualreports"

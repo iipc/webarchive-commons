@@ -27,7 +27,6 @@ import org.netpreserve.commons.cdx.FieldName;
 import org.netpreserve.commons.cdx.HasUnparsedData;
 import org.netpreserve.commons.cdx.SearchResult;
 import org.netpreserve.commons.cdx.cdxrecord.NonCdxLineFormat;
-import org.netpreserve.commons.cdx.json.NullValue;
 import org.netpreserve.commons.cdx.json.StringValue;
 import org.netpreserve.commons.cdx.json.TimestampValue;
 import org.netpreserve.commons.cdx.json.Value;
@@ -128,14 +127,7 @@ public class CdxRecordFormatter {
                 .uri(record.get(FieldName.ORIGINAL_URI).getValue()).build();
 
         Value timeStamp = record.get(FieldName.TIMESTAMP);
-        if (timeStamp instanceof NullValue) {
-            timeStamp = record.getKey().getTimeStamp();
-        }
-
         Value recordType = record.get(FieldName.RECORD_TYPE);
-        if (recordType instanceof NullValue) {
-            recordType = record.getKey().getRecordType();
-        }
 
         CdxRecordKey key = new CdxRecordKey(
                 StringValue.valueOf(surt.toString()), (TimestampValue) timeStamp, (StringValue) recordType);

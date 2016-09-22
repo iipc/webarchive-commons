@@ -46,7 +46,7 @@ public class CdxRecordFormatterTest {
                 + "IAH-20070907235053-00459-heritrix.arc.gz";
         CdxRecord cdx09Record = new CdxLine(cdx09String, CdxLineFormat.CDX09LINE);
 
-        String cdxjString = "no,dagbladet)/premier2000/spiller_2519.html 2007-09-08T00:25:41 response "
+        String cdxjString = "no,dagbladet)/premier2000/spiller_2519.html 2007-09-08T00:25:41Z response "
                 + "{\"uri\":\"http://www.dagbladet.no/premier2000/spiller_2519.html\",\"mct\":\"text/html\","
                 + "\"hsc\":404,\"digest\":\"4GYIEA43CYREJWAD2NSGSIWYVGXJNGB7\",\"rle\":1506,"
                 + "\"ref\":\"warcfile:IAH-20070907235053-00459-heritrix.arc.gz#68224437\"}";
@@ -69,7 +69,7 @@ public class CdxRecordFormatterTest {
         formatter = new CdxRecordFormatter(CdxjLineFormat.DEFAULT_CDXJLINE);
         assertThat(formatter.format(cdx11Record)).isEqualTo(cdxjString);
         assertThat(formatter.format(cdx09Record))
-                .isEqualTo("no,dagbladet)/premier2000/spiller_2519.html 2007-09-08T00:25:41 response "
+                .isEqualTo("no,dagbladet)/premier2000/spiller_2519.html 2007-09-08T00:25:41Z response "
                         + "{\"uri\":\"http://www.dagbladet.no/premier2000/spiller_2519.html\",\"mct\":\"text/html\","
                         + "\"hsc\":404,\"digest\":\"4GYIEA43CYREJWAD2NSGSIWYVGXJNGB7\","
                         + "\"ref\":\"warcfile:IAH-20070907235053-00459-heritrix.arc.gz#68224437\"}");
@@ -82,7 +82,7 @@ public class CdxRecordFormatterTest {
     @Test
     public void testFormatTwoArguments() {
         String legacyKey = "no,dagbladet)/premier2000/spiller_2519.html 20070908002541";
-        String cdxjKey = "(no,dagbladet,)/premier2000/spiller_2519.html 2007-09-08T00:25:41 response";
+        String cdxjKey = "(no,dagbladet,)/premier2000/spiller_2519.html 2007-09-08T00:25:41Z response";
 
         String cdx11String = " http://www.dagbladet.no/premier2000/spiller_2519.html text/html 404 "
                 + "4GYIEA43CYREJWAD2NSGSIWYVGXJNGB7 - - 1506 68224437 "

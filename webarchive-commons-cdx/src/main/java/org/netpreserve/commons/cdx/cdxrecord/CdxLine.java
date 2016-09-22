@@ -95,6 +95,10 @@ public class CdxLine extends BaseCdxRecord<CdxLineFormat> implements HasUnparsed
      * @return the field's value
      */
     private Value getValue(FieldName name, int fieldIndex) {
+        if (name == FieldName.RECORD_TYPE) {
+            return getKey().getRecordType();
+        }
+
         if (fieldIndex < 0 || fieldIndex > getCdxFormat().getLength()) {
             return NullValue.NULL;
         }

@@ -19,9 +19,11 @@ import org.netpreserve.commons.util.datetime.DateTimeRange;
 import org.netpreserve.commons.util.datetime.VariablePrecisionDateTime;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
 import org.netpreserve.commons.cdx.cdxrecord.CdxLineFormat;
+import org.netpreserve.commons.cdx.cdxrecord.CdxjLineFormat;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -119,4 +121,5 @@ public class SearchKeyTest {
         key = new SearchKey().uri("åå.jalla.øx.com/foo/index.html").cdxFormat(format);
         assertThat(key.included(ByteBuffer.wrap("ch)".getBytes()))).isFalse();
     }
+
 }

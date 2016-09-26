@@ -17,6 +17,7 @@ package org.netpreserve.commons.cdx.json;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Objects;
 
 import org.netpreserve.commons.uri.Uri;
 import org.netpreserve.commons.uri.UriBuilder;
@@ -27,6 +28,7 @@ import org.netpreserve.commons.uri.UriBuilder;
 public final class UriValue implements Value<Uri> {
 
     private Uri value;
+
     private String unparsed;
 
     private UriValue(final String value) {
@@ -73,6 +75,28 @@ public final class UriValue implements Value<Uri> {
         out.write('\"');
         out.write(unparsed);
         out.write('\"');
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 83 * hash + Objects.hashCode(getValue());
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final UriValue other = (UriValue) obj;
+        if (!Objects.equals(this.getValue(), other.getValue())) {
+            return false;
+        }
+        return true;
     }
 
 }

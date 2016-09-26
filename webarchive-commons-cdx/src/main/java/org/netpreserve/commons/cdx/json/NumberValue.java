@@ -17,6 +17,7 @@ package org.netpreserve.commons.cdx.json;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Objects;
 
 /**
  *
@@ -37,6 +38,15 @@ public final class NumberValue implements Value<Number> {
         } else {
             value = d;
         }
+//        if (d.intValue() == d) {
+//            value = d.intValue();
+//        } else if (d.longValue() == d) {
+//            value = d.longValue();
+//        } else if (d.floatValue() == d) {
+//            value = d.floatValue();
+//        } else {
+//            value = d;
+//        }
         return new NumberValue(value);
     }
 
@@ -61,6 +71,25 @@ public final class NumberValue implements Value<Number> {
     @Override
     public void toJson(Writer out) throws IOException {
         out.write(value.toString());
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 17 * hash + Objects.hashCode(this.value);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final NumberValue other = (NumberValue) obj;
+        return value.doubleValue() == other.value.doubleValue();
     }
 
 }

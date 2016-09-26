@@ -18,11 +18,13 @@ package org.netpreserve.commons.cdx.json;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.BitSet;
+import java.util.Objects;
 
 /**
  *
  */
 public final class StringValue implements Value<String> {
+
     private static final BitSet ILLEGAL_IN_JSON_STRING = new BitSet(256);
 
     static {
@@ -94,6 +96,28 @@ public final class StringValue implements Value<String> {
             }
         }
         out.write('\"');
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 89 * hash + Objects.hashCode(this.value);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final StringValue other = (StringValue) obj;
+        if (!Objects.equals(this.value, other.value)) {
+            return false;
+        }
+        return true;
     }
 
 }

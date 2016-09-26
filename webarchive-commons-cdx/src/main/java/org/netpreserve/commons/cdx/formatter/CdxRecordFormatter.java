@@ -21,17 +21,10 @@ import java.io.Writer;
 import org.netpreserve.commons.cdx.CdxFormat;
 import org.netpreserve.commons.cdx.cdxrecord.CdxLineFormat;
 import org.netpreserve.commons.cdx.CdxRecord;
-import org.netpreserve.commons.cdx.CdxRecordKey;
 import org.netpreserve.commons.cdx.cdxrecord.CdxjLineFormat;
-import org.netpreserve.commons.cdx.FieldName;
 import org.netpreserve.commons.cdx.HasUnparsedData;
 import org.netpreserve.commons.cdx.SearchResult;
 import org.netpreserve.commons.cdx.cdxrecord.NonCdxLineFormat;
-import org.netpreserve.commons.cdx.json.StringValue;
-import org.netpreserve.commons.cdx.json.TimestampValue;
-import org.netpreserve.commons.cdx.json.Value;
-import org.netpreserve.commons.uri.Uri;
-import org.netpreserve.commons.uri.UriBuilder;
 
 /**
  *
@@ -63,14 +56,7 @@ public class CdxRecordFormatter {
     }
 
     public String format(final CdxRecord record) {
-        return format(record, false);
-    }
-
-    public String format(final CdxRecord record, final boolean createKey) {
-        if (createKey) {
-            CdxRecordKey key = createKey(record);
-            record.setKey(key);
-        } else if (record instanceof HasUnparsedData && record.getCdxFormat().equals(format)) {
+        if (record instanceof HasUnparsedData && record.getCdxFormat().equals(format)) {
             return new String(((HasUnparsedData) record).getUnparsed());
         }
 
@@ -84,11 +70,8 @@ public class CdxRecordFormatter {
         return sbw.toString();
     }
 
-    public void format(final Writer out, final CdxRecord record, final boolean createKey) throws IOException {
-        if (createKey) {
-            CdxRecordKey key = createKey(record);
-            record.setKey(key);
-        } else if (record instanceof HasUnparsedData && record.getCdxFormat().equals(format)) {
+    public void format(final Writer out, final CdxRecord record) throws IOException {
+        if (record instanceof HasUnparsedData && record.getCdxFormat().equals(format)) {
             out.write(((HasUnparsedData) record).getUnparsed());
             return;
         }
@@ -110,29 +93,10 @@ public class CdxRecordFormatter {
             }
             count++;
 
-            format(out, cdxLine, false);
+            format(out, cdxLine);
             out.append('\n');
         }
 
-    }
-
-    /**
-     * Create a key for a record from the uri and timestamp of the record.
-     * <p>
-     * @param record the record to create a key for.
-     * @return the created key.
-     */
-    CdxRecordKey createKey(final CdxRecord record) {
-        Uri surt = UriBuilder.builder(format.getKeyUriFormat())
-                .uri(record.get(FieldName.ORIGINAL_URI).getValue()).build();
-
-        Value timeStamp = record.get(FieldName.TIMESTAMP);
-        Value recordType = record.get(FieldName.RECORD_TYPE);
-
-        CdxRecordKey key = new CdxRecordKey(
-                StringValue.valueOf(surt.toString()), (TimestampValue) timeStamp, (StringValue) recordType);
-
-        return key;
     }
 
 }

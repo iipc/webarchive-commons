@@ -23,6 +23,8 @@ import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.CdxRecordKey;
 import org.netpreserve.commons.cdx.cdxrecord.CdxjLineRecordKey;
 import org.netpreserve.commons.cdx.FieldName;
+import org.netpreserve.commons.uri.Uri;
+import org.netpreserve.commons.uri.UriBuilder;
 
 /**
  * Formats a cdx record in the cdxj format.
@@ -43,11 +45,14 @@ public class CdxjLineFormatter implements CdxFormatter {
         if (key instanceof CdxjLineRecordKey) {
             out.write(((CdxjLineRecordKey) key).getUnparsed());
         } else {
-            out.write(key.getUriKey().getValue());
+            Uri surt = UriBuilder.builder(outputFormat.getKeyUriFormat())
+                    .uri(record.get(FieldName.ORIGINAL_URI).getValue()).build();
+
+            out.write(surt.toString());
             out.write(' ');
-            out.write(key.getTimeStamp().getValue().toFormattedString(outputFormat.getKeyDateFormat()));
+            out.write(record.get(FieldName.TIMESTAMP).getValue().toFormattedString(outputFormat.getKeyDateFormat()));
             out.write(' ');
-            out.write(key.getRecordType().getValue());
+            out.write(record.get(FieldName.RECORD_TYPE).getValue());
         }
 
         out.write(JSON_START);

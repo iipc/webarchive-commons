@@ -33,7 +33,7 @@ public interface CdxRecord extends
      * @return The format of the raw data this record is read from or {@link NonCdxLineFormat}, if no such raw data
      * exist.
      */
-     <T extends CdxFormat> T getCdxFormat();
+    <T extends CdxFormat> T getCdxFormat();
 
     /**
      * Get the key for this record.
@@ -41,13 +41,6 @@ public interface CdxRecord extends
      * @return the key or null if no one exist
      */
     CdxRecordKey getKey();
-
-    /**
-     * Set the key for this record.
-     * <p>
-     * @param recordKey the key to set
-     */
-    void setKey(CdxRecordKey recordKey);
 
     /**
      * Convenience method to get a named field by its name as a String.
@@ -99,6 +92,7 @@ public interface CdxRecord extends
 
     /**
      * A combination of field name and value used for the field iterator.
+     * <p>
      * @param <T> the Java type encapsulated by this field
      */
     interface Field<T> {

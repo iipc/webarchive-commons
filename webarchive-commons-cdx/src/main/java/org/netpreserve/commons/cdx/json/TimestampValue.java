@@ -17,6 +17,7 @@ package org.netpreserve.commons.cdx.json;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Objects;
 
 import org.netpreserve.commons.util.datetime.DateFormat;
 import org.netpreserve.commons.util.datetime.VariablePrecisionDateTime;
@@ -27,6 +28,7 @@ import org.netpreserve.commons.util.datetime.VariablePrecisionDateTime;
 public final class TimestampValue implements Value<VariablePrecisionDateTime>, Comparable<TimestampValue> {
 
     private VariablePrecisionDateTime value;
+
     private String unparsed;
 
     private TimestampValue(final String value) {
@@ -75,6 +77,28 @@ public final class TimestampValue implements Value<VariablePrecisionDateTime>, C
     @Override
     public int compareTo(TimestampValue other) {
         return getValue().compareTo(other.getValue());
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 11 * hash + Objects.hashCode(getValue());
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final TimestampValue other = (TimestampValue) obj;
+        if (!Objects.equals(this.getValue(), other.getValue())) {
+            return false;
+        }
+        return true;
     }
 
 }

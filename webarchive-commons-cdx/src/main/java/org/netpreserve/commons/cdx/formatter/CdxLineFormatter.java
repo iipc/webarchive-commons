@@ -29,6 +29,7 @@ import org.netpreserve.commons.cdx.json.NumberValue;
 import org.netpreserve.commons.cdx.json.StringValue;
 import org.netpreserve.commons.cdx.json.Value;
 import org.netpreserve.commons.uri.Uri;
+import org.netpreserve.commons.uri.UriBuilder;
 
 /**
  * Formats a CdxRecord in the Legacy cdx format.
@@ -45,9 +46,12 @@ public class CdxLineFormatter implements CdxFormatter {
         if (key instanceof CdxLineRecordKey) {
             out.write(((CdxLineRecordKey) key).getUnparsed());
         } else {
-            out.write(key.getUriKey().getValue());
+            Uri surt = UriBuilder.builder(format.getKeyUriFormat())
+                    .uri(record.get(FieldName.ORIGINAL_URI).getValue()).build();
+
+            out.write(surt.toString());
             out.write(' ');
-            out.write(key.getTimeStamp().getValue().toFormattedString(format.getKeyDateFormat()));
+            out.write(record.get(FieldName.TIMESTAMP).getValue().toFormattedString(format.getKeyDateFormat()));
         }
 
         for (int i = 2; i < format.getLength(); i++) {

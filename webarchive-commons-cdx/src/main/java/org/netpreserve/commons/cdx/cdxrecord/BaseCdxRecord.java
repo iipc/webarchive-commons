@@ -15,6 +15,7 @@
  */
 package org.netpreserve.commons.cdx.cdxrecord;
 
+import java.util.BitSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -28,8 +29,8 @@ import org.netpreserve.commons.cdx.json.Value;
 /**
  * Base class for implementations of CdxRecord.
  * <p>
- * @param <T> The format of the raw data this record is read from. If no such
- * raw data exist, a format of {@link NonCdxLineFormat} should be used.
+ * @param <T> The format of the raw data this record is read from. If no such raw data exist, a format of
+ * {@link NonCdxLineFormat} should be used.
  */
 public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord {
 
@@ -70,12 +71,6 @@ public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord {
     }
 
     @Override
-    public void setKey(CdxRecordKey recordKey) {
-        this.key = recordKey;
-        this.modified = true;
-    }
-
-    @Override
     public Value get(String fieldName) {
         return get(FieldName.forName(fieldName));
     }
@@ -90,18 +85,43 @@ public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord {
      */
     protected abstract class FieldIterator implements Iterator<CdxRecord.Field> {
 
+        private final BitSet handledKeyFields = new BitSet(3);
+
         private CdxRecord.Field next;
 
         @Override
-        public boolean hasNext() {
+        public final boolean hasNext() {
             if (next == null) {
                 next = getNext();
+
+                // Make sure that also the key fields gets included in the iterator
+                if (next != null) {
+                    if (next.getFieldName() == FieldName.URI_KEY) {
+                        handledKeyFields.set(0);
+                    } else if (next.getFieldName() == FieldName.TIMESTAMP) {
+                        handledKeyFields.set(1);
+                    } else if (next.getFieldName() == FieldName.RECORD_TYPE) {
+                        handledKeyFields.set(2);
+                    }
+                } else {
+                    if (!handledKeyFields.get(0)) {
+                        handledKeyFields.set(0);
+                        next = new ImmutableField(FieldName.URI_KEY, get(FieldName.URI_KEY));
+                    } else if (!handledKeyFields.get(1)) {
+                        handledKeyFields.set(1);
+                        next = new ImmutableField(FieldName.TIMESTAMP, get(FieldName.TIMESTAMP));
+                    } else if (!handledKeyFields.get(2)) {
+                        handledKeyFields.set(2);
+                        next = new ImmutableField(FieldName.RECORD_TYPE, get(FieldName.RECORD_TYPE));
+                    }
+                }
             }
+
             return next != null;
         }
 
         @Override
-        public CdxRecord.Field next() {
+        public final CdxRecord.Field next() {
             if (hasNext()) {
                 CdxRecord.Field result = next;
                 next = null;
@@ -129,6 +149,7 @@ public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord {
 
     /**
      * An immutable implementation of the {@link Field} interface.
+     * <p>
      * @param <T> the Java type encapsulated by this field
      */
     protected static class ImmutableField<T> implements Field<T> {
@@ -161,6 +182,32 @@ public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord {
         @Override
         public String toString() {
             return "\"" + name + "\"=" + value.toJson();
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 61 * hash + Objects.hashCode(this.name);
+            hash = 61 * hash + Objects.hashCode(this.value);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (!Field.class.isInstance(obj)) {
+                return false;
+            }
+            final Field<?> other = (Field<?>) obj;
+            if (!Objects.equals(this.name, other.getFieldName())) {
+                return false;
+            }
+            if (!Objects.equals(this.value, other.getValue())) {
+                return false;
+            }
+            return true;
         }
 
     }

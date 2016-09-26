@@ -19,8 +19,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.FieldName;
 import org.netpreserve.commons.cdx.json.NullValue;
+import org.netpreserve.commons.cdx.json.SimpleJsonParser;
 import org.netpreserve.commons.cdx.json.Value;
 
 /**
@@ -37,6 +39,41 @@ public class UnconnectedCdxRecord extends BaseCdxRecord<NonCdxLineFormat> {
      */
     public UnconnectedCdxRecord() {
         super(NonCdxLineFormat.FORMAT);
+    }
+
+    /**
+     * Create instance by copying content from another CdxRecord.
+     * <p>
+     * @param cdxRecord the record to make a copy of
+     */
+    public UnconnectedCdxRecord(CdxRecord cdxRecord) {
+        super(NonCdxLineFormat.FORMAT);
+        for (Field f : cdxRecord) {
+            fields.put(f.getFieldName(), f);
+        }
+    }
+
+    /**
+     * Create instance by parsing a json block formatted according to the json block part of the CDXJ format.
+     * <p>
+     * @param json the data to parse
+     */
+    public UnconnectedCdxRecord(char[] json) {
+        super(NonCdxLineFormat.FORMAT);
+        Map<FieldName, Value> parsedFieldMap = new SimpleJsonParser(json, 0).parseObject();
+        fields = new HashMap<>();
+        for (Map.Entry<FieldName, Value> entry : parsedFieldMap.entrySet()) {
+            fields.put(entry.getKey(), new ImmutableField(entry.getKey(), entry.getValue()));
+        }
+    }
+
+    /**
+     * Create instance by parsing a json block formatted according to the json block part of the CDXJ format.
+     * <p>
+     * @param json the string to parse
+     */
+    public UnconnectedCdxRecord(String json) {
+        this(json.toCharArray());
     }
 
     @Override

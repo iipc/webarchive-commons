@@ -16,8 +16,13 @@
 package org.netpreserve.commons.cdx.cdxrecord;
 
 import org.junit.Test;
+import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.FieldName;
 import org.netpreserve.commons.cdx.HasUnparsedData;
+import org.netpreserve.commons.cdx.json.NumberValue;
+import org.netpreserve.commons.cdx.json.StringValue;
+import org.netpreserve.commons.cdx.json.TimestampValue;
+import org.netpreserve.commons.cdx.json.UriValue;
 import org.netpreserve.commons.util.datetime.DateFormat;
 
 import static org.assertj.core.api.Assertions.*;
@@ -126,6 +131,35 @@ public class CdxjLineTest {
                 .isNotNull()
                 .isInstanceOf(HasUnparsedData.class)
                 .hasFieldOrPropertyWithValue("unparsed", keyString.toCharArray());
+    }
+
+    @Test
+    public void testIterator() {
+        CdxjLineFormat format = new CdxjLineFormat();
+        String keyString = "(no,dagbladet,www,)/premier2000/spiller_2519.html 2007-08-21T18:35:28Z response";
+        String valueString = "{\"uri\":\"http://www.dagbladet.no/premier2000/spiller_2519.html\","
+                + "\"mct\":\"text/html\",\"hsc\":404,"
+                + "\"sha\":\"4GYIEA43CYREJWAD2NSGSIWYVGXJNGB7\",\"rle\":1506,"
+                + "\"ref\":\"warcfile:IAH-20070907235053-00459-heritrix.arc.gz#68224437\"}";
+        char[] keyValue = (keyString + ' ' + valueString).toCharArray();
+
+        CdxRecord record = new CdxjLine(keyValue, format);
+
+        assertThat(record.iterator()).containsOnly(
+                new BaseCdxRecord.ImmutableField(FieldName.ORIGINAL_URI,
+                        UriValue.valueOf("http://www.dagbladet.no/premier2000/spiller_2519.html")),
+                new BaseCdxRecord.ImmutableField(FieldName.CONTENT_TYPE, StringValue.valueOf("text/html")),
+                new BaseCdxRecord.ImmutableField(FieldName.RESPONSE_CODE, NumberValue.valueOf(404)),
+                new BaseCdxRecord.ImmutableField(FieldName.TIMESTAMP, TimestampValue.valueOf("2007-08-21T18:35:28Z")),
+                new BaseCdxRecord.ImmutableField(FieldName.RESOURCE_REF,
+                        UriValue.valueOf("warcfile:IAH-20070907235053-00459-heritrix.arc.gz#68224437")),
+                new BaseCdxRecord.ImmutableField(FieldName.RECORD_TYPE, StringValue.valueOf("response")),
+                new BaseCdxRecord.ImmutableField(FieldName.PAYLOAD_DIGEST,
+                        StringValue.valueOf("4GYIEA43CYREJWAD2NSGSIWYVGXJNGB7")),
+                new BaseCdxRecord.ImmutableField(FieldName.URI_KEY,
+                        StringValue.valueOf("(no,dagbladet,www,)/premier2000/spiller_2519.html")),
+                new BaseCdxRecord.ImmutableField(FieldName.RECORD_LENGTH, NumberValue.valueOf(1506))
+        );
     }
 
 }

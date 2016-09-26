@@ -16,6 +16,7 @@
 package org.netpreserve.commons.cdx.cdxrecord;
 
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -90,7 +91,19 @@ public class CdxjLine extends BaseCdxRecord<CdxjLineFormat> implements HasUnpars
     @Override
     public Iterator<Field> iterator() {
         parseFields();
-        return fields.values().iterator();
+
+        return new FieldIterator() {
+            Iterator<Field> srcIterator = fields.values().iterator();
+
+            @Override
+            protected Field getNext() {
+                if (srcIterator.hasNext()) {
+                    return srcIterator.next();
+                }
+                return null;
+            }
+
+        };
     }
 
     /**

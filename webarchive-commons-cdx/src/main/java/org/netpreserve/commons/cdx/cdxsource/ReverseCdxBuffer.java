@@ -17,7 +17,6 @@ package org.netpreserve.commons.cdx.cdxsource;
 
 import java.nio.ByteBuffer;
 
-import org.netpreserve.commons.cdx.CdxFormat;
 import org.netpreserve.commons.cdx.SearchKey;
 
 /**
@@ -81,11 +80,6 @@ public class ReverseCdxBuffer extends CdxBuffer {
             endOfLine = byteBuf.position();
             skipToBeginningOfLine();
         }
-    }
-
-    @Override
-    boolean includableByFilter(byte[] filter) {
-        return compareToFilter(filter) >= 0;
     }
 
     @Override

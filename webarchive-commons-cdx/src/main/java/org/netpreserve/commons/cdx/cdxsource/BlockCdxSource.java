@@ -23,6 +23,7 @@ import java.util.ListIterator;
 import org.netpreserve.commons.cdx.processor.Processor;
 import org.netpreserve.commons.cdx.CdxSource;
 import org.netpreserve.commons.cdx.SearchKey;
+import org.netpreserve.commons.cdx.SearchKeyTemplate;
 import org.netpreserve.commons.cdx.SearchResult;
 
 /**
@@ -37,8 +38,8 @@ public class BlockCdxSource implements CdxSource {
     }
 
     @Override
-    public SearchResult search(final SearchKey searchKey, final List<Processor> processors, final boolean reverse) {
-        SearchKey key = searchKey.cdxFormat(sourceDescriptor.getInputFormat());
+    public SearchResult search(final SearchKeyTemplate searchKey, final List<Processor> processors, final boolean reverse) {
+        SearchKey key = searchKey.createSearchKey(sourceDescriptor.getInputFormat());
 
         return new AbstractSearchResult() {
             final List<SourceBlock> blocks = sourceDescriptor.calculateBlocks(key);
@@ -97,8 +98,8 @@ public class BlockCdxSource implements CdxSource {
     }
 
     @Override
-    public long count(final SearchKey searchKey) {
-        SearchKey key = searchKey.cdxFormat(sourceDescriptor.getInputFormat());
+    public long count(final SearchKeyTemplate searchKey) {
+        SearchKey key = searchKey.createSearchKey(sourceDescriptor.getInputFormat());
 
         final List<SourceBlock> blocks = sourceDescriptor.calculateBlocks(key);
 

@@ -29,10 +29,9 @@ import org.netpreserve.commons.cdx.SearchKey;
 public interface SourceDescriptor extends Closeable {
 
     /**
-     * Get a list of blocks containing all lines between fromKey (inclusive) and toKey (exclusive).
+     * Get a list of blocks containing all lines included by the SearchKey.
      * <p>
-     * @param fromKey the key giving a starting point or null for starting at the beginning.
-     * @param toKey the key giving a ending point or null for unlimited.
+     * @param key the key used to determine if a block should be included.
      * @return the list of blocks.
      */
     List<SourceBlock> calculateBlocks(SearchKey key);

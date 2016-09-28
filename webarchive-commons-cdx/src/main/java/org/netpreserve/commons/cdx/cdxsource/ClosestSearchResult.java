@@ -18,7 +18,7 @@ package org.netpreserve.commons.cdx.cdxsource;
 import java.util.List;
 
 import org.netpreserve.commons.cdx.CdxSource;
-import org.netpreserve.commons.cdx.SearchKey;
+import org.netpreserve.commons.cdx.SearchKeyTemplate;
 import org.netpreserve.commons.cdx.processor.Processor;
 import org.netpreserve.commons.util.datetime.VariablePrecisionDateTime;
 
@@ -29,13 +29,13 @@ public class ClosestSearchResult extends AbstractSearchResult {
 
     final CdxSource source;
 
-    final SearchKey key;
+    final SearchKeyTemplate key;
 
     final VariablePrecisionDateTime timestamp;
 
     final List<Processor> processors;
 
-    public ClosestSearchResult(CdxSource source, SearchKey key, VariablePrecisionDateTime timestamp,
+    public ClosestSearchResult(CdxSource source, SearchKeyTemplate key, VariablePrecisionDateTime timestamp,
             List<Processor> processors) {
         this.source = source;
         this.key = key;

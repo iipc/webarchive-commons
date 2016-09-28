@@ -23,7 +23,7 @@ import java.util.List;
 import org.netpreserve.commons.cdx.SearchResult;
 import org.netpreserve.commons.cdx.processor.Processor;
 import org.netpreserve.commons.cdx.CdxSource;
-import org.netpreserve.commons.cdx.SearchKey;
+import org.netpreserve.commons.cdx.SearchKeyTemplate;
 import org.netpreserve.commons.cdx.processor.BiFunctionProcessor;
 
 /**
@@ -70,7 +70,7 @@ public class MultiCdxSource implements CdxSource {
     }
 
     @Override
-    public SearchResult search(SearchKey key, List<Processor> processors, boolean reverse) {
+    public SearchResult search(SearchKeyTemplate key, List<Processor> processors, boolean reverse) {
 
         SearchResult[] sourceIterables = new SearchResult[sources.size()];
         for (int i = 0; i < sources.size(); i++) {
@@ -80,7 +80,7 @@ public class MultiCdxSource implements CdxSource {
     }
 
     @Override
-    public long count(SearchKey key) {
+    public long count(SearchKeyTemplate key) {
         long count = 0L;
         for (int i = 0; i < sources.size(); i++) {
             count += sources.get(i).count(key);

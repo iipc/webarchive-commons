@@ -29,8 +29,7 @@ public class BlockCdxSourceReverseIterator extends BlockCdxSourceIterator {
      * <p>
      * @param sourceDescriptor the source descriptor to use
      * @param blockIterator an iterator over blocks which contain data within the requested range
-     * @param startKey the range start (inclusive)
-     * @param endKey the range end (exclusive)
+     * @param searchKey the key used to check if a line is within scope.
      */
     public BlockCdxSourceReverseIterator(final SourceDescriptor sourceDescriptor,
             final Iterator<SourceBlock> blockIterator, final SearchKey searchKey) {

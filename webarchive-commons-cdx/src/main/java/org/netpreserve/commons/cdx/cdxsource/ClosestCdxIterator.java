@@ -22,7 +22,7 @@ import org.netpreserve.commons.util.datetime.VariablePrecisionDateTime;
 import org.netpreserve.commons.util.datetime.DateTimeRange;
 import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.CdxSource;
-import org.netpreserve.commons.cdx.SearchKey;
+import org.netpreserve.commons.cdx.SearchKeyTemplate;
 import org.netpreserve.commons.cdx.SearchResult;
 import org.netpreserve.commons.cdx.processor.Processor;
 
@@ -53,17 +53,17 @@ public class ClosestCdxIterator implements CdxIterator {
      * @param source the CdxSource to wrap
      * @param key the key containing the Uri to search for
      * @param timeStamp the timeStamp to sort around
-     * @param processors processors to apply before sorting, might be empty
+     * @param processors processors to apply before sorting, might be empty or null
      */
-    public ClosestCdxIterator(CdxSource source, SearchKey key, VariablePrecisionDateTime timeStamp,
+    public ClosestCdxIterator(CdxSource source, SearchKeyTemplate key, VariablePrecisionDateTime timeStamp,
             List<Processor> processors) {
 
-        if (key.getMatchType() != SearchKey.UriMatchType.EXACT) {
+        if (key.getMatchType() != SearchKeyTemplate.UriMatchType.EXACT) {
             throw new IllegalArgumentException("Closest match not allowed for wildcard uri");
         }
 
-        SearchKey forwardKey = key.dateRange(DateTimeRange.start(timeStamp));
-        SearchKey backwardKey = key.dateRange(DateTimeRange.end(timeStamp));
+        SearchKeyTemplate forwardKey = key.dateRange(DateTimeRange.start(timeStamp));
+        SearchKeyTemplate backwardKey = key.dateRange(DateTimeRange.end(timeStamp));
 
         forwardResult = source.search(forwardKey, processors, false);
         backwardResult = source.search(backwardKey, processors, true);

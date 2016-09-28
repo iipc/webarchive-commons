@@ -15,37 +15,21 @@
  */
 package org.netpreserve.commons.cdx;
 
-import org.netpreserve.commons.util.datetime.DateTimeRange;
-
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 import org.netpreserve.commons.cdx.cdxsource.ByteBufferUtil;
 import org.netpreserve.commons.cdx.cdxsource.SearchKeyFilter;
 import org.netpreserve.commons.uri.Uri;
+import org.netpreserve.commons.util.datetime.DateTimeRange;
 import org.netpreserve.commons.util.datetime.VariablePrecisionDateTime;
 
 /**
- * An instance of this class can determine if a CdxRecord is within scope for a search.
+ *
  */
 public final class SearchKey {
 
-    public enum UriMatchType {
-
-        ALL,
-        EXACT,
-        HOST,
-        PATH,
-        RANGE;
-
-    }
-
-    private final String primaryUriString;
-
-    private final DateTimeRange dateRange;
-
-    private final String secondaryUriString;
-
-    private final UriMatchType uriMatchType;
+    private final SearchKeyTemplate skt;
 
     private final CdxFormat cdxFormat;
 
@@ -59,83 +43,42 @@ public final class SearchKey {
 
     private SearchKeyFilter<SearchKeyFilter<Uri>> surtHostFilter;
 
-    public SearchKey() {
-        this(null, null, null, null, null, null, null, UriMatchType.ALL, null, false, false);
-    }
+    SearchKey(final SearchKeyTemplate skt, final CdxFormat cdxFormat) {
+        this.skt = skt;
+        this.cdxFormat = Objects.requireNonNull(cdxFormat);
 
-    public SearchKey(final String uri, final UriMatchType matchType) {
-        this(uri.trim(), null, null, null, null, null, null, matchType, null, true, false);
-    }
-
-    public SearchKey(final String uri, final UriMatchType matchType, final DateTimeRange dateRange) {
-        this(uri.trim(), null, null, null, dateRange, null, null, matchType, null, false, false);
-    }
-
-    private SearchKey(String primaryUri, SearchKeyFilter primaryUriFilter,
-            String secondaryUri, SearchKeyFilter secondaryUriFilter,
-            DateTimeRange dateRange, SearchKeyFilter fromDateFilter, SearchKeyFilter toDateFilter,
-            UriMatchType uriMatchType, CdxFormat cdxFormat, boolean parseUri, boolean parseDate) {
-
-        if (parseUri && cdxFormat != null) {
-
-            if (primaryUri != null) {
-                primaryUriFilter = SearchKeyFilter.newUriFilter(primaryUri, cdxFormat.getKeyUriFormat(), uriMatchType);
-            }
-            if (secondaryUriFilter == null && secondaryUri != null) {
-                secondaryUriFilter = SearchKeyFilter.newUriFilter(
-                        secondaryUri, cdxFormat.getKeyUriFormat(), uriMatchType);
-            }
+        if (skt.primaryUriString != null) {
+            primaryUriFilter = SearchKeyFilter
+                    .newUriFilter(skt.primaryUriString, cdxFormat.getKeyUriFormat(), skt.uriMatchType);
+        } else {
+            primaryUriFilter = null;
+        }
+        if (skt.secondaryUriString != null) {
+            secondaryUriFilter = SearchKeyFilter.newUriFilter(
+                    skt.secondaryUriString, cdxFormat.getKeyUriFormat(), skt.uriMatchType);
+        } else {
+            secondaryUriFilter = null;
         }
 
-        if (parseDate && cdxFormat != null && dateRange != null) {
-            if (dateRange.hasStartDate()) {
-                fromDateFilter = SearchKeyFilter.newDateFilter(dateRange.getStart(), cdxFormat.getKeyDateFormat());
+        if (skt.dateRange != null) {
+            if (skt.dateRange.hasStartDate()) {
+                fromDateFilter = SearchKeyFilter.newDateFilter(skt.dateRange.getStart(), cdxFormat
+                        .getKeyDateFormat());
+            } else {
+                fromDateFilter = null;
             }
-            if (dateRange.hasEndDate()) {
-                toDateFilter = SearchKeyFilter.newDateFilter(dateRange.getEnd(), cdxFormat.getKeyDateFormat());
+            if (skt.dateRange.hasEndDate()) {
+                toDateFilter = SearchKeyFilter.newDateFilter(skt.dateRange.getEnd(), cdxFormat.getKeyDateFormat());
+            } else {
+                toDateFilter = null;
             }
+        } else {
+            fromDateFilter = null;
+            toDateFilter = null;
         }
-
-        this.primaryUriString = primaryUri;
-        this.primaryUriFilter = primaryUriFilter;
-        this.secondaryUriString = secondaryUri;
-        this.secondaryUriFilter = secondaryUriFilter;
-        this.uriMatchType = uriMatchType;
-        this.cdxFormat = cdxFormat;
-        this.dateRange = dateRange;
-        this.fromDateFilter = fromDateFilter;
-        this.toDateFilter = toDateFilter;
-    }
-
-    public SearchKey uri(final String uri) {
-        return uri(uri, UriMatchType.EXACT);
-    }
-
-    public SearchKey uri(final String uri, final UriMatchType matchType) {
-        return new SearchKey(uri.trim(), null, null, null, dateRange, fromDateFilter, toDateFilter,
-                matchType, cdxFormat, true, false);
-    }
-
-    public SearchKey dateRange(final DateTimeRange dateRange) {
-        return new SearchKey(primaryUriString, primaryUriFilter, secondaryUriString, secondaryUriFilter, dateRange,
-                null, null, uriMatchType, cdxFormat, false, true);
-    }
-
-    public SearchKey uriRange(final String fromUri, final String toUri) {
-        return new SearchKey(fromUri.trim(), null, toUri.trim(), null, dateRange, null, null,
-                UriMatchType.RANGE, cdxFormat, true, false);
-    }
-
-    public SearchKey cdxFormat(final CdxFormat format) {
-        return new SearchKey(primaryUriString, null, secondaryUriString, null, dateRange, null, null,
-                uriMatchType, format, true, true);
     }
 
     public Uri getPrimaryUri() {
-        if (cdxFormat == null) {
-            throw new IllegalStateException("Cannot get parsed URI when CdxFormat is not set");
-        }
-
         if (primaryUriFilter == null) {
             return null;
         }
@@ -144,10 +87,6 @@ public final class SearchKey {
     }
 
     public Uri getSecondaryUri() {
-        if (cdxFormat == null) {
-            throw new IllegalStateException("Cannot get parsed URI when CdxFormat is not set");
-        }
-
         if (secondaryUriFilter == null) {
             return null;
         }
@@ -155,12 +94,8 @@ public final class SearchKey {
         return secondaryUriFilter.getOriginalValue();
     }
 
-    public UriMatchType getMatchType() {
-        return uriMatchType;
-    }
-
     public DateTimeRange getDateRange() {
-        return dateRange;
+        return skt.dateRange;
     }
 
     public CdxFormat getCdxFormat() {
@@ -168,11 +103,7 @@ public final class SearchKey {
     }
 
     public boolean isBefore(final String keyToTest) {
-        if (cdxFormat == null) {
-            throw new IllegalStateException("CdxFormat must be set");
-        }
-
-        switch (uriMatchType) {
+        switch (skt.uriMatchType) {
             case ALL:
                 return false;
 
@@ -199,11 +130,7 @@ public final class SearchKey {
     }
 
     public boolean included(final String keyToTest) {
-        if (cdxFormat == null) {
-            throw new IllegalStateException("CdxFormat must be set");
-        }
-
-        switch (uriMatchType) {
+        switch (skt.uriMatchType) {
             case ALL:
                 return true;
 
@@ -237,21 +164,17 @@ public final class SearchKey {
     }
 
     public boolean included(final ByteBuffer byteBuf) {
-        if (cdxFormat == null) {
-            throw new IllegalStateException("CdxFormat must be set");
-        }
-
-        switch (uriMatchType) {
+        switch (skt.uriMatchType) {
             case ALL:
                 return true;
 
             case EXACT:
                 if (ByteBufferUtil.compareToFilter(byteBuf, primaryUriFilter) == 0) {
-                    if (dateRange != null && dateRange.hasStartDateOrEndDate()
+                    if (skt.dateRange != null && skt.dateRange.hasStartDateOrEndDate()
                             && ByteBufferUtil.nextField(byteBuf) && byteBuf.hasRemaining()) {
-                        if (dateRange.hasStartDate() && dateRange.hasEndDate()) {
+                        if (skt.dateRange.hasStartDate() && skt.dateRange.hasEndDate()) {
                             return ByteBufferUtil.between(byteBuf, fromDateFilter, toDateFilter);
-                        } else if (dateRange.hasStartDate()) {
+                        } else if (skt.dateRange.hasStartDate()) {
                             return ByteBufferUtil.compareToFilter(byteBuf, fromDateFilter) >= 0;
                         } else {
                             return ByteBufferUtil.compareToFilter(byteBuf, toDateFilter) < 0;
@@ -298,4 +221,5 @@ public final class SearchKey {
         }
         return surtHostFilter;
     }
+
 }

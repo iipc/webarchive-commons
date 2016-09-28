@@ -15,7 +15,7 @@
  */
 package org.netpreserve.commons.cdx.cdxsource;
 
-import org.netpreserve.commons.cdx.SearchKey;
+import org.netpreserve.commons.cdx.SearchKeyTemplate;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -108,7 +108,7 @@ public class ByteBufferUtilTest {
         assertThat(cdxSrcNoArray.hasArray()).isFalse();
 
         UriBuilderConfig uriConfig = cdxFormat.getKeyUriFormat();
-        SearchKey.UriMatchType matchType = SearchKey.UriMatchType.EXACT;
+        SearchKeyTemplate.UriMatchType matchType = SearchKeyTemplate.UriMatchType.EXACT;
         DateFormat dateFormat = cdxFormat.getKeyDateFormat();
         DateTimeRange dateRange = DateTimeRange.ofRangeExpression("2007-08-21T13:41:20;2008");
         SearchKeyFilter filter;
@@ -203,7 +203,7 @@ public class ByteBufferUtilTest {
 
         cdxSrc.position(uriOffset);
         cdxSrcNoArray.position(uriOffset);
-        filter = SearchKeyFilter.newUriFilter("http://www.nb.no", uriConfig, SearchKey.UriMatchType.EXACT);
+        filter = SearchKeyFilter.newUriFilter("http://www.nb.no", uriConfig, SearchKeyTemplate.UriMatchType.EXACT);
         assertThat(ByteBufferUtil.compareToFilter(cdxSrc, filter)).isPositive();
         assertThat(ByteBufferUtil.compareToFilter(cdxSrcNoArray, filter)).isPositive();
         assertThat(cdxSrc.position()).isLessThanOrEqualTo(uriFieldEnd).isGreaterThan(uriOffset);
@@ -211,7 +211,7 @@ public class ByteBufferUtilTest {
 
         cdxSrc.position(uriOffset);
         cdxSrcNoArray.position(uriOffset);
-        filter = SearchKeyFilter.newUriFilter("http://www.nb.no/jkl", uriConfig, SearchKey.UriMatchType.EXACT);
+        filter = SearchKeyFilter.newUriFilter("http://www.nb.no/jkl", uriConfig, SearchKeyTemplate.UriMatchType.EXACT);
         assertThat(ByteBufferUtil.compareToFilter(cdxSrc, filter)).isNegative();
         assertThat(ByteBufferUtil.compareToFilter(cdxSrcNoArray, filter)).isNegative();
         assertThat(cdxSrc.position()).isLessThanOrEqualTo(uriFieldEnd).isGreaterThan(uriOffset);
@@ -219,7 +219,7 @@ public class ByteBufferUtilTest {
 
         cdxSrc.position(uriOffset);
         cdxSrcNoArray.position(uriOffset);
-        filter = SearchKeyFilter.newUriFilter("http://www.nb.no/index.html", uriConfig, SearchKey.UriMatchType.EXACT);
+        filter = SearchKeyFilter.newUriFilter("http://www.nb.no/index.html", uriConfig, SearchKeyTemplate.UriMatchType.EXACT);
         assertThat(ByteBufferUtil.compareToFilter(cdxSrc, filter)).isZero();
         assertThat(ByteBufferUtil.compareToFilter(cdxSrcNoArray, filter)).isZero();
         assertThat(cdxSrc.position()).isLessThanOrEqualTo(uriFieldEnd).isGreaterThan(uriOffset);
@@ -227,7 +227,7 @@ public class ByteBufferUtilTest {
 
         cdxSrc.position(uriOffset);
         cdxSrcNoArray.position(uriOffset);
-        filter = SearchKeyFilter.newUriFilter("http://www.nb.no/abc.html", uriConfig, SearchKey.UriMatchType.EXACT);
+        filter = SearchKeyFilter.newUriFilter("http://www.nb.no/abc.html", uriConfig, SearchKeyTemplate.UriMatchType.EXACT);
         assertThat(ByteBufferUtil.compareToFilter(cdxSrc, filter)).isPositive();
         assertThat(ByteBufferUtil.compareToFilter(cdxSrcNoArray, filter)).isPositive();
         assertThat(cdxSrc.position()).isLessThanOrEqualTo(uriFieldEnd).isGreaterThan(uriOffset);
@@ -235,7 +235,7 @@ public class ByteBufferUtilTest {
 
         cdxSrc.position(uriOffset);
         cdxSrcNoArray.position(uriOffset);
-        filter = SearchKeyFilter.newUriFilter("http://www.nb.no/jkl", uriConfig, SearchKey.UriMatchType.PATH);
+        filter = SearchKeyFilter.newUriFilter("http://www.nb.no/jkl", uriConfig, SearchKeyTemplate.UriMatchType.PATH);
         assertThat(ByteBufferUtil.compareToFilter(cdxSrc, filter)).isNegative();
         assertThat(ByteBufferUtil.compareToFilter(cdxSrcNoArray, filter)).isNegative();
         assertThat(cdxSrc.position()).isLessThanOrEqualTo(uriFieldEnd).isGreaterThan(uriOffset);
@@ -243,7 +243,7 @@ public class ByteBufferUtilTest {
 
         cdxSrc.position(uriOffset);
         cdxSrcNoArray.position(uriOffset);
-        filter = SearchKeyFilter.newUriFilter("http://www.nb.no/index.html", uriConfig, SearchKey.UriMatchType.PATH);
+        filter = SearchKeyFilter.newUriFilter("http://www.nb.no/index.html", uriConfig, SearchKeyTemplate.UriMatchType.PATH);
         assertThat(ByteBufferUtil.compareToFilter(cdxSrc, filter)).isZero();
         assertThat(ByteBufferUtil.compareToFilter(cdxSrcNoArray, filter)).isZero();
         assertThat(cdxSrc.position()).isLessThanOrEqualTo(uriFieldEnd).isGreaterThan(uriOffset);
@@ -251,7 +251,7 @@ public class ByteBufferUtilTest {
 
         cdxSrc.position(uriOffset);
         cdxSrcNoArray.position(uriOffset);
-        filter = SearchKeyFilter.newUriFilter("http://www.nb.no/abc.html", uriConfig, SearchKey.UriMatchType.PATH);
+        filter = SearchKeyFilter.newUriFilter("http://www.nb.no/abc.html", uriConfig, SearchKeyTemplate.UriMatchType.PATH);
         assertThat(ByteBufferUtil.compareToFilter(cdxSrc, filter)).isPositive();
         assertThat(ByteBufferUtil.compareToFilter(cdxSrcNoArray, filter)).isPositive();
         assertThat(cdxSrc.position()).isLessThanOrEqualTo(uriFieldEnd).isGreaterThan(uriOffset);

@@ -15,7 +15,7 @@
  */
 package org.netpreserve.commons.cdx.cdxsource;
 
-import org.netpreserve.commons.cdx.SearchKey;
+import org.netpreserve.commons.cdx.SearchKeyTemplate;
 
 import java.nio.charset.StandardCharsets;
 
@@ -45,8 +45,8 @@ final class SearchKeyUriFilter implements SearchKeyFilter<Uri> {
      * @param uriBuilderConfig the {@link UriBuilderConfig} used for parsing the filter
      * @param uriMatchType the match type which could influence parsing beyond whats in the config
      */
-    SearchKeyUriFilter(String filter, UriBuilderConfig uriBuilderConfig, SearchKey.UriMatchType uriMatchType) {
-        if (uriMatchType == SearchKey.UriMatchType.PATH) {
+    SearchKeyUriFilter(String filter, UriBuilderConfig uriBuilderConfig, SearchKeyTemplate.UriMatchType uriMatchType) {
+        if (uriMatchType == SearchKeyTemplate.UriMatchType.PATH) {
             // If match type is PATH, we need to keep ending slashes because we removed the final '*'.
             UriBuilderConfig.ConfigBuilder builder = uriBuilderConfig.toBuilder();
             builder.getPostParseNormalizers()

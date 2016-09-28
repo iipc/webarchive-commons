@@ -32,7 +32,7 @@ import org.netpreserve.commons.cdx.cdxrecord.CdxLineFormat;
 import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.processor.Processor;
 import org.netpreserve.commons.cdx.CdxSource;
-import org.netpreserve.commons.cdx.SearchKey;
+import org.netpreserve.commons.cdx.SearchKeyTemplate;
 import org.netpreserve.commons.cdx.functions.FieldRegexFilter;
 import org.netpreserve.commons.cdx.SearchResult;
 import org.netpreserve.commons.cdx.processor.FilterProcessor;
@@ -63,7 +63,7 @@ public class BlockCdxSourceTest {
         Path path = Paths.get(ClassLoader.getSystemResource("cdxfile1.cdx").toURI());
         try (SourceDescriptor sourceDescriptor = new CdxFileDescriptor(path);) {
 
-            SearchKey key = new SearchKey();
+            SearchKeyTemplate key = new SearchKeyTemplate();
             int expectedSize = 1666;
 
             CdxSource cdxSource = new BlockCdxSource(sourceDescriptor);
@@ -100,7 +100,7 @@ public class BlockCdxSourceTest {
         Path path = Paths.get(ClassLoader.getSystemResource("cdxfile1.cdx").toURI());
         try (SourceDescriptor sourceDescriptor = new ReadOnlyBufferSourceDescriptor(path);) {
 
-            SearchKey key = new SearchKey();
+            SearchKeyTemplate key = new SearchKeyTemplate();
             int expectedSize = 1666;
 
             CdxSource cdxSource = new BlockCdxSource(sourceDescriptor);
@@ -138,7 +138,7 @@ public class BlockCdxSourceTest {
         Path path = Paths.get(ClassLoader.getSystemResource("cdxfile3.cdx").toURI());
         try (SourceDescriptor sourceDescriptor = new CdxFileDescriptor(path);) {
 
-            SearchKey key = new SearchKey().uri("http://vg.no/din_verden/assets/images/himmel.gif");
+            SearchKeyTemplate key = new SearchKeyTemplate().uri("http://vg.no/din_verden/assets/images/himmel.gif");
             int expectedSize = 2;
 
             CdxSource cdxSource = new BlockCdxSource(sourceDescriptor);
@@ -176,7 +176,7 @@ public class BlockCdxSourceTest {
 
         try (CdxSource cdxSource = new BlockCdxSource(sourceDescriptor);) {
 
-            SearchKey key = new SearchKey().uriRange("halten.be", "ch");
+            SearchKeyTemplate key = new SearchKeyTemplate().uriRange("halten.be", "ch");
 
             List<CdxLine> expectedResult = new ArrayList<>();
             expectedResult.add(new CdxLine("be,halten)/ 20070821143342", format));
@@ -224,7 +224,7 @@ public class BlockCdxSourceTest {
 
         try (CdxSource cdxSource = new BlockCdxSource(sourceDescriptor);) {
 
-            SearchKey key = new SearchKey().uriRange("halten.be", "ch");
+            SearchKeyTemplate key = new SearchKeyTemplate().uriRange("halten.be", "ch");
 
             FieldRegexFilter f = new FieldRegexFilter(Collections.singletonList("!hsc:200"));
             Processor<Filter> fp = new FilterProcessor().addFunction(f);
@@ -249,13 +249,13 @@ public class BlockCdxSourceTest {
 
         try (CdxSource cdxSource = new BlockCdxSource(sourceDescriptor);) {
 
-            SearchKey key = new SearchKey().uriRange("halten.be", "ch");
+            SearchKeyTemplate key = new SearchKeyTemplate().uriRange("halten.be", "ch");
 
             long count = cdxSource.count(key);
             assertThat(count).isEqualTo(15);
 
             // Count whole file
-            count = cdxSource.count(new SearchKey());
+            count = cdxSource.count(new SearchKeyTemplate());
             assertThat(count).isEqualTo(1666);
         }
     }

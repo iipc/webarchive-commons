@@ -30,7 +30,7 @@ import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.CdxRecordFactory;
 import org.netpreserve.commons.cdx.CdxSource;
 import org.netpreserve.commons.cdx.FieldName;
-import org.netpreserve.commons.cdx.SearchKey;
+import org.netpreserve.commons.cdx.SearchKeyTemplate;
 import org.netpreserve.commons.cdx.SearchResult;
 import org.netpreserve.commons.cdx.CdxSourceFactory;
 import org.netpreserve.commons.cdx.cdxsource.BlockCdxSource;
@@ -190,7 +190,7 @@ public class BiFunctionProcessorTest {
 
         CdxSource cdxSource = CdxSourceFactory.getCdxSource("cdxfile:src/test/resources/cdxfile3.cdx");
 
-        SearchKey key = new SearchKey();
+        SearchKeyTemplate key = new SearchKeyTemplate();
         SearchResult result = cdxSource.search(key, processors, false);
 
 //        assertThat(result).hasSize(113);
@@ -225,7 +225,7 @@ public class BiFunctionProcessorTest {
         CdxSource cdxSource1 = CdxSourceFactory.getCdxSource("cdxfile:src/test/resources/cdxfile4.cdx");
         CdxSource cdxSource2 = CdxSourceFactory.getCdxSource("cdxfile:src/test/resources/cdxfile5.cdx");
 
-        SearchKey key = new SearchKey();
+        SearchKeyTemplate key = new SearchKeyTemplate();
         MultiCdxSource cdxSource = new MultiCdxSource(cdxSource1, cdxSource2);
         SearchResult result = cdxSource.search(key, processors, false);
 

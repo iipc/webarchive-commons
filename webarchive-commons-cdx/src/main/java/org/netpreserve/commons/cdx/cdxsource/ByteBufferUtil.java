@@ -17,7 +17,6 @@ package org.netpreserve.commons.cdx.cdxsource;
 
 import java.nio.ByteBuffer;
 
-
 /**
  * Static helper methods for working with ByteBuffers.
  */
@@ -283,17 +282,35 @@ public final class ByteBufferUtil {
     /**
      * Advance buffer position to next field.
      * <p>
-     * @param buf the buffer which position is to be advanced to the next field
+     * @param byteBuf the buffer which position is to be advanced to the next field
      * @return return true if a new field was found, false if end of line or end of buffer
      */
-    public final static boolean nextField(ByteBuffer buf) {
-        while (buf.hasRemaining()) {
-            byte c = buf.get();
-            if (c == ' ') {
-                return true;
+    public final static boolean nextField(ByteBuffer byteBuf) {
+        if (byteBuf.hasArray()) {
+            final byte[] buf = byteBuf.array();
+            final int arrayOffset = byteBuf.arrayOffset();
+            final int offset = byteBuf.position();
+            final int limit = byteBuf.limit();
+            for (int i = offset; i < limit; i++) {
+                byte c = buf[arrayOffset + i];
+                if (c == ' ') {
+                    byteBuf.position(i + 1);
+                    return true;
+                }
+                if (c == '\n' || c == '\r') {
+                    byteBuf.position(i + 1);
+                    return false;
+                }
             }
-            if (c == '\n' || c == '\r') {
-                return false;
+        } else {
+            while (byteBuf.hasRemaining()) {
+                byte c = byteBuf.get();
+                if (c == ' ') {
+                    return true;
+                }
+                if (c == '\n' || c == '\r') {
+                    return false;
+                }
             }
         }
         return false;

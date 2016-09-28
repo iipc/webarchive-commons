@@ -77,7 +77,19 @@ public abstract class BaseCdxRecord<T extends CdxFormat> implements CdxRecord {
 
     @Override
     public int compareTo(CdxRecord other) {
-        return key.compareTo(other.getKey());
+        if (key != null && other.getKey() != null) {
+            return key.compareTo(other.getKey());
+        } else {
+            int result = get(FieldName.URI_KEY).getValue().compareTo(other.get(FieldName.URI_KEY).getValue());
+            if (result == 0) {
+                result = get(FieldName.TIMESTAMP).getValue().compareTo(other.get(FieldName.TIMESTAMP).getValue());
+                if (result == 0) {
+                    result = get(FieldName.RECORD_TYPE).getValue()
+                            .compareTo(other.get(FieldName.RECORD_TYPE).getValue());
+                }
+            }
+            return result;
+        }
     }
 
     /**

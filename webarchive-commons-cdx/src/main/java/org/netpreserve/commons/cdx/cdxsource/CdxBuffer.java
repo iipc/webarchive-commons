@@ -167,62 +167,10 @@ public class CdxBuffer {
         skipLF();
     }
 
-    boolean includableByFilter(final byte[] filter) {
-        return compareToFilter(filter) < 0;
-    }
-
-    /**
-     * Compare line starting at current position to a filter.
-     * <p>
-     * @param filter the filter to compare
-     * @return negative number if filter is before current line, zero if equal, and positive number if filter is after
-     * current line
-     */
-    final int compareToFilter(final byte[] filter) {
-        int filterLength = filter.length;
-
-        int k = 0;
-
-        if (byteBuf.hasArray()) {
-            // When buffer is backed by an array, this runs faster than using ByteBuffer API
-            byte[] buf = byteBuf.array();
-            int offset = byteBuf.position();
-            int limit = byteBuf.limit();
-
-            for (int i = offset; i < limit && k < filterLength; i++) {
-                byte c = buf[i];
-                byte cf = filter[k];
-
-                if (isLf(c)) {
-                    byteBuf.position(i + 1);
-                    break;
-                }
-                if (c != cf) {
-                    byteBuf.position(i + 1);
-                    return c - cf;
-                }
-                k++;
-            }
-        } else {
-            while (k < filterLength && byteBuf.hasRemaining()) {
-                byte c = byteBuf.get();
-                byte cf = filter[k];
-
-                if (isLf(c)) {
-                    break;
-                }
-                if (c != cf) {
-                    return c - cf;
-                }
-                k++;
-            }
-        }
-
-        return k - filterLength;
-    }
-
     /**
      * If a start filter exist, skip lines not matching filter.
+     *
+     * @return true when the first line to be included is reached
      */
     boolean skipLines() {
         while (byteBuf.hasRemaining()) {

@@ -28,7 +28,7 @@ import org.netpreserve.commons.cdx.functions.Filter;
 import org.netpreserve.commons.cdx.CdxRecord;
 import org.netpreserve.commons.cdx.processor.Processor;
 import org.netpreserve.commons.cdx.CdxSource;
-import org.netpreserve.commons.cdx.SearchKey;
+import org.netpreserve.commons.cdx.SearchKeyTemplate;
 import org.netpreserve.commons.cdx.functions.FieldRegexFilter;
 import org.netpreserve.commons.cdx.SearchResult;
 import org.netpreserve.commons.cdx.processor.FilterProcessor;
@@ -59,7 +59,7 @@ public class MultiCdxSourceTest {
         CdxSource cdxFile1 = new BlockCdxSource(sourceDescriptor1);
         CdxSource cdxFile2 = new BlockCdxSource(sourceDescriptor2);
 
-        SearchKey key = new SearchKey();
+        SearchKeyTemplate key = new SearchKeyTemplate();
 
         SearchResult result1 = cdxFile1.search(key, null, false);
         assertThat(result1).hasSize(1666);
@@ -102,7 +102,7 @@ public class MultiCdxSourceTest {
         CdxSource cdxFile1 = new BlockCdxSource(sourceDescriptor1);
         CdxSource cdxFile2 = new BlockCdxSource(sourceDescriptor2);
 
-        SearchKey key = new SearchKey().uriRange("halten.be", "ch");
+        SearchKeyTemplate key = new SearchKeyTemplate().uriRange("halten.be", "ch");
 
         SearchResult result1 = cdxFile1.search(key, null, false);
         assertThat(result1).hasSize(15);
@@ -145,7 +145,7 @@ public class MultiCdxSourceTest {
         CdxSource cdxFile1 = new BlockCdxSource(sourceDescriptor1);
         CdxSource cdxFile2 = new BlockCdxSource(sourceDescriptor2);
 
-        SearchKey key = new SearchKey().uriRange("halten.be", "ch");
+        SearchKeyTemplate key = new SearchKeyTemplate().uriRange("halten.be", "ch");
 
         FieldRegexFilter f = new FieldRegexFilter(Collections.singletonList("!hsc:200"));
         Processor<Filter> fp = new FilterProcessor().addFunction(f);
@@ -184,7 +184,7 @@ public class MultiCdxSourceTest {
         CdxSource cdxFile1 = new BlockCdxSource(sourceDescriptor1);
         CdxSource cdxFile2 = new BlockCdxSource(sourceDescriptor2);
 
-        SearchKey key = new SearchKey();
+        SearchKeyTemplate key = new SearchKeyTemplate();
 
         long result1 = cdxFile1.count(key);
         assertThat(result1).isEqualTo(1666);

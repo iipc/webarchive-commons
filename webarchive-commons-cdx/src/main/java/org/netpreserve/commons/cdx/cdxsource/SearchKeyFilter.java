@@ -15,7 +15,7 @@
  */
 package org.netpreserve.commons.cdx.cdxsource;
 
-import org.netpreserve.commons.cdx.SearchKey;
+import org.netpreserve.commons.cdx.SearchKeyTemplate;
 import org.netpreserve.commons.uri.Uri;
 import org.netpreserve.commons.uri.UriBuilderConfig;
 import org.netpreserve.commons.util.datetime.DateFormat;
@@ -97,7 +97,7 @@ public interface SearchKeyFilter<T> {
      * @param matchType the match type which could influence parsing beyond whats in the config
      * @return the newly created filter
      */
-    static SearchKeyFilter newUriFilter(String filter, UriBuilderConfig config, SearchKey.UriMatchType matchType) {
+    static SearchKeyFilter newUriFilter(String filter, UriBuilderConfig config, SearchKeyTemplate.UriMatchType matchType) {
         return new SearchKeyUriFilter(filter, config, matchType);
     }
 

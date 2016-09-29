@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.netpreserve.commons.cdx.CdxSource;
+import org.netpreserve.commons.uri.ParsedQuery;
 import org.netpreserve.commons.uri.Uri;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,12 +55,15 @@ public class CdxFileSourceFactory extends CdxSourceFactory {
     @Override
     public CdxSource createCdxSource(Uri identifier) {
         Path sourcePath = Paths.get(identifier.getPath());
+        ParsedQuery query = identifier.getParsedQuery();
+
+        boolean watch = false;
+        ParsedQuery.Entry watchParam = query.get("watch");
+        if (watchParam != null && (watchParam.size() == 0 || !watchParam.getSingle().equalsIgnoreCase("false"))) {
+            watch = true;
+        }
 
         List<Path> files = resolveFiles(sourcePath);
-
-        if (files.isEmpty()) {
-            return null;
-        }
 
         CdxSource cdxSource;
         switch (files.size()) {
@@ -67,29 +71,39 @@ public class CdxFileSourceFactory extends CdxSourceFactory {
                 cdxSource = null;
                 break;
             case 1:
-                try {
-                    cdxSource = new BlockCdxSource(new CdxFileDescriptor(files.get(0)));
-                    LOG.info("Added file '{}' as a cdx source", files.get(0).toAbsolutePath());
-                } catch (Exception ex) {
-                    LOG.warn("Could not create CDX Source from '{}'. Cause: {}:{}", files.get(0).toAbsolutePath(),
-                            ex.getClass().getName(), ex.getLocalizedMessage());
-                    return null;
-                }
+                cdxSource = createCdxSource(files.get(0), watch);
                 break;
             default:
                 cdxSource = new MultiCdxSource();
                 for (Path file : files) {
-                    try {
-                        ((MultiCdxSource) cdxSource).addSource(new BlockCdxSource(new CdxFileDescriptor(file)));
-                        LOG.info("Added file '{}' as a cdx source", files.get(0).toAbsolutePath());
-                    } catch (Exception ex) {
-                        LOG.warn("Could not create CDX Source from '{}'. Cause: {}:{}", file.toAbsolutePath(),
-                                ex.getClass().getName(), ex.getLocalizedMessage());
-                    }
+                    ((MultiCdxSource) cdxSource).addSource(createCdxSource(file, watch));
                 }
                 break;
         }
         return cdxSource;
+    }
+
+    /**
+     * Turn a path into a CdxSource.
+     * <p>
+     * @param file the input file
+     * @param watch if true and file is a directory, then modifications to files in that directory will be watched.
+     * @return the created CdxSource
+     */
+    CdxSource createCdxSource(Path file, boolean watch) {
+        CdxSource result = null;
+        try {
+            if (Files.isRegularFile(file)) {
+                result = new BlockCdxSource(new CdxFileDescriptor(file));
+                LOG.info("Added file '{}' as a cdx source", file.toAbsolutePath());
+            } else if (Files.isDirectory(file)) {
+                result = new FileDirectoryCdxSource(file, watch);
+            }
+        } catch (Exception ex) {
+            LOG.warn("Could not create CDX Source from '{}'. Cause: {}:{}", file.toAbsolutePath(),
+                    ex.getClass().getName(), ex.getLocalizedMessage());
+        }
+        return result;
     }
 
     /**
@@ -108,28 +122,13 @@ public class CdxFileSourceFactory extends CdxSourceFactory {
      * <p>
      * @param sourcePath the potentially modified source path (if original contains wildcard)
      * @param nameIdx the index of the path element to be evaluated for wildcards
-     * @param files the list of discovered files to add to
+     * @param files the list of discovered files and directories to add
      * @return the list of discovered files is returned as a convenience
      */
     private List<Path> innerResolveFiles(Path sourcePath, int nameIdx, List<Path> files) {
-        // The sourcePath is a regular file, add it and return.
-        if (Files.isRegularFile(sourcePath)) {
+        // The sourcePath is a found, add it and return.
+        if (Files.isRegularFile(sourcePath) || Files.isDirectory(sourcePath)) {
             files.add(sourcePath);
-            return files;
-        }
-
-        // The sourcePath is a directory, add all files in directory and return.
-        if (Files.isDirectory(sourcePath)) {
-            try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(sourcePath)) {
-                LOG.info("Adding all files in '{}' as cdx sources", sourcePath.toAbsolutePath());
-                for (Path file : dirStream) {
-                    if (Files.isRegularFile(file)) {
-                        files.add(file);
-                    }
-                }
-            } catch (IOException ex) {
-                throw new UncheckedIOException(ex);
-            }
             return files;
         }
 

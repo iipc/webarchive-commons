@@ -108,18 +108,12 @@ public class CdxFileSourceFactoryTest {
         sourcePath = Paths.get("src/test/resources");
         files = instance.resolveFiles(sourcePath);
         assertThat(files).contains(
-                Paths.get("src/test/resources/cdxfile1.cdx"),
-                Paths.get("src/test/resources/cdxfile2.cdx"),
-                Paths.get("src/test/resources/cdxfile3.cdx"),
-                Paths.get("src/test/resources/cdxfile4.cdx"));
+                Paths.get("src/test/resources"));
 
         sourcePath = Paths.get("src/test/res*");
         files = instance.resolveFiles(sourcePath);
         assertThat(files).contains(
-                Paths.get("src/test/resources/cdxfile1.cdx"),
-                Paths.get("src/test/resources/cdxfile2.cdx"),
-                Paths.get("src/test/resources/cdxfile3.cdx"),
-                Paths.get("src/test/resources/cdxfile4.cdx"));
+                Paths.get("src/test/resources"));
 
         sourcePath = Paths.get("src/test/resources/foo.cdxj");
         files = instance.resolveFiles(sourcePath);

@@ -17,7 +17,7 @@ package org.netpreserve.commons.cdx.cdxsource;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.netpreserve.commons.cdx.SearchResult;
@@ -44,16 +44,17 @@ public class MultiCdxSource implements CdxSource {
 
     /**
      * Creates a MultiCdxSource from an array of {@link CdxSource}s.
-     *
+     * <p>
      * @param sources the array of sources to start out with
      */
     public MultiCdxSource(CdxSource... sources) {
-        this.sources = Arrays.asList(sources);
+        this.sources = new ArrayList<>();
+        Collections.addAll(this.sources, sources);
     }
 
     /**
      * Creates a MultiCdxSource from a list of {@link CdxSource}s.
-     *
+     * <p>
      * @param sources the list of sources to start out with
      */
     public MultiCdxSource(List<CdxSource> sources) {
@@ -62,11 +63,29 @@ public class MultiCdxSource implements CdxSource {
 
     /**
      * Add a {@link CdxSource} to this MultiCdxSource.
-     *
+     * <p>
      * @param source the source to add
      */
     public void addSource(CdxSource source) {
         this.sources.add(source);
+    }
+
+    /**
+     * Remove a {@link CdxSource} from this MultiCdxSource.
+     * <p>
+     * @param source the source to remove
+     */
+    public void removeSource(CdxSource source) {
+        this.sources.remove(source);
+    }
+
+    /**
+     * Get the number of CdxSources handled by this MultiCdxSource.
+     * <p>
+     * @return the size
+     */
+    public int size() {
+        return this.sources.size();
     }
 
     @Override
@@ -94,6 +113,7 @@ public class MultiCdxSource implements CdxSource {
             source.close();
         }
     }
+
     private class MultiCdxIterable extends AbstractSearchResult {
 
         SearchResult[] sourceIterables;

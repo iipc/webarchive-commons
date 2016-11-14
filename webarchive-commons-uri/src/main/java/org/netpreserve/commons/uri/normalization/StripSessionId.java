@@ -20,11 +20,12 @@ import java.util.Set;
 
 import org.netpreserve.commons.uri.ParsedQuery;
 import org.netpreserve.commons.uri.PostParseNormalizer;
+import org.netpreserve.commons.uri.Scheme;
 import org.netpreserve.commons.uri.UriBuilder;
 import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
-import static org.netpreserve.commons.uri.Schemes.HTTP;
-import static org.netpreserve.commons.uri.Schemes.HTTPS;
+import static org.netpreserve.commons.uri.Scheme.HTTP;
+import static org.netpreserve.commons.uri.Scheme.HTTPS;
 import static org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer.immutableSetOf;
 
 /**
@@ -32,7 +33,7 @@ import static org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer.im
  */
 public class StripSessionId extends SchemeBasedNormalizer implements PostParseNormalizer {
 
-    private static final Set<String> SUPPORTED_SCHEMES = immutableSetOf(HTTP.name, HTTPS.name);
+    private static final Set<Scheme> SUPPORTED_SCHEMES = immutableSetOf(HTTP, HTTPS);
 
     @Override
     public void normalize(UriBuilder builder) {
@@ -43,7 +44,7 @@ public class StripSessionId extends SchemeBasedNormalizer implements PostParseNo
     }
 
     @Override
-    public Set<String> getSupportedSchemes() {
+    public Set<Scheme> getSupportedSchemes() {
         return SUPPORTED_SCHEMES;
     }
 

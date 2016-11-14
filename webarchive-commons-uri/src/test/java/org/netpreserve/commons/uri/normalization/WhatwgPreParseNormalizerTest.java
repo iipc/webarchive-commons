@@ -13,24 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.netpreserve.commons.uri;
+
+package org.netpreserve.commons.uri.normalization;
 
 
-import org.netpreserve.commons.uri.normalization.report.NormalizationDescriber;
+import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.*;
 
 /**
- * A Normalizer that can be added to the Uri parsing process.
+ *
  */
-public interface Normalizer extends NormalizationDescriber {
+public class WhatwgPreParseNormalizerTest {
 
+    public WhatwgPreParseNormalizerTest() {
+    }
     /**
-     * Gives the Normalizer an opportunity to decide if this Normalizer should be run for the submitted builder.
-     * <p>
-     * @param builder the builder to check
-     * @return true if this normalizer should be used for this builder.
+     * Test of normalize method, of class WhatwgPreParseNormalizer.
      */
-    default boolean validFor(UriBuilder builder) {
-        return true;
+    @Test
+    public void testNormalize() {
+        String uriString = " \tabc\ndef\u0003";
+        MimicBrowserNormalizer instance = new MimicBrowserNormalizer();
+        String expResult = "abcdef";
+        String result = instance.normalize(uriString);
+        assertThat(result).isEqualTo(expResult);
     }
 
 }

@@ -18,7 +18,7 @@ package org.netpreserve.commons.uri.normalization;
 import java.util.List;
 
 import org.netpreserve.commons.uri.InParseNormalizer;
-import org.netpreserve.commons.uri.Rfc3986Parser;
+import org.netpreserve.commons.uri.parser.Parser;
 import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
 /**
@@ -29,12 +29,12 @@ import org.netpreserve.commons.uri.normalization.report.NormalizationDescription
 public class InsertCommonSchemesForSchemelessUri implements InParseNormalizer {
 
     @Override
-    public void preParseAuthority(Rfc3986Parser.ParserState parserState) {
+    public void preParseAuthority(Parser.ParserState parserState) {
         if (parserState.getBuilder().scheme() == null) {
-            if (parserState.getUri().startsWith("/", parserState.getOffset())) {
+            if (parserState.getUri().charAt(0) == '/') {
                 parserState.setHasAuthority(true);
                 parserState.getBuilder().scheme("file");
-                if (parserState.getUri().startsWith("/", parserState.getOffset() + 1)) {
+                if (parserState.getUri().charAt(1) == '/') {
                     parserState.incrementOffset(1);
                 }
             } else {

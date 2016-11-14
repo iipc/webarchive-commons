@@ -25,11 +25,13 @@ import java.util.Objects;
  */
 public class Uri {
 
+    public static final int DEFAULT_PORT_MARKER = -1;
+
     final String scheme;
 
-    final String authority;
+    final String user;
 
-    final String userinfo;
+    final String password;
 
     final String host;
 
@@ -57,13 +59,16 @@ public class Uri {
 
     private transient String toStringCache;
 
+    private transient String authorityCache;
+
     Uri(final UriBuilder uriBuilder) {
         // There are usually only a little number of schemes. Interning the field reuses the same
         // string to reduce memory footprint.
-        this.scheme = uriBuilder.scheme != null ? uriBuilder.scheme.intern() : null;
+        this.scheme = uriBuilder.scheme() != null ? uriBuilder.scheme().intern() : null;
 
-        this.authority = uriBuilder.authority;
-        this.userinfo = uriBuilder.userinfo;
+        this.user = uriBuilder.user();
+        this.password = uriBuilder.password();
+        this.host = uriBuilder.host();
         this.port = uriBuilder.port;
         this.path = uriBuilder.path;
         this.query = uriBuilder.query;
@@ -74,21 +79,6 @@ public class Uri {
         this.isIPv6reference = uriBuilder.isIPv6reference;
         this.isAbsPath = uriBuilder.isAbsPath;
 
-        // Coalesce the getHost and getAuthority fields where possible.
-        //
-        // In the web crawl/http domain, most URIs have an identical getHost and getAuthority. (There is
-        // no getPort or user info.)
-        //
-        // Notably, the lengths of these fields are equal if and only if their values are identical.
-        // This code makes use of this fact to reduce the two instances to one where possible,
-        // slimming instances.
-        if (uriBuilder.host != null && uriBuilder.authority != null
-                && uriBuilder.host.length() == uriBuilder.authority.length()) {
-            this.host = uriBuilder.authority;
-        } else {
-            this.host = uriBuilder.host;
-        }
-
         this.charset = uriBuilder.charset;
         this.defaultFormat = uriBuilder.config.getDefaultFormat();
     }
@@ -98,7 +88,22 @@ public class Uri {
     }
 
     public String getUserinfo() {
-        return userinfo;
+        StringBuilder sb = new StringBuilder();
+        if (user != null) {
+            sb.append(user);
+        }
+        if (password != null) {
+            sb.append(':').append(password);
+        }
+        return sb.toString();
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public String getHost() {
@@ -106,7 +111,10 @@ public class Uri {
     }
 
     public String getDecodedHost() {
-        if (Schemes.forName(scheme).punycodedHost) {
+        if (isIPv4address || isIPv6reference) {
+            return host;
+        }
+        if (Scheme.forName(scheme).isPunycodedHost()) {
             return IDN.toUnicode(host);
         }
         return decode(host);
@@ -117,19 +125,19 @@ public class Uri {
     }
 
     public int getDecodedPort() {
-        if (port == -1) {
-            return Schemes.forName(scheme).defaultPort;
+        if (port == DEFAULT_PORT_MARKER) {
+            return Scheme.forName(scheme).defaultPort();
         } else {
             return port;
         }
     }
 
-    public String getFormattedAuthority() {
-        return formatAuthority(defaultFormat, new StringBuilder()).toString();
-    }
-
     public String getAuthority() {
-        return authority;
+        if (isAuthority() && authorityCache == null) {
+            StringBuilder authBuf = new StringBuilder();
+            authorityCache = formatAuthority(defaultFormat, authBuf).toString();
+        }
+        return authorityCache;
     }
 
     public String getPath() {
@@ -155,6 +163,10 @@ public class Uri {
         return fragment;
     }
 
+    public boolean isAuthority() {
+        return host != null || user != null || password != null || port != DEFAULT_PORT_MARKER;
+    }
+
     public boolean isRegistryName() {
         return isRegName;
     }
@@ -175,11 +187,20 @@ public class Uri {
         return isAbsPath;
     }
 
+    public Charset getCharset() {
+        return charset;
+    }
+
+    public UriFormat getDefaultFormat() {
+        return defaultFormat;
+    }
+
     public String toDebugString() {
         StringBuilder buf = new StringBuilder("Details for '" + toString() + "'\n");
         buf.append("  Scheme: ").append(scheme).append('\n');
-        buf.append("  Authority: ").append(authority).append('\n');
-        buf.append("  UserInfo: ").append(userinfo).append('\n');
+        buf.append("  Authority: ").append(getAuthority()).append('\n');
+        buf.append("  User: ").append(user).append('\n');
+        buf.append("  Password: ").append(password).append('\n');
         buf.append("  Host: ").append(host).append('\n');
         buf.append("  Port: ").append(port).append('\n');
         buf.append("  Path: ").append(path).append('\n');
@@ -221,12 +242,16 @@ public class Uri {
                 buf.append(':');
             }
 
-            if (!format.ignoreAuthority && authority != null) {
+            if (!format.ignoreAuthority && isAuthority()) {
                 if (!format.ignoreScheme && scheme != null) {
                     buf.append("//");
                 }
 
-                formatAuthority(format, buf);
+                if (format == defaultFormat) {
+                    buf.append(getAuthority());
+                } else {
+                    formatAuthority(format, buf);
+                }
             }
 
             if (!format.ignorePath && path != null) {
@@ -258,25 +283,38 @@ public class Uri {
     private StringBuilder formatAuthority(UriFormat format, StringBuilder buf) {
         if (format.surtEncoding) {
             format.surtEncoder.encode(buf, this, format);
-        } else if ((format.ignoreUserInfo && userinfo != null)
-                || (host != null && (format.ignoreHost || format.decodeHost))
-                || (format.ignorePort && port != -1)) {
+        } else {
 
-            if (!format.ignoreUserInfo && userinfo != null) {
-                buf.append(userinfo).append('@');
+            boolean isUserInfo = false;
+            if (!format.ignoreUser && user != null) {
+                buf.append(user);
+                isUserInfo = true;
             }
+            if (!format.ignorePassword && password != null) {
+                buf.append(':').append(password);
+                isUserInfo = true;
+            }
+            if (isUserInfo) {
+                buf.append('@');
+            }
+
             if (!format.ignoreHost && host != null) {
+                if (isIPv6reference) {
+                    buf.append('[');
+                }
                 if (format.decodeHost) {
                     buf.append(getDecodedHost());
                 } else {
                     buf.append(host);
                 }
+                if (isIPv6reference) {
+                    buf.append(']');
+                }
             }
-            if (!format.ignorePort && port >= 0) {
+
+            if (!format.ignorePort && port > DEFAULT_PORT_MARKER) {
                 buf.append(':').append(port);
             }
-        } else {
-            buf.append(authority);
         }
 
         return buf;
@@ -284,12 +322,15 @@ public class Uri {
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 53 * hash + Objects.hashCode(this.scheme);
-        hash = 53 * hash + Objects.hashCode(this.authority);
-        hash = 53 * hash + Objects.hashCode(this.path);
-        hash = 53 * hash + Objects.hashCode(this.query);
-        hash = 53 * hash + Objects.hashCode(this.fragment);
+        int hash = 7;
+        hash = 47 * hash + Objects.hashCode(this.scheme);
+        hash = 47 * hash + Objects.hashCode(this.user);
+        hash = 47 * hash + Objects.hashCode(this.password);
+        hash = 47 * hash + Objects.hashCode(this.host);
+        hash = 47 * hash + this.port;
+        hash = 47 * hash + Objects.hashCode(this.path);
+        hash = 47 * hash + Objects.hashCode(this.query);
+        hash = 47 * hash + Objects.hashCode(this.fragment);
         return hash;
     }
 
@@ -305,7 +346,16 @@ public class Uri {
         if (!Objects.equals(this.scheme, other.scheme)) {
             return false;
         }
-        if (!Objects.equals(this.authority, other.authority)) {
+        if (!Objects.equals(this.user, other.user)) {
+            return false;
+        }
+        if (!Objects.equals(this.password, other.password)) {
+            return false;
+        }
+        if (!Objects.equals(this.host, other.host)) {
+            return false;
+        }
+        if (this.port != other.port) {
             return false;
         }
         if (!Objects.equals(this.path, other.path)) {

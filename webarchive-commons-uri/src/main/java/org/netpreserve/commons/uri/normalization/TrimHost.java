@@ -13,35 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.netpreserve.commons.uri.normalization;
 
 import java.util.List;
 
 import org.netpreserve.commons.uri.InParseNormalizer;
-import org.netpreserve.commons.uri.parser.Parser;
+import org.netpreserve.commons.uri.UriException;
 import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
-
-import static org.netpreserve.commons.uri.UriBuilder.ESCAPED_SPACE;
+import org.netpreserve.commons.uri.normalization.report.NormalizationExample;
+import org.netpreserve.commons.uri.parser.Parser;
 
 /**
  *
  */
-public class StripTrailingEscapedSpaceOnAuthority implements InParseNormalizer {
-
+public class TrimHost implements InParseNormalizer {
     @Override
     public String preParseHost(Parser.ParserState parserState, String host) {
-        // Remove trailing escaped space
-        while (host.endsWith(ESCAPED_SPACE)) {
-            host = host.substring(0, host.length() - 3);
+        if (host.contains("..")) {
+            throw new UriException("Illegal hostname: " + host);
         }
+        host = trim(host, '.');
+
         return host;
+    }
+
+    private String trim(String string, char trim) {
+        int len = string.length();
+        int st = 0;
+        char[] val = string.toCharArray();
+
+        while ((st < len) && (val[st] == trim)) {
+            st++;
+        }
+        while ((st < len) && (val[len - 1] == trim)) {
+            len--;
+        }
+        return ((st > 0) || (len < string.length())) ? string.substring(st, len) : string;
     }
 
     @Override
     public void describeNormalization(List<NormalizationDescription> descriptions) {
-        descriptions.add(NormalizationDescription.builder(StripTrailingEscapedSpaceOnAuthority.class)
-                .name("Strip trailing escaped space on authority")
-                .description("Removes escaped space i.e. %20, from end of authority.")
+        descriptions.add(NormalizationDescription.builder(LaxTrimming.class)
+                .name("Trim host")
+                .description("Remove leading and trailing dots from host name.")
+                .example(NormalizationExample.builder()
+                        .uri("<http://foo.com./bar>").normalizedUri("http://foo.com/bar").build())
                 .build());
     }
 

@@ -27,7 +27,7 @@ public class NormalizationDescription {
 
     private final String description;
 
-    private final Class implementingClass;
+    private final String implementingClass;
 
     private final NormalizationExample[] example;
 
@@ -37,7 +37,7 @@ public class NormalizationDescription {
 
         private String description = "No description";
 
-        private Class implementingClass;
+        private String implementingClass;
 
         private List<NormalizationExample> example = new ArrayList<>();
 
@@ -55,7 +55,7 @@ public class NormalizationDescription {
         }
 
         public Builder implementingClass(final Class value) {
-            this.implementingClass = value;
+            this.implementingClass = value.getName();
             return this;
         }
 
@@ -78,7 +78,7 @@ public class NormalizationDescription {
     private NormalizationDescription(
             final String name,
             final String description,
-            final Class implementingClass,
+            final String implementingClass,
             final NormalizationExample[] example) {
 
         this.name = name;
@@ -95,7 +95,7 @@ public class NormalizationDescription {
     public String toString(String indent) {
         StringBuilder sb = new StringBuilder(indent + name)
                 .append("\n  " + indent + "Description: " + description)
-                .append("\n  " + indent + "Implemented by: " + implementingClass.getName());
+                .append("\n  " + indent + "Implemented by: " + implementingClass);
 
         if (example.length > 0) {
             sb.append("\n  " + indent + "Example");

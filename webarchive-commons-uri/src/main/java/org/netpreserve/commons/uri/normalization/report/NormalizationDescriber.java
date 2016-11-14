@@ -13,24 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.netpreserve.commons.uri;
 
+package org.netpreserve.commons.uri.normalization.report;
 
-import org.netpreserve.commons.uri.normalization.report.NormalizationDescriber;
+import java.util.List;
 
 /**
- * A Normalizer that can be added to the Uri parsing process.
+ *
  */
-public interface Normalizer extends NormalizationDescriber {
+public interface NormalizationDescriber {
 
     /**
-     * Gives the Normalizer an opportunity to decide if this Normalizer should be run for the submitted builder.
+     * Add a human readable description of the normalization done by this class.
      * <p>
-     * @param builder the builder to check
-     * @return true if this normalizer should be used for this builder.
+     * @param descriptions A list of descriptions which this class can add its own descriptions to.
      */
-    default boolean validFor(UriBuilder builder) {
-        return true;
-    }
+    void describeNormalization(List<NormalizationDescription> descriptions);
 
 }

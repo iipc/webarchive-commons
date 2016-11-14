@@ -15,6 +15,8 @@
  */
 package org.netpreserve.commons.uri;
 
+import org.netpreserve.commons.uri.parser.Parser;
+
 /**
  * A Normalizer which hooks into the parsing process.
  * <p>
@@ -28,17 +30,19 @@ public interface InParseNormalizer extends Normalizer {
      * <p>
      * @param parserState the parserState to manipulate
      */
-    default void preParseAuthority(Rfc3986Parser.ParserState parserState) {
+    default void preParseAuthority(Parser.ParserState parserState) {
 
     }
 
     /**
-     * Hook into the parsing process after the Authority is parsed.
+     * Hook into the parsing process after the Host is detected, but before any validation.
      * <p>
-     * @param parserState the parserState to manipulate
+     * @param parserState the parserState
+     * @param host the detected host
+     * @return the host string after manipulation
      */
-    default void postParseAuthority(Rfc3986Parser.ParserState parserState) {
-
+    default String preParseHost(Parser.ParserState parserState, String host) {
+        return host;
     }
 
 }

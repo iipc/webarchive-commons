@@ -19,34 +19,35 @@ import java.util.List;
 import java.util.Set;
 
 import org.netpreserve.commons.uri.PostParseNormalizer;
+import org.netpreserve.commons.uri.Scheme;
 import org.netpreserve.commons.uri.UriException;
 import org.netpreserve.commons.uri.UriBuilder;
 import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
-import static org.netpreserve.commons.uri.Schemes.HTTP;
-import static org.netpreserve.commons.uri.Schemes.HTTPS;
+import static org.netpreserve.commons.uri.Scheme.HTTP;
+import static org.netpreserve.commons.uri.Scheme.HTTPS;
 import static org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer.immutableSetOf;
 
 /**
  * Check if the URI is long enough to be valid.
- *
+ * <p>
  * The check is only done for URI's with http and https schemes.
- *
+ * <p>
  * This isn't really a normalizer since it will throw an exception instead of fixing the URI.
  */
 public class CheckLongEnough extends SchemeBasedNormalizer implements PostParseNormalizer {
-    private static final Set<String> SUPPORTED_SCHEMES = immutableSetOf(HTTP.name, HTTPS.name);
+
+    private static final Set<Scheme> SUPPORTED_SCHEMES = immutableSetOf(HTTP, HTTPS);
 
     @Override
     public void normalize(UriBuilder builder) {
-            if ((builder.authority() == null || builder.authority().isEmpty()) && builder.path().length() <= 2) {
-                throw new UriException("http(s) scheme specific part is "
-                        + "too short: " + toString());
-            }
+        if ((!builder.isAuthority() || builder.host().isEmpty()) && builder.path().length() <= 2) {
+            throw new UriException("http(s) scheme specific part is too short: " + toString());
+        }
     }
 
     @Override
-    public Set<String> getSupportedSchemes() {
+    public Set<Scheme> getSupportedSchemes() {
         return SUPPORTED_SCHEMES;
     }
 

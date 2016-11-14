@@ -15,6 +15,13 @@
  */
 package org.netpreserve.commons.uri;
 
+import org.netpreserve.commons.uri.parser.Parser;
+import org.netpreserve.commons.uri.parser.MimicBrowserReferenceResolver;
+import org.netpreserve.commons.uri.parser.LegacyWaybackSurtEncoder;
+import org.netpreserve.commons.uri.parser.MimicBrowserParser;
+import org.netpreserve.commons.uri.parser.Rfc3986Parser;
+import org.netpreserve.commons.uri.parser.Rfc3986ReferenceResolver;
+import org.netpreserve.commons.uri.parser.LaxRfc3986Parser;
 import org.netpreserve.commons.uri.normalization.AllLowerCase;
 import org.netpreserve.commons.uri.normalization.CheckLongEnough;
 import org.netpreserve.commons.uri.normalization.InsertCommonSchemesForSchemelessUri;
@@ -25,17 +32,23 @@ import org.netpreserve.commons.uri.normalization.StripSessionId;
 import org.netpreserve.commons.uri.normalization.StripTrailingEscapedSpaceOnAuthority;
 import org.netpreserve.commons.uri.normalization.StripSlashesAtEndOfPath;
 import org.netpreserve.commons.uri.normalization.StripWwwN;
+import org.netpreserve.commons.uri.normalization.MimicBrowserNormalizer;
+import org.netpreserve.commons.uri.normalization.TrimHost;
 
 /**
  * Common configurations to use with UriBuilder.
  */
 public final class Configurations {
 
-    public static final Rfc3986Parser STRICT_PARSER = new Rfc3986Parser();
+    public static final Parser STRICT_PARSER = new Rfc3986Parser();
 
-    public static final Rfc3986Parser LAX_PARSER = new LaxRfc3986Parser();
+    public static final Parser LAX_PARSER = new LaxRfc3986Parser();
 
-    public static final Rfc3986ReferenceResolver REFERENCE_RESOLVER = new Rfc3986ReferenceResolver();
+    public static final Parser MIMIC_BROWSER_PARSER = new MimicBrowserParser();
+
+    public static final ReferenceResolver REFERENCE_RESOLVER = new Rfc3986ReferenceResolver();
+
+    public static final ReferenceResolver MIMIC_BROWSER_REFERENCE_RESOLVER = new MimicBrowserReferenceResolver();
 
     public static final UriFormat DEFAULT_FORMAT = UriFormat.builder().build();
 
@@ -43,20 +56,23 @@ public final class Configurations {
             .ignoreFragment(true).build();
 
     public static final UriFormat CANONICALIZED_URI_FORMAT = UriFormat.builder()
-            .ignoreUserInfo(true)
+            .ignoreUser(true)
+            .ignorePassword(true)
             .ignoreFragment(true).build();
 
     public static final UriFormat SURT_KEY_FORMAT = UriFormat.builder()
             .surtEncoding(true)
             .ignoreScheme(true)
-            .ignoreUserInfo(true)
+            .ignoreUser(true)
+            .ignorePassword(true)
             .ignoreFragment(true)
             .decodeHost(true).build();
 
     public static final UriFormat LEGACY_SURT_KEY_FORMAT = UriFormat.builder()
             .surtEncoding(true)
             .ignoreScheme(true)
-            .ignoreUserInfo(true)
+            .ignoreUser(true)
+            .ignorePassword(true)
             .ignoreFragment(true)
             .decodeHost(false)
             .surtEncoder(new LegacyWaybackSurtEncoder()).build();
@@ -72,6 +88,25 @@ public final class Configurations {
             .schemeBasedNormalization(true)
             .encodeIllegalCharacters(false)
             .defaultFormat(Configurations.DEFAULT_FORMAT)
+            .build();
+
+    /**
+     * A Uri config trying to mimic the behavior of major browsers as described by
+     * <a herf="https://url.spec.whatwg.org/">whatwg.org</a>.
+     */
+    public static final UriBuilderConfig MIMIC_BROWSER_URI = UriBuilderConfig.newBuilder()
+            .parser(Configurations.MIMIC_BROWSER_PARSER)
+            .referenceResolver(Configurations.MIMIC_BROWSER_REFERENCE_RESOLVER)
+            .requireAbsoluteUri(false)
+            .strictReferenceResolution(false)
+            .caseNormalization(true)
+            .percentEncodingNormalization(false)
+            .pathSegmentNormalization(true)
+            .schemeBasedNormalization(true)
+            .encodeIllegalCharacters(true)
+            .punycodeUnknownScheme(true)
+            .defaultFormat(Configurations.DEFAULT_FORMAT)
+            .addNormalizer(new MimicBrowserNormalizer())
             .build();
 
     /**
@@ -117,12 +152,13 @@ public final class Configurations {
             .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
             .addNormalizer(new OptimisticDnsScheme())
             .addNormalizer(new CheckLongEnough())
+            .addNormalizer(new TrimHost())
             .build();
 
     public static final UriBuilderConfig CANONICALIZED_URI
             = UriBuilderConfig.newBuilder()
             .parser(Configurations.LAX_PARSER)
-            .referenceResolver(Configurations.REFERENCE_RESOLVER)
+            .referenceResolver(Configurations.MIMIC_BROWSER_REFERENCE_RESOLVER)
             .requireAbsoluteUri(true)
             .strictReferenceResolution(false)
             .caseNormalization(true)

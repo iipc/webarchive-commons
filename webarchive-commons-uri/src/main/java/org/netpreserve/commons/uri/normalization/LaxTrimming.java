@@ -118,7 +118,7 @@ public class LaxTrimming implements PreParseNormalizer {
         descriptions.add(NormalizationDescription.builder(LaxTrimming.class)
                 .name("Convert backslashes")
                 .description("IE converts backslashes preceding the query string to slashes, rather than to %5C. "
-                        + "Since URIs that have backslashes usually work only with IE, the we will convert "
+                        + "Since URIs that have backslashes usually work only with IE, we will convert "
                         + "backslashes to slashes as well.")
                 .build());
         descriptions.add(NormalizationDescription.builder(LaxTrimming.class)

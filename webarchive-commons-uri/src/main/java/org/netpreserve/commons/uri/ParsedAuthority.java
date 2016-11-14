@@ -15,22 +15,24 @@
  */
 package org.netpreserve.commons.uri;
 
-
-import org.netpreserve.commons.uri.normalization.report.NormalizationDescriber;
-
 /**
- * A Normalizer that can be added to the Uri parsing process.
+ *
  */
-public interface Normalizer extends NormalizationDescriber {
+public class ParsedAuthority {
 
-    /**
-     * Gives the Normalizer an opportunity to decide if this Normalizer should be run for the submitted builder.
-     * <p>
-     * @param builder the builder to check
-     * @return true if this normalizer should be used for this builder.
-     */
-    default boolean validFor(UriBuilder builder) {
-        return true;
+    private final String user;
+
+    private final String password;
+
+    private final String host;
+
+    private final int port;
+
+    public ParsedAuthority(String user, String password, String host, int port) {
+        this.user = user;
+        this.password = password;
+        this.host = host;
+        this.port = port;
     }
 
 }

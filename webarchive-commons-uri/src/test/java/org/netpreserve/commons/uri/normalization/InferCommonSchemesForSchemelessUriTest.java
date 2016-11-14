@@ -36,7 +36,7 @@ public class InferCommonSchemesForSchemelessUriTest {
     public void testMissingHttpScheme() {
         Uri uri = UriBuilder.builder(config).uri("example.com/index.html").build();
         assertThat(uri).hasFieldOrPropertyWithValue("scheme", "http")
-                .hasFieldOrPropertyWithValue("authority", "example.com")
+                .hasFieldOrPropertyWithValue("host", "example.com")
                 .hasFieldOrPropertyWithValue("path", "/index.html")
                 .hasFieldOrPropertyWithValue("absolute", true)
                 .hasFieldOrPropertyWithValue("absolutePath", true)
@@ -47,7 +47,8 @@ public class InferCommonSchemesForSchemelessUriTest {
     public void testMissingHttpSchemeWithUserAndPort() {
         Uri uri = UriBuilder.builder(config).uri("user@example.com:80/index.html").build();
         assertThat(uri).hasFieldOrPropertyWithValue("scheme", "http")
-                .hasFieldOrPropertyWithValue("authority", "user@example.com")
+                .hasFieldOrPropertyWithValue("user", "user")
+                .hasFieldOrPropertyWithValue("host", "example.com")
                 .hasFieldOrPropertyWithValue("path", "/index.html")
                 .hasFieldOrPropertyWithValue("absolute", true)
                 .hasFieldOrPropertyWithValue("absolutePath", true)
@@ -60,7 +61,7 @@ public class InferCommonSchemesForSchemelessUriTest {
         assertThat(uri)
                 .hasToString("file:///index.html")
                 .hasFieldOrPropertyWithValue("scheme", "file")
-                .hasFieldOrPropertyWithValue("authority", "")
+                .hasFieldOrPropertyWithValue("host", "")
                 .hasFieldOrPropertyWithValue("path", "/index.html")
                 .hasFieldOrPropertyWithValue("absolute", true)
                 .hasFieldOrPropertyWithValue("absolutePath", true)
@@ -73,7 +74,7 @@ public class InferCommonSchemesForSchemelessUriTest {
         assertThat(uri)
                 .hasToString("file:///example.com/index.html")
                 .hasFieldOrPropertyWithValue("scheme", "file")
-                .hasFieldOrPropertyWithValue("authority", "")
+                .hasFieldOrPropertyWithValue("host", "")
                 .hasFieldOrPropertyWithValue("path", "/example.com/index.html")
                 .hasFieldOrPropertyWithValue("absolute", true)
                 .hasFieldOrPropertyWithValue("absolutePath", true)
@@ -86,7 +87,7 @@ public class InferCommonSchemesForSchemelessUriTest {
         assertThat(uri)
                 .hasToString("file:///example.com/index.html")
                 .hasFieldOrPropertyWithValue("scheme", "file")
-                .hasFieldOrPropertyWithValue("authority", "")
+                .hasFieldOrPropertyWithValue("host", "")
                 .hasFieldOrPropertyWithValue("path", "/example.com/index.html")
                 .hasFieldOrPropertyWithValue("absolute", true)
                 .hasFieldOrPropertyWithValue("absolutePath", true)

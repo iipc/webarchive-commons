@@ -19,11 +19,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.netpreserve.commons.uri.InParseNormalizer;
-import org.netpreserve.commons.uri.Rfc3986Parser;
+import org.netpreserve.commons.uri.parser.Parser;
+import org.netpreserve.commons.uri.Scheme;
 import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
-import static org.netpreserve.commons.uri.Schemes.HTTP;
-import static org.netpreserve.commons.uri.Schemes.HTTPS;
+import static org.netpreserve.commons.uri.Scheme.HTTP;
+import static org.netpreserve.commons.uri.Scheme.HTTPS;
+import static org.netpreserve.commons.uri.Scheme.FTP;
+import static org.netpreserve.commons.uri.Scheme.FTPS;
 
 /**
  * Normalizer for skipping errorneous extra slashes.
@@ -32,17 +35,17 @@ import static org.netpreserve.commons.uri.Schemes.HTTPS;
  */
 public class StripErrorneousExtraSlashes extends SchemeBasedNormalizer implements InParseNormalizer {
 
-    private static final Set<String> SUPPORTED_SCHEMES = immutableSetOf(HTTP.name, HTTPS.name);
+    private static final Set<Scheme> SUPPORTED_SCHEMES = immutableSetOf(HTTP, HTTPS, FTP, FTPS);
 
     @Override
-    public void preParseAuthority(Rfc3986Parser.ParserState parserState) {
+    public void preParseAuthority(Parser.ParserState parserState) {
         // Skip errorneous extra slashes at start of authority
         if (!parserState.hasAuthority() && parserState.uriHasAtLeastMoreChararcters(1)
-                && parserState.getUri().charAt(parserState.getOffset()) == '/') {
+                && parserState.getUri().charAt(0) == '/') {
 
             int leadingSlashCount = 1;
             while (parserState.uriHasAtLeastMoreChararcters(1 + leadingSlashCount)
-                    && parserState.getUri().charAt(parserState.getOffset() + leadingSlashCount) == '/') {
+                    && parserState.getUri().charAt(leadingSlashCount) == '/') {
                 leadingSlashCount++;
             }
             if (leadingSlashCount >= 2) {
@@ -53,7 +56,7 @@ public class StripErrorneousExtraSlashes extends SchemeBasedNormalizer implement
     }
 
     @Override
-    public Set<String> getSupportedSchemes() {
+    public Set<Scheme> getSupportedSchemes() {
         return SUPPORTED_SCHEMES;
     }
 

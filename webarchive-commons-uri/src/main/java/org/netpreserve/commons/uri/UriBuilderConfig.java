@@ -15,6 +15,8 @@
  */
 package org.netpreserve.commons.uri;
 
+import org.netpreserve.commons.uri.parser.Parser;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -28,9 +30,9 @@ public final class UriBuilderConfig {
 
     private final int maxUrlLength;
 
-    private final Rfc3986Parser parser;
+    private final Parser parser;
 
-    private final Rfc3986ReferenceResolver referenceResolver;
+    private final ReferenceResolver referenceResolver;
 
     private final PreParseNormalizer[] preParseNormalizers;
 
@@ -53,6 +55,8 @@ public final class UriBuilderConfig {
     private final boolean schemeBasedNormalization;
 
     private final boolean encodeIllegalCharacters;
+
+    private final boolean punycodeUnknownScheme;
 
     private final UriFormat defaultFormat;
 
@@ -86,6 +90,7 @@ public final class UriBuilderConfig {
         this.pathSegmentNormalization = config.isPathSegmentNormalization();
         this.schemeBasedNormalization = config.isSchemeBasedNormalization();
         this.encodeIllegalCharacters = config.isEncodeIllegalCharacters();
+        this.punycodeUnknownScheme = config.isPunycodeUnknownScheme();
         this.preParseNormalizers = config.preParseNormalizers.toArray(new PreParseNormalizer[0]);
         this.inParseNormalizers = config.inParseNormalizers.toArray(new InParseNormalizer[0]);
         this.postParseNormalizers = config.postParseNormalizers.toArray(new PostParseNormalizer[0]);
@@ -96,11 +101,11 @@ public final class UriBuilderConfig {
         return maxUrlLength;
     }
 
-    public Rfc3986Parser getParser() {
+    public Parser getParser() {
         return parser;
     }
 
-    public Rfc3986ReferenceResolver getReferenceResolver() {
+    public ReferenceResolver getReferenceResolver() {
         return referenceResolver;
     }
 
@@ -136,6 +141,10 @@ public final class UriBuilderConfig {
         return encodeIllegalCharacters;
     }
 
+    public boolean isPunycodeUnknownScheme() {
+        return punycodeUnknownScheme;
+    }
+
     public PreParseNormalizer[] getPreParseNormalizers() {
         return preParseNormalizers;
     }
@@ -156,9 +165,9 @@ public final class UriBuilderConfig {
 
         private int maxUrlLength = Integer.MAX_VALUE;
 
-        private Rfc3986Parser parser = Configurations.STRICT_PARSER;
+        private Parser parser = Configurations.STRICT_PARSER;
 
-        private Rfc3986ReferenceResolver referenceResolver = Configurations.REFERENCE_RESOLVER;
+        private ReferenceResolver referenceResolver = Configurations.REFERENCE_RESOLVER;
 
         private final List<PreParseNormalizer> preParseNormalizers = new ArrayList<>();
 
@@ -182,6 +191,8 @@ public final class UriBuilderConfig {
 
         private boolean encodeIllegalCharacters = false;
 
+        private boolean punycodeUnknownScheme = false;
+
         private UriFormat defaultFormat = Configurations.DEFAULT_FORMAT;
 
         private ConfigBuilder() {
@@ -199,6 +210,7 @@ public final class UriBuilderConfig {
             this.pathSegmentNormalization = config.isPathSegmentNormalization();
             this.schemeBasedNormalization = config.isSchemeBasedNormalization();
             this.encodeIllegalCharacters = config.isEncodeIllegalCharacters();
+            this.punycodeUnknownScheme = config.isPunycodeUnknownScheme();
             this.preParseNormalizers.addAll(Arrays.asList(config.preParseNormalizers));
             this.inParseNormalizers.addAll(Arrays.asList(config.inParseNormalizers));
             this.postParseNormalizers.addAll(Arrays.asList(config.postParseNormalizers));
@@ -210,12 +222,12 @@ public final class UriBuilderConfig {
             return this;
         }
 
-        public ConfigBuilder parser(final Rfc3986Parser value) {
+        public ConfigBuilder parser(final Parser value) {
             this.parser = value;
             return this;
         }
 
-        public ConfigBuilder referenceResolver(final Rfc3986ReferenceResolver value) {
+        public ConfigBuilder referenceResolver(final ReferenceResolver value) {
             this.referenceResolver = value;
             return this;
         }
@@ -265,6 +277,11 @@ public final class UriBuilderConfig {
             return this;
         }
 
+        public ConfigBuilder punycodeUnknownScheme(final boolean value) {
+            this.punycodeUnknownScheme = value;
+            return this;
+        }
+
         public ConfigBuilder addNormalizer(Normalizer normalizer) {
             if (normalizer instanceof PreParseNormalizer) {
                 this.preParseNormalizers.add((PreParseNormalizer) normalizer);
@@ -282,11 +299,11 @@ public final class UriBuilderConfig {
             return maxUrlLength;
         }
 
-        public Rfc3986Parser getParser() {
+        public Parser getParser() {
             return parser;
         }
 
-        public Rfc3986ReferenceResolver getReferenceResolver() {
+        public ReferenceResolver getReferenceResolver() {
             return referenceResolver;
         }
 
@@ -320,6 +337,10 @@ public final class UriBuilderConfig {
 
         public boolean isEncodeIllegalCharacters() {
             return encodeIllegalCharacters;
+        }
+
+        public boolean isPunycodeUnknownScheme() {
+            return punycodeUnknownScheme;
         }
 
         public List<PreParseNormalizer> getPreParseNormalizers() {

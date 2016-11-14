@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.netpreserve.commons.uri;
+package org.netpreserve.commons.uri.parser;
 
 import org.junit.Test;
+import org.netpreserve.commons.uri.Configurations;
+import org.netpreserve.commons.uri.Uri;
+import org.netpreserve.commons.uri.UriBuilder;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.netpreserve.commons.uri.UriAssert.assertThat;
+import static org.netpreserve.commons.uri.parser.UriAssert.assertThat;
 
 /**
  *
@@ -97,7 +100,7 @@ public class StrictUriTest {
                 .hasUserinfo("john:doe")
                 .hasHost("127.0.0.1")
                 .hasDecodedHost("127.0.0.1")
-                .hasPort(-1)
+                .hasPort(Uri.DEFAULT_PORT_MARKER)
                 .hasDecodedPort(80);
 
         instance = UriBuilder.strictUriBuilder()
@@ -107,7 +110,7 @@ public class StrictUriTest {
                 .hasUserinfo("john:doe")
                 .hasHost("127.0.0.1")
                 .hasDecodedHost("127.0.0.1")
-                .hasPort(-1)
+                .hasPort(Uri.DEFAULT_PORT_MARKER)
                 .hasDecodedPort(80);
     }
 

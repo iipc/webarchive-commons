@@ -13,9 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.netpreserve.commons.uri;
+package org.netpreserve.commons.uri.parser;
 
+import org.netpreserve.commons.uri.parser.Rfc3986ReferenceResolver;
+import org.netpreserve.commons.uri.parser.Rfc3986Parser;
 import org.junit.Test;
+import org.netpreserve.commons.uri.Configurations;
+import org.netpreserve.commons.uri.Uri;
+import org.netpreserve.commons.uri.UriBuilder;
+import org.netpreserve.commons.uri.UriBuilderConfig;
+
 import static org.assertj.core.api.Assertions.*;
 
 /**

@@ -15,6 +15,9 @@
  */
 package org.netpreserve.commons.uri;
 
+import org.netpreserve.commons.uri.parser.SurtEncoder;
+import org.netpreserve.commons.uri.parser.StrictSurtEncoder;
+
 /**
  * A format describing how to convert a Uri into a String.
  */
@@ -28,7 +31,9 @@ public final class UriFormat {
 
     final boolean ignoreAuthority;
 
-    final boolean ignoreUserInfo;
+    final boolean ignoreUser;
+
+    final boolean ignorePassword;
 
     final boolean ignoreHost;
 
@@ -46,6 +51,38 @@ public final class UriFormat {
 
     final SurtEncoder surtEncoder;
 
+    public String getUser(Uri uri) {
+        if (!ignoreUser) {
+            return uri.getUser();
+        }
+        return null;
+    }
+
+    public String getPassword(Uri uri) {
+        if (!ignorePassword) {
+            return uri.getPassword();
+        }
+        return null;
+    }
+
+    public String getHost(Uri uri) {
+        if (!ignoreHost) {
+            if (decodeHost) {
+                return uri.getDecodedHost();
+            } else {
+                return uri.getHost();
+            }
+        }
+        return null;
+    }
+
+    public Integer getPort(Uri uri) {
+        if (!ignorePort && uri.getPort() != Uri.DEFAULT_PORT_MARKER) {
+            return uri.getPort();
+        }
+        return null;
+    }
+
     /**
      * Builder for UriFormat.
      */
@@ -57,7 +94,9 @@ public final class UriFormat {
 
         private boolean ignoreAuthority;
 
-        private boolean ignoreUserInfo;
+        private boolean ignoreUser;
+
+        private boolean ignorePassword;
 
         private boolean ignoreHost;
 
@@ -76,8 +115,7 @@ public final class UriFormat {
         private SurtEncoder surtEncoder;
 
         /**
-         * This class should not be constructed directly. Use
-         * UriFormat.builder() instead.
+         * This class should not be constructed directly. Use UriFormat.builder() instead.
          */
         private Builder() {
         }
@@ -129,13 +167,24 @@ public final class UriFormat {
         }
 
         /**
-         * Ignore UserInfo in output.
+         * Ignore User in output.
          * <p>
-         * @param value true if UserInfo should be ignored.
+         * @param value true if User should be ignored.
          * @return this builder for method call chaining
          */
-        public Builder ignoreUserInfo(final boolean value) {
-            this.ignoreUserInfo = value;
+        public Builder ignoreUser(final boolean value) {
+            this.ignoreUser = value;
+            return this;
+        }
+
+        /**
+         * Ignore Password in output.
+         * <p>
+         * @param value true if Password should be ignored.
+         * @return this builder for method call chaining
+         */
+        public Builder ignorePassword(final boolean value) {
+            this.ignorePassword = value;
             return this;
         }
 
@@ -197,9 +246,8 @@ public final class UriFormat {
         /**
          * Decode the Host in output.
          * <p>
-         * If the host is an IDN, it could be puny encoded or contain
-         * international characters in UTF-8. The default is to puny encode.
-         * Setting this value to true decodes the host into UTF-8.
+         * If the host is an IDN, it could be puny encoded or contain international characters in UTF-8. The default is
+         * to puny encode. Setting this value to true decodes the host into UTF-8.
          * <p>
          * @param value true if Host should be decoded to UTF-8.
          * @return this builder for method call chaining
@@ -211,7 +259,7 @@ public final class UriFormat {
 
         /**
          * Decode any percent encoded characters.
-         *
+         * <p>
          * @param value true if the path should be decoded.
          * @return this builder for method call chaining
          */
@@ -250,7 +298,8 @@ public final class UriFormat {
         formatBuilder.surtEncoding = surtEncoding;
         formatBuilder.ignoreScheme = ignoreScheme;
         formatBuilder.ignoreAuthority = ignoreAuthority;
-        formatBuilder.ignoreUserInfo = ignoreUserInfo;
+        formatBuilder.ignoreUser = ignoreUser;
+        formatBuilder.ignorePassword = ignorePassword;
         formatBuilder.ignoreHost = ignoreHost;
         formatBuilder.ignorePort = ignorePort;
         formatBuilder.ignorePath = ignorePath;
@@ -274,7 +323,8 @@ public final class UriFormat {
         this.surtEncoding = formatBuilder.surtEncoding;
         this.ignoreScheme = formatBuilder.ignoreScheme;
         this.ignoreAuthority = formatBuilder.ignoreAuthority;
-        this.ignoreUserInfo = formatBuilder.ignoreUserInfo;
+        this.ignoreUser = formatBuilder.ignoreUser;
+        this.ignorePassword = formatBuilder.ignorePassword;
         this.ignoreHost = formatBuilder.ignoreHost;
         this.ignorePort = formatBuilder.ignorePort;
         this.ignorePath = formatBuilder.ignorePath;

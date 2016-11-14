@@ -13,16 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.netpreserve.commons.uri;
+package org.netpreserve.commons.uri.parser;
+
+import org.netpreserve.commons.uri.parser.StrictSurtEncoder;
+
+import java.nio.charset.StandardCharsets;
 
 import org.junit.Test;
+import org.netpreserve.commons.uri.Configurations;
+import org.netpreserve.commons.uri.Uri;
+import org.netpreserve.commons.uri.UriBuilder;
+import org.netpreserve.commons.uri.UriFormat;
+
 import static org.assertj.core.api.Assertions.*;
 
 /**
  *
  */
-public class LegacyWaybackSurtEncoderTest {
-
+public class StrictSurtEncoderTest {
+    
     /**
      * Test of encode method, of class StrictSurtEncoder.
      */
@@ -30,23 +39,24 @@ public class LegacyWaybackSurtEncoderTest {
     public void testEncode() {
         Uri uri = UriBuilder.strictUriBuilder()
                 .uri("http://www.øks.com/path").build();
-        SurtEncoder instance = new LegacyWaybackSurtEncoder();
+        StrictSurtEncoder instance = new StrictSurtEncoder();
 
         StringBuilder sb = new StringBuilder();
         UriFormat uriFormat = Configurations.SURT_KEY_FORMAT;
         instance.encode(sb, uri, uriFormat);
-        assertThat(sb.toString()).isEqualTo("com,øks,www)");
-
+        assertThat(sb.toString()).isEqualTo("(com,øks,www,)");
+        
         sb = new StringBuilder();
         uriFormat = uriFormat.toBuilder().decodeHost(false).build();
         instance.encode(sb, uri, uriFormat);
-        assertThat(sb.toString()).isEqualTo("com,xn--ks-kka,www)");
+        assertThat(sb.toString()).isEqualTo("(com,xn--ks-kka,www,)");
     }
 
     @Test
     public void testWithDefaultConfig() {
-        Uri uri = UriBuilder.builder(Configurations.LEGACY_SURT_KEY)
+        Uri uri = UriBuilder.builder(Configurations.SURT_KEY)
                 .uri("http://www.øks.Com/pAth%2dår?jsessionid=foo&q=r").build();
-        assertThat(uri).hasToString("com,xn--ks-kka)/path-%C3%A5r?q=r");
+        assertThat(uri).hasToString("(com,øks,)/pAth-%C3%A5r?q=r");
     }
+    
 }

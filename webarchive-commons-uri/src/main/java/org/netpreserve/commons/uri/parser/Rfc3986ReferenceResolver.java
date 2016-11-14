@@ -13,68 +13,88 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.netpreserve.commons.uri;
+package org.netpreserve.commons.uri.parser;
+
+import org.netpreserve.commons.uri.ReferenceResolver;
+import org.netpreserve.commons.uri.UriBuilder;
+import org.netpreserve.commons.uri.UriBuilderConfig;
+import org.netpreserve.commons.uri.UriException;
 
 /**
  *
  */
-public class Rfc3986ReferenceResolver {
+public class Rfc3986ReferenceResolver implements ReferenceResolver {
 
+    @Override
     public void resolve(UriBuilder base, UriBuilder reference) throws UriException {
         UriBuilderConfig config = base.config;
 
-        if (!config.isStrictReferenceResolution() && base.scheme.equals(reference.scheme)) {
-            reference.scheme = null;
-        }
+        preResolve(base, reference);
 
-        if (reference.scheme != null) {
-            base.scheme = reference.scheme;
-            base.authority = reference.authority;
-            base.userinfo = reference.userinfo;
-            base.host = reference.host;
-            base.port = reference.port;
+        if (reference.scheme() != null) {
+            base.scheme(reference.scheme());
+            base.user(reference.user());
+            base.password(reference.password());
+            base.host(reference.host());
+            base.port(reference.port());
             if (config.isPathSegmentNormalization()) {
-                base.path = removeDotSegments(reference.path);
+                base.rawPath(removeDotSegments(reference.path()));
             } else {
-                base.path = reference.path;
+                base.rawPath(reference.path());
             }
-            base.query = reference.query;
+            base.rawQuery(reference.query());
+            base.isAbsPath(reference.isAbsPath());
+            base.copyHostFlags(reference);
         } else {
-            if (reference.authority != null) {
-                base.authority = reference.authority;
-                base.userinfo = reference.userinfo;
-                base.host = reference.host;
-                base.port = reference.port;
+            if (reference.isAuthority()) {
+                base.user(reference.user());
+                base.password(reference.password());
+                base.host(reference.host());
+                base.port(reference.port());
                 if (config.isPathSegmentNormalization()) {
-                    base.path = removeDotSegments(reference.path);
+                    base.rawPath(removeDotSegments(reference.path()));
                 } else {
-                    base.path = reference.path;
+                    base.rawPath(reference.path());
                 }
-                base.query = reference.query;
+                base.rawQuery(reference.query());
+                base.isAbsPath(reference.isAbsPath());
+                base.copyHostFlags(reference);
             } else {
-                if (reference.path.isEmpty()) {
-                    if (reference.query != null) {
-                        base.query = reference.query;
+                if (reference.path().isEmpty()) {
+                    if (reference.query() != null) {
+                        base.rawQuery(reference.query());
                     }
                 } else {
-                    if (reference.path.startsWith("/")) {
+                    if (isAbsolutePath(base, reference)) {
                         if (config.isPathSegmentNormalization()) {
-                            base.path = removeDotSegments(reference.path);
+                            base.rawPath(removeDotSegments(reference.path()));
                         } else {
-                            base.path = reference.path;
+                            base.rawPath(reference.path());
                         }
                     } else {
                         mergePath(base, reference);
                         if (config.isPathSegmentNormalization()) {
-                            base.path = removeDotSegments(base.path);
+                            base.rawPath(removeDotSegments(base.path()));
                         }
-                        base.path = removeDotSegments(base.path);
+                        base.rawPath(removeDotSegments(base.path()));
                     }
-                    base.query = reference.query;
+                    base.rawQuery(reference.query());
                 }
             }
         }
-        base.fragment = reference.fragment;
+        base.rawFragment(reference.fragment());
+    }
+
+    public void preResolve(UriBuilder base, UriBuilder reference) throws UriException {
+        UriBuilderConfig config = base.config;
+
+        if (!config.isStrictReferenceResolution() && base.scheme().equals(reference.scheme())) {
+            reference.scheme(null);
+        }
+    }
+
+    boolean isAbsolutePath(UriBuilder base, UriBuilder reference) {
+        return reference.path().startsWith("/");
     }
 
     /**
@@ -84,24 +104,24 @@ public class Rfc3986ReferenceResolver {
      * @param reference a UriBuilder for the reference's path
      */
     public void mergePath(UriBuilder base, UriBuilder reference) {
-        if (base.authority != null && base.path.isEmpty()) {
-            base.path = "/" + reference.path;
+        if (base.isAuthority() && base.path().isEmpty()) {
+            base.rawPath("/" + reference.path());
             return;
         }
 
-        if (reference.path.isEmpty()) {
+        if (reference.path().isEmpty()) {
             return;
-        } else if (reference.path.charAt(0) == '/') {
-            base.path = reference.path;
+        } else if (reference.path().charAt(0) == '/') {
+            base.rawPath(reference.path());
         } else {
-            int at = base.path.lastIndexOf('/');
+            int at = base.path().lastIndexOf('/');
             if (at != -1) {
-                base.path = base.path.substring(0, at + 1);
+                base.rawPath(base.path().substring(0, at + 1));
             }
-            StringBuilder buff = new StringBuilder(base.path.length() + reference.path.length());
-            buff.append((at != -1) ? base.path.substring(0, at + 1) : "/");
-            buff.append(reference.path);
-            base.path = buff.toString();
+            StringBuilder buff = new StringBuilder(base.path().length() + reference.path().length());
+            buff.append((at != -1) ? base.path().substring(0, at + 1) : "/");
+            buff.append(reference.path());
+            base.rawPath(buff.toString());
         }
     }
 

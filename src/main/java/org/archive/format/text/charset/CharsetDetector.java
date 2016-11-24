@@ -182,6 +182,8 @@ public abstract class CharsetDetector {
 			return value;
 		}
 		String result = value;
+		if (result.isEmpty())
+		    return result;
 		if (result.charAt(0) == '"') {
 			result = result.substring(1, result.length() - 1);
 		} else if (result.charAt(0) == '\'') {

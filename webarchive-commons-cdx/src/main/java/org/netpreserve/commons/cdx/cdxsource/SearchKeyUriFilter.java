@@ -36,8 +36,6 @@ final class SearchKeyUriFilter implements SearchKeyFilter<Uri> {
 
     private final Uri uri;
 
-    private SearchKeyFilter surtHostFilter;
-
     /**
      * Construct a filter from a URI.
      * <p>

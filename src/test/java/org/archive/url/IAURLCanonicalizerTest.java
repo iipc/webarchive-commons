@@ -12,6 +12,7 @@ public class IAURLCanonicalizerTest extends TestCase {
 		compCan(iaC,"https://www.archive.org:80/","https://archive.org:80/");
 		compCan(iaC,"http://www.archive.org:443/","http://archive.org:443/");
 		compCan(iaC,"https://www.archive.org:443/","https://archive.org/");
+		compCan(iaC,"http://www.archive.org:/","http://archive.org/");
 		compCan(iaC,"http://www.archive.org/big/","http://archive.org/big");
 		compCan(iaC,"dns:www.archive.org","dns:www.archive.org");
 

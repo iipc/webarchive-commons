@@ -246,16 +246,20 @@ public class URLParser {
             colonPort = uriAuthority.substring(portColonIndex);
         }
         if(colonPort != null) {
-        	if(colonPort.startsWith(":")) {
-        		try {
-        			port = Integer.parseInt(colonPort.substring(1));
-        		} catch(NumberFormatException e) {
-					throw new URISyntaxException(urlString, "bad port "
-							+ colonPort.substring(1));
-				}
-        	} else {
-        		// XXX: what's happened?!
-        	}
+            if(colonPort.startsWith(":")) {
+                if (colonPort.length() == 1) {
+                    // a bare colon (http://example.com:/), use default port
+                } else {
+                    try {
+                        port = Integer.parseInt(colonPort.substring(1));
+                    } catch(NumberFormatException e) {
+                        throw new URISyntaxException(urlString, "bad port "
+                                + colonPort.substring(1));
+                    }
+                }
+            } else {
+                // XXX: what's happened?!
+            }
         }
         if(userInfo != null) {
         	int passColonIndex = userInfo.indexOf(COLON);

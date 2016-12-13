@@ -13,21 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.netpreserve.commons.uri;
+package org.netpreserve.commons.uri.normalization.report;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * A Normalizer that can be added to the Uri parsing process.
+ *
  */
-public interface Normalizer {
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Repeatable(Examples.class)
+public @interface Example {
+        String uri();
 
-    /**
-     * Gives the Normalizer an opportunity to decide if this Normalizer should be run for the submitted builder.
-     * <p>
-     * @param builder the builder to check
-     * @return true if this normalizer should be used for this builder.
-     */
-    default boolean validFor(UriBuilder builder) {
-        return true;
-    }
+        String normalizedUri();
 
 }

@@ -30,6 +30,7 @@ import org.netpreserve.commons.uri.UriBuilder;
 import org.netpreserve.commons.uri.UriBuilderConfig;
 import org.netpreserve.commons.uri.UriException;
 import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
+import org.netpreserve.commons.uri.normalization.report.NormalizationExample;
 
 /**
  *
@@ -485,7 +486,6 @@ public class Rfc3986Parser implements Parser {
                 registryName = normalizer.preParseHost(parserState, registryName);
             }
         }
-
         if (builder.config.isSchemeBasedNormalization()) {
             if (builder.config.isPunycodeUnknownScheme() || builder.schemeType().isPunycodedHost()) {
                 // apply IDN-punycoding, as necessary
@@ -504,7 +504,8 @@ public class Rfc3986Parser implements Parser {
                     }
                 }
             } else {
-                builder.host(validateAndNormalize(builder.config, builder.charset(), registryName, allowedInRegistryName));
+                builder.host(validateAndNormalize(
+                        builder.config, builder.charset(), registryName, allowedInRegistryName));
             }
         } else {
             builder.host(validateAndNormalize(builder.config, builder.charset(), registryName, allowedInRegistryName));
@@ -777,12 +778,25 @@ public class Rfc3986Parser implements Parser {
      * <p>
      * @param descriptions A list of descriptions which this class can add its own descriptions to.
      */
-    @Override
-    public void describeNormalization(List<NormalizationDescription> descriptions) {
+    public void describeNormalization(UriBuilder builder, List<NormalizationDescription> descriptions) {
         descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
                 .name("Missing")
-                .description("The description of normalization done by the parser is missing")
+                .description("The description of normalization done by the parser is not complete")
                 .build());
+        if (builder.config.isCaseNormalization()) {
+            descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
+                    .name("Case normalization")
+                    .description("Converts scheme and hostname to lower case. Percent encoded characters are converted to upper case.")
+                    .example(NormalizationExample.builder().uri("HtTp://eXample.COM/a%20%2fpath")
+                            .normalizedUri("http://example.com/a%20%2Fpath").build())
+                    .build());
+        }
+        if (builder.config.isEncodeIllegalCharacters()) {
+            descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
+                    .name("Encode illegal characters")
+                    .description("Converts characters not allowed in a certain part of the URI to percent encoding.")
+                    .build());
+        }
     }
 
 }

@@ -44,7 +44,7 @@ public class NormalizationExample {
         }
 
         public NormalizationExample build() {
-            return new org.netpreserve.commons.uri.normalization.report.NormalizationExample(uri, normalizedUri);
+            return new NormalizationExample(uri, normalizedUri);
         }
 
     }
@@ -56,6 +56,19 @@ public class NormalizationExample {
     private NormalizationExample(final String uri, final String normalizedUri) {
         this.uri = uri;
         this.normalizedUri = normalizedUri;
+    }
+
+    public NormalizationExample(Example exampleAnnotation) {
+        this.uri = exampleAnnotation.uri();
+        this.normalizedUri = exampleAnnotation.normalizedUri();
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public String getNormalizedUri() {
+        return normalizedUri;
     }
 
     @Override

@@ -15,13 +15,13 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
-import java.util.List;
 import java.util.Set;
 
 import org.netpreserve.commons.uri.PostParseNormalizer;
 import org.netpreserve.commons.uri.Scheme;
 import org.netpreserve.commons.uri.UriBuilder;
-import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
+import org.netpreserve.commons.uri.normalization.report.Description;
+import org.netpreserve.commons.uri.normalization.report.Example;
 
 import static org.netpreserve.commons.uri.Scheme.HTTP;
 import static org.netpreserve.commons.uri.Scheme.HTTPS;
@@ -40,9 +40,12 @@ public class StripSlashesAtEndOfPath extends SchemeBasedNormalizer implements Po
     private static final Set<Scheme> SUPPORTED_SCHEMES = immutableSetOf(HTTP, HTTPS);
 
     @Override
+    @Description(name = "Strip slashes in path",
+                 description = "Strips double slashes in path and slash at end of path.")
+    @Example(uri = "http://www.example.com/my//path/", normalizedUri = "http://www.example.com/my/path")
     public void normalize(UriBuilder builder) {
         if (!builder.path().isEmpty()) {
-            builder.path(builder.path().replace("/+", "/"));
+            builder.path(builder.path().replaceAll("/+", "/"));
             if (builder.path().endsWith("/")) {
                 builder.path(builder.path().substring(0, builder.path().length() - 1));
             }
@@ -52,14 +55,6 @@ public class StripSlashesAtEndOfPath extends SchemeBasedNormalizer implements Po
     @Override
     public Set<Scheme> getSupportedSchemes() {
         return SUPPORTED_SCHEMES;
-    }
-
-    @Override
-    public void describeNormalization(List<NormalizationDescription> descriptions) {
-        descriptions.add(NormalizationDescription.builder(StripSlashesAtEndOfPath.class)
-                .name("Strip slashes in path")
-                .description("Strips double slashes in path and slash at end of path.")
-                .build());
     }
 
 }

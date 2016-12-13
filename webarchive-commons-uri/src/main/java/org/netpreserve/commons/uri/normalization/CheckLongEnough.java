@@ -15,14 +15,12 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
-import java.util.List;
 import java.util.Set;
 
 import org.netpreserve.commons.uri.PostParseNormalizer;
 import org.netpreserve.commons.uri.Scheme;
 import org.netpreserve.commons.uri.UriException;
 import org.netpreserve.commons.uri.UriBuilder;
-import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
 import static org.netpreserve.commons.uri.Scheme.HTTP;
 import static org.netpreserve.commons.uri.Scheme.HTTPS;
@@ -49,11 +47,6 @@ public class CheckLongEnough extends SchemeBasedNormalizer implements PostParseN
     @Override
     public Set<Scheme> getSupportedSchemes() {
         return SUPPORTED_SCHEMES;
-    }
-
-    @Override
-    public void describeNormalization(List<NormalizationDescription> descriptions) {
-        // No description is added because this normalizer doesn't normalize, but throws an exception.
     }
 
 }

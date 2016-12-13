@@ -15,13 +15,13 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
-import java.util.List;
 import java.util.Set;
 
 import org.netpreserve.commons.uri.InParseNormalizer;
 import org.netpreserve.commons.uri.parser.Parser;
 import org.netpreserve.commons.uri.Scheme;
-import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
+import org.netpreserve.commons.uri.normalization.report.Description;
+import org.netpreserve.commons.uri.normalization.report.Example;
 
 import static org.netpreserve.commons.uri.Scheme.HTTP;
 import static org.netpreserve.commons.uri.Scheme.HTTPS;
@@ -30,7 +30,7 @@ import static org.netpreserve.commons.uri.Scheme.FTPS;
 
 /**
  * Normalizer for skipping errorneous extra slashes.
- *
+ * <p>
  * Skips extra slashes at start of authority
  */
 public class StripErrorneousExtraSlashes extends SchemeBasedNormalizer implements InParseNormalizer {
@@ -38,6 +38,9 @@ public class StripErrorneousExtraSlashes extends SchemeBasedNormalizer implement
     private static final Set<Scheme> SUPPORTED_SCHEMES = immutableSetOf(HTTP, HTTPS, FTP, FTPS);
 
     @Override
+    @Description(name = "Strip errorneous extra slashes",
+                 description = "Skips extra slashes at start of authority.")
+    @Example(uri = "http:///www.example.com/path", normalizedUri = "http://www.example.com/path")
     public void preParseAuthority(Parser.ParserState parserState) {
         // Skip errorneous extra slashes at start of authority
         if (!parserState.hasAuthority() && parserState.uriHasAtLeastMoreChararcters(1)
@@ -58,14 +61,6 @@ public class StripErrorneousExtraSlashes extends SchemeBasedNormalizer implement
     @Override
     public Set<Scheme> getSupportedSchemes() {
         return SUPPORTED_SCHEMES;
-    }
-
-    @Override
-    public void describeNormalization(List<NormalizationDescription> descriptions) {
-        descriptions.add(NormalizationDescription.builder(StripErrorneousExtraSlashes.class)
-                .name("Strip errorneous extra slashes")
-                .description("Skips extra slashes at start of authority.")
-                .build());
     }
 
 }

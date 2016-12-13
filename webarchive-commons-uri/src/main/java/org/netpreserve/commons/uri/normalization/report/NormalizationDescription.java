@@ -16,6 +16,7 @@
 package org.netpreserve.commons.uri.normalization.report;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ public class NormalizationDescription {
 
     private final String implementingClass;
 
-    private final NormalizationExample[] example;
+    private final NormalizationExample[] examples;
 
     public static class Builder {
 
@@ -84,7 +85,34 @@ public class NormalizationDescription {
         this.name = name;
         this.description = description;
         this.implementingClass = implementingClass;
-        this.example = example;
+        this.examples = example;
+    }
+
+    public NormalizationDescription(Class implementingClass, Description descriptionAnnotation,
+            Example... exampleAnnotations) {
+        this.name = descriptionAnnotation.name();
+        this.description = descriptionAnnotation.description();
+        this.implementingClass = implementingClass.getName();
+        this.examples = new NormalizationExample[exampleAnnotations.length];
+        for (int i = 0; i < exampleAnnotations.length; i++) {
+            this.examples[i] = new NormalizationExample(exampleAnnotations[i]);
+        }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getImplementingClass() {
+        return implementingClass;
+    }
+
+    public NormalizationExample[] getExamples() {
+        return Arrays.copyOf(examples, examples.length);
     }
 
     @Override
@@ -97,14 +125,14 @@ public class NormalizationDescription {
                 .append("\n  " + indent + "Description: " + description)
                 .append("\n  " + indent + "Implemented by: " + implementingClass);
 
-        if (example.length > 0) {
+        if (examples.length > 0) {
             sb.append("\n  " + indent + "Example");
-            if (example.length > 1) {
+            if (examples.length > 1) {
                 sb.append("s:");
             } else {
                 sb.append(":");
             }
-            for (NormalizationExample ex : example) {
+            for (NormalizationExample ex : examples) {
                 sb.append("\n    " + indent + ex.toString());
             }
         }

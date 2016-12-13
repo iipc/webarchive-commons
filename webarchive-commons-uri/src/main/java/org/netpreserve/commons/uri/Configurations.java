@@ -24,7 +24,7 @@ import org.netpreserve.commons.uri.parser.Rfc3986ReferenceResolver;
 import org.netpreserve.commons.uri.parser.LaxRfc3986Parser;
 import org.netpreserve.commons.uri.normalization.AllLowerCase;
 import org.netpreserve.commons.uri.normalization.CheckLongEnough;
-import org.netpreserve.commons.uri.normalization.InsertCommonSchemesForSchemelessUri;
+import org.netpreserve.commons.uri.normalization.InferCommonSchemesForSchemelessUri;
 import org.netpreserve.commons.uri.normalization.LaxTrimming;
 import org.netpreserve.commons.uri.normalization.OptimisticDnsScheme;
 import org.netpreserve.commons.uri.normalization.StripErrorneousExtraSlashes;
@@ -202,7 +202,7 @@ public final class Configurations {
             .addNormalizer(new StripErrorneousExtraSlashes())
             .addNormalizer(new StripSlashesAtEndOfPath())
             .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
-            .addNormalizer(new InsertCommonSchemesForSchemelessUri())
+            .addNormalizer(new InferCommonSchemesForSchemelessUri())
             .addNormalizer(new OptimisticDnsScheme())
             .addNormalizer(new CheckLongEnough())
             //            .addNormalizer(new StripSessionIDs());
@@ -231,7 +231,7 @@ public final class Configurations {
             .addNormalizer(new StripErrorneousExtraSlashes())
             .addNormalizer(new StripSlashesAtEndOfPath())
             .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
-            .addNormalizer(new InsertCommonSchemesForSchemelessUri())
+            .addNormalizer(new InferCommonSchemesForSchemelessUri())
             .addNormalizer(new OptimisticDnsScheme())
             .addNormalizer(new CheckLongEnough())
             //            .addNormalizer(new StripSessionIDs());

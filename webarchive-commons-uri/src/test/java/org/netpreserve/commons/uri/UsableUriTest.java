@@ -175,15 +175,15 @@ public class UsableUriTest {
     public final void testDnsHost() {
         String uri = "dns://ads.nandomedia.com:81/one.html";
         Uri uuri = UriBuilder.usableUriBuilder().uri(uri).build();
-        assertThat(uuri.getHost()).isEqualTo("ads.nandomedia.com");
+        assertThat(uuri.getPath()).isEqualTo("ads.nandomedia.com");
 
         uri = "dns:ads.nandomedia.com";
         uuri = UriBuilder.usableUriBuilder().uri(uri).build();
-        assertThat(uuri.getHost()).isEqualTo("ads.nandomedia.com");
+        assertThat(uuri.getPath()).isEqualTo("ads.nandomedia.com");
 
         uri = "dns:ads.nandomedia.com?a=b";
         uuri = UriBuilder.usableUriBuilder().uri(uri).build();
-        assertThat(uuri.getHost()).isEqualTo("ads.nandomedia.com");
+        assertThat(uuri.getPath()).isEqualTo("ads.nandomedia.com");
     }
 
     @Test

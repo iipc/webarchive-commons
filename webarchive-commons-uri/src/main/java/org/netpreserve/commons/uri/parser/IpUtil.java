@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.netpreserve.commons.uri.parser;
 
 import java.io.UnsupportedEncodingException;
@@ -21,7 +20,6 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.netpreserve.commons.uri.UriBuilder;
 import org.netpreserve.commons.uri.UriException;
 
 import static org.netpreserve.commons.uri.parser.Rfc3986Parser.HEX;
@@ -30,8 +28,10 @@ import static org.netpreserve.commons.uri.parser.Rfc3986Parser.HEX;
  * Utility methods for parsing IP addresses.
  */
 public class IpUtil {
+
     private IpUtil() {
     }
+
     public static String checkAndNormalizeIpv6(String ipv6) {
         List<String> ipv6Parts = split(':', ipv6);
         if (ipv6Parts.size() < 8) {

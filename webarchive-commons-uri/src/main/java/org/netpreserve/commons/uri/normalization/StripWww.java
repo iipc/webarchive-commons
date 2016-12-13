@@ -15,13 +15,13 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
-import java.util.List;
 import java.util.Set;
 
 import org.netpreserve.commons.uri.PostParseNormalizer;
 import org.netpreserve.commons.uri.Scheme;
 import org.netpreserve.commons.uri.UriBuilder;
-import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
+import org.netpreserve.commons.uri.normalization.report.Description;
+import org.netpreserve.commons.uri.normalization.report.Example;
 
 import static org.netpreserve.commons.uri.Scheme.HTTP;
 import static org.netpreserve.commons.uri.Scheme.HTTPS;
@@ -30,9 +30,14 @@ import static org.netpreserve.commons.uri.Scheme.HTTPS;
  *
  */
 public class StripWww extends SchemeBasedNormalizer implements PostParseNormalizer {
+
     private static final Set<Scheme> SUPPORTED_SCHEMES = immutableSetOf(HTTP, HTTPS);
 
     @Override
+    @Description(name = "Strip www",
+                 description = "Strips www from host part of authority.")
+    @Example(uri = "http://www.example.com/path", normalizedUri = "http://example.com/path")
+    @Example(uri = "http://www1.example.com/path", normalizedUri = "http://www1.example.com/path")
     public void normalize(UriBuilder builder) {
         if (builder.host() != null && builder.host().startsWith("www.")) {
             builder.host(builder.host().substring(builder.host().indexOf('.') + 1));
@@ -42,14 +47,6 @@ public class StripWww extends SchemeBasedNormalizer implements PostParseNormaliz
     @Override
     public Set<Scheme> getSupportedSchemes() {
         return SUPPORTED_SCHEMES;
-    }
-
-    @Override
-    public void describeNormalization(List<NormalizationDescription> descriptions) {
-        descriptions.add(NormalizationDescription.builder(StripWww.class)
-                .name("Strip www")
-                .description("Strips www from host part of authority.")
-                .build());
     }
 
 }

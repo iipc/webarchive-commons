@@ -13,21 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.netpreserve.commons.uri.normalization.report;
 
-import java.util.List;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  *
+ * @author John Erik Halse
  */
-public interface NormalizationDescriber {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Description {
+    String name();
 
-    /**
-     * Add a human readable description of the normalization done by this class.
-     * <p>
-     * @param descriptions A list of descriptions which this class can add its own descriptions to.
-     */
-    void describeNormalization(List<NormalizationDescription> descriptions);
-
+    String description();
 }

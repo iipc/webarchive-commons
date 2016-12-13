@@ -30,7 +30,12 @@ public class InferCommonSchemesForSchemelessUriTest {
 
     UriBuilderConfig config = Configurations.USABLE_URI.toBuilder()
             .defaultFormat(Configurations.CANONICALIZED_URI_FORMAT)
-            .addNormalizer(new InsertCommonSchemesForSchemelessUri()).build();
+            .addNormalizer(new InferCommonSchemesForSchemelessUri()).build();
+
+    @Test
+    public void testExamples() {
+        NormalizationTestUtil.testNormalizerExamples(new InferCommonSchemesForSchemelessUri());
+    }
 
     @Test
     public void testMissingHttpScheme() {

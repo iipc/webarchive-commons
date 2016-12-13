@@ -15,16 +15,15 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
-import java.util.List;
-
 import org.netpreserve.commons.uri.PreParseNormalizer;
-import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
-import org.netpreserve.commons.uri.normalization.report.NormalizationExample;
+import org.netpreserve.commons.uri.normalization.report.Description;
+import org.netpreserve.commons.uri.normalization.report.Example;
 
 /**
  *
  */
 public class LaxTrimming implements PreParseNormalizer {
+
     static final char SPACE = ' ';
 
     static final char NBSP = '\u00A0';
@@ -34,6 +33,10 @@ public class LaxTrimming implements PreParseNormalizer {
     static final String BACKSLASH = "\\";
 
     @Override
+    @Description(name = "Lax trimming",
+                 description = "Remove angle brackets and stray TAB/CR/LF. Convert backslashes to forward slashes "
+                 + "except in query. Replace nbsp with normal spaces")
+    @Example(uri = "<http://foo.com/bar>", normalizedUri = "http://foo.com/bar")
     public String normalize(String uriString) {
 
         /*
@@ -102,28 +105,4 @@ public class LaxTrimming implements PreParseNormalizer {
         }
     }
 
-    @Override
-    public void describeNormalization(List<NormalizationDescription> descriptions) {
-        descriptions.add(NormalizationDescription.builder(LaxTrimming.class)
-                .name("Remove angle brackets")
-                .description("Remove angle brackets around an URI.")
-                .example(NormalizationExample.builder()
-                        .uri("<http://foo.com/bar>").normalizedUri("http://foo.com/bar").build())
-                .build());
-        descriptions.add(NormalizationDescription.builder(LaxTrimming.class)
-                .name("Replace nbsp")
-                .description("Replace nbsp with normal spaces so that they get stripped if at ends,"
-                        + " or encoded if in middle.")
-                .build());
-        descriptions.add(NormalizationDescription.builder(LaxTrimming.class)
-                .name("Convert backslashes")
-                .description("IE converts backslashes preceding the query string to slashes, rather than to %5C. "
-                        + "Since URIs that have backslashes usually work only with IE, we will convert "
-                        + "backslashes to slashes as well.")
-                .build());
-        descriptions.add(NormalizationDescription.builder(LaxTrimming.class)
-                .name("Remove stray whitespace")
-                .description("Remove stray TAB/CR/LF.")
-                .build());
-    }
 }

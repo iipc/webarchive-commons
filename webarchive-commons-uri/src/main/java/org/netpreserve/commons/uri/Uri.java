@@ -21,10 +21,13 @@ import java.nio.charset.Charset;
 import java.util.Objects;
 
 /**
- *
+ * Immutable representation of a URI.
  */
 public class Uri {
 
+    /**
+     * Value to use to indicate that the default port for the protocol (if any) should be used.
+     */
     public static final int DEFAULT_PORT_MARKER = -1;
 
     final String scheme;
@@ -106,10 +109,29 @@ public class Uri {
         return password;
     }
 
+    /**
+     * Get the hostname or ip address from this URI's authority component.
+     * <p>
+     * @return the hostname from this URI's authority component
+     * @see #getDecodedHost()
+     * @see #isRegistryName()
+     * @see #isIPv4address()
+     * @see #isIPv6reference()
+     */
     public String getHost() {
         return host;
     }
 
+    /**
+     * Get the decoded hostname or ip address from this URI's authority component.
+     * <p>
+     * <p>
+     * @return the hostname from this URI's authority component
+     * @see #getHost()
+     * @see #isRegistryName()
+     * @see #isIPv4address()
+     * @see #isIPv6reference()
+     */
     public String getDecodedHost() {
         if (isIPv4address || isIPv6reference) {
             return host;
@@ -140,18 +162,56 @@ public class Uri {
         return authorityCache;
     }
 
+    /**
+     * Get the URI's path component.
+     * <p>
+     * The path might be empty, but never null.
+     * <p>
+     * @return the URI's path
+     * @see #getDecodedPath()
+     */
     public String getPath() {
         return path;
     }
 
+    /**
+     * Get the URI's decoded path component.
+     * <p>
+     * All percent encoded characters are decoded to Unicode characters. The path might be empty, but never null.
+     * <p>
+     * @return the URI's decoded path
+     * @see #getPath()
+     */
     public String getDecodedPath() {
         return decode(path);
     }
 
+    /**
+     * Get the URI's query component.
+     * <p>
+     * The query is the part after a question mark. Not all schemes support queries. The RFC 3986 doesn't specify a
+     * format for queries for those schemas that supports it, but it is common to take the form:
+     * {@code ?var1=val1&var2=val2}. For schemas using this form, {@link #getParsedQuery()} can be used to get the query
+     * in a parsed format.
+     * <p>
+     * @return the URI's query. Can be null
+     * @see #getParsedQuery()
+     */
     public String getQuery() {
         return query;
     }
 
+    /**
+     * Get a parsed version of the URI's query component.
+     * <p>
+     * The query is the part after a question mark. Not all schemes support queries. The RFC 3986 doesn't specify a
+     * format for queries for those schemas that supports it. This method only supports queries of the form:
+     * {@code ?var1=val1&var2=val2} which is commonly used for example by the http scheme. For schemas not using this
+     * form, {@link #getQuery()} can be used to get the query as a string.
+     * <p>
+     * @return the URI's query. Can be null
+     * @see #getQuery()
+     */
     public ParsedQuery getParsedQuery() {
         if (parsedQuery == null) {
             parsedQuery = new ParsedQuery(query);
@@ -159,10 +219,33 @@ public class Uri {
         return parsedQuery;
     }
 
+    /**
+     * Get the URI's fragment component.
+     * <p>
+     * The fragment is the part after a '#'. It is also often referred to as the hash component of the URI.
+     * <p>
+     * @return the fragment component
+     */
     public String getFragment() {
         return fragment;
     }
 
+    /**
+     * Returns true if this URI contains an authority component.
+     * <p>
+     * @return true if this URI contains an authority component
+     * @see #getAuthority()
+     * @see #getUserinfo()
+     * @see #getUser()
+     * @see #getPassword()
+     * @see #getHost()
+     * @see #getDecodedHost()
+     * @see #getPort()
+     * @see #getDecodedPort()
+     * @see #isRegistryName()
+     * @see #isIPv4address()
+     * @see #isIPv6reference()
+     */
     public boolean isAuthority() {
         return host != null || user != null || password != null || port != DEFAULT_PORT_MARKER;
     }
@@ -179,10 +262,25 @@ public class Uri {
         return isIPv6reference;
     }
 
+    /**
+     * Returns true if this URI is absolute.
+     * <p>
+     * RFC 3986 defines an absolute URI to be a URI with a scheme. This is equal to {@code getScheme() != null}.
+     * <p>
+     * @return true if this URI is absolute
+     */
     public boolean isAbsolute() {
         return scheme != null;
     }
 
+    /**
+     * Returns true if this URI's path is absolute.
+     * <p>
+     * A URI's path is absolute if it starts with the character {@code '/'}. This method is only relevant for URIs with
+     * a scheme which defines a hierarchical path (eg. http,ftp).
+     * <p>
+     * @return true if this URI's path is absolute
+     */
     public boolean isAbsolutePath() {
         return isAbsPath;
     }
@@ -191,6 +289,11 @@ public class Uri {
         return charset;
     }
 
+    /**
+     * Get the default formatting as specified when creating the URI.
+     * <p>
+     * @return the default format
+     */
     public UriFormat getDefaultFormat() {
         return defaultFormat;
     }

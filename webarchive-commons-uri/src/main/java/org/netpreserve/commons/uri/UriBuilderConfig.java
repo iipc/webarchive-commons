@@ -252,6 +252,14 @@ public final class UriBuilderConfig {
             return this;
         }
 
+        /**
+         * Set if the URI's case should be normalized.
+         * <p>
+         * Converts scheme and hostname to lower case. Percent encoded characters are converted to upper case.
+         * <p>
+         * @param value set to true for case normalization
+         * @return this UriBuilderConfig for command chaining
+         */
         public ConfigBuilder caseNormalization(final boolean value) {
             this.caseNormalization = value;
             return this;
@@ -319,10 +327,22 @@ public final class UriBuilderConfig {
             return strictReferenceResolution;
         }
 
+        /**
+         * Returns true if the URI's case should be normalized.
+         * <p>
+         * Converts scheme and hostname to lower case. Percent encoded characters are converted to upper case.
+         * <p>
+         * @return true if the URI's case should be normalized
+         */
         public boolean isCaseNormalization() {
             return caseNormalization;
         }
 
+        /**
+         * Returns true if characters not allowed in a certain part of the URI should be percent encoded.
+         * <p>
+         * @return true if characters not allowed in a certain part of the URI should be percent encoded
+         */
         public boolean isPercentEncodingNormalization() {
             return percentEncodingNormalization;
         }

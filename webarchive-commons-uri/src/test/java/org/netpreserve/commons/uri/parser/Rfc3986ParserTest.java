@@ -211,7 +211,6 @@ public class Rfc3986ParserTest {
         UriBuilder builder = UriBuilder.strictUriBuilder();
         Rfc3986Parser parser = new Rfc3986Parser();
         String uri;
-        int nextOffset;
 
         uri = "example://a/b/c/%7Bfoo%7D";
         parser.parseUri(builder, uri, 0);

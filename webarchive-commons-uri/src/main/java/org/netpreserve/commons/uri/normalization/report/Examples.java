@@ -13,31 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.netpreserve.commons.uri.normalization.report;
 
-package org.netpreserve.commons.uri.normalization;
-
-
-import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  *
  */
-public class WhatwgPreParseNormalizerTest {
-
-    public WhatwgPreParseNormalizerTest() {
-    }
-    /**
-     * Test of normalize method, of class WhatwgPreParseNormalizer.
-     */
-    @Test
-    public void testNormalize() {
-        String uriString = " \tabc\ndef\u0003";
-        MimicBrowserNormalizer instance = new MimicBrowserNormalizer();
-        String expResult = "abcdef";
-        String result = instance.normalize(uriString);
-        assertThat(result).isEqualTo(expResult);
-    }
-
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Examples {
+    Example[] value();
 }

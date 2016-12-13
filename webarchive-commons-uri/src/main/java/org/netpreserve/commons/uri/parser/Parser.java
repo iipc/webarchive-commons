@@ -21,13 +21,12 @@ import java.util.List;
 
 import org.netpreserve.commons.uri.UriBuilder;
 import org.netpreserve.commons.uri.UriBuilderConfig;
-import org.netpreserve.commons.uri.normalization.report.NormalizationDescriber;
 import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
 /**
  *
  */
-public interface Parser extends NormalizationDescriber {
+public interface Parser {
 
     void parseUri(UriBuilder builder, String uri, int offset);
 
@@ -39,7 +38,11 @@ public interface Parser extends NormalizationDescriber {
 
     String validateFragment(UriBuilderConfig config, Charset charset, CharBuffer uri);
 
-    void describeNormalization(List<NormalizationDescription> descriptions);
+    default void describeNormalization(List<NormalizationDescription> descriptions) {
+
+    }
+    
+    void describeNormalization(UriBuilder uriBuilder, List<NormalizationDescription> descriptions);
 
     public static class ParserState {
 

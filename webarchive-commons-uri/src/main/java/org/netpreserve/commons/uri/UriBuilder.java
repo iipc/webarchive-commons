@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer;
+import org.netpreserve.commons.uri.normalization.report.NormalizationConfigReport;
 import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
 import static org.netpreserve.commons.uri.Uri.DEFAULT_PORT_MARKER;
@@ -440,43 +441,13 @@ public final class UriBuilder {
      * <p>
      * @return the list of normalization descriptions
      */
-    public List<NormalizationDescription> getNormalizationDescriptions() {
-        List<NormalizationDescription> descriptions = new ArrayList<>();
-
-        for (Normalizer normalizer : config.getPreParseNormalizers()) {
-            addNormalizationDescription(normalizer, descriptions);
-        }
-
-        config.getParser().describeNormalization(descriptions);
-
-        for (Normalizer normalizer : config.getInParseNormalizers()) {
-            addNormalizationDescription(normalizer, descriptions);
-        }
-
-        for (Normalizer normalizer : config.getPostParseNormalizers()) {
-            addNormalizationDescription(normalizer, descriptions);
-        }
-
-        return descriptions;
-    }
-
-    private void addNormalizationDescription(Normalizer normalizer, List<NormalizationDescription> descriptions) {
-        if (normalizer instanceof SchemeBasedNormalizer) {
-            if (config.isSchemeBasedNormalization()) {
-                normalizer.describeNormalization(descriptions);
-            }
-        } else {
-            normalizer.describeNormalization(descriptions);
-        }
+    public NormalizationConfigReport getNormalizationDescriptions() {
+        return NormalizationConfigReport.parse(this);
     }
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("UriBuilder configured with these normalizations:");
-        for (NormalizationDescription desc : getNormalizationDescriptions()) {
-            sb.append("\n").append(desc.toString("  "));
-        }
-        return sb.toString();
+        return getNormalizationDescriptions().toString();
     }
 
 }

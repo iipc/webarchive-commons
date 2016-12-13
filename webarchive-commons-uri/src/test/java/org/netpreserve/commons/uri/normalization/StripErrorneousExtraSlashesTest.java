@@ -15,21 +15,16 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
-import org.netpreserve.commons.uri.PreParseNormalizer;
-import org.netpreserve.commons.uri.normalization.report.Description;
-import org.netpreserve.commons.uri.normalization.report.Example;
+import org.junit.Test;
 
 /**
- * Normalizer which turn the URI string into lower case before parsing.
+ *
  */
-public class AllLowerCase implements PreParseNormalizer {
+public class StripErrorneousExtraSlashesTest {
 
-    @Override
-    @Description(name = "All lower case",
-                 description = "Turns all the characters of the URI into lower case.")
-    @Example(uri = "HTTP://example.COM/path/Index.HTM", normalizedUri = "http://example.com/path/index.htm")
-    public String normalize(String uriString) {
-        return uriString.toLowerCase();
+    @Test
+    public void testExamples() {
+        NormalizationTestUtil.testNormalizerExamples(new StripErrorneousExtraSlashes());
     }
 
 }

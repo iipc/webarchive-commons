@@ -27,25 +27,18 @@ import static org.netpreserve.commons.uri.Scheme.HTTP;
 import static org.netpreserve.commons.uri.Scheme.HTTPS;
 
 /**
- * Normalizer for skipping extra slashes in path.
- *
- * Skips:
- * <ul>
- *   <li>double slashes in path</li>
- *   <li>slashes at end of path</li>
- * </ul>
+ * Normalizer for skipping slashes at end of path.
  */
-public class StripSlashesAtEndOfPath extends SchemeBasedNormalizer implements PostParseNormalizer {
+public class StripSlashAtEndOfPath extends SchemeBasedNormalizer implements PostParseNormalizer {
 
     private static final Set<Scheme> SUPPORTED_SCHEMES = immutableSetOf(HTTP, HTTPS);
 
     @Override
-    @Description(name = "Strip slashes in path",
-                 description = "Strips double slashes in path and slash at end of path.")
-    @Example(uri = "http://www.example.com/my//path/", normalizedUri = "http://www.example.com/my/path")
+    @Description(name = "Strip slash at end of path",
+                 description = "Strips slash at end of path.")
+    @Example(uri = "http://www.example.com/my//path/", normalizedUri = "http://www.example.com/my//path")
     public void normalize(UriBuilder builder) {
         if (!builder.path().isEmpty()) {
-            builder.path(builder.path().replaceAll("/+", "/"));
             if (builder.path().endsWith("/")) {
                 builder.path(builder.path().substring(0, builder.path().length() - 1));
             }

@@ -20,11 +20,11 @@ import org.junit.Test;
 /**
  *
  */
-public class StripSlashesAtEndOfPathTest {
+public class StripExtraSlashesInPathTest {
 
     @Test
     public void testExamples() {
-        NormalizationTestUtil.testNormalizerExamples(new StripSlashesAtEndOfPath());
+        NormalizationTestUtil.testNormalizerExamples(new StripExtraSlashesInPath());
     }
 
 }

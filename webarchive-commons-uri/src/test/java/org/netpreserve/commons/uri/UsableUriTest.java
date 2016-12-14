@@ -979,7 +979,7 @@ public class UsableUriTest {
         assertThat(uuri.toString()).isEqualTo("http://foo.com/");
 
         // Default normalization is to remove trailing slash. To get this one working we must change config.
-        uuri = UriBuilder.builder(Configurations.USABLE_URI.toBuilder().schemeBasedNormalization(false).build())
+        uuri = UriBuilder.builder(Configurations.USABLE_URI.schemeBasedNormalization(false))
                 .uri("http://foo.com/aa/bb/../").build();
         assertThat(uuri.toString()).isEqualTo("http://foo.com/aa/");
         // Check for default behavior of above
@@ -1193,8 +1193,7 @@ public class UsableUriTest {
 
     @Test
     public void testMetadata() {
-        UriBuilderConfig config = Configurations.USABLE_URI.toBuilder()
-                .requireAbsoluteUri(false).build();
+        UriBuilderConfig config = Configurations.USABLE_URI.requireAbsoluteUri(false);
 
         Uri uri;
 

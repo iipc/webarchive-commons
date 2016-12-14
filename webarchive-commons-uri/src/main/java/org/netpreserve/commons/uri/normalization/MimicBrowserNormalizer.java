@@ -17,7 +17,6 @@ package org.netpreserve.commons.uri.normalization;
 
 import java.nio.CharBuffer;
 import java.util.BitSet;
-import java.util.List;
 
 import org.netpreserve.commons.uri.InParseNormalizer;
 import org.netpreserve.commons.uri.parser.Parser;
@@ -25,7 +24,6 @@ import org.netpreserve.commons.uri.PreParseNormalizer;
 import org.netpreserve.commons.uri.Scheme;
 import org.netpreserve.commons.uri.normalization.report.Description;
 import org.netpreserve.commons.uri.normalization.report.Example;
-import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
 /**
  *
@@ -44,7 +42,8 @@ public class MimicBrowserNormalizer implements PreParseNormalizer, InParseNormal
         }
     }
 
-    @Description(name = "Trim", description = "Remove leading and trailing control characters and space. Remove stray TAB/CR/LF.")
+    @Description(name = "Trim", description = "Remove leading and trailing control characters and space."
+                 + " Remove stray TAB/CR/LF.")
     @Example(uri = " http://www.example.com", normalizedUri = "http://www.example.com/")
     @Example(uri = "http://www.\texample.com", normalizedUri = "http://www.example.com/")
     @Override
@@ -81,7 +80,7 @@ public class MimicBrowserNormalizer implements PreParseNormalizer, InParseNormal
 
     @Description(name = "Normalize start of authority",
                  description = "Skip or normalize errorneous slashes at start of authority. "
-                         + "Handle windows drive letters at start of path.")
+                 + "Handle windows drive letters at start of path.")
     @Example(uri = "foo:///example.com/", normalizedUri = "foo:///example.com/")
     @Example(uri = "http:\\\\example.com/", normalizedUri = "http://example.com/")
     @Example(uri = "file:///C|path", normalizedUri = "file:///C:path")

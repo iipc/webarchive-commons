@@ -77,7 +77,7 @@ public final class Configurations {
             .decodeHost(false)
             .surtEncoder(new LegacyWaybackSurtEncoder());
 
-    public static final UriBuilderConfig STRICT_URI = UriBuilderConfig.newBuilder()
+    public static final UriBuilderConfig STRICT_URI = new UriBuilderConfig()
             .parser(Configurations.STRICT_PARSER)
             .referenceResolver(Configurations.REFERENCE_RESOLVER)
             .requireAbsoluteUri(false)
@@ -87,14 +87,13 @@ public final class Configurations {
             .pathSegmentNormalization(true)
             .schemeBasedNormalization(true)
             .encodeIllegalCharacters(false)
-            .defaultFormat(Configurations.DEFAULT_FORMAT)
-            .build();
+            .defaultFormat(Configurations.DEFAULT_FORMAT);
 
     /**
      * A Uri config trying to mimic the behavior of major browsers as described by
      * <a herf="https://url.spec.whatwg.org/">whatwg.org</a>.
      */
-    public static final UriBuilderConfig MIMIC_BROWSER_URI = UriBuilderConfig.newBuilder()
+    public static final UriBuilderConfig MIMIC_BROWSER_URI = new UriBuilderConfig()
             .parser(Configurations.MIMIC_BROWSER_PARSER)
             .referenceResolver(Configurations.MIMIC_BROWSER_REFERENCE_RESOLVER)
             .requireAbsoluteUri(false)
@@ -106,15 +105,14 @@ public final class Configurations {
             .encodeIllegalCharacters(true)
             .punycodeUnknownScheme(true)
             .defaultFormat(Configurations.DEFAULT_FORMAT)
-            .addNormalizer(new MimicBrowserNormalizer())
-            .build();
+            .addNormalizer(new MimicBrowserNormalizer());
 
     /**
      * A forgiving URI config.
      * <p>
      * Normalizes some illegal characters, but otherwise tries to accept the URI as it is as much as possible.
      */
-    public static final UriBuilderConfig LAX_URI = UriBuilderConfig.newBuilder()
+    public static final UriBuilderConfig LAX_URI = new UriBuilderConfig()
             .parser(Configurations.LAX_PARSER)
             .referenceResolver(Configurations.REFERENCE_RESOLVER)
             .requireAbsoluteUri(false)
@@ -130,10 +128,9 @@ public final class Configurations {
             .addNormalizer(new StripSlashAtEndOfPath())
             .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
             .addNormalizer(new OptimisticDnsScheme())
-            .addNormalizer(new CheckLongEnough())
-            .build();
+            .addNormalizer(new CheckLongEnough());
 
-    public static final UriBuilderConfig USABLE_URI = UriBuilderConfig.newBuilder()
+    public static final UriBuilderConfig USABLE_URI = new UriBuilderConfig()
             .parser(Configurations.LAX_PARSER)
             .referenceResolver(Configurations.REFERENCE_RESOLVER)
             .requireAbsoluteUri(true)
@@ -152,11 +149,9 @@ public final class Configurations {
             .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
             .addNormalizer(new OptimisticDnsScheme())
             .addNormalizer(new CheckLongEnough())
-            .addNormalizer(new TrimHost())
-            .build();
+            .addNormalizer(new TrimHost());
 
-    public static final UriBuilderConfig CANONICALIZED_URI
-            = UriBuilderConfig.newBuilder()
+    public static final UriBuilderConfig CANONICALIZED_URI = new UriBuilderConfig()
             .parser(Configurations.LAX_PARSER)
             .referenceResolver(Configurations.MIMIC_BROWSER_REFERENCE_RESOLVER)
             .requireAbsoluteUri(true)
@@ -176,14 +171,9 @@ public final class Configurations {
             .addNormalizer(new StripSlashAtEndOfPath())
             .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
             .addNormalizer(new OptimisticDnsScheme())
-            .addNormalizer(new CheckLongEnough())
-            //            .addNormalizer(new StripSessionIDs());
-            //            .addNormalizer(new StripSessionCFIDs());
-            //            .addNormalizer(new FixupQueryString());
-            .build();
+            .addNormalizer(new CheckLongEnough());
 
-    public static final UriBuilderConfig SURT_KEY
-            = UriBuilderConfig.newBuilder()
+    public static final UriBuilderConfig SURT_KEY = new UriBuilderConfig()
             .parser(Configurations.LAX_PARSER)
             .referenceResolver(Configurations.REFERENCE_RESOLVER)
             .requireAbsoluteUri(true)
@@ -204,14 +194,9 @@ public final class Configurations {
             .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
             .addNormalizer(new InferCommonSchemesForSchemelessUri())
             .addNormalizer(new OptimisticDnsScheme())
-            .addNormalizer(new CheckLongEnough())
-            //            .addNormalizer(new StripSessionIDs());
-            //            .addNormalizer(new StripSessionCFIDs());
-            //            .addNormalizer(new FixupQueryString());
-            .build();
+            .addNormalizer(new CheckLongEnough());
 
-    public static final UriBuilderConfig LEGACY_SURT_KEY
-            = UriBuilderConfig.newBuilder()
+    public static final UriBuilderConfig LEGACY_SURT_KEY = new UriBuilderConfig()
             .parser(Configurations.LAX_PARSER)
             .referenceResolver(Configurations.REFERENCE_RESOLVER)
             .requireAbsoluteUri(true)
@@ -233,11 +218,7 @@ public final class Configurations {
             .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
             .addNormalizer(new InferCommonSchemesForSchemelessUri())
             .addNormalizer(new OptimisticDnsScheme())
-            .addNormalizer(new CheckLongEnough())
-            //            .addNormalizer(new StripSessionIDs());
-            //            .addNormalizer(new StripSessionCFIDs());
-            //            .addNormalizer(new FixupQueryString());
-            .build();
+            .addNormalizer(new CheckLongEnough());
 
     private Configurations() {
     }

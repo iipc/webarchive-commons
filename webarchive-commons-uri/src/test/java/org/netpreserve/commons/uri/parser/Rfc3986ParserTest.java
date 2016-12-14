@@ -15,7 +15,6 @@
  */
 package org.netpreserve.commons.uri.parser;
 
-import org.netpreserve.commons.uri.parser.Rfc3986Parser;
 import org.junit.Test;
 import org.netpreserve.commons.uri.Configurations;
 import org.netpreserve.commons.uri.Uri;
@@ -34,8 +33,7 @@ public class Rfc3986ParserTest {
      */
     @Test
     public void testParseParts() {
-        UriBuilderConfig config = Configurations.STRICT_URI.toBuilder()
-                .schemeBasedNormalization(false).build();
+        UriBuilderConfig config = Configurations.STRICT_URI.schemeBasedNormalization(false);
 
         Rfc3986Parser parser = new Rfc3986Parser();
         Rfc3986Parser.ParserState parserState;
@@ -224,4 +222,5 @@ public class Rfc3986ParserTest {
 
         assertThat(uri1).isEqualTo(uri2);
     }
+
 }

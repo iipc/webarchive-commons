@@ -28,9 +28,9 @@ import static org.assertj.core.api.Assertions.*;
  */
 public class InferCommonSchemesForSchemelessUriTest {
 
-    UriBuilderConfig config = Configurations.USABLE_URI.toBuilder()
+    UriBuilderConfig config = Configurations.USABLE_URI
             .defaultFormat(Configurations.CANONICALIZED_URI_FORMAT)
-            .addNormalizer(new InferCommonSchemesForSchemelessUri()).build();
+            .addNormalizer(new InferCommonSchemesForSchemelessUri());
 
     @Test
     public void testExamples() {

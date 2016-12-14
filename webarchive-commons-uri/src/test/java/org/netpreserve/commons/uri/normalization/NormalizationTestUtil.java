@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class NormalizationTestUtil {
 
     public static void testNormalizerExamples(Normalizer normalizer) {
-        UriBuilderConfig.ConfigBuilder config = UriBuilderConfig.newBuilder()
+        UriBuilderConfig config = new UriBuilderConfig()
                 .parser(Configurations.STRICT_PARSER)
                 .referenceResolver(Configurations.REFERENCE_RESOLVER)
                 .requireAbsoluteUri(false)
@@ -46,7 +46,7 @@ public class NormalizationTestUtil {
 
         config.addNormalizer(normalizer);
 
-        UriBuilder builder = UriBuilder.builder(config.build());
+        UriBuilder builder = UriBuilder.builder(config);
 
         boolean testsFound = false;
 

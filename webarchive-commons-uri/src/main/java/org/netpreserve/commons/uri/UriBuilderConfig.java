@@ -20,82 +20,47 @@ import org.netpreserve.commons.uri.parser.Parser;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
- *
+ * Configuration for a UriBuilder.
+ * <p>
+ * This class is immutable and thread safe. All methods setting a value returns a fresh copy.
  */
 public final class UriBuilderConfig {
 
-    private final int maxUrlLength;
+    private int maxUrlLength = Integer.MAX_VALUE;
 
-    private final Parser parser;
+    private Parser parser = Configurations.STRICT_PARSER;
 
-    private final ReferenceResolver referenceResolver;
+    private ReferenceResolver referenceResolver = Configurations.REFERENCE_RESOLVER;
 
-    private final PreParseNormalizer[] preParseNormalizers;
+    private List<PreParseNormalizer> preParseNormalizers = Collections.emptyList();
 
-    private final InParseNormalizer[] inParseNormalizers;
+    private List<InParseNormalizer> inParseNormalizers = Collections.emptyList();
 
-    private final PostParseNormalizer[] postParseNormalizers;
+    private List<PostParseNormalizer> postParseNormalizers = Collections.emptyList();
 
-    private final Charset charset;
+    private Charset charset = StandardCharsets.UTF_8;
 
-    private final boolean requireAbsoluteUri;
+    private boolean requireAbsoluteUri = false;
 
-    private final boolean strictReferenceResolution;
+    private boolean strictReferenceResolution = true;
 
-    private final boolean caseNormalization;
+    private boolean caseNormalization = true;
 
-    private final boolean percentEncodingNormalization;
+    private boolean percentEncodingNormalization = true;
 
-    private final boolean pathSegmentNormalization;
+    private boolean pathSegmentNormalization = true;
 
-    private final boolean schemeBasedNormalization;
+    private boolean schemeBasedNormalization = false;
 
-    private final boolean encodeIllegalCharacters;
+    private boolean encodeIllegalCharacters = false;
 
-    private final boolean punycodeUnknownScheme;
+    private boolean punycodeUnknownScheme = false;
 
-    private final UriFormat defaultFormat;
-
-    /**
-     * Create a new builder for UriBuilderConfig initialized with sensible defaults for parsing valid Uri's.
-     * <p>
-     * @return the builder
-     */
-    public static ConfigBuilder newBuilder() {
-        return new ConfigBuilder();
-    }
-
-    /**
-     * Create a new builder for UriBuilderConfig initialized with this UriBuilderConfig.
-     * <p>
-     * @return the builder
-     */
-    public ConfigBuilder toBuilder() {
-        return new ConfigBuilder(this);
-    }
-
-    private UriBuilderConfig(ConfigBuilder config) {
-        this.maxUrlLength = config.getMaxUrlLength();
-        this.parser = config.getParser();
-        this.referenceResolver = config.getReferenceResolver();
-        this.charset = config.getCharset();
-        this.requireAbsoluteUri = config.isRequireAbsoluteUri();
-        this.strictReferenceResolution = config.isStrictReferenceResolution();
-        this.caseNormalization = config.isCaseNormalization();
-        this.percentEncodingNormalization = config.isPercentEncodingNormalization();
-        this.pathSegmentNormalization = config.isPathSegmentNormalization();
-        this.schemeBasedNormalization = config.isSchemeBasedNormalization();
-        this.encodeIllegalCharacters = config.isEncodeIllegalCharacters();
-        this.punycodeUnknownScheme = config.isPunycodeUnknownScheme();
-        this.preParseNormalizers = config.preParseNormalizers.toArray(new PreParseNormalizer[0]);
-        this.inParseNormalizers = config.inParseNormalizers.toArray(new InParseNormalizer[0]);
-        this.postParseNormalizers = config.postParseNormalizers.toArray(new PostParseNormalizer[0]);
-        this.defaultFormat = config.getDefaultFormat();
-    }
+    private UriFormat defaultFormat = Configurations.DEFAULT_FORMAT;
 
     public int getMaxUrlLength() {
         return maxUrlLength;
@@ -121,10 +86,25 @@ public final class UriBuilderConfig {
         return strictReferenceResolution;
     }
 
+    /**
+     * Returns true if the URI's case should be normalized.
+     * <p>
+     * Converts scheme and hostname to lower case. Percent encoded characters are converted to upper case.
+     * <p>
+     * @return true if the URI's case should be normalized
+     */
     public boolean isCaseNormalization() {
         return caseNormalization;
     }
 
+    /**
+     * Returns true if HEX values should be normalized.
+     * <p>
+     * If this parameter is true, all HEX values will be uppercased. For percent encoded characters, unnecessary encoded
+     * characters will be decoded. Illegal characters will be encoded.
+     * <p>
+     * @return true if HEX values should be normalized
+     */
     public boolean isPercentEncodingNormalization() {
         return percentEncodingNormalization;
     }
@@ -145,15 +125,15 @@ public final class UriBuilderConfig {
         return punycodeUnknownScheme;
     }
 
-    public PreParseNormalizer[] getPreParseNormalizers() {
+    public List<PreParseNormalizer> getPreParseNormalizers() {
         return preParseNormalizers;
     }
 
-    public InParseNormalizer[] getInParseNormalizers() {
+    public List<InParseNormalizer> getInParseNormalizers() {
         return inParseNormalizers;
     }
 
-    public PostParseNormalizer[] getPostParseNormalizers() {
+    public List<PostParseNormalizer> getPostParseNormalizers() {
         return postParseNormalizers;
     }
 
@@ -161,227 +141,171 @@ public final class UriBuilderConfig {
         return defaultFormat;
     }
 
-    public static final class ConfigBuilder {
-
-        private int maxUrlLength = Integer.MAX_VALUE;
-
-        private Parser parser = Configurations.STRICT_PARSER;
-
-        private ReferenceResolver referenceResolver = Configurations.REFERENCE_RESOLVER;
-
-        private final List<PreParseNormalizer> preParseNormalizers = new ArrayList<>();
-
-        private final List<InParseNormalizer> inParseNormalizers = new ArrayList<>();
-
-        private final List<PostParseNormalizer> postParseNormalizers = new ArrayList<>();
-
-        private Charset charset = StandardCharsets.UTF_8;
-
-        private boolean requireAbsoluteUri = false;
-
-        private boolean strictReferenceResolution = true;
-
-        private boolean caseNormalization = true;
-
-        private boolean percentEncodingNormalization = true;
-
-        private boolean pathSegmentNormalization = true;
-
-        private boolean schemeBasedNormalization = false;
-
-        private boolean encodeIllegalCharacters = false;
-
-        private boolean punycodeUnknownScheme = false;
-
-        private UriFormat defaultFormat = Configurations.DEFAULT_FORMAT;
-
-        private ConfigBuilder() {
-        }
-
-        private ConfigBuilder(UriBuilderConfig config) {
-            this.maxUrlLength = config.getMaxUrlLength();
-            this.parser = config.getParser();
-            this.referenceResolver = config.getReferenceResolver();
-            this.charset = config.getCharset();
-            this.requireAbsoluteUri = config.isRequireAbsoluteUri();
-            this.strictReferenceResolution = config.isStrictReferenceResolution();
-            this.caseNormalization = config.isCaseNormalization();
-            this.percentEncodingNormalization = config.isPercentEncodingNormalization();
-            this.pathSegmentNormalization = config.isPathSegmentNormalization();
-            this.schemeBasedNormalization = config.isSchemeBasedNormalization();
-            this.encodeIllegalCharacters = config.isEncodeIllegalCharacters();
-            this.punycodeUnknownScheme = config.isPunycodeUnknownScheme();
-            this.preParseNormalizers.addAll(Arrays.asList(config.preParseNormalizers));
-            this.inParseNormalizers.addAll(Arrays.asList(config.inParseNormalizers));
-            this.postParseNormalizers.addAll(Arrays.asList(config.postParseNormalizers));
-            this.defaultFormat = config.getDefaultFormat();
-        }
-
-        public ConfigBuilder maxUrlLength(final int value) {
-            this.maxUrlLength = value;
-            return this;
-        }
-
-        public ConfigBuilder parser(final Parser value) {
-            this.parser = value;
-            return this;
-        }
-
-        public ConfigBuilder referenceResolver(final ReferenceResolver value) {
-            this.referenceResolver = value;
-            return this;
-        }
-
-        public ConfigBuilder charset(final Charset value) {
-            this.charset = value;
-            return this;
-        }
-
-        public ConfigBuilder defaultFormat(final UriFormat value) {
-            this.defaultFormat = value;
-            return this;
-        }
-
-        public ConfigBuilder requireAbsoluteUri(final boolean value) {
-            this.requireAbsoluteUri = value;
-            return this;
-        }
-
-        public ConfigBuilder strictReferenceResolution(final boolean value) {
-            this.strictReferenceResolution = value;
-            return this;
-        }
-
-        /**
-         * Set if the URI's case should be normalized.
-         * <p>
-         * Converts scheme and hostname to lower case. Percent encoded characters are converted to upper case.
-         * <p>
-         * @param value set to true for case normalization
-         * @return this UriBuilderConfig for command chaining
-         */
-        public ConfigBuilder caseNormalization(final boolean value) {
-            this.caseNormalization = value;
-            return this;
-        }
-
-        public ConfigBuilder percentEncodingNormalization(final boolean value) {
-            this.percentEncodingNormalization = value;
-            return this;
-        }
-
-        public ConfigBuilder pathSegmentNormalization(final boolean value) {
-            this.pathSegmentNormalization = value;
-            return this;
-        }
-
-        public ConfigBuilder schemeBasedNormalization(final boolean value) {
-            this.schemeBasedNormalization = value;
-            return this;
-        }
-
-        public ConfigBuilder encodeIllegalCharacters(final boolean value) {
-            this.encodeIllegalCharacters = value;
-            return this;
-        }
-
-        public ConfigBuilder punycodeUnknownScheme(final boolean value) {
-            this.punycodeUnknownScheme = value;
-            return this;
-        }
-
-        public ConfigBuilder addNormalizer(Normalizer normalizer) {
-            if (normalizer instanceof PreParseNormalizer) {
-                this.preParseNormalizers.add((PreParseNormalizer) normalizer);
-            }
-            if (normalizer instanceof InParseNormalizer) {
-                this.inParseNormalizers.add((InParseNormalizer) normalizer);
-            }
-            if (normalizer instanceof PostParseNormalizer) {
-                this.postParseNormalizers.add((PostParseNormalizer) normalizer);
-            }
-            return this;
-        }
-
-        public int getMaxUrlLength() {
-            return maxUrlLength;
-        }
-
-        public Parser getParser() {
-            return parser;
-        }
-
-        public ReferenceResolver getReferenceResolver() {
-            return referenceResolver;
-        }
-
-        public Charset getCharset() {
-            return charset;
-        }
-
-        public boolean isRequireAbsoluteUri() {
-            return requireAbsoluteUri;
-        }
-
-        public boolean isStrictReferenceResolution() {
-            return strictReferenceResolution;
-        }
-
-        /**
-         * Returns true if the URI's case should be normalized.
-         * <p>
-         * Converts scheme and hostname to lower case. Percent encoded characters are converted to upper case.
-         * <p>
-         * @return true if the URI's case should be normalized
-         */
-        public boolean isCaseNormalization() {
-            return caseNormalization;
-        }
-
-        /**
-         * Returns true if characters not allowed in a certain part of the URI should be percent encoded.
-         * <p>
-         * @return true if characters not allowed in a certain part of the URI should be percent encoded
-         */
-        public boolean isPercentEncodingNormalization() {
-            return percentEncodingNormalization;
-        }
-
-        public boolean isPathSegmentNormalization() {
-            return pathSegmentNormalization;
-        }
-
-        public boolean isSchemeBasedNormalization() {
-            return schemeBasedNormalization;
-        }
-
-        public boolean isEncodeIllegalCharacters() {
-            return encodeIllegalCharacters;
-        }
-
-        public boolean isPunycodeUnknownScheme() {
-            return punycodeUnknownScheme;
-        }
-
-        public List<PreParseNormalizer> getPreParseNormalizers() {
-            return preParseNormalizers;
-        }
-
-        public List<InParseNormalizer> getInParseNormalizers() {
-            return inParseNormalizers;
-        }
-
-        public List<PostParseNormalizer> getPostParseNormalizers() {
-            return postParseNormalizers;
-        }
-
-        public UriFormat getDefaultFormat() {
-            return defaultFormat;
-        }
-
-        public UriBuilderConfig build() {
-            return new UriBuilderConfig(this);
-        }
-
+    public UriBuilderConfig maxUrlLength(final int value) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        copy.maxUrlLength = value;
+        return copy;
     }
+
+    public UriBuilderConfig parser(final Parser value) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        copy.parser = value;
+        return copy;
+    }
+
+    public UriBuilderConfig referenceResolver(final ReferenceResolver value) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        copy.referenceResolver = value;
+        return copy;
+    }
+
+    public UriBuilderConfig charset(final Charset value) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        copy.charset = value;
+        return copy;
+    }
+
+    public UriBuilderConfig defaultFormat(final UriFormat value) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        copy.defaultFormat = value;
+        return copy;
+    }
+
+    public UriBuilderConfig requireAbsoluteUri(final boolean value) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        copy.requireAbsoluteUri = value;
+        return copy;
+    }
+
+    public UriBuilderConfig strictReferenceResolution(final boolean value) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        copy.strictReferenceResolution = value;
+        return copy;
+    }
+
+    /**
+     * Set if the URI's case should be normalized.
+     * <p>
+     * Converts scheme and hostname to lower case. Percent encoded characters are converted to upper case.
+     * <p>
+     * @param value set to true for case normalization
+     * @return this UriBuilderConfig for command chaining
+     */
+    public UriBuilderConfig caseNormalization(final boolean value) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        copy.caseNormalization = value;
+        return copy;
+    }
+
+    /**
+     * Set if HEX values should be normalized.
+     * <p>
+     * If this parameter is set to true, all HEX values will be uppercased. For percent encoded characters, unnecessary
+     * encoded characters will be decoded. Illegal characters will be encoded.
+     * <p>
+     * @param value set to true for HEX normalization
+     * @return this UriBuilderConfig for command chaining
+     */
+    public UriBuilderConfig percentEncodingNormalization(final boolean value) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        copy.percentEncodingNormalization = value;
+        return copy;
+    }
+
+    public UriBuilderConfig pathSegmentNormalization(final boolean value) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        copy.pathSegmentNormalization = value;
+        return copy;
+    }
+
+    public UriBuilderConfig schemeBasedNormalization(final boolean value) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        copy.schemeBasedNormalization = value;
+        return copy;
+    }
+
+    public UriBuilderConfig encodeIllegalCharacters(final boolean value) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        copy.encodeIllegalCharacters = value;
+        return copy;
+    }
+
+    public UriBuilderConfig punycodeUnknownScheme(final boolean value) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        copy.punycodeUnknownScheme = value;
+        return copy;
+    }
+
+    public UriBuilderConfig addNormalizer(Normalizer normalizer) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        if (normalizer instanceof PreParseNormalizer) {
+            List<PreParseNormalizer> listCopy = new ArrayList<>(copy.preParseNormalizers);
+            listCopy.add((PreParseNormalizer) normalizer);
+            copy.preParseNormalizers = Collections.unmodifiableList(listCopy);
+        }
+        if (normalizer instanceof InParseNormalizer) {
+            List<InParseNormalizer> listCopy = new ArrayList<>(copy.inParseNormalizers);
+            listCopy.add((InParseNormalizer) normalizer);
+            copy.inParseNormalizers = Collections.unmodifiableList(listCopy);
+        }
+        if (normalizer instanceof PostParseNormalizer) {
+            List<PostParseNormalizer> listCopy = new ArrayList<>(copy.postParseNormalizers);
+            listCopy.add((PostParseNormalizer) normalizer);
+            copy.postParseNormalizers = Collections.unmodifiableList(listCopy);
+        }
+        return copy;
+    }
+
+    public UriBuilderConfig removeNormalizersOfType(Class<? extends Normalizer> normalizer) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        if (PreParseNormalizer.class.isAssignableFrom(normalizer)) {
+            List<PreParseNormalizer> listCopy = new ArrayList<>(copy.preParseNormalizers);
+            listCopy.removeIf((PreParseNormalizer t) -> normalizer.isInstance(t));
+            copy.preParseNormalizers = Collections.unmodifiableList(listCopy);
+        }
+        if (InParseNormalizer.class.isAssignableFrom(normalizer)) {
+            List<InParseNormalizer> listCopy = new ArrayList<>(copy.inParseNormalizers);
+            listCopy.removeIf((InParseNormalizer t) -> normalizer.isInstance(t));
+            copy.inParseNormalizers = Collections.unmodifiableList(listCopy);
+        }
+        if (PostParseNormalizer.class.isAssignableFrom(normalizer)) {
+            List<PostParseNormalizer> listCopy = new ArrayList<>(copy.postParseNormalizers);
+            listCopy.removeIf((PostParseNormalizer t) -> normalizer.isInstance(t));
+            copy.postParseNormalizers = Collections.unmodifiableList(listCopy);
+        }
+        return copy;
+    }
+
+    /**
+     * Construct a new UriBuilderConfig with all parameters set to default values.
+     */
+    public UriBuilderConfig() {
+    }
+
+    /**
+     * Constructs a new UriBuilderConfig by copying all fields from another UriBuilderConfig.
+     * <p>
+     * This constructor is private to ensure immutability.
+     * <p>
+     * @param src the UriBuilderConfig to copy from
+     */
+    private UriBuilderConfig(UriBuilderConfig src) {
+        this.maxUrlLength = src.getMaxUrlLength();
+        this.parser = src.getParser();
+        this.referenceResolver = src.getReferenceResolver();
+        this.charset = src.getCharset();
+        this.requireAbsoluteUri = src.isRequireAbsoluteUri();
+        this.strictReferenceResolution = src.isStrictReferenceResolution();
+        this.caseNormalization = src.isCaseNormalization();
+        this.percentEncodingNormalization = src.isPercentEncodingNormalization();
+        this.pathSegmentNormalization = src.isPathSegmentNormalization();
+        this.schemeBasedNormalization = src.isSchemeBasedNormalization();
+        this.encodeIllegalCharacters = src.isEncodeIllegalCharacters();
+        this.punycodeUnknownScheme = src.isPunycodeUnknownScheme();
+        this.preParseNormalizers = src.preParseNormalizers;
+        this.inParseNormalizers = src.inParseNormalizers;
+        this.postParseNormalizers = src.postParseNormalizers;
+        this.defaultFormat = src.getDefaultFormat();
+    }
+
 }

@@ -428,10 +428,7 @@ public final class UriBuilder {
     }
 
     public UriBuilder resolve(String relative) throws UriException {
-        UriBuilder uri = UriBuilder.builder(
-                config.toBuilder().requireAbsoluteUri(false).build())
-                .uri(relative);
-
+        UriBuilder uri = UriBuilder.builder(config.requireAbsoluteUri(false)).uri(relative);
         resolve(uri);
         return this;
     }

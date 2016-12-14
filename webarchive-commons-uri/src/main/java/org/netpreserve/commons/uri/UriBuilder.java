@@ -103,7 +103,7 @@ public final class UriBuilder {
     /**
      * Creates a new UriBuilder.
      * <p>
-     * The builder is configured to only allow URI's which conforms to the RFC 3986. It does little normalizing. The
+     * The builder is configured to only allow URI's which conforms to the RFC 3986. It does some normalizing. The
      * normalizing done is not altering semantics. It normalizes case in places where the URI is case insensitive. Path
      * is normalized for constructs like '{@code foo/../bar/.}'.
      * <p>

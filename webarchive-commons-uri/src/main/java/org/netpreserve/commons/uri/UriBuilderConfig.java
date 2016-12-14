@@ -52,6 +52,14 @@ public final class UriBuilderConfig {
 
     private boolean percentEncodingNormalization = true;
 
+    private boolean normalizeIpv4 = true;
+
+    private boolean normalizeIpv6 = true;
+
+    private boolean upperCaseIpv6HexValues = false;
+
+    private boolean useIpv6Base85Encoding = false;
+
     private boolean pathSegmentNormalization = true;
 
     private boolean schemeBasedNormalization = false;
@@ -107,6 +115,22 @@ public final class UriBuilderConfig {
      */
     public boolean isPercentEncodingNormalization() {
         return percentEncodingNormalization;
+    }
+
+    public boolean isNormalizeIpv4() {
+        return normalizeIpv4;
+    }
+
+    public boolean isNormalizeIpv6() {
+        return normalizeIpv6;
+    }
+
+    public boolean isUpperCaseIpv6HexValues() {
+        return upperCaseIpv6HexValues;
+    }
+
+    public boolean isUseIpv6Base85Encoding() {
+        return useIpv6Base85Encoding;
     }
 
     public boolean isPathSegmentNormalization() {
@@ -212,6 +236,30 @@ public final class UriBuilderConfig {
         return copy;
     }
 
+    public UriBuilderConfig normalizeIpv4(final boolean value) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        copy.normalizeIpv4 = value;
+        return copy;
+    }
+
+    public UriBuilderConfig normalizeIpv6(final boolean value) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        copy.normalizeIpv6 = value;
+        return copy;
+    }
+
+    public UriBuilderConfig upperCaseIpv6HexValues(final boolean value) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        copy.upperCaseIpv6HexValues = value;
+        return copy;
+    }
+
+    public UriBuilderConfig useIpv6Base85Encoding(final boolean value) {
+        UriBuilderConfig copy = new UriBuilderConfig(this);
+        copy.useIpv6Base85Encoding = value;
+        return copy;
+    }
+
     public UriBuilderConfig pathSegmentNormalization(final boolean value) {
         UriBuilderConfig copy = new UriBuilderConfig(this);
         copy.pathSegmentNormalization = value;
@@ -298,6 +346,10 @@ public final class UriBuilderConfig {
         this.strictReferenceResolution = src.isStrictReferenceResolution();
         this.caseNormalization = src.isCaseNormalization();
         this.percentEncodingNormalization = src.isPercentEncodingNormalization();
+        this.normalizeIpv4 = src.normalizeIpv4;
+        this.normalizeIpv6 = src.normalizeIpv6;
+        this.upperCaseIpv6HexValues = src.upperCaseIpv6HexValues;
+        this.useIpv6Base85Encoding = src.useIpv6Base85Encoding;
         this.pathSegmentNormalization = src.isPathSegmentNormalization();
         this.schemeBasedNormalization = src.isSchemeBasedNormalization();
         this.encodeIllegalCharacters = src.isEncodeIllegalCharacters();

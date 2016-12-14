@@ -16,6 +16,7 @@
 package org.netpreserve.commons.uri.parser;
 
 import java.io.ByteArrayOutputStream;
+import java.math.BigInteger;
 import java.net.IDN;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -439,7 +440,9 @@ public class Rfc3986Parser implements Parser {
             String host = uri.toString();
 
             // Normalize unicode characters
-            host = java.text.Normalizer.normalize(host, java.text.Normalizer.Form.NFKC);
+            if (builder.config.isNormalizeIpv4()) {
+                host = java.text.Normalizer.normalize(host, java.text.Normalizer.Form.NFKC);
+            }
             parseIpv4(builder, host);
 
             if (!builder.isIPv4address()) {
@@ -460,7 +463,16 @@ public class Rfc3986Parser implements Parser {
     }
 
     void parseIpv6(UriBuilder builder, String host) {
-        builder.host(IpUtil.checkAndNormalizeIpv6(host));
+        BigInteger ipv6Value = IpUtil.parseIpv6(host);
+        if (builder.config.isNormalizeIpv6()) {
+            if (builder.config.isUseIpv6Base85Encoding()) {
+                builder.host(IpUtil.serializeIpv6Base85(ipv6Value));
+            } else {
+                boolean upperCaseIpv6Values = builder.config.isCaseNormalization()
+                        && builder.config.isUpperCaseIpv6HexValues();
+                builder.host(IpUtil.serializeIpv6(ipv6Value, upperCaseIpv6Values));
+            }
+        }
 
         if (builder.host() != null) {
             builder.setIPv6referenceFlag();
@@ -468,7 +480,11 @@ public class Rfc3986Parser implements Parser {
     }
 
     void parseIpv4(UriBuilder builder, String ipv4Address) {
-        builder.host(IpUtil.checkIpv4(ipv4Address));
+        if (builder.config.isNormalizeIpv4()) {
+            builder.host(IpUtil.checkAndNormalizeIpv4(ipv4Address));
+        } else {
+            builder.host(IpUtil.checkIpv4(ipv4Address));
+        }
         if (builder.host() != null) {
             builder.setIPv4addressFlag();
         }
@@ -669,7 +685,7 @@ public class Rfc3986Parser implements Parser {
         }
 
         if (illegalChar) {
-            return new String(encode(generous, result.toString().getBytes(charset)), StandardCharsets.US_ASCII);
+            return new String(encode(config, generous, result.toString().getBytes(charset)), StandardCharsets.US_ASCII);
         }
 
         return result.toString();
@@ -746,7 +762,7 @@ public class Rfc3986Parser implements Parser {
      * @param bytes array of bytes to convert to URL safe characters
      * @return array of bytes containing URL safe characters
      */
-    final byte[] encode(final BitSet urlsafe, final byte[] bytes) {
+    final byte[] encode(final UriBuilderConfig config, final BitSet urlsafe, final byte[] bytes) {
         if (bytes == null) {
             return null;
         }
@@ -764,8 +780,15 @@ public class Rfc3986Parser implements Parser {
                 buffer.write(b);
             } else {
                 buffer.write('%');
-                final char hex1 = Character.toUpperCase(Character.forDigit((b >> 4) & 0xF, RADIX));
-                final char hex2 = Character.toUpperCase(Character.forDigit(b & 0xF, RADIX));
+                final char hex1;
+                final char hex2;
+                if (config.isCaseNormalization()) {
+                    hex1 = Character.toUpperCase(Character.forDigit((b >> 4) & 0xF, RADIX));
+                    hex2 = Character.toUpperCase(Character.forDigit(b & 0xF, RADIX));
+                } else {
+                    hex1 = Character.forDigit((b >> 4) & 0xF, RADIX);
+                    hex2 = Character.forDigit(b & 0xF, RADIX);
+                }
                 buffer.write(hex1);
                 buffer.write(hex2);
             }

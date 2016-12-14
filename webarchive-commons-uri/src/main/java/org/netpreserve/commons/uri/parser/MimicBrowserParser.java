@@ -65,9 +65,8 @@ public class MimicBrowserParser extends Rfc3986Parser {
      * <p>
      * This implementation differs from the strict by allowing empty port number and port number 0.
      * <p>
-     * @param builder
-     * @param authority
-     * @param offset
+     * @param builder the UriBuilder
+     * @param authority the authority buffer positioned at the start of port or at end if no port
      */
     @Override
     void parsePort(UriBuilder builder, CharBuffer authority) {
@@ -94,14 +93,15 @@ public class MimicBrowserParser extends Rfc3986Parser {
         }
     }
 
-    @Override
-    void parseIpv4(UriBuilder builder, String ipv4Address) {
-        builder.host(IpUtil.checkAndNormalizeIpv4(ipv4Address));
-        if (builder.host() != null) {
-            builder.setIPv4addressFlag();
-        }
-    }
-
+    /**
+     * Parse path.
+     * <p>
+     * This implementation differ from the standard parser by switching from backslash to forward slash and decoding %2e
+     * (dot) for the special schemes.
+     * <p>
+     * @param parserState the parser state
+     * @return the validated and normalized path
+     */
     @Override
     String validatePath(ParserState parserState) {
         UriBuilder builder = parserState.getBuilder();
@@ -117,6 +117,17 @@ public class MimicBrowserParser extends Rfc3986Parser {
         }
     }
 
+    /**
+     * Validate fragment.
+     * <p>
+     * This implementation differ from the standard parser by not doing anything with the fragment. This allows illegal
+     * characters in the fragment and breaks RFC 3986, but major browsers do this.
+     * <p>
+     * @param config the UriBuilderConfig
+     * @param charset the Charset
+     * @param uri the Uri positioned at start of fragment or at the end if there is no fragment
+     * @return the validated fragment
+     */
     @Override
     public String validateFragment(UriBuilderConfig config, Charset charset, CharBuffer uri) {
         return uri.toString();

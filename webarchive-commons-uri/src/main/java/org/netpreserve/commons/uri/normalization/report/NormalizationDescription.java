@@ -18,6 +18,7 @@ package org.netpreserve.commons.uri.normalization.report;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Documentation of a step in URI normalization.
@@ -137,6 +138,28 @@ public class NormalizationDescription {
             }
         }
         return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 41 * hash + Objects.hashCode(this.name);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final NormalizationDescription other = (NormalizationDescription) obj;
+        if (!Objects.equals(this.name, other.name)) {
+            return false;
+        }
+        return true;
     }
 
 }

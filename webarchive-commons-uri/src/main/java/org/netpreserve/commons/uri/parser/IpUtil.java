@@ -16,6 +16,7 @@
 package org.netpreserve.commons.uri.parser;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +28,87 @@ import static org.netpreserve.commons.uri.parser.Rfc3986Parser.HEX;
 /**
  * Utility methods for parsing IP addresses.
  */
-public class IpUtil {
+public final class IpUtil {
 
+    private static final BigInteger RADIX_85 = BigInteger.valueOf(85);
+
+    private static final BigInteger RADIX_0X10000 = BigInteger.valueOf(0x10000);
+
+    private final static char[] base85Charset = new char[85];
+
+    static {
+        int j = 0;
+        for (char i = '0'; i <= '9'; i++) {
+            base85Charset[j++] = i;
+        }
+        for (char i = 'A'; i <= 'Z'; i++) {
+            base85Charset[j++] = i;
+        }
+        for (char i = 'a'; i <= 'z'; i++) {
+            base85Charset[j++] = i;
+        }
+        base85Charset[j++] = '!';
+        base85Charset[j++] = '#';
+        base85Charset[j++] = '$';
+        base85Charset[j++] = '%';
+        base85Charset[j++] = '&';
+        base85Charset[j++] = '(';
+        base85Charset[j++] = ')';
+        base85Charset[j++] = '*';
+        base85Charset[j++] = '+';
+        base85Charset[j++] = '-';
+        base85Charset[j++] = ';';
+        base85Charset[j++] = '<';
+        base85Charset[j++] = '=';
+        base85Charset[j++] = '>';
+        base85Charset[j++] = '?';
+        base85Charset[j++] = '@';
+        base85Charset[j++] = '^';
+        base85Charset[j++] = '_';
+        base85Charset[j++] = '`';
+        base85Charset[j++] = '{';
+        base85Charset[j++] = '|';
+        base85Charset[j++] = '}';
+        base85Charset[j++] = '~';
+    }
+
+    /**
+     * Private constructor to avoid instantiation of utility class.
+     */
     private IpUtil() {
     }
 
-    public static String checkAndNormalizeIpv6(String ipv6) {
-        List<String> ipv6Parts = split(':', ipv6);
+    public static BigInteger parseIpv6(String ipv6String) {
+        BigInteger ipv6Number;
+        List<String> ipv6Parts = split(':', ipv6String);
+
+        if (ipv6Parts.size() > 8) {
+            throw new UriException("Too many segments in IPv6 address: " + ipv6String);
+        }
+
+        // Check if base85 encoded
+        if (ipv6Parts.size() == 1) {
+            if (ipv6String.length() != 20) {
+                throw new UriException("Illegal IPv6 address: " + ipv6String);
+            }
+
+            ipv6Number = BigInteger.ZERO;
+            for (int i = 0; i < 20; i++) {
+                int val = -1;
+                for (int j = 0; j < base85Charset.length; j++) {
+                    if (ipv6String.charAt(i) == base85Charset[j]) {
+                        val = j;
+                        break;
+                    }
+                }
+                ipv6Number = ipv6Number.add(BigInteger.valueOf(val).multiply(RADIX_85.pow(19 - i)));
+            }
+            return ipv6Number;
+        }
+
+        // Used to check that there are enough parts in the IPv6 string
+        int minimumNumberOfParts = 8;
+
         if (ipv6Parts.size() < 8) {
             List<String> ipv4Parts = split('.', ipv6Parts.get(ipv6Parts.size() - 1));
             if (ipv4Parts.size() == 4) {
@@ -41,33 +116,121 @@ public class IpUtil {
                         (Integer.parseInt(ipv4Parts.get(0), 10) << 8) + Integer.parseInt(ipv4Parts.get(1), 10)));
                 ipv6Parts.add(Integer.toHexString(
                         (Integer.parseInt(ipv4Parts.get(2), 10) << 8) + Integer.parseInt(ipv4Parts.get(3), 10)));
+                minimumNumberOfParts = 7;
             }
         }
 
-        boolean canConcatenate = ipv6Parts.size() == 8;
-        boolean hasConcatenated = false;
-        for (int i = 0; i < ipv6Parts.size(); i++) {
-            int part;
-            if (ipv6Parts.get(i).isEmpty()) {
-                part = 0;
+        long[] numbers = new long[8];
+        int pIdx = 0;
+        int nIdx = 0;
+        while (pIdx < ipv6Parts.size()) {
+            String part = ipv6Parts.get(pIdx);
+            if (part.isEmpty()) {
+                minimumNumberOfParts = 0;
+                while (pIdx < ipv6Parts.size() && ipv6Parts.get(pIdx).isEmpty()) {
+                    ipv6Parts.remove(pIdx);
+                }
+                for (int j = ipv6Parts.size(); j < 8; j++) {
+                    numbers[nIdx++] = 0;
+                }
             } else {
                 try {
-                    part = Integer.parseInt(ipv6Parts.get(i), 16);
+                    numbers[nIdx++] = Long.parseLong(part, 16);
+                    pIdx++;
                 } catch (NumberFormatException e) {
-                    throw new UriException("Illegal IPv6 address: " + ipv6);
-                }
-            }
-            if (canConcatenate) {
-                if (hasConcatenated && part > 0) {
-                    canConcatenate = false;
-                    ipv6Parts.add(i++, ":");
-                } else if (part == 0) {
-                    ipv6Parts.remove(i--);
-                    hasConcatenated = true;
+                    throw new UriException("Illegal IPv6 address: " + ipv6String);
                 }
             }
         }
-        return String.join(":", ipv6Parts);
+
+        if (ipv6Parts.size() < minimumNumberOfParts) {
+            throw new UriException("Illegal IPv6 address: " + ipv6String);
+        }
+
+        ipv6Number = BigInteger.valueOf(numbers[numbers.length - 1]);
+        for (int i = 6; i >= 0; i--) {
+            ipv6Number = ipv6Number.add(BigInteger.valueOf(numbers[i]).multiply(RADIX_0X10000.pow(7 - i)));
+        }
+
+        return ipv6Number;
+    }
+
+    public static String serializeIpv6(BigInteger ipv6Number, boolean normalizeCase) {
+        BigInteger[] numbers = new BigInteger[8];
+        int nullRunStart = -1;
+        int longestNullRunStart = -1;
+        int nullRunLength = -1;
+        int longestNullRunLength = -1;
+        for (int i = 7; i >= 0; i--) {
+            numbers[7 - i] = ipv6Number.shiftRight(i * 16).and(BigInteger.valueOf(0xffff));
+            if (numbers[7 - i].equals(BigInteger.ZERO)) {
+                if (nullRunStart < 0) {
+                    nullRunStart = 7 - i;
+                    nullRunLength = 1;
+                } else {
+                    nullRunLength++;
+                }
+            } else {
+                if (nullRunStart >= 0) {
+                    if (nullRunLength > longestNullRunLength) {
+                        longestNullRunStart = nullRunStart;
+                        longestNullRunLength = nullRunLength;
+                    }
+                    nullRunStart = -1;
+                    nullRunLength = -1;
+                }
+            }
+        }
+        if (nullRunLength > longestNullRunLength) {
+            longestNullRunStart = nullRunStart;
+            longestNullRunLength = nullRunLength;
+        }
+
+        StringBuilder result = new StringBuilder();
+        if (longestNullRunLength > 1) {
+            // Handle consecutive nulls
+            if (longestNullRunStart > 0) {
+                result.append(numberToHex(numbers[0], normalizeCase));
+            }
+            for (int i = 1; i < longestNullRunStart; i++) {
+                result.append(':').append(numberToHex(numbers[i], normalizeCase));
+            }
+            result.append("::");
+            if (longestNullRunStart + longestNullRunLength < 8) {
+                result.append(numberToHex(numbers[longestNullRunStart + longestNullRunLength], normalizeCase));
+            }
+            for (int i = longestNullRunStart + longestNullRunLength + 1; i < 8; i++) {
+                result.append(':').append(numberToHex(numbers[i], normalizeCase));
+            }
+        } else {
+            result.append(numberToHex(numbers[0], normalizeCase));
+            for (int i = 1; i < 8; i++) {
+                result.append(':').append(numberToHex(numbers[i], normalizeCase));
+            }
+        }
+        return result.toString();
+    }
+
+    private static String numberToHex(BigInteger num, boolean normalizeCase) {
+        if (normalizeCase) {
+            return num.toString(16).toUpperCase();
+        } else {
+            return num.toString(16);
+        }
+    }
+
+    public static String serializeIpv6Base85(BigInteger ipv6Number) {
+        System.out.println(ipv6Number);
+        BigInteger val85 = BigInteger.valueOf(85);
+        BigInteger curVal = ipv6Number;
+        char[] buf = new char[20];
+        for (int i = 0; i < 20; i++) {
+            BigInteger[] divideAndRemainder = curVal.divideAndRemainder(val85);
+            buf[19 - i] = base85Charset[divideAndRemainder[1].intValue()];
+            curVal = divideAndRemainder[0];
+        }
+
+        return new String(buf);
     }
 
     public static String checkIpv4(String ipv4Address) {

@@ -23,7 +23,7 @@ import org.netpreserve.commons.uri.PostParseNormalizer;
 import org.netpreserve.commons.uri.Uri;
 import org.netpreserve.commons.uri.UriBuilder;
 import org.netpreserve.commons.uri.UriBuilderConfig;
-import org.netpreserve.commons.uri.normalization.StripSlashesAtEndOfPath;
+import org.netpreserve.commons.uri.normalization.StripSlashAtEndOfPath;
 
 /**
  * A filter encapsulating a URI.
@@ -46,10 +46,7 @@ final class SearchKeyUriFilter implements SearchKeyFilter<Uri> {
     SearchKeyUriFilter(String filter, UriBuilderConfig uriBuilderConfig, SearchKeyTemplate.UriMatchType uriMatchType) {
         if (uriMatchType == SearchKeyTemplate.UriMatchType.PATH) {
             // If match type is PATH, we need to keep ending slashes because we removed the final '*'.
-            UriBuilderConfig.ConfigBuilder builder = uriBuilderConfig.toBuilder();
-            builder.getPostParseNormalizers()
-                    .removeIf((PostParseNormalizer t) -> StripSlashesAtEndOfPath.class.isInstance(t));
-            uriBuilderConfig = builder.build();
+            uriBuilderConfig = uriBuilderConfig.removeNormalizersOfType(StripSlashAtEndOfPath.class);
         }
 
         uri = UriBuilder.builder(uriBuilderConfig).uri(filter).build();

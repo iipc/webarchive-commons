@@ -328,10 +328,10 @@ public class Uri {
 
     public String toDecodedString() {
         UriFormat format;
-        if (defaultFormat.decodeHost && defaultFormat.decodePath) {
+        if (defaultFormat.isDecodeHost() && defaultFormat.isDecodePath()) {
             format = defaultFormat;
         } else {
-            format = defaultFormat.toBuilder().decodeHost(true).decodePath(true).build();
+            format = defaultFormat.decodeHost(true).decodePath(true);
         }
         return toCustomString(format);
     }
@@ -340,13 +340,13 @@ public class Uri {
         try {
             StringBuilder buf = new StringBuilder();
 
-            if (!format.ignoreScheme && scheme != null) {
+            if (!format.isIgnoreScheme() && scheme != null) {
                 buf.append(scheme);
                 buf.append(':');
             }
 
-            if (!format.ignoreAuthority && isAuthority()) {
-                if (!format.ignoreScheme && scheme != null) {
+            if (!format.isIgnoreAuthority() && isAuthority()) {
+                if (!format.isIgnoreScheme() && scheme != null) {
                     buf.append("//");
                 }
 
@@ -357,9 +357,9 @@ public class Uri {
                 }
             }
 
-            if (!format.ignorePath && path != null) {
+            if (!format.isIgnorePath() && path != null) {
                 if (!path.isEmpty()) {
-                    if (format.decodePath) {
+                    if (format.isDecodePath()) {
                         buf.append(getDecodedPath());
                     } else {
                         buf.append(path);
@@ -367,12 +367,12 @@ public class Uri {
                 }
             }
 
-            if (!format.ignoreQuery && query != null) {
+            if (!format.isIgnoreQuery() && query != null) {
                 buf.append('?');
                 buf.append(query);
             }
 
-            if (!format.ignoreFragment && fragment != null) {
+            if (!format.isIgnoreFragment() && fragment != null) {
                 buf.append('#');
                 buf.append(fragment);
             }
@@ -384,16 +384,16 @@ public class Uri {
     }
 
     private StringBuilder formatAuthority(UriFormat format, StringBuilder buf) {
-        if (format.surtEncoding) {
-            format.surtEncoder.encode(buf, this, format);
+        if (format.isSurtEncoding()) {
+            format.getSurtEncoder().encode(buf, this, format);
         } else {
 
             boolean isUserInfo = false;
-            if (!format.ignoreUser && user != null) {
+            if (!format.isIgnoreUser() && user != null) {
                 buf.append(user);
                 isUserInfo = true;
             }
-            if (!format.ignorePassword && password != null) {
+            if (!format.isIgnorePassword() && password != null) {
                 buf.append(':').append(password);
                 isUserInfo = true;
             }
@@ -401,11 +401,11 @@ public class Uri {
                 buf.append('@');
             }
 
-            if (!format.ignoreHost && host != null) {
+            if (!format.isIgnoreHost() && host != null) {
                 if (isIPv6reference) {
                     buf.append('[');
                 }
-                if (format.decodeHost) {
+                if (format.isDecodeHost()) {
                     buf.append(getDecodedHost());
                 } else {
                     buf.append(host);
@@ -415,7 +415,7 @@ public class Uri {
                 }
             }
 
-            if (!format.ignorePort && port > DEFAULT_PORT_MARKER) {
+            if (!format.isIgnorePort() && port > DEFAULT_PORT_MARKER) {
                 buf.append(':').append(port);
             }
         }

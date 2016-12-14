@@ -15,8 +15,6 @@
  */
 package org.netpreserve.commons.uri.parser;
 
-import org.netpreserve.commons.uri.parser.LegacyWaybackSurtEncoder;
-import org.netpreserve.commons.uri.parser.SurtEncoder;
 import org.junit.Test;
 import org.netpreserve.commons.uri.Configurations;
 import org.netpreserve.commons.uri.Uri;
@@ -45,7 +43,7 @@ public class LegacyWaybackSurtEncoderTest {
         assertThat(sb.toString()).isEqualTo("com,øks,www)");
 
         sb = new StringBuilder();
-        uriFormat = uriFormat.toBuilder().decodeHost(false).build();
+        uriFormat = uriFormat.decodeHost(false);
         instance.encode(sb, uri, uriFormat);
         assertThat(sb.toString()).isEqualTo("com,xn--ks-kka,www)");
     }
@@ -56,4 +54,5 @@ public class LegacyWaybackSurtEncoderTest {
                 .uri("http://www.øks.Com/pAth%2dår?jsessionid=foo&q=r").build();
         assertThat(uri).hasToString("com,xn--ks-kka)/path-%C3%A5r?q=r");
     }
+
 }

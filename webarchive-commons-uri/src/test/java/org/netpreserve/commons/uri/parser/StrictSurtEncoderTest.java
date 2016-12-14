@@ -15,10 +15,6 @@
  */
 package org.netpreserve.commons.uri.parser;
 
-import org.netpreserve.commons.uri.parser.StrictSurtEncoder;
-
-import java.nio.charset.StandardCharsets;
-
 import org.junit.Test;
 import org.netpreserve.commons.uri.Configurations;
 import org.netpreserve.commons.uri.Uri;
@@ -31,7 +27,7 @@ import static org.assertj.core.api.Assertions.*;
  *
  */
 public class StrictSurtEncoderTest {
-    
+
     /**
      * Test of encode method, of class StrictSurtEncoder.
      */
@@ -45,9 +41,9 @@ public class StrictSurtEncoderTest {
         UriFormat uriFormat = Configurations.SURT_KEY_FORMAT;
         instance.encode(sb, uri, uriFormat);
         assertThat(sb.toString()).isEqualTo("(com,øks,www,)");
-        
+
         sb = new StringBuilder();
-        uriFormat = uriFormat.toBuilder().decodeHost(false).build();
+        uriFormat = uriFormat.decodeHost(false);
         instance.encode(sb, uri, uriFormat);
         assertThat(sb.toString()).isEqualTo("(com,xn--ks-kka,www,)");
     }
@@ -58,5 +54,5 @@ public class StrictSurtEncoderTest {
                 .uri("http://www.øks.Com/pAth%2dår?jsessionid=foo&q=r").build();
         assertThat(uri).hasToString("(com,øks,)/pAth-%C3%A5r?q=r");
     }
-    
+
 }

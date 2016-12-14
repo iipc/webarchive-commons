@@ -20,37 +20,337 @@ import org.netpreserve.commons.uri.parser.StrictSurtEncoder;
 
 /**
  * A format describing how to convert a Uri into a String.
+ * <p>
+ * This class is immutable and thread safe. All methods setting a value returns a fresh copy of the UriFormat.
  */
 public final class UriFormat {
 
     private static final SurtEncoder DEFAULT_ENCODER = new StrictSurtEncoder();
 
-    final boolean surtEncoding;
+    private boolean surtEncoding;
 
-    final boolean ignoreScheme;
+    private boolean ignoreScheme;
 
-    final boolean ignoreAuthority;
+    private boolean ignoreAuthority;
 
-    final boolean ignoreUser;
+    private boolean ignoreUser;
 
-    final boolean ignorePassword;
+    private boolean ignorePassword;
 
-    final boolean ignoreHost;
+    private boolean ignoreHost;
 
-    final boolean ignorePort;
+    private boolean ignorePort;
 
-    final boolean ignorePath;
+    private boolean ignorePath;
 
-    final boolean ignoreQuery;
+    private boolean ignoreQuery;
 
-    final boolean ignoreFragment;
+    private boolean ignoreFragment;
 
-    final boolean decodeHost;
+    private boolean decodeHost;
 
-    final boolean decodePath;
+    private boolean decodePath;
 
-    final SurtEncoder surtEncoder;
+    private SurtEncoder surtEncoder;
 
+    /**
+     * Use SURT encoding.
+     * <p>
+     * @param value true if SURT encoding should be used.
+     * @return a clone of this UriFormat with the new value set
+     * @see #surtEncoder(org.netpreserve.commons.uri.parser.SurtEncoder)
+     * @see #getSurtEncoder()
+     */
+    public UriFormat surtEncoding(final boolean value) {
+        UriFormat copy = new UriFormat(this);
+        copy.surtEncoding = value;
+        return copy;
+    }
+
+    /**
+     * Returns true if SURT encoding of the authority should be used.
+     * <p>
+     * @return true if SURT encoding should be used
+     * @see #surtEncoder(org.netpreserve.commons.uri.parser.SurtEncoder)
+     * @see #getSurtEncoder()
+     */
+    public boolean isSurtEncoding() {
+        return surtEncoding;
+    }
+
+    /**
+     * Set the SurtEncoder implementation used when surtEncoding is set.
+     * <p>
+     * If no encoder is set, {@link StrictSurtEncoder} is used.
+     * <p>
+     * @param value the SurtEncoder to use.
+     * @return a clone of this UriFormat with the new value set
+     * @see #isSurtEncoding()
+     */
+    public UriFormat surtEncoder(final SurtEncoder value) {
+        UriFormat copy = new UriFormat(this);
+        copy.surtEncoder = value;
+        return copy;
+    }
+
+    /**
+     * Get the SURT encoder.
+     * <p>
+     * The SURT encoder to use for encoding the authority if {@link #isSurtEncoding()} is true.
+     * <p>
+     * @return the SURT encoder to use
+     * @see #isSurtEncoding()
+     */
+    public SurtEncoder getSurtEncoder() {
+        return surtEncoder;
+    }
+
+    /**
+     * Ignore Scheme in output.
+     * <p>
+     * @param value true if Scheme should be ignored.
+     * @return a clone of this UriFormat with the new value set
+     */
+    public UriFormat ignoreScheme(final boolean value) {
+        UriFormat copy = new UriFormat(this);
+        copy.ignoreScheme = value;
+        return copy;
+    }
+
+    /**
+     * Returns true if the scheme should be ignored.
+     * <p>
+     * @return true if the scheme should be ignored
+     */
+    public boolean isIgnoreScheme() {
+        return ignoreScheme;
+    }
+
+    /**
+     * Ignore Authority in output.
+     * <p>
+     * @param value true if Authority should be ignored.
+     * @return a clone of this UriFormat with the new value set
+     */
+    public UriFormat ignoreAuthority(final boolean value) {
+        UriFormat copy = new UriFormat(this);
+        copy.ignoreAuthority = value;
+        return copy;
+    }
+
+    /**
+     * Returns true if the whole authority (user, password, host and port) should be ignored.
+     * <p>
+     * @return true if the whole authority should be ignored
+     */
+    public boolean isIgnoreAuthority() {
+        return ignoreAuthority;
+    }
+
+    /**
+     * Ignore User in output.
+     * <p>
+     * @param value true if User should be ignored.
+     * @return a clone of this UriFormat with the new value set
+     */
+    public UriFormat ignoreUser(final boolean value) {
+        UriFormat copy = new UriFormat(this);
+        copy.ignoreUser = value;
+        return copy;
+    }
+
+    /**
+     * Returns true if the user should be ignored.
+     * <p>
+     * @return true if the user should be ignored
+     */
+    public boolean isIgnoreUser() {
+        return ignoreUser;
+    }
+
+    /**
+     * Ignore Password in output.
+     * <p>
+     * @param value true if Password should be ignored.
+     * @return a clone of this UriFormat with the new value set
+     */
+    public UriFormat ignorePassword(final boolean value) {
+        UriFormat copy = new UriFormat(this);
+        copy.ignorePassword = value;
+        return copy;
+    }
+
+    /**
+     * Returns true if the password should be ignored.
+     * <p>
+     * @return true if the password should be ignored
+     */
+    public boolean isIgnorePassword() {
+        return ignorePassword;
+    }
+
+    /**
+     * Ignore Host in output.
+     * <p>
+     * @param value true if Host should be ignored.
+     * @return a clone of this UriFormat with the new value set
+     */
+    public UriFormat ignoreHost(final boolean value) {
+        UriFormat copy = new UriFormat(this);
+        copy.ignoreHost = value;
+        return copy;
+    }
+
+    /**
+     * Returns true if the host should be ignored.
+     * <p>
+     * @return true if the host should be ignored
+     */
+    public boolean isIgnoreHost() {
+        return ignoreHost;
+    }
+
+    /**
+     * Ignore Port in output.
+     * <p>
+     * @param value true if Port should be ignored.
+     * @return a clone of this UriFormat with the new value set
+     */
+    public UriFormat ignorePort(final boolean value) {
+        UriFormat copy = new UriFormat(this);
+        copy.ignorePort = value;
+        return copy;
+    }
+
+    /**
+     * Returns true if the port should be ignored.
+     * <p>
+     * @return true if the port should be ignored
+     */
+    public boolean isIgnorePort() {
+        return ignorePort;
+    }
+
+    /**
+     * Ignore Path in output.
+     * <p>
+     * @param value true if Path should be ignored.
+     * @return a clone of this UriFormat with the new value set
+     */
+    public UriFormat ignorePath(final boolean value) {
+        UriFormat copy = new UriFormat(this);
+        copy.ignorePath = value;
+        return copy;
+    }
+
+    /**
+     * Returns true if the path should be ignored.
+     * <p>
+     * @return true if the path should be ignored
+     */
+    public boolean isIgnorePath() {
+        return ignorePath;
+    }
+
+    /**
+     * Ignore Query in output.
+     * <p>
+     * @param value true if Query should be ignored.
+     * @return a clone of this UriFormat with the new value set
+     */
+    public UriFormat ignoreQuery(final boolean value) {
+        UriFormat copy = new UriFormat(this);
+        copy.ignoreQuery = value;
+        return copy;
+    }
+
+    /**
+     * Returns true if the query should be ignored.
+     * <p>
+     * @return true if the query should be ignored
+     */
+    public boolean isIgnoreQuery() {
+        return ignoreQuery;
+    }
+
+    /**
+     * Ignore Fragment in output.
+     * <p>
+     * @param value true if Fragment should be ignored.
+     * @return a clone of this UriFormat with the new value set
+     */
+    public UriFormat ignoreFragment(final boolean value) {
+        UriFormat copy = new UriFormat(this);
+        copy.ignoreFragment = value;
+        return copy;
+    }
+
+    /**
+     * Returns true if fragment should be ignored.
+     * <p>
+     * @return true if fragment should be ignored
+     */
+    public boolean isIgnoreFragment() {
+        return ignoreFragment;
+    }
+
+    /**
+     * Decode the Host in output.
+     * <p>
+     * If the host is an IDN, it could be puny encoded or contain international characters in UTF-8. The default is to
+     * puny encode. Setting this value to true decodes the host into UTF-8.
+     * <p>
+     * @param value true if Host should be decoded to UTF-8.
+     * @return a clone of this UriFormat with the new value set
+     */
+    public UriFormat decodeHost(final boolean value) {
+        UriFormat copy = new UriFormat(this);
+        copy.decodeHost = value;
+        return copy;
+    }
+
+    /**
+     * Returns true if the host should be decoded.
+     * <p>
+     * If the host is an IDN, it could be puny encoded or contain international characters in UTF-8. The default is to
+     * puny encode. If this value is true host is decoded into UTF-8.
+     * <p>
+     * @return true if the host should be decoded
+     */
+    public boolean isDecodeHost() {
+        return decodeHost;
+    }
+
+    /**
+     * Decode any percent encoded characters.
+     * <p>
+     * @param value true if the path should be decoded.
+     * @return a clone of this UriFormat with the new value set
+     */
+    public UriFormat decodePath(final boolean value) {
+        UriFormat copy = new UriFormat(this);
+        copy.decodePath = value;
+        return copy;
+    }
+
+    /**
+     * Returns true if percent encoded characters in path should be decoded.
+     * <p>
+     * @return true if percent encoded characters in path should be decoded
+     */
+    public boolean isDecodePath() {
+        return decodePath;
+    }
+
+    /**
+     * Get the value of the URI's user field.
+     * <p>
+     * If URI has no user or {@code ignoreUser} is set, null is returned.
+     * <p>
+     * @param uri the URI to get the user from
+     * @return the URI's user or null
+     * @see #ignoreUser(boolean)
+     */
     public String getUser(Uri uri) {
         if (!ignoreUser) {
             return uri.getUser();
@@ -58,6 +358,15 @@ public final class UriFormat {
         return null;
     }
 
+    /**
+     * Get the value of the URI's password field.
+     * <p>
+     * If URI has no password or {@code ignorePassword} is set, null is returned.
+     * <p>
+     * @param uri the URI to get the password from
+     * @return the URI's password or null
+     * @see #ignorePassword(boolean)
+     */
     public String getPassword(Uri uri) {
         if (!ignorePassword) {
             return uri.getPassword();
@@ -65,6 +374,17 @@ public final class UriFormat {
         return null;
     }
 
+    /**
+     * Get the value of the URI's host field.
+     * <p>
+     * If URI has no host or {@code ignoreHost} is set, null is returned. If {@code decodeHost} is set, the host value
+     * will be decoded before it is returned.
+     * <p>
+     * @param uri the URI to get the host from
+     * @return the URI's host or null
+     * @see #ignoreHost(boolean)
+     * @see #decodeHost(boolean)
+     */
     public String getHost(Uri uri) {
         if (!ignoreHost) {
             if (decodeHost) {
@@ -76,6 +396,15 @@ public final class UriFormat {
         return null;
     }
 
+    /**
+     * Get the value of the URI's port field.
+     * <p>
+     * If URI has the scheme's default port or {@code ignorePort} is set, null is returned.
+     * <p>
+     * @param uri the URI to get the port from
+     * @return the URI's port or null
+     * @see #ignorePort(boolean)
+     */
     public Integer getPort(Uri uri) {
         if (!ignorePort && uri.getPort() != Uri.DEFAULT_PORT_MARKER) {
             return uri.getPort();
@@ -84,259 +413,38 @@ public final class UriFormat {
     }
 
     /**
-     * Builder for UriFormat.
-     */
-    public static final class Builder {
-
-        private boolean surtEncoding;
-
-        private boolean ignoreScheme;
-
-        private boolean ignoreAuthority;
-
-        private boolean ignoreUser;
-
-        private boolean ignorePassword;
-
-        private boolean ignoreHost;
-
-        private boolean ignorePort;
-
-        private boolean ignorePath;
-
-        private boolean ignoreQuery;
-
-        private boolean ignoreFragment;
-
-        private boolean decodeHost;
-
-        private boolean decodePath;
-
-        private SurtEncoder surtEncoder;
-
-        /**
-         * This class should not be constructed directly. Use UriFormat.builder() instead.
-         */
-        private Builder() {
-        }
-
-        /**
-         * Use SURT encoding.
-         * <p>
-         * @param value true if SURT encoding should be used.
-         * @return this builder for method call chaining
-         */
-        public Builder surtEncoding(final boolean value) {
-            this.surtEncoding = value;
-            return this;
-        }
-
-        /**
-         * Set the SurtEncoder implementation used when surtEncoding is set.
-         * <p>
-         * If no encoder is set, {@link StrictSurtEncoder} is used.
-         * <p>
-         * @param value the SurtEncoder to use.
-         * @return this builder for method call chaining
-         */
-        public Builder surtEncoder(final SurtEncoder value) {
-            this.surtEncoder = value;
-            return this;
-        }
-
-        /**
-         * Ignore Scheme in output.
-         * <p>
-         * @param value true if Scheme should be ignored.
-         * @return this builder for method call chaining
-         */
-        public Builder ignoreScheme(final boolean value) {
-            this.ignoreScheme = value;
-            return this;
-        }
-
-        /**
-         * Ignore Authority in output.
-         * <p>
-         * @param value true if Authority should be ignored.
-         * @return this builder for method call chaining
-         */
-        public Builder ignoreAuthority(final boolean value) {
-            this.ignoreAuthority = value;
-            return this;
-        }
-
-        /**
-         * Ignore User in output.
-         * <p>
-         * @param value true if User should be ignored.
-         * @return this builder for method call chaining
-         */
-        public Builder ignoreUser(final boolean value) {
-            this.ignoreUser = value;
-            return this;
-        }
-
-        /**
-         * Ignore Password in output.
-         * <p>
-         * @param value true if Password should be ignored.
-         * @return this builder for method call chaining
-         */
-        public Builder ignorePassword(final boolean value) {
-            this.ignorePassword = value;
-            return this;
-        }
-
-        /**
-         * Ignore Host in output.
-         * <p>
-         * @param value true if Host should be ignored.
-         * @return this builder for method call chaining
-         */
-        public Builder ignoreHost(final boolean value) {
-            this.ignoreHost = value;
-            return this;
-        }
-
-        /**
-         * Ignore Port in output.
-         * <p>
-         * @param value true if Port should be ignored.
-         * @return this builder for method call chaining
-         */
-        public Builder ignorePort(final boolean value) {
-            this.ignorePort = value;
-            return this;
-        }
-
-        /**
-         * Ignore Path in output.
-         * <p>
-         * @param value true if Path should be ignored.
-         * @return this builder for method call chaining
-         */
-        public Builder ignorePath(final boolean value) {
-            this.ignorePath = value;
-            return this;
-        }
-
-        /**
-         * Ignore Query in output.
-         * <p>
-         * @param value true if Query should be ignored.
-         * @return this builder for method call chaining
-         */
-        public Builder ignoreQuery(final boolean value) {
-            this.ignoreQuery = value;
-            return this;
-        }
-
-        /**
-         * Ignore Fragment in output.
-         * <p>
-         * @param value true if Fragment should be ignored.
-         * @return this builder for method call chaining
-         */
-        public Builder ignoreFragment(final boolean value) {
-            this.ignoreFragment = value;
-            return this;
-        }
-
-        /**
-         * Decode the Host in output.
-         * <p>
-         * If the host is an IDN, it could be puny encoded or contain international characters in UTF-8. The default is
-         * to puny encode. Setting this value to true decodes the host into UTF-8.
-         * <p>
-         * @param value true if Host should be decoded to UTF-8.
-         * @return this builder for method call chaining
-         */
-        public Builder decodeHost(final boolean value) {
-            this.decodeHost = value;
-            return this;
-        }
-
-        /**
-         * Decode any percent encoded characters.
-         * <p>
-         * @param value true if the path should be decoded.
-         * @return this builder for method call chaining
-         */
-        public Builder decodePath(final boolean value) {
-            this.decodePath = value;
-            return this;
-        }
-
-        /**
-         * Create a UriFormat from this builder.
-         * <p>
-         * @return the newly created UriFormat.
-         */
-        public UriFormat build() {
-            return new UriFormat(this);
-        }
-
-    }
-
-    /**
-     * Create a new builder for UriFormat.
+     * Constructs a new UriFormat by copying all fields from another UriFormat.
      * <p>
-     * @return the new builder
-     */
-    public static UriFormat.Builder builder() {
-        return new UriFormat.Builder();
-    }
-
-    /**
-     * Create a new builder for UriFormat initialized with this UriFormat.
+     * This constructor is private to ensure immutability.
      * <p>
-     * @return the new builder
+     * @param src the UriFormat to copy from
      */
-    public UriFormat.Builder toBuilder() {
-        Builder formatBuilder = new UriFormat.Builder();
-        formatBuilder.surtEncoding = surtEncoding;
-        formatBuilder.ignoreScheme = ignoreScheme;
-        formatBuilder.ignoreAuthority = ignoreAuthority;
-        formatBuilder.ignoreUser = ignoreUser;
-        formatBuilder.ignorePassword = ignorePassword;
-        formatBuilder.ignoreHost = ignoreHost;
-        formatBuilder.ignorePort = ignorePort;
-        formatBuilder.ignorePath = ignorePath;
-        formatBuilder.ignoreQuery = ignoreQuery;
-        formatBuilder.ignoreFragment = ignoreFragment;
-        formatBuilder.decodeHost = decodeHost;
-        formatBuilder.decodePath = decodePath;
-        formatBuilder.surtEncoder = surtEncoder;
-
-        return formatBuilder;
-    }
-
-    /**
-     * Create a UriFormat from a builder.
-     * <p>
-     * This constructor is private since formats should be created by a builder.
-     * <p>
-     * @param formatBuilder the builder
-     */
-    private UriFormat(final Builder formatBuilder) {
-        this.surtEncoding = formatBuilder.surtEncoding;
-        this.ignoreScheme = formatBuilder.ignoreScheme;
-        this.ignoreAuthority = formatBuilder.ignoreAuthority;
-        this.ignoreUser = formatBuilder.ignoreUser;
-        this.ignorePassword = formatBuilder.ignorePassword;
-        this.ignoreHost = formatBuilder.ignoreHost;
-        this.ignorePort = formatBuilder.ignorePort;
-        this.ignorePath = formatBuilder.ignorePath;
-        this.ignoreQuery = formatBuilder.ignoreQuery;
-        this.ignoreFragment = formatBuilder.ignoreFragment;
-        this.decodeHost = formatBuilder.decodeHost;
-        this.decodePath = formatBuilder.decodePath;
-        if (formatBuilder.surtEncoder != null) {
-            this.surtEncoder = formatBuilder.surtEncoder;
+    private UriFormat(final UriFormat src) {
+        this.surtEncoding = src.surtEncoding;
+        this.ignoreScheme = src.ignoreScheme;
+        this.ignoreAuthority = src.ignoreAuthority;
+        this.ignoreUser = src.ignoreUser;
+        this.ignorePassword = src.ignorePassword;
+        this.ignoreHost = src.ignoreHost;
+        this.ignorePort = src.ignorePort;
+        this.ignorePath = src.ignorePath;
+        this.ignoreQuery = src.ignoreQuery;
+        this.ignoreFragment = src.ignoreFragment;
+        this.decodeHost = src.decodeHost;
+        this.decodePath = src.decodePath;
+        if (src.surtEncoder != null) {
+            this.surtEncoder = src.surtEncoder;
         } else {
             this.surtEncoder = DEFAULT_ENCODER;
         }
+    }
+
+    /**
+     * Constructs a new UriFormat.
+     * <p>
+     * All fields are set to false. Surt encoder is set to {@link #DEFAULT_ENCODER}
+     */
+    public UriFormat() {
     }
 
 }

@@ -50,32 +50,32 @@ public final class Configurations {
 
     public static final ReferenceResolver MIMIC_BROWSER_REFERENCE_RESOLVER = new MimicBrowserReferenceResolver();
 
-    public static final UriFormat DEFAULT_FORMAT = UriFormat.builder().build();
+    public static final UriFormat DEFAULT_FORMAT = new UriFormat();
 
-    public static final UriFormat USABLE_URI_FORMAT = UriFormat.builder()
-            .ignoreFragment(true).build();
+    public static final UriFormat USABLE_URI_FORMAT = new UriFormat()
+            .ignoreFragment(true);
 
-    public static final UriFormat CANONICALIZED_URI_FORMAT = UriFormat.builder()
+    public static final UriFormat CANONICALIZED_URI_FORMAT = new UriFormat()
             .ignoreUser(true)
             .ignorePassword(true)
-            .ignoreFragment(true).build();
+            .ignoreFragment(true);
 
-    public static final UriFormat SURT_KEY_FORMAT = UriFormat.builder()
+    public static final UriFormat SURT_KEY_FORMAT = new UriFormat()
             .surtEncoding(true)
             .ignoreScheme(true)
             .ignoreUser(true)
             .ignorePassword(true)
             .ignoreFragment(true)
-            .decodeHost(true).build();
+            .decodeHost(true);
 
-    public static final UriFormat LEGACY_SURT_KEY_FORMAT = UriFormat.builder()
+    public static final UriFormat LEGACY_SURT_KEY_FORMAT = new UriFormat()
             .surtEncoding(true)
             .ignoreScheme(true)
             .ignoreUser(true)
             .ignorePassword(true)
             .ignoreFragment(true)
             .decodeHost(false)
-            .surtEncoder(new LegacyWaybackSurtEncoder()).build();
+            .surtEncoder(new LegacyWaybackSurtEncoder());
 
     public static final UriBuilderConfig STRICT_URI = UriBuilderConfig.newBuilder()
             .parser(Configurations.STRICT_PARSER)

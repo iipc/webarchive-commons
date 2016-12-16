@@ -21,6 +21,7 @@ import java.util.Objects;
 
 import org.netpreserve.commons.uri.Uri;
 import org.netpreserve.commons.uri.UriBuilder;
+import org.netpreserve.commons.uri.UriConfigs;
 
 /**
  *
@@ -54,7 +55,7 @@ public final class UriValue implements Value<Uri> {
     @Override
     public Uri getValue() {
         if (value == null) {
-            value = UriBuilder.laxUriBuilder().uri(unparsed).build();
+            value = UriConfigs.LAX_URI.buildUri(unparsed);
         }
         return value;
     }

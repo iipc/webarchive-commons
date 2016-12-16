@@ -36,7 +36,7 @@ import org.netpreserve.commons.cdx.SearchKeyTemplate;
 import org.netpreserve.commons.cdx.functions.FieldRegexFilter;
 import org.netpreserve.commons.cdx.SearchResult;
 import org.netpreserve.commons.cdx.processor.FilterProcessor;
-import org.netpreserve.commons.uri.Configurations;
+import org.netpreserve.commons.uri.UriConfigs;
 import org.netpreserve.commons.uri.UriBuilder;
 
 import static org.assertj.core.api.Assertions.*;

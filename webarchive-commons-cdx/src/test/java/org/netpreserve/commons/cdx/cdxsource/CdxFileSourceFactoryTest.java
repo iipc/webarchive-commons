@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.netpreserve.commons.cdx.CdxSource;
 import org.netpreserve.commons.uri.Uri;
 import org.netpreserve.commons.uri.UriBuilder;
+import org.netpreserve.commons.uri.UriConfigs;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -41,19 +42,19 @@ public class CdxFileSourceFactoryTest {
         Uri sourceIdentifier;
         CdxSource cdxSource;
 
-        sourceIdentifier = UriBuilder.strictUriBuilder().uri("cdxfile:src/test/*/*.cdx").build();
+        sourceIdentifier = UriConfigs.STRICT.buildUri("cdxfile:src/test/*/*.cdx");
         cdxSource = instance.createCdxSource(sourceIdentifier);
         assertThat(cdxSource).isNotNull().isInstanceOf(MultiCdxSource.class);
 
-        sourceIdentifier = UriBuilder.strictUriBuilder().uri("cdxfile:src/test/resources/cdxfile1.cdx").build();
+        sourceIdentifier = UriConfigs.STRICT.buildUri("cdxfile:src/test/resources/cdxfile1.cdx");
         cdxSource = instance.createCdxSource(sourceIdentifier);
         assertThat(cdxSource).isNotNull().isInstanceOf(BlockCdxSource.class);
 
-        sourceIdentifier = UriBuilder.strictUriBuilder().uri("cdxfile:src/test/resources/foo.cdxj").build();
+        sourceIdentifier = UriConfigs.STRICT.buildUri("cdxfile:src/test/resources/foo.cdxj");
         cdxSource = instance.createCdxSource(sourceIdentifier);
         assertThat(cdxSource).isNull();
 
-        sourceIdentifier = UriBuilder.strictUriBuilder().uri("cdxfile:src/test/resources/notcdx.cdx").build();
+        sourceIdentifier = UriConfigs.STRICT.buildUri("cdxfile:src/test/resources/notcdx.cdx");
         cdxSource = instance.createCdxSource(sourceIdentifier);
         assertThat(cdxSource).isNull();
     }

@@ -46,8 +46,7 @@ public class CdxLineFormatter implements CdxFormatter {
         if (key instanceof CdxLineRecordKey) {
             out.write(((CdxLineRecordKey) key).getUnparsed());
         } else {
-            Uri surt = UriBuilder.builder(format.getKeyUriFormat())
-                    .uri(record.get(FieldName.ORIGINAL_URI).getValue()).build();
+            Uri surt = format.getKeyUriFormat().builder(record.get(FieldName.ORIGINAL_URI).getValue()).build();
 
             out.write(surt.toString());
             out.write(' ');

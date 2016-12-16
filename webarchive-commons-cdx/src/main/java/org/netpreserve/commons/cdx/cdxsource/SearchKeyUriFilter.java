@@ -49,7 +49,7 @@ final class SearchKeyUriFilter implements SearchKeyFilter<Uri> {
             uriBuilderConfig = uriBuilderConfig.removeNormalizersOfType(StripSlashAtEndOfPath.class);
         }
 
-        uri = UriBuilder.builder(uriBuilderConfig).uri(filter).build();
+        uri = uriBuilderConfig.buildUri(filter);
         filterString = uri.toString();
         filterArray = filterString.getBytes(StandardCharsets.UTF_8);
     }

@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.netpreserve.commons.cdx.CdxFormat;
 import org.netpreserve.commons.cdx.FieldName;
-import org.netpreserve.commons.uri.Configurations;
+import org.netpreserve.commons.uri.UriConfigs;
 import org.netpreserve.commons.uri.UriBuilderConfig;
 import org.netpreserve.commons.util.datetime.DateFormat;
 
@@ -204,7 +204,7 @@ public class CdxLineFormat implements CdxFormat {
 
     @Override
     public UriBuilderConfig getKeyUriFormat() {
-        return Configurations.LEGACY_SURT_KEY;
+        return UriConfigs.LEGACY_SURT_KEY;
     }
 
 }

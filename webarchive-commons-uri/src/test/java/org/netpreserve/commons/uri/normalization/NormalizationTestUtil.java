@@ -16,7 +16,7 @@
 package org.netpreserve.commons.uri.normalization;
 
 import org.assertj.core.api.Fail;
-import org.netpreserve.commons.uri.Configurations;
+import org.netpreserve.commons.uri.UriConfigs;
 import org.netpreserve.commons.uri.Normalizer;
 import org.netpreserve.commons.uri.UriBuilder;
 import org.netpreserve.commons.uri.UriBuilderConfig;
@@ -33,8 +33,8 @@ public class NormalizationTestUtil {
 
     public static void testNormalizerExamples(Normalizer normalizer) {
         UriBuilderConfig config = new UriBuilderConfig()
-                .parser(Configurations.STRICT_PARSER)
-                .referenceResolver(Configurations.REFERENCE_RESOLVER)
+                .parser(UriConfigs.STRICT_PARSER)
+                .referenceResolver(UriConfigs.REFERENCE_RESOLVER)
                 .requireAbsoluteUri(false)
                 .strictReferenceResolution(true)
                 .caseNormalization(false)
@@ -42,11 +42,11 @@ public class NormalizationTestUtil {
                 .pathSegmentNormalization(false)
                 .schemeBasedNormalization(true)
                 .encodeIllegalCharacters(false)
-                .defaultFormat(Configurations.DEFAULT_FORMAT);
+                .defaultFormat(UriConfigs.DEFAULT_FORMAT);
 
         config.addNormalizer(normalizer);
 
-        UriBuilder builder = UriBuilder.builder(config);
+        UriBuilder builder = config.builder();
 
         boolean testsFound = false;
 

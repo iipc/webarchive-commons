@@ -16,9 +16,8 @@
 package org.netpreserve.commons.uri.parser;
 
 import org.junit.Test;
-import org.netpreserve.commons.uri.Configurations;
+import org.netpreserve.commons.uri.UriConfigs;
 import org.netpreserve.commons.uri.Uri;
-import org.netpreserve.commons.uri.UriBuilder;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.netpreserve.commons.uri.parser.UriAssert.assertThat;
@@ -33,34 +32,29 @@ public class StrictUriTest {
      */
     @Test
     public void testScheme() {
-        Uri instance = UriBuilder.strictUriBuilder()
-                .uri("http://john:doe@example.com:123/foo#bar").build();
+        Uri instance = UriConfigs.STRICT.buildUri("http://john:doe@example.com:123/foo#bar");
         assertThat(instance)
                 .hasScheme("http");
 
-        instance = UriBuilder.strictUriBuilder()
-                .uri("//example.com/foo#bar").build();
+        instance = UriConfigs.STRICT.buildUri("//example.com/foo#bar");
         assertThat(instance)
                 .hasScheme(null);
 
-        instance = UriBuilder.strictUriBuilder()
-                .uri("//example.com:123/foo#bar").build();
+        instance = UriConfigs.STRICT.buildUri("//example.com:123/foo#bar");
         assertThat(instance)
                 .hasScheme(null)
                 .hasAuthority("example.com:123")
                 .hasPath("/foo")
                 .hasFragment("bar");
 
-        instance = UriBuilder.strictUriBuilder()
-                .uri("/foo#bar").build();
+        instance = UriConfigs.STRICT.buildUri("/foo#bar");
         assertThat(instance)
                 .hasScheme(null)
                 .hasAuthority(null)
                 .hasPath("/foo")
                 .hasFragment("bar");
 
-        instance = UriBuilder.strictUriBuilder()
-                .uri("foo#bar").build();
+        instance = UriConfigs.STRICT.buildUri("foo#bar");
         assertThat(instance)
                 .hasScheme(null)
                 .hasAuthority(null)
@@ -73,8 +67,7 @@ public class StrictUriTest {
      */
     @Test
     public void testAuthority() {
-        Uri instance = UriBuilder.strictUriBuilder()
-                .uri("http://john:doe@example.com:123/foo#bar").build();
+        Uri instance = UriConfigs.STRICT.buildUri("http://john:doe@example.com:123/foo#bar");
         assertThat(instance)
                 .hasAuthority("john:doe@example.com:123")
                 .hasUserinfo("john:doe")
@@ -83,8 +76,7 @@ public class StrictUriTest {
                 .hasPort(123)
                 .hasDecodedPort(123);
 
-        instance = UriBuilder.strictUriBuilder()
-                .uri("http://john:doe@127.0.0.1:123/foo#bar").build();
+        instance = UriConfigs.STRICT.buildUri("http://john:doe@127.0.0.1:123/foo#bar");
         assertThat(instance)
                 .hasAuthority("john:doe@127.0.0.1:123")
                 .hasUserinfo("john:doe")
@@ -93,8 +85,7 @@ public class StrictUriTest {
                 .hasPort(123)
                 .hasDecodedPort(123);
 
-        instance = UriBuilder.strictUriBuilder()
-                .uri("http://john:doe@127.0.0.1:80/foo#bar").build();
+        instance = UriConfigs.STRICT.buildUri("http://john:doe@127.0.0.1:80/foo#bar");
         assertThat(instance)
                 .hasAuthority("john:doe@127.0.0.1")
                 .hasUserinfo("john:doe")
@@ -103,8 +94,7 @@ public class StrictUriTest {
                 .hasPort(Uri.DEFAULT_PORT_MARKER)
                 .hasDecodedPort(80);
 
-        instance = UriBuilder.strictUriBuilder()
-                .uri("http://john:doe@127.0.0.1/foo#bar").build();
+        instance = UriConfigs.STRICT.buildUri("http://john:doe@127.0.0.1/foo#bar");
         assertThat(instance)
                 .hasAuthority("john:doe@127.0.0.1")
                 .hasUserinfo("john:doe")
@@ -119,8 +109,7 @@ public class StrictUriTest {
      */
     @Test
     public void testPath() {
-        Uri instance = UriBuilder.strictUriBuilder()
-                .uri("http://john:doe@example.com:123/foo#bar").build();
+        Uri instance = UriConfigs.STRICT.buildUri("http://john:doe@example.com:123/foo#bar");
         assertThat(instance)
                 .hasPath("/foo")
                 .hasDecodedPath("/foo");
@@ -131,8 +120,7 @@ public class StrictUriTest {
      */
     @Test
     public void testQuery() {
-        Uri instance = UriBuilder.strictUriBuilder()
-                .uri("http://john:doe@example.com:123/foo?q#bar").build();
+        Uri instance = UriConfigs.STRICT.buildUri("http://john:doe@example.com:123/foo?q#bar");
         assertThat(instance)
                 .hasQuery("q");
     }
@@ -142,8 +130,7 @@ public class StrictUriTest {
      */
     @Test
     public void testFragment() {
-        Uri instance = UriBuilder.strictUriBuilder()
-                .uri("http://john:doe@example.com:123/foo#bar").build();
+        Uri instance = UriConfigs.STRICT.buildUri("http://john:doe@example.com:123/foo#bar");
         assertThat(instance)
                 .hasFragment("bar");
     }
@@ -153,29 +140,25 @@ public class StrictUriTest {
      */
     @Test
     public void testAddress() {
-        Uri instance = UriBuilder.strictUriBuilder()
-                .uri("http://john:doe@example.com:123/foo?q#bar").build();
+        Uri instance = UriConfigs.STRICT.buildUri("http://john:doe@example.com:123/foo?q#bar");
         assertThat(instance)
                 .isRegistryName(true)
                 .isIPv4address(false)
                 .isIPv6reference(false);
 
-        instance = UriBuilder.strictUriBuilder()
-                .uri("http://john:doe@127.0.0.1:123/foo#bar").build();
+        instance = UriConfigs.STRICT.buildUri("http://john:doe@127.0.0.1:123/foo#bar");
         assertThat(instance)
                 .isRegistryName(false)
                 .isIPv4address(true)
                 .isIPv6reference(false);
 
-        instance = UriBuilder.strictUriBuilder()
-                .uri("http://john:doe@[::1]:123/foo#bar").build();
+        instance = UriConfigs.STRICT.buildUri("http://john:doe@[::1]:123/foo#bar");
         assertThat(instance)
                 .isRegistryName(false)
                 .isIPv4address(false)
                 .isIPv6reference(true);
 
-        instance = UriBuilder.strictUriBuilder()
-                .uri("mailto:john.doe@example.com").build();
+        instance = UriConfigs.STRICT.buildUri("mailto:john.doe@example.com");
         assertThat(instance)
                 .isRegistryName(false)
                 .isIPv4address(false)
@@ -187,23 +170,19 @@ public class StrictUriTest {
      */
     @Test
     public void testIsAbsolute() {
-        Uri instance = UriBuilder.strictUriBuilder()
-                .uri("http://john:doe@example.com:123/foo#bar").build();
+        Uri instance = UriConfigs.STRICT.buildUri("http://john:doe@example.com:123/foo#bar");
         assertThat(instance)
                 .isAbsolute(true);
 
-        instance = UriBuilder.strictUriBuilder()
-                .uri("//example.com/foo#bar").build();
+        instance = UriConfigs.STRICT.buildUri("//example.com/foo#bar");
         assertThat(instance)
                 .isAbsolute(false);
 
-        instance = UriBuilder.strictUriBuilder()
-                .uri("foo#bar").build();
+        instance = UriConfigs.STRICT.buildUri("foo#bar");
         assertThat(instance)
                 .isAbsolute(false);
 
-        instance = UriBuilder.strictUriBuilder()
-                .uri("mailto:john.doe@example.com").build();
+        instance = UriConfigs.STRICT.buildUri("mailto:john.doe@example.com");
         assertThat(instance)
                 .isAbsolute(true);
     }
@@ -213,23 +192,19 @@ public class StrictUriTest {
      */
     @Test
     public void testIsAbsolutePath() {
-        Uri instance = UriBuilder.strictUriBuilder()
-                .uri("http://john:doe@example.com:123/foo#bar").build();
+        Uri instance = UriConfigs.STRICT.buildUri("http://john:doe@example.com:123/foo#bar");
         assertThat(instance)
                 .isAbsolutePath(true);
 
-        instance = UriBuilder.strictUriBuilder()
-                .uri("//example.com/foo#bar").build();
+        instance = UriConfigs.STRICT.buildUri("//example.com/foo#bar");
         assertThat(instance)
                 .isAbsolutePath(true);
 
-        instance = UriBuilder.strictUriBuilder()
-                .uri("foo#bar").build();
+        instance = UriConfigs.STRICT.buildUri("foo#bar");
         assertThat(instance)
                 .isAbsolutePath(false);
 
-        instance = UriBuilder.strictUriBuilder()
-                .uri("mailto:john.doe@example.com").build();
+        instance = UriConfigs.STRICT.buildUri("mailto:john.doe@example.com");
         assertThat(instance)
                 .isAbsolutePath(false);
     }
@@ -239,13 +214,11 @@ public class StrictUriTest {
      */
     @Test
     public void testToString() {
-        Uri instance = UriBuilder.strictUriBuilder()
-                .uri("http://john:doe@example.com:123/foo#bar").build();
+        Uri instance = UriConfigs.STRICT.buildUri("http://john:doe@example.com:123/foo#bar");
         assertThat(instance)
                 .hasToString("http://john:doe@example.com:123/foo#bar");
 
-        instance = UriBuilder.strictUriBuilder().uri("http://john:doe@127.0.0.1:123/foo#bar")
-                .build();
+        instance = UriConfigs.STRICT.buildUri("http://john:doe@127.0.0.1:123/foo#bar");
         assertThat(instance)
                 .hasToString("http://john:doe@127.0.0.1:123/foo#bar");
     }
@@ -255,28 +228,26 @@ public class StrictUriTest {
      */
     @Test
     public void testToCustomString() {
-        Uri instance = UriBuilder.strictUriBuilder()
-                .uri("http://john:doe@example.com:123/foo#bar").build();
+        Uri instance = UriConfigs.STRICT.buildUri("http://john:doe@example.com:123/foo#bar");
         assertThat(instance)
-                .usingCustomUriFormat(Configurations.DEFAULT_FORMAT)
+                .usingCustomUriFormat(UriConfigs.DEFAULT_FORMAT)
                 .hasToCustomString("http://john:doe@example.com:123/foo#bar")
-                .usingCustomUriFormat(Configurations.USABLE_URI_FORMAT)
+                .usingCustomUriFormat(UriConfigs.USABLE_URI_FORMAT)
                 .hasToCustomString("http://john:doe@example.com:123/foo")
-                .usingCustomUriFormat(Configurations.CANONICALIZED_URI_FORMAT)
+                .usingCustomUriFormat(UriConfigs.CANONICALIZED_URI_FORMAT)
                 .hasToCustomString("http://example.com:123/foo")
-                .usingCustomUriFormat(Configurations.SURT_KEY_FORMAT)
+                .usingCustomUriFormat(UriConfigs.SURT_KEY_FORMAT)
                 .hasToCustomString("(com,example,:123)/foo");
 
-        instance = UriBuilder.strictUriBuilder().uri("http://john:doe@127.0.0.1:123/foo#bar")
-                .build();
+        instance = UriConfigs.STRICT.buildUri("http://john:doe@127.0.0.1:123/foo#bar");
         assertThat(instance)
-                .usingCustomUriFormat(Configurations.DEFAULT_FORMAT)
+                .usingCustomUriFormat(UriConfigs.DEFAULT_FORMAT)
                 .hasToCustomString("http://john:doe@127.0.0.1:123/foo#bar")
-                .usingCustomUriFormat(Configurations.USABLE_URI_FORMAT)
+                .usingCustomUriFormat(UriConfigs.USABLE_URI_FORMAT)
                 .hasToCustomString("http://john:doe@127.0.0.1:123/foo")
-                .usingCustomUriFormat(Configurations.CANONICALIZED_URI_FORMAT)
+                .usingCustomUriFormat(UriConfigs.CANONICALIZED_URI_FORMAT)
                 .hasToCustomString("http://127.0.0.1:123/foo")
-                .usingCustomUriFormat(Configurations.SURT_KEY_FORMAT)
+                .usingCustomUriFormat(UriConfigs.SURT_KEY_FORMAT)
                 .hasToCustomString("(127.0.0.1:123)/foo");
     }
 
@@ -285,14 +256,12 @@ public class StrictUriTest {
      */
     @Test
     public void testToDecodedString() {
-        Uri instance = UriBuilder.strictUriBuilder()
-                .uri("http://john:doe@example.com:123/fo%20o#bar").build();
+        Uri instance = UriConfigs.STRICT.buildUri("http://john:doe@example.com:123/fo%20o#bar");
         assertThat(instance)
                 .hasToString("http://john:doe@example.com:123/fo%20o#bar")
                 .hasToDecodedString("http://john:doe@example.com:123/fo o#bar");
 
-        instance = UriBuilder.strictUriBuilder()
-                .uri("http://xn--rksmrgs-5wao1o.josefßon.org/foo#bar").build();
+        instance = UriConfigs.STRICT.buildUri("http://xn--rksmrgs-5wao1o.josefßon.org/foo#bar");
         assertThat(instance)
                 .hasToString("http://xn--rksmrgs-5wao1o.josefsson.org/foo#bar")
                 .hasToDecodedString("http://räksmörgås.josefsson.org/foo#bar");

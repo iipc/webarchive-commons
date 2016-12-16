@@ -16,9 +16,8 @@
 package org.netpreserve.commons.uri.normalization;
 
 import org.junit.Test;
-import org.netpreserve.commons.uri.Configurations;
+import org.netpreserve.commons.uri.UriConfigs;
 import org.netpreserve.commons.uri.Uri;
-import org.netpreserve.commons.uri.UriBuilder;
 import org.netpreserve.commons.uri.UriBuilderConfig;
 
 import static org.assertj.core.api.Assertions.*;
@@ -28,8 +27,8 @@ import static org.assertj.core.api.Assertions.*;
  */
 public class InferCommonSchemesForSchemelessUriTest {
 
-    UriBuilderConfig config = Configurations.USABLE_URI
-            .defaultFormat(Configurations.CANONICALIZED_URI_FORMAT)
+    UriBuilderConfig config = UriConfigs.HERITRIX
+            .defaultFormat(UriConfigs.CANONICALIZED_URI_FORMAT)
             .addNormalizer(new InferCommonSchemesForSchemelessUri());
 
     @Test
@@ -39,7 +38,7 @@ public class InferCommonSchemesForSchemelessUriTest {
 
     @Test
     public void testMissingHttpScheme() {
-        Uri uri = UriBuilder.builder(config).uri("example.com/index.html").build();
+        Uri uri = config.buildUri("example.com/index.html");
         assertThat(uri).hasFieldOrPropertyWithValue("scheme", "http")
                 .hasFieldOrPropertyWithValue("host", "example.com")
                 .hasFieldOrPropertyWithValue("path", "/index.html")
@@ -50,7 +49,7 @@ public class InferCommonSchemesForSchemelessUriTest {
 
     @Test
     public void testMissingHttpSchemeWithUserAndPort() {
-        Uri uri = UriBuilder.builder(config).uri("user@example.com:80/index.html").build();
+        Uri uri = config.buildUri("user@example.com:80/index.html");
         assertThat(uri).hasFieldOrPropertyWithValue("scheme", "http")
                 .hasFieldOrPropertyWithValue("user", "user")
                 .hasFieldOrPropertyWithValue("host", "example.com")
@@ -62,7 +61,7 @@ public class InferCommonSchemesForSchemelessUriTest {
 
     @Test
     public void testMissingFileSchemeOneSlash() {
-        Uri uri = UriBuilder.builder(config).uri("/index.html").build();
+        Uri uri = config.buildUri("/index.html");
         assertThat(uri)
                 .hasToString("file:///index.html")
                 .hasFieldOrPropertyWithValue("scheme", "file")
@@ -75,7 +74,7 @@ public class InferCommonSchemesForSchemelessUriTest {
 
     @Test
     public void testMissingFileSchemeTwoSlash() {
-        Uri uri = UriBuilder.builder(config).uri("//example.com/index.html").build();
+        Uri uri = config.buildUri("//example.com/index.html");
         assertThat(uri)
                 .hasToString("file:///example.com/index.html")
                 .hasFieldOrPropertyWithValue("scheme", "file")
@@ -88,7 +87,7 @@ public class InferCommonSchemesForSchemelessUriTest {
 
     @Test
     public void testMissingFileSchemeThreeSlash() {
-        Uri uri = UriBuilder.builder(config).uri("//example.com/index.html").build();
+        Uri uri = config.buildUri("//example.com/index.html");
         assertThat(uri)
                 .hasToString("file:///example.com/index.html")
                 .hasFieldOrPropertyWithValue("scheme", "file")

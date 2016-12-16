@@ -16,7 +16,7 @@
 package org.netpreserve.commons.uri.parser;
 
 import org.junit.Test;
-import org.netpreserve.commons.uri.Configurations;
+import org.netpreserve.commons.uri.UriConfigs;
 import org.netpreserve.commons.uri.Uri;
 import org.netpreserve.commons.uri.UriBuilder;
 import org.netpreserve.commons.uri.UriBuilderConfig;
@@ -33,12 +33,12 @@ public class Rfc3986ParserTest {
      */
     @Test
     public void testParseParts() {
-        UriBuilderConfig config = Configurations.STRICT_URI.schemeBasedNormalization(false);
+        UriBuilderConfig config = UriConfigs.STRICT.schemeBasedNormalization(false);
 
         Rfc3986Parser parser = new Rfc3986Parser();
         Rfc3986Parser.ParserState parserState;
 
-        parserState = new Rfc3986Parser.ParserState(UriBuilder.builder(config), "mailto:java-net@java.sun.com", 0);
+        parserState = new Rfc3986Parser.ParserState(new UriBuilder(config), "mailto:java-net@java.sun.com", 0);
         parser.parseScheme(parserState);
         assertThat(parserState.builder.scheme()).isEqualTo("mailto");
         parser.parseAuthority(parserState);
@@ -53,7 +53,7 @@ public class Rfc3986ParserTest {
         parser.parseFragment(parserState);
         assertThat(parserState.builder.fragment()).isNull();
 
-        parserState = new Rfc3986Parser.ParserState(UriBuilder.builder(config), "news:comp.lang.java#fragment", 0);
+        parserState = new Rfc3986Parser.ParserState(new UriBuilder(config), "news:comp.lang.java#fragment", 0);
         parser.parseScheme(parserState);
         assertThat(parserState.builder.scheme()).isEqualTo("news");
         parser.parseAuthority(parserState);
@@ -68,7 +68,7 @@ public class Rfc3986ParserTest {
         parser.parseFragment(parserState);
         assertThat(parserState.builder.fragment()).isEqualTo("fragment");
 
-        parserState = new Rfc3986Parser.ParserState(UriBuilder.builder(config), "urn:isbn:096139210x", 0);
+        parserState = new Rfc3986Parser.ParserState(new UriBuilder(config), "urn:isbn:096139210x", 0);
         parser.parseScheme(parserState);
         assertThat(parserState.builder.scheme()).isEqualTo("urn");
         parser.parseAuthority(parserState);
@@ -83,7 +83,7 @@ public class Rfc3986ParserTest {
         parser.parseFragment(parserState);
         assertThat(parserState.builder.fragment()).isNull();
 
-        parserState = new Rfc3986Parser.ParserState(UriBuilder.builder(config), "http://java.sun.com/j2se/1.3/", 0);
+        parserState = new Rfc3986Parser.ParserState(new UriBuilder(config), "http://java.sun.com/j2se/1.3/", 0);
         parser.parseScheme(parserState);
         assertThat(parserState.builder.scheme()).isEqualTo("http");
         parser.parseAuthority(parserState);
@@ -98,7 +98,7 @@ public class Rfc3986ParserTest {
         parser.parseFragment(parserState);
         assertThat(parserState.builder.fragment()).isNull();
 
-        parserState = new Rfc3986Parser.ParserState(UriBuilder.builder(config), "http://java.sun.com/j2se/1.3/?#", 0);
+        parserState = new Rfc3986Parser.ParserState(new UriBuilder(config), "http://java.sun.com/j2se/1.3/?#", 0);
         parser.parseScheme(parserState);
         assertThat(parserState.builder.scheme()).isEqualTo("http");
         parser.parseAuthority(parserState);
@@ -113,7 +113,7 @@ public class Rfc3986ParserTest {
         parser.parseFragment(parserState);
         assertThat(parserState.builder.fragment()).isEmpty();
 
-        parserState = new Rfc3986Parser.ParserState(UriBuilder.builder(config), "http://user@java.sun.com:80/j2se/1.3/", 0);
+        parserState = new Rfc3986Parser.ParserState(new UriBuilder(config), "http://user@java.sun.com:80/j2se/1.3/", 0);
         parser.parseScheme(parserState);
         assertThat(parserState.builder.scheme()).isEqualTo("http");
         parser.parseAuthority(parserState);
@@ -128,7 +128,7 @@ public class Rfc3986ParserTest {
         parser.parseFragment(parserState);
         assertThat(parserState.builder.fragment()).isNull();
 
-        parserState = new Rfc3986Parser.ParserState(UriBuilder.builder(config), "docs/guide/collections/designfaq.html#28", 0);
+        parserState = new Rfc3986Parser.ParserState(new UriBuilder(config), "docs/guide/collections/designfaq.html#28", 0);
         parser.parseScheme(parserState);
         assertThat(parserState.builder.scheme()).isNull();
         parser.parseAuthority(parserState);
@@ -143,7 +143,7 @@ public class Rfc3986ParserTest {
         parser.parseFragment(parserState);
         assertThat(parserState.builder.fragment()).isEqualTo("28");
 
-        parserState = new Rfc3986Parser.ParserState(UriBuilder.builder(config), "../../../demo/jfc/SwingSet2/src/SwingSet2.java", 0);
+        parserState = new Rfc3986Parser.ParserState(new UriBuilder(config), "../../../demo/jfc/SwingSet2/src/SwingSet2.java", 0);
         parser.parseScheme(parserState);
         assertThat(parserState.builder.scheme()).isNull();
         parser.parseAuthority(parserState);
@@ -158,7 +158,7 @@ public class Rfc3986ParserTest {
         parser.parseFragment(parserState);
         assertThat(parserState.builder.fragment()).isNull();
 
-        parserState = new Rfc3986Parser.ParserState(UriBuilder.builder(config), "file:///~/calendar", 0);
+        parserState = new Rfc3986Parser.ParserState(new UriBuilder(config), "file:///~/calendar", 0);
         parser.parseScheme(parserState);
         assertThat(parserState.builder.scheme()).isEqualTo("file");
         parser.parseAuthority(parserState);
@@ -173,7 +173,7 @@ public class Rfc3986ParserTest {
         parser.parseFragment(parserState);
         assertThat(parserState.builder.fragment()).isNull();
 
-        parserState = new Rfc3986Parser.ParserState(UriBuilder.builder(config), ":foo", 0);
+        parserState = new Rfc3986Parser.ParserState(new UriBuilder(config), ":foo", 0);
         parser.parseScheme(parserState);
         assertThat(parserState.builder.scheme()).isNull();
         parser.parseAuthority(parserState);
@@ -188,7 +188,7 @@ public class Rfc3986ParserTest {
         parser.parseFragment(parserState);
         assertThat(parserState.builder.fragment()).isNull();
 
-        parserState = new Rfc3986Parser.ParserState(UriBuilder.builder(config), "example.html;jsessionid=deadbeef:deadbeed?parameter=this:value", 0);
+        parserState = new Rfc3986Parser.ParserState(new UriBuilder(config), "example.html;jsessionid=deadbeef:deadbeed?parameter=this:value", 0);
         parser.parseScheme(parserState);
         assertThat(parserState.builder.scheme()).isNull();
         parser.parseAuthority(parserState);
@@ -206,7 +206,7 @@ public class Rfc3986ParserTest {
 
     @Test
     public void testNormalization() {
-        UriBuilder builder = UriBuilder.strictUriBuilder();
+        UriBuilder builder = UriConfigs.STRICT.builder();
         Rfc3986Parser parser = new Rfc3986Parser();
         String uri;
 

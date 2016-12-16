@@ -38,7 +38,7 @@ import org.netpreserve.commons.uri.normalization.TrimHost;
 /**
  * Common configurations to use with UriBuilder.
  */
-public final class Configurations {
+public final class UriConfigs {
 
     public static final Parser STRICT_PARSER = new Rfc3986Parser();
 
@@ -77,9 +77,9 @@ public final class Configurations {
             .decodeHost(false)
             .surtEncoder(new LegacyWaybackSurtEncoder());
 
-    public static final UriBuilderConfig STRICT_URI = new UriBuilderConfig()
-            .parser(Configurations.STRICT_PARSER)
-            .referenceResolver(Configurations.REFERENCE_RESOLVER)
+    public static final UriBuilderConfig STRICT = new UriBuilderConfig()
+            .parser(UriConfigs.STRICT_PARSER)
+            .referenceResolver(UriConfigs.REFERENCE_RESOLVER)
             .requireAbsoluteUri(false)
             .strictReferenceResolution(true)
             .caseNormalization(true)
@@ -87,15 +87,15 @@ public final class Configurations {
             .pathSegmentNormalization(true)
             .schemeBasedNormalization(true)
             .encodeIllegalCharacters(false)
-            .defaultFormat(Configurations.DEFAULT_FORMAT);
+            .defaultFormat(UriConfigs.DEFAULT_FORMAT);
 
     /**
      * A Uri config trying to mimic the behavior of major browsers as described by
      * <a herf="https://url.spec.whatwg.org/">whatwg.org</a>.
      */
-    public static final UriBuilderConfig MIMIC_BROWSER_URI = new UriBuilderConfig()
-            .parser(Configurations.MIMIC_BROWSER_PARSER)
-            .referenceResolver(Configurations.MIMIC_BROWSER_REFERENCE_RESOLVER)
+    public static final UriBuilderConfig WHATWG = new UriBuilderConfig()
+            .parser(UriConfigs.MIMIC_BROWSER_PARSER)
+            .referenceResolver(UriConfigs.MIMIC_BROWSER_REFERENCE_RESOLVER)
             .requireAbsoluteUri(false)
             .strictReferenceResolution(false)
             .caseNormalization(true)
@@ -105,7 +105,7 @@ public final class Configurations {
             .schemeBasedNormalization(true)
             .encodeIllegalCharacters(true)
             .punycodeUnknownScheme(true)
-            .defaultFormat(Configurations.DEFAULT_FORMAT)
+            .defaultFormat(UriConfigs.DEFAULT_FORMAT)
             .addNormalizer(new MimicBrowserNormalizer());
 
     /**
@@ -114,8 +114,8 @@ public final class Configurations {
      * Normalizes some illegal characters, but otherwise tries to accept the URI as it is as much as possible.
      */
     public static final UriBuilderConfig LAX_URI = new UriBuilderConfig()
-            .parser(Configurations.LAX_PARSER)
-            .referenceResolver(Configurations.REFERENCE_RESOLVER)
+            .parser(UriConfigs.LAX_PARSER)
+            .referenceResolver(UriConfigs.REFERENCE_RESOLVER)
             .requireAbsoluteUri(false)
             .strictReferenceResolution(false)
             .caseNormalization(true)
@@ -123,7 +123,7 @@ public final class Configurations {
             .pathSegmentNormalization(true)
             .schemeBasedNormalization(true)
             .encodeIllegalCharacters(true)
-            .defaultFormat(Configurations.DEFAULT_FORMAT)
+            .defaultFormat(UriConfigs.DEFAULT_FORMAT)
             .addNormalizer(new LaxTrimming())
             .addNormalizer(new StripErrorneousExtraSlashes())
             .addNormalizer(new StripSlashAtEndOfPath())
@@ -131,9 +131,12 @@ public final class Configurations {
             .addNormalizer(new OptimisticDnsScheme())
             .addNormalizer(new CheckLongEnough());
 
-    public static final UriBuilderConfig USABLE_URI = new UriBuilderConfig()
-            .parser(Configurations.LAX_PARSER)
-            .referenceResolver(Configurations.REFERENCE_RESOLVER)
+    /**
+     * A config that behave as the UsableUri used in Heritrix.
+     */
+    public static final UriBuilderConfig HERITRIX = new UriBuilderConfig()
+            .parser(UriConfigs.LAX_PARSER)
+            .referenceResolver(UriConfigs.REFERENCE_RESOLVER)
             .requireAbsoluteUri(true)
             .strictReferenceResolution(false)
             .caseNormalization(true)
@@ -144,7 +147,7 @@ public final class Configurations {
             .encodeIllegalCharacters(true)
             // Consider URIs too long for IE as illegal.
             .maxUrlLength(2083)
-            .defaultFormat(Configurations.USABLE_URI_FORMAT)
+            .defaultFormat(UriConfigs.USABLE_URI_FORMAT)
             .addNormalizer(new LaxTrimming())
             .addNormalizer(new StripErrorneousExtraSlashes())
             .addNormalizer(new StripSlashAtEndOfPath())
@@ -153,9 +156,12 @@ public final class Configurations {
             .addNormalizer(new CheckLongEnough())
             .addNormalizer(new TrimHost());
 
-    public static final UriBuilderConfig CANONICALIZED_URI = new UriBuilderConfig()
-            .parser(Configurations.LAX_PARSER)
-            .referenceResolver(Configurations.MIMIC_BROWSER_REFERENCE_RESOLVER)
+    /**
+     * A config with the standard normalizations used in OpenWayback.
+     */
+    public static final UriBuilderConfig WAYBACK = new UriBuilderConfig()
+            .parser(UriConfigs.LAX_PARSER)
+            .referenceResolver(UriConfigs.MIMIC_BROWSER_REFERENCE_RESOLVER)
             .requireAbsoluteUri(true)
             .strictReferenceResolution(false)
             .caseNormalization(true)
@@ -165,7 +171,7 @@ public final class Configurations {
             .encodeIllegalCharacters(true)
             // Consider URIs too long for IE as illegal.
             .maxUrlLength(2083)
-            .defaultFormat(Configurations.CANONICALIZED_URI_FORMAT)
+            .defaultFormat(UriConfigs.CANONICALIZED_URI_FORMAT)
             .addNormalizer(new LaxTrimming())
             .addNormalizer(new StripWwwN())
             .addNormalizer(new StripSessionId())
@@ -176,8 +182,8 @@ public final class Configurations {
             .addNormalizer(new CheckLongEnough());
 
     public static final UriBuilderConfig SURT_KEY = new UriBuilderConfig()
-            .parser(Configurations.LAX_PARSER)
-            .referenceResolver(Configurations.REFERENCE_RESOLVER)
+            .parser(UriConfigs.LAX_PARSER)
+            .referenceResolver(UriConfigs.REFERENCE_RESOLVER)
             .requireAbsoluteUri(true)
             .strictReferenceResolution(false)
             .caseNormalization(true)
@@ -187,7 +193,7 @@ public final class Configurations {
             .encodeIllegalCharacters(true)
             // Consider URIs too long for IE as illegal.
             .maxUrlLength(2083)
-            .defaultFormat(Configurations.SURT_KEY_FORMAT)
+            .defaultFormat(UriConfigs.SURT_KEY_FORMAT)
             .addNormalizer(new LaxTrimming())
             .addNormalizer(new StripWwwN())
             .addNormalizer(new StripSessionId())
@@ -199,8 +205,8 @@ public final class Configurations {
             .addNormalizer(new CheckLongEnough());
 
     public static final UriBuilderConfig LEGACY_SURT_KEY = new UriBuilderConfig()
-            .parser(Configurations.LAX_PARSER)
-            .referenceResolver(Configurations.REFERENCE_RESOLVER)
+            .parser(UriConfigs.LAX_PARSER)
+            .referenceResolver(UriConfigs.REFERENCE_RESOLVER)
             .requireAbsoluteUri(true)
             .strictReferenceResolution(false)
             .caseNormalization(true)
@@ -210,7 +216,7 @@ public final class Configurations {
             .encodeIllegalCharacters(true)
             // Consider URIs too long for IE as illegal.
             .maxUrlLength(2083)
-            .defaultFormat(Configurations.LEGACY_SURT_KEY_FORMAT)
+            .defaultFormat(UriConfigs.LEGACY_SURT_KEY_FORMAT)
             .addNormalizer(new LaxTrimming())
             .addNormalizer(new AllLowerCase())
             .addNormalizer(new StripWwwN())
@@ -222,7 +228,7 @@ public final class Configurations {
             .addNormalizer(new OptimisticDnsScheme())
             .addNormalizer(new CheckLongEnough());
 
-    private Configurations() {
+    private UriConfigs() {
     }
 
 }

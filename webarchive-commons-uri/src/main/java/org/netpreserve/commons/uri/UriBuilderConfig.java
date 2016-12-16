@@ -32,9 +32,9 @@ public final class UriBuilderConfig {
 
     private int maxUrlLength = Integer.MAX_VALUE;
 
-    private Parser parser = Configurations.STRICT_PARSER;
+    private Parser parser = UriConfigs.STRICT_PARSER;
 
-    private ReferenceResolver referenceResolver = Configurations.REFERENCE_RESOLVER;
+    private ReferenceResolver referenceResolver = UriConfigs.REFERENCE_RESOLVER;
 
     private List<PreParseNormalizer> preParseNormalizers = Collections.emptyList();
 
@@ -68,7 +68,7 @@ public final class UriBuilderConfig {
 
     private boolean punycodeUnknownScheme = false;
 
-    private UriFormat defaultFormat = Configurations.DEFAULT_FORMAT;
+    private UriFormat defaultFormat = UriConfigs.DEFAULT_FORMAT;
 
     public int getMaxUrlLength() {
         return maxUrlLength;
@@ -360,4 +360,55 @@ public final class UriBuilderConfig {
         this.defaultFormat = src.getDefaultFormat();
     }
 
+    public Uri buildUri(String uri) {
+        return new UriBuilder(this).uri(uri).build();
+    }
+
+    public UriBuilder builder() {
+        return new UriBuilder(this);
+    }
+
+    public UriBuilder builder(String uri) {
+        return new UriBuilder(this).uri(uri);
+    }
+
+    public UriBuilder builder(Uri uri) {
+        return new UriBuilder(this).uri(uri);
+    }
+
+    public Uri resolve(String base, String reference) {
+        return new UriBuilder(this).uri(base).resolve(reference).build();
+    }
+
+    public Uri resolve(String base, Uri reference) {
+        return new UriBuilder(this).uri(base).resolve(reference).build();
+    }
+
+    public Uri resolve(String base, UriBuilder reference) {
+        return new UriBuilder(this).uri(base).resolve(reference).build();
+    }
+
+    public Uri resolve(Uri base, String reference) {
+        return new UriBuilder(this).uri(base).resolve(reference).build();
+    }
+
+    public Uri resolve(Uri base, Uri reference) {
+        return new UriBuilder(this).uri(base).resolve(reference).build();
+    }
+
+    public Uri resolve(Uri base, UriBuilder reference) {
+        return new UriBuilder(this).uri(base).resolve(reference).build();
+    }
+
+    public Uri resolve(UriBuilder base, String reference) {
+        return base.resolve(reference).build();
+    }
+
+    public Uri resolve(UriBuilder base, Uri reference) {
+        return base.resolve(reference).build();
+    }
+
+    public Uri resolve(UriBuilder base, UriBuilder reference) {
+        return base.resolve(reference).build();
+    }
 }

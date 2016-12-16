@@ -21,13 +21,9 @@ import org.netpreserve.commons.uri.parser.Parser;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
-import org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer;
 import org.netpreserve.commons.uri.normalization.report.NormalizationConfigReport;
-import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
 import static org.netpreserve.commons.uri.Uri.DEFAULT_PORT_MARKER;
 
@@ -72,7 +68,7 @@ public final class UriBuilder {
 
     Charset charset = StandardCharsets.UTF_8;
 
-    private UriBuilder(UriBuilderConfig config) {
+    public UriBuilder(UriBuilderConfig config) {
         this.config = config;
         this.charset = config.getCharset();
     }
@@ -85,20 +81,13 @@ public final class UriBuilder {
      * @param config the configuration used by the returned builder
      * @return the newly created builder.
      */
-    public static UriBuilder builder(UriBuilderConfig config) {
-        return new UriBuilder(config);
-    }
-
-    /**
-     * Creates a new UriBuilder.
-     * <p>
-     * The builder is configured to behave as the UsableUri used in Heritrix.
-     * <p>
-     * @return the newly created builder.
-     */
-    public static UriBuilder usableUriBuilder() {
-        return builder(Configurations.USABLE_URI);
-    }
+//    public static UriBuilder builder(UriBuilderConfig config) {
+//        return new UriBuilder(config);
+//    }
+//
+//    public static Uri buildUri(UriBuilderConfig config, String uri) {
+//        return new UriBuilder(config).uri(uri).build();
+//    }
 
     /**
      * Creates a new UriBuilder.
@@ -109,9 +98,9 @@ public final class UriBuilder {
      * <p>
      * @return the newly created builder.
      */
-    public static UriBuilder strictUriBuilder() {
-        return builder(Configurations.STRICT_URI);
-    }
+//    public static UriBuilder strictUriBuilder() {
+//        return builder(Configurations.STRICT_URI);
+//    }
 
     /**
      * Creates a new UriBuilder.
@@ -121,29 +110,18 @@ public final class UriBuilder {
      * <p>
      * @return the newly created builder.
      */
-    public static UriBuilder laxUriBuilder() {
-        return builder(Configurations.LAX_URI);
-    }
-
-    /**
-     * Creates a new UriBuilder.
-     * <p>
-     * The builder is configured with the standard normalizations used in OpenWayback.
-     * <p>
-     * @return the newly created builder.
-     */
-    public static UriBuilder canonicalizedUriBuilder() {
-        return builder(Configurations.CANONICALIZED_URI);
-    }
+//    public static UriBuilder laxUriBuilder() {
+//        return builder(Configurations.LAX_URI);
+//    }
 
     /**
      * Create a new builder configured to mimic behavior of major browsers.
      * <p>
      * @return the newly created builder.
      */
-    public static UriBuilder mimicBrowserUriBuilder() {
-        return builder(Configurations.MIMIC_BROWSER_URI);
-    }
+//    public static UriBuilder whathwgConformantUriBuilder() {
+//        return builder(Configurations.MIMIC_BROWSER_URI);
+//    }
 
     /**
      * Convenience method for creating a Uri.
@@ -153,9 +131,9 @@ public final class UriBuilder {
      * @param uri a uri to be parsed
      * @return the parsed and immutable Uri
      */
-    public static Uri mimicBrowserUri(String uri) {
-        return builder(Configurations.MIMIC_BROWSER_URI).uri(uri).build();
-    }
+//    public static Uri whatwgConformantUri(String uri) {
+//        return builder(Configurations.MIMIC_BROWSER_URI).uri(uri).build();
+//    }
 
     public UriBuilder charset(Charset charset) {
         this.charset = charset;
@@ -417,18 +395,18 @@ public final class UriBuilder {
         return uri;
     }
 
-    public UriBuilder resolve(UriBuilder relative) throws UriException {
-        config.getReferenceResolver().resolve(this, relative);
+    public UriBuilder resolve(UriBuilder reference) throws UriException {
+        config.getReferenceResolver().resolve(this, reference);
         return this;
     }
 
-    public UriBuilder resolve(Uri relative) throws UriException {
-        resolve(UriBuilder.builder(config).uri(relative));
+    public UriBuilder resolve(Uri reference) throws UriException {
+        resolve(new UriBuilder(config).uri(reference));
         return this;
     }
 
-    public UriBuilder resolve(String relative) throws UriException {
-        UriBuilder uri = UriBuilder.builder(config.requireAbsoluteUri(false)).uri(relative);
+    public UriBuilder resolve(String reference) throws UriException {
+        UriBuilder uri = new UriBuilder(config.requireAbsoluteUri(false)).uri(reference);
         resolve(uri);
         return this;
     }

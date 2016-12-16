@@ -16,7 +16,7 @@
 package org.netpreserve.commons.uri.parser;
 
 import org.junit.Test;
-import org.netpreserve.commons.uri.Configurations;
+import org.netpreserve.commons.uri.UriConfigs;
 import org.netpreserve.commons.uri.Uri;
 import org.netpreserve.commons.uri.UriBuilder;
 import org.netpreserve.commons.uri.UriBuilderConfig;
@@ -174,8 +174,8 @@ public class Rfc3986ReferenceResolverTest {
     }
 
     UriBuilder createUriBuilder(String uriString) {
-        UriBuilderConfig config = Configurations.STRICT_URI.schemeBasedNormalization(false);
-        UriBuilder uriBuilder = UriBuilder.builder(config);
+        UriBuilderConfig config = UriConfigs.STRICT.schemeBasedNormalization(false);
+        UriBuilder uriBuilder = new UriBuilder(config);
         Rfc3986Parser parser = new Rfc3986Parser();
         Rfc3986Parser.ParserState parserState = new Rfc3986Parser.ParserState(uriBuilder, uriString, 0);
         parser.parseScheme(parserState);

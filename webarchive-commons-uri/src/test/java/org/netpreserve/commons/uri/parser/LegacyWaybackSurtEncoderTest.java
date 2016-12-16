@@ -16,9 +16,8 @@
 package org.netpreserve.commons.uri.parser;
 
 import org.junit.Test;
-import org.netpreserve.commons.uri.Configurations;
+import org.netpreserve.commons.uri.UriConfigs;
 import org.netpreserve.commons.uri.Uri;
-import org.netpreserve.commons.uri.UriBuilder;
 import org.netpreserve.commons.uri.UriFormat;
 
 import static org.assertj.core.api.Assertions.*;
@@ -33,12 +32,11 @@ public class LegacyWaybackSurtEncoderTest {
      */
     @Test
     public void testEncode() {
-        Uri uri = UriBuilder.strictUriBuilder()
-                .uri("http://www.øks.com/path").build();
+        Uri uri = UriConfigs.STRICT.buildUri("http://www.øks.com/path");
         SurtEncoder instance = new LegacyWaybackSurtEncoder();
 
         StringBuilder sb = new StringBuilder();
-        UriFormat uriFormat = Configurations.SURT_KEY_FORMAT;
+        UriFormat uriFormat = UriConfigs.SURT_KEY_FORMAT;
         instance.encode(sb, uri, uriFormat);
         assertThat(sb.toString()).isEqualTo("com,øks,www)");
 
@@ -50,8 +48,7 @@ public class LegacyWaybackSurtEncoderTest {
 
     @Test
     public void testWithDefaultConfig() {
-        Uri uri = UriBuilder.builder(Configurations.LEGACY_SURT_KEY)
-                .uri("http://www.øks.Com/pAth%2dår?jsessionid=foo&q=r").build();
+        Uri uri = UriConfigs.LEGACY_SURT_KEY.buildUri("http://www.øks.Com/pAth%2dår?jsessionid=foo&q=r");
         assertThat(uri).hasToString("com,xn--ks-kka)/path-%C3%A5r?q=r");
     }
 

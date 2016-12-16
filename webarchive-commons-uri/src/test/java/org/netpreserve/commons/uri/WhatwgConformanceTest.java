@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.*;
  * The test cases are from
  * <a href="https://github.com/w3c/web-platform-tests/blob/master/url/urltestdata.json">https://github.com/w3c/web-platform-tests/blob/master/url/urltestdata.json</a>
  */
-public class MimicBrowserTest {
+public class WhatwgConformanceTest {
 
     @Test
     public void testParsing() throws IOException {
@@ -56,7 +56,7 @@ public class MimicBrowserTest {
 
             try {
                 try {
-                    Uri uri = UriBuilder.mimicBrowserUriBuilder().uri(td.base).resolve(td.input).build();
+                    Uri uri = UriConfigs.WHATWG.builder().uri(td.base).resolve(td.input).build();
 
                     if (td.failure) {
                         fail("UriException was expected for test #" + i

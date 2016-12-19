@@ -37,7 +37,7 @@ public abstract class SchemeBasedNormalizer implements Normalizer {
 
     @Override
     public boolean validFor(UriBuilder builder) {
-        if (builder.config.isSchemeBasedNormalization()) {
+        if (builder.config().isSchemeBasedNormalization()) {
             Set<Scheme> supportedSchemes = getSupportedSchemes();
             if (supportedSchemes.isEmpty()) {
                 return true;
@@ -57,7 +57,7 @@ public abstract class SchemeBasedNormalizer implements Normalizer {
      * @param rest remainig schemes the set is to contain
      * @return an immutable set containing the schemes
      */
-    protected final static Set<Scheme> immutableSetOf(Scheme first, Scheme... rest) {
+    protected static final Set<Scheme> immutableSetOf(Scheme first, Scheme... rest) {
         return Collections.unmodifiableSet(EnumSet.of(first, rest));
     }
 

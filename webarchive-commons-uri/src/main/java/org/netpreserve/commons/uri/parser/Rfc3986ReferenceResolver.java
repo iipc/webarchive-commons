@@ -27,7 +27,7 @@ public class Rfc3986ReferenceResolver implements ReferenceResolver {
 
     @Override
     public void resolve(UriBuilder base, UriBuilder reference) throws UriException {
-        UriBuilderConfig config = base.config;
+        UriBuilderConfig config = base.config();
 
         preResolve(base, reference);
 
@@ -85,14 +85,33 @@ public class Rfc3986ReferenceResolver implements ReferenceResolver {
         base.rawFragment(reference.fragment());
     }
 
+    /**
+     * Modifications to be done to the URIs before reference resolution.
+     * <p>
+     * This method can be overridden in subclasses to enable special handling of some URIs.
+     * <p>
+     * @param base the base URI
+     * @param reference the URI to resolved against the base URI
+     * @throws UriException is thrown if reference resolution is not possible with the given URIs.
+     */
     public void preResolve(UriBuilder base, UriBuilder reference) throws UriException {
-        UriBuilderConfig config = base.config;
+        UriBuilderConfig config = base.config();
 
         if (!config.isStrictReferenceResolution() && base.scheme().equals(reference.scheme())) {
             reference.scheme(null);
         }
     }
 
+    /**
+     * Returns true if the reference has an absolute path.
+     * <p>
+     * This method can be overridden in subclasses if more advanced analysis is needed. For example if Windows drive
+     * letters should be taken into account.
+     * <p>
+     * @param base the base URI
+     * @param reference the URI to resolved against the base URI
+     * @return true if the reference has an absolute path
+     */
     boolean isAbsolutePath(UriBuilder base, UriBuilder reference) {
         return reference.path().startsWith("/");
     }
@@ -119,7 +138,11 @@ public class Rfc3986ReferenceResolver implements ReferenceResolver {
                 base.rawPath(base.path().substring(0, at + 1));
             }
             StringBuilder buff = new StringBuilder(base.path().length() + reference.path().length());
-            buff.append((at != -1) ? base.path().substring(0, at + 1) : "/");
+            if (at != -1) {
+                buff.append(base.path().substring(0, at + 1));
+            } else {
+                buff.append("/");
+            }
             buff.append(reference.path());
             base.rawPath(buff.toString());
         }
@@ -129,8 +152,7 @@ public class Rfc3986ReferenceResolver implements ReferenceResolver {
      * Normalize the given hier path part.
      * <p>
      * <p>
-     * Algorithm taken from URI reference parser at
-     * http://www.apache.org/~fielding/uri/rev-2002/issues.html.
+     * Algorithm taken from URI reference parser at http://www.apache.org/~fielding/uri/rev-2002/issues.html.
      * <p>
      * @param path the path to removeDotSegments
      * @return the normalized path

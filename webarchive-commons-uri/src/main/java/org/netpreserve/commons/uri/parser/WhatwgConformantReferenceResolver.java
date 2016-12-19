@@ -23,11 +23,11 @@ import org.netpreserve.commons.uri.UriException;
 /**
  *
  */
-public class MimicBrowserReferenceResolver extends Rfc3986ReferenceResolver {
+public class WhatwgConformantReferenceResolver extends Rfc3986ReferenceResolver {
 
     @Override
     public void preResolve(UriBuilder base, UriBuilder reference) throws UriException {
-        UriBuilderConfig config = base.config;
+        UriBuilderConfig config = base.config();
 
         if (!config.isStrictReferenceResolution() && base.scheme().equals(reference.scheme())) {
             reference.scheme(null);
@@ -66,10 +66,10 @@ public class MimicBrowserReferenceResolver extends Rfc3986ReferenceResolver {
                 path = path.substring(leadingSlashCount);
                 int slash = path.indexOf('/');
                 if (slash > 0) {
-                    reference.config.getParser().decomposeAuthority(reference, path.substring(0, slash));
+                    reference.config().getParser().decomposeAuthority(reference, path.substring(0, slash));
                     reference.rawPath(path.substring(slash));
                 } else {
-                    reference.config.getParser().decomposeAuthority(reference, path);
+                    reference.config().getParser().decomposeAuthority(reference, path);
                     reference.rawPath("/");
                 }
             }

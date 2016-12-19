@@ -25,38 +25,40 @@ import org.netpreserve.commons.uri.Normalizer;
 import org.netpreserve.commons.uri.PostParseNormalizer;
 import org.netpreserve.commons.uri.PreParseNormalizer;
 import org.netpreserve.commons.uri.UriBuilder;
+import org.netpreserve.commons.uri.UriBuilderConfig;
 import org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer;
 
 /**
  *
  */
-public class NormalizationConfigReport {
+public final class NormalizationConfigReport {
 
     private final List<NormalizationDescription> normalizations;
 
-    public static final NormalizationConfigReport parse(UriBuilder uriBuilder) {
+    public static NormalizationConfigReport parse(UriBuilder uriBuilder) {
         return new NormalizationConfigReport(uriBuilder);
     }
 
     private NormalizationConfigReport(UriBuilder uriBuilder) {
+        UriBuilderConfig config = uriBuilder.config();
         this.normalizations = new ArrayList<>();
 
-        for (Normalizer normalizer : uriBuilder.config.getPreParseNormalizers()) {
-            if (!(normalizer instanceof SchemeBasedNormalizer) || uriBuilder.config.isSchemeBasedNormalization()) {
+        for (Normalizer normalizer : config.getPreParseNormalizers()) {
+            if (!(normalizer instanceof SchemeBasedNormalizer) || config.isSchemeBasedNormalization()) {
                 evalNormalizerConfigurations(PreParseNormalizer.class, (PreParseNormalizer) normalizer);
             }
         }
 
-        uriBuilder.config.getParser().describeNormalization(uriBuilder, normalizations);
+        config.getParser().describeNormalization(uriBuilder, normalizations);
 
-        for (Normalizer normalizer : uriBuilder.config.getInParseNormalizers()) {
-            if (!(normalizer instanceof SchemeBasedNormalizer) || uriBuilder.config.isSchemeBasedNormalization()) {
+        for (Normalizer normalizer : config.getInParseNormalizers()) {
+            if (!(normalizer instanceof SchemeBasedNormalizer) || config.isSchemeBasedNormalization()) {
                 evalNormalizerConfigurations(InParseNormalizer.class, (InParseNormalizer) normalizer);
             }
         }
 
-        for (Normalizer normalizer : uriBuilder.config.getPostParseNormalizers()) {
-            if (!(normalizer instanceof SchemeBasedNormalizer) || uriBuilder.config.isSchemeBasedNormalization()) {
+        for (Normalizer normalizer : config.getPostParseNormalizers()) {
+            if (!(normalizer instanceof SchemeBasedNormalizer) || config.isSchemeBasedNormalization()) {
                 evalNormalizerConfigurations(PostParseNormalizer.class, (PostParseNormalizer) normalizer);
             }
         }

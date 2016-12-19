@@ -23,7 +23,7 @@ import java.util.Objects;
 /**
  * Documentation of a step in URI normalization.
  */
-public class NormalizationDescription {
+public final class NormalizationDescription {
 
     private final String name;
 
@@ -33,7 +33,7 @@ public class NormalizationDescription {
 
     private final NormalizationExample[] examples;
 
-    public static class Builder {
+    public static final class Builder {
 
         private String name = "Missing";
 

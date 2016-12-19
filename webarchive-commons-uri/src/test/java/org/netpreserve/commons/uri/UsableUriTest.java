@@ -32,6 +32,8 @@ import static org.assertj.core.api.Assertions.*;
  */
 public class UsableUriTest {
 
+    private static final char NBSP = '\u00A0';
+
     /**
      * Test that parsing of escaped and unescaped uri gives expected result.
      */
@@ -242,8 +244,7 @@ public class UsableUriTest {
 
     @Test
     public final void testTrimSpaceNBSP() {
-        final String uri = "   http://archive.org/DIR WITH SPACES/"
-                + UriBuilder.NBSP + "home.html    " + UriBuilder.NBSP + "   ";
+        final String uri = "   http://archive.org/DIR WITH SPACES/" + NBSP + "home.html    " + NBSP + "   ";
         final String tgtUri = "http://archive.org/DIR%20WITH%20SPACES/%20home.html";
         Uri uuri = UriConfigs.HERITRIX.buildUri(uri);
         assertThat(uuri).hasToString(tgtUri);

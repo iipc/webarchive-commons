@@ -26,7 +26,7 @@ public class MimicBrowserNormalizerTest {
 
     @Test
     public void testExamples() {
-        NormalizationTestUtil.testNormalizerExamples(new MimicBrowserNormalizer());
+        NormalizationTestUtil.testNormalizerExamples(new WhatwgPreTrimming());
     }
 
     /**
@@ -35,7 +35,7 @@ public class MimicBrowserNormalizerTest {
     @Test
     public void testNormalize() {
         String uriString = " \tabc\ndef\u0003";
-        MimicBrowserNormalizer instance = new MimicBrowserNormalizer();
+        WhatwgPreTrimming instance = new WhatwgPreTrimming();
         String expResult = "abcdef";
         String result = instance.normalize(uriString);
         assertThat(result).isEqualTo(expResult);

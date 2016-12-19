@@ -34,42 +34,42 @@ public final class IpUtil {
 
     private static final BigInteger RADIX_0X10000 = BigInteger.valueOf(0x10000);
 
-    private final static char[] base85Charset = new char[85];
+    private static final char[] BASE85_CHARSET = new char[85];
 
     static {
         int j = 0;
         for (char i = '0'; i <= '9'; i++) {
-            base85Charset[j++] = i;
+            BASE85_CHARSET[j++] = i;
         }
         for (char i = 'A'; i <= 'Z'; i++) {
-            base85Charset[j++] = i;
+            BASE85_CHARSET[j++] = i;
         }
         for (char i = 'a'; i <= 'z'; i++) {
-            base85Charset[j++] = i;
+            BASE85_CHARSET[j++] = i;
         }
-        base85Charset[j++] = '!';
-        base85Charset[j++] = '#';
-        base85Charset[j++] = '$';
-        base85Charset[j++] = '%';
-        base85Charset[j++] = '&';
-        base85Charset[j++] = '(';
-        base85Charset[j++] = ')';
-        base85Charset[j++] = '*';
-        base85Charset[j++] = '+';
-        base85Charset[j++] = '-';
-        base85Charset[j++] = ';';
-        base85Charset[j++] = '<';
-        base85Charset[j++] = '=';
-        base85Charset[j++] = '>';
-        base85Charset[j++] = '?';
-        base85Charset[j++] = '@';
-        base85Charset[j++] = '^';
-        base85Charset[j++] = '_';
-        base85Charset[j++] = '`';
-        base85Charset[j++] = '{';
-        base85Charset[j++] = '|';
-        base85Charset[j++] = '}';
-        base85Charset[j++] = '~';
+        BASE85_CHARSET[j++] = '!';
+        BASE85_CHARSET[j++] = '#';
+        BASE85_CHARSET[j++] = '$';
+        BASE85_CHARSET[j++] = '%';
+        BASE85_CHARSET[j++] = '&';
+        BASE85_CHARSET[j++] = '(';
+        BASE85_CHARSET[j++] = ')';
+        BASE85_CHARSET[j++] = '*';
+        BASE85_CHARSET[j++] = '+';
+        BASE85_CHARSET[j++] = '-';
+        BASE85_CHARSET[j++] = ';';
+        BASE85_CHARSET[j++] = '<';
+        BASE85_CHARSET[j++] = '=';
+        BASE85_CHARSET[j++] = '>';
+        BASE85_CHARSET[j++] = '?';
+        BASE85_CHARSET[j++] = '@';
+        BASE85_CHARSET[j++] = '^';
+        BASE85_CHARSET[j++] = '_';
+        BASE85_CHARSET[j++] = '`';
+        BASE85_CHARSET[j++] = '{';
+        BASE85_CHARSET[j++] = '|';
+        BASE85_CHARSET[j++] = '}';
+        BASE85_CHARSET[j++] = '~';
     }
 
     /**
@@ -95,8 +95,8 @@ public final class IpUtil {
             ipv6Number = BigInteger.ZERO;
             for (int i = 0; i < 20; i++) {
                 int val = -1;
-                for (int j = 0; j < base85Charset.length; j++) {
-                    if (ipv6String.charAt(i) == base85Charset[j]) {
+                for (int j = 0; j < BASE85_CHARSET.length; j++) {
+                    if (ipv6String.charAt(i) == BASE85_CHARSET[j]) {
                         val = j;
                         break;
                     }
@@ -226,7 +226,7 @@ public final class IpUtil {
         char[] buf = new char[20];
         for (int i = 0; i < 20; i++) {
             BigInteger[] divideAndRemainder = curVal.divideAndRemainder(val85);
-            buf[19 - i] = base85Charset[divideAndRemainder[1].intValue()];
+            buf[19 - i] = BASE85_CHARSET[divideAndRemainder[1].intValue()];
             curVal = divideAndRemainder[0];
         }
 

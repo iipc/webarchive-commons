@@ -18,13 +18,13 @@ package org.netpreserve.commons.uri.normalization.report;
 /**
  * An example of a URI before and after normalization.
  */
-public class NormalizationExample {
+public final class NormalizationExample {
 
     private final String uri;
 
     private final String normalizedUri;
 
-    public static class Builder {
+    public static final class Builder {
 
         private String uri;
 

@@ -16,47 +16,28 @@
 package org.netpreserve.commons.uri.normalization;
 
 import org.netpreserve.commons.uri.InParseNormalizer;
-import org.netpreserve.commons.uri.UriException;
+import org.netpreserve.commons.uri.parser.Parser;
+import org.netpreserve.commons.uri.Scheme;
 import org.netpreserve.commons.uri.normalization.report.Description;
 import org.netpreserve.commons.uri.normalization.report.Example;
-import org.netpreserve.commons.uri.parser.Parser;
 
 /**
- * Trim host.
+ * Remove localhost for file scheme.
  * <p>
- * Remove leading and trailing dots from host name.
+ * Remove the string 'localhost' from authority if scheme is 'file'.
  */
-public class TrimHost implements InParseNormalizer {
+public class RemoveLocalhost implements InParseNormalizer {
 
     @Override
-    @Description(name = "Trim host",
-                 description = "Remove leading and trailing dots from host name.")
-    @Example(uri = "http://foo.com./bar", normalizedUri = "http://foo.com/bar")
+    @Description(name = "Remove localhost for file scheme",
+                 description = "Remove the string 'localhost' from authority if scheme is 'file'.")
+    @Example(uri = "file://localhost/path", normalizedUri = "file:///path")
+    @Example(uri = "http://localhost/path", normalizedUri = "http://localhost/path")
     public String preParseHost(Parser.ParserState parserState, String host) {
-        if (host.contains("..")) {
-            throw new UriException("Illegal hostname: " + host);
+        if (parserState.getBuilder().schemeType() == Scheme.FILE && "localhost".equals(host)) {
+            return "";
         }
-        host = trim(host, '.');
-
         return host;
-    }
-
-    private String trim(String string, char trim) {
-        int len = string.length();
-        int st = 0;
-        char[] val = string.toCharArray();
-
-        while ((st < len) && (val[st] == trim)) {
-            st++;
-        }
-        while ((st < len) && (val[len - 1] == trim)) {
-            len--;
-        }
-        if (st > 0 || len < string.length()) {
-            return string.substring(st, len);
-        } else {
-            return string;
-        }
     }
 
 }

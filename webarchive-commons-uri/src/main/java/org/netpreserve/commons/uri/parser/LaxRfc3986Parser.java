@@ -18,7 +18,15 @@ package org.netpreserve.commons.uri.parser;
 import java.util.BitSet;
 
 /**
- *
+ * A RFC 3986 conformant parser which is a little bit more relaxed on what characters are allowed in qurey and path.
+ * <p>
+ * The changes done by this parser is to behave like the lax uris used in Heritrix.
+ * <p>
+ * This parser differ from the strict one in that it in addition to the characters allowed by RFC 3986, allows the
+ * characters {@code | < >} in paths and {@code ^ { } [ ] |} in queries.
+ * <p>
+ * It is more restrictive than the strict parser by not allowing percent encoded characters in registry names (host
+ * name).
  */
 public class LaxRfc3986Parser extends Rfc3986Parser {
 
@@ -31,9 +39,6 @@ public class LaxRfc3986Parser extends Rfc3986Parser {
         allowedInQuery.set('[');
         allowedInQuery.set(']');
         allowedInQuery.set('|');
-//        allowedInQuery.set('<');
-//        allowedInQuery.set('>');
-//        allowedInQuery.set('"');
 
         // Do not allow percent encoded registry names
         allowedInRegistryName = (BitSet) REGISTRY_NAME.clone();
@@ -43,9 +48,6 @@ public class LaxRfc3986Parser extends Rfc3986Parser {
         allowedInPath.set('|');
         allowedInPath.set('<');
         allowedInPath.set('>');
-//        allowedInPath.set('[');
-//        allowedInPath.set(']');
-//        allowedInPath.set('"');
     }
 
 }

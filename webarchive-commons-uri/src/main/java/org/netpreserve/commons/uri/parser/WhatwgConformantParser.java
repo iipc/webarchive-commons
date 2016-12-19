@@ -27,11 +27,11 @@ import org.netpreserve.commons.uri.UriException;
 /**
  *
  */
-public class MimicBrowserParser extends Rfc3986Parser {
+public class WhatwgConformantParser extends Rfc3986Parser {
 
     BitSet simpleEncodeSet = new BitSet(256);
 
-    public MimicBrowserParser() {
+    public WhatwgConformantParser() {
         // Laxed to conform to browser behavior.
         allowedInQuery = (BitSet) QUERY.clone();
         allowedInQuery.set('^');
@@ -86,7 +86,7 @@ public class MimicBrowserParser extends Rfc3986Parser {
         }
 
         // Normalize known port numbers
-        if (builder.config.isSchemeBasedNormalization() && builder.port() != Uri.DEFAULT_PORT_MARKER) {
+        if (builder.config().isSchemeBasedNormalization() && builder.port() != Uri.DEFAULT_PORT_MARKER) {
             if (builder.port() == builder.schemeType().defaultPort()) {
                 builder.port(Uri.DEFAULT_PORT_MARKER);
             }
@@ -108,10 +108,10 @@ public class MimicBrowserParser extends Rfc3986Parser {
         CharBuffer uri = parserState.getUri();
         if ((builder.scheme() == null || !builder.schemeType().isSpecial())
                 && (!builder.isAuthority() && (!uri.hasRemaining() || uri.charAt(0) != '/'))) {
-            return validateAndNormalize(parserState.config, parserState.charset, parserState.uri, simpleEncodeSet);
+            return validateAndNormalize(builder.config(), parserState.charset, parserState.uri, simpleEncodeSet);
         } else {
             replace(uri, '\\', '/');
-            String path = validateAndNormalize(parserState.config, parserState.charset, parserState.uri, allowedInPath);
+            String path = validateAndNormalize(builder.config(), parserState.charset, parserState.uri, allowedInPath);
             path = path.replaceAll("%2[eE]", ".");
             return path;
         }

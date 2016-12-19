@@ -20,12 +20,12 @@ import org.netpreserve.commons.uri.normalization.report.Description;
 import org.netpreserve.commons.uri.normalization.report.Example;
 import org.netpreserve.commons.uri.parser.Parser;
 
-import static org.netpreserve.commons.uri.UriBuilder.ESCAPED_SPACE;
-
 /**
- *
+ * Normalizer for stripping trailing escaped space on authority.
  */
 public class StripTrailingEscapedSpaceOnAuthority implements InParseNormalizer {
+    private static final String ESCAPED_SPACE = "%20";
+
 
     @Override
     @Description(name = "Strip trailing escaped space on authority",

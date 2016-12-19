@@ -24,7 +24,10 @@ import org.netpreserve.commons.uri.UriBuilderConfig;
 import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
 
 /**
- *
+ * URI parser.
+ * <p>
+ * A Parser is used for parsing a whole URI or some of its components for validation and normalization. The parser
+ * itself is stateless and thread safe. All state is kept in a {@link UriBuilder} and a {@link ParserState} object.
  */
 public interface Parser {
 
@@ -41,16 +44,14 @@ public interface Parser {
     default void describeNormalization(List<NormalizationDescription> descriptions) {
 
     }
-    
+
     void describeNormalization(UriBuilder uriBuilder, List<NormalizationDescription> descriptions);
 
-    public static class ParserState {
+    class ParserState {
 
         UriBuilder builder;
 
         CharBuffer uri;
-
-        final UriBuilderConfig config;
 
         final Charset charset;
 
@@ -60,14 +61,12 @@ public interface Parser {
             this.builder = builder;
             this.uri = CharBuffer.wrap(uri.toCharArray());
             this.uri.position(offset);
-            this.config = builder.config;
             this.charset = builder.charset();
         }
 
         public ParserState(UriBuilder builder, String uri) {
             this.builder = builder;
             this.uri = CharBuffer.wrap(uri.toCharArray());
-            this.config = builder.config;
             this.charset = builder.charset();
         }
 
@@ -77,10 +76,6 @@ public interface Parser {
 
         public CharBuffer getUri() {
             return uri;
-        }
-
-        public UriBuilderConfig getConfig() {
-            return config;
         }
 
         public boolean hasAuthority() {

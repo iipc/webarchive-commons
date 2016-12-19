@@ -20,15 +20,16 @@ import java.util.BitSet;
 
 import org.netpreserve.commons.uri.InParseNormalizer;
 import org.netpreserve.commons.uri.parser.Parser;
-import org.netpreserve.commons.uri.PreParseNormalizer;
 import org.netpreserve.commons.uri.Scheme;
 import org.netpreserve.commons.uri.normalization.report.Description;
 import org.netpreserve.commons.uri.normalization.report.Example;
 
 /**
- *
+ * WHATWG Normalize start of authority and path.
+ * <p>
+ * Skip or normalize errorneous slashes at start of authority. Handle windows drive letters at start of path.
  */
-public class MimicBrowserNormalizer implements PreParseNormalizer, InParseNormalizer {
+public class WhatwgNormalizeHostAndPath implements InParseNormalizer {
 
     protected static final BitSet ALPHA = new BitSet(256);
 
@@ -42,43 +43,7 @@ public class MimicBrowserNormalizer implements PreParseNormalizer, InParseNormal
         }
     }
 
-    @Description(name = "Trim", description = "Remove leading and trailing control characters and space."
-                 + " Remove stray TAB/CR/LF.")
-    @Example(uri = " http://www.example.com", normalizedUri = "http://www.example.com/")
-    @Example(uri = "http://www.\texample.com", normalizedUri = "http://www.example.com/")
-    @Override
-    public String normalize(String uriString) {
-        char[] val = uriString.toCharArray();
-        int len = val.length;
-        int st = 0;
-
-        // Remove leading controls and space
-        while ((st < len) && (val[st] <= ' ')) {
-            st++;
-        }
-
-        // Remove trailing controls and space
-        while ((st < len) && (val[len - 1] <= ' ')) {
-            len--;
-        }
-
-        // Remove tab and newline
-        int removed = 0;
-        for (int i = st; i < len; i++) {
-            if (removed > 0) {
-                val[i - removed] = val[i];
-            }
-
-            if (val[i] == '\n' || val[i] == '\r' || val[i] == '\t') {
-                removed++;
-            }
-        }
-
-        len -= removed;
-        return ((st > 0) || (len < val.length)) ? new String(val, st, len - st) : uriString;
-    }
-
-    @Description(name = "Normalize start of authority",
+    @Description(name = "WHATWG Normalize start of authority and path",
                  description = "Skip or normalize errorneous slashes at start of authority. "
                  + "Handle windows drive letters at start of path.")
     @Example(uri = "foo:///example.com/", normalizedUri = "foo:///example.com/")
@@ -110,25 +75,17 @@ public class MimicBrowserNormalizer implements PreParseNormalizer, InParseNormal
                 }
             } else if (parserState.getBuilder().scheme() == null
                     && isWindowsDriveLetter(parserState, leadingSlashCount)) {
-                parserState.incrementOffset(leadingSlashCount > 0 ? leadingSlashCount - 1 : 0);
+                if (leadingSlashCount > 0) {
+                    parserState.incrementOffset(leadingSlashCount - 1);
+                } else {
+                    parserState.incrementOffset(0);
+                }
                 parserState.setHasAuthority(leadingSlashCount >= 2);
             } else if (leadingSlashCount >= 2) {
                 parserState.setHasAuthority(true);
                 parserState.incrementOffset(2);
             }
         }
-    }
-
-    @Override
-    @Description(name = "Remove localhost for file scheme",
-                 description = "Remove the string 'localhost' from authority if scheme is 'file'.")
-    @Example(uri = "file://localhost/path", normalizedUri = "file:///path")
-    @Example(uri = "http://localhost/path", normalizedUri = "http://localhost/path")
-    public String preParseHost(Parser.ParserState parserState, String host) {
-        if (parserState.getBuilder().schemeType() == Scheme.FILE && "localhost".equals(host)) {
-            return "";
-        }
-        return host;
     }
 
     /**

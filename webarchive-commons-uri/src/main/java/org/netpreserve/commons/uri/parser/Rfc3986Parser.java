@@ -351,7 +351,7 @@ public class Rfc3986Parser implements Parser {
     }
 
     void checkHasAuthority(ParserState parserState) {
-        for (InParseNormalizer normalizer : parserState.config.getInParseNormalizers()) {
+        for (InParseNormalizer normalizer : parserState.builder.config().getInParseNormalizers()) {
             if (normalizer.validFor(parserState.builder)) {
                 normalizer.preParseAuthority(parserState);
             }
@@ -388,8 +388,9 @@ public class Rfc3986Parser implements Parser {
 
     public void decomposeAuthority(ParserState parserState) {
         UriBuilder builder = parserState.builder;
+        UriBuilderConfig config = builder.config();
         CharBuffer uri = parserState.uri;
-        int endOfAuthority = uri.limit();
+        int endOfAuthorityPos = uri.limit();
 
         int next = lastIndexOf(uri, '@');
         if (next == uri.position()) {
@@ -401,18 +402,18 @@ public class Rfc3986Parser implements Parser {
             int passIdx = indexOf(uri, ':');
             if (passIdx == -1 || passIdx >= next) {
                 uri.limit(next);
-                builder.user(validateAndNormalize(builder.config, builder.charset(), uri, allowedInUserInfo));
+                builder.user(validateAndNormalize(config, builder.charset(), uri, allowedInUserInfo));
             } else {
                 uri.limit(passIdx);
-                builder.user(validateAndNormalize(builder.config, builder.charset(), uri, allowedInUserInfo));
+                builder.user(validateAndNormalize(config, builder.charset(), uri, allowedInUserInfo));
                 if (next > passIdx) {
                     uri.limit(next);
                     uri.position(passIdx + 1);
                     builder.password(
-                            validateAndNormalize(builder.config, builder.charset(), uri, allowedInUserInfo));
+                            validateAndNormalize(config, builder.charset(), uri, allowedInUserInfo));
                 }
             }
-            uri.limit(endOfAuthority);
+            uri.limit(endOfAuthorityPos);
             uri.position(next + 1);
         }
 
@@ -425,14 +426,14 @@ public class Rfc3986Parser implements Parser {
             }
             uri.limit(endOfIpv6);
             parseIpv6(builder, uri.toString());
-            uri.limit(endOfAuthority);
+            uri.limit(endOfAuthorityPos);
             uri.position(endOfIpv6 + 1);
         }
 
         // Eventual IPv6 reference is now consumed. We can safely search for port separator ':'
         int endOfHost = indexOf(uri, ':');
         if (endOfHost == -1) {
-            endOfHost = endOfAuthority;
+            endOfHost = endOfAuthorityPos;
         }
         uri.limit(endOfHost);
 
@@ -440,7 +441,7 @@ public class Rfc3986Parser implements Parser {
             String host = uri.toString();
 
             // Normalize unicode characters
-            if (builder.config.isNormalizeIpv4()) {
+            if (config.isNormalizeIpv4()) {
                 host = java.text.Normalizer.normalize(host, java.text.Normalizer.Form.NFKC);
             }
             parseIpv4(builder, host);
@@ -455,8 +456,8 @@ public class Rfc3986Parser implements Parser {
             }
         }
 
-        if (endOfAuthority > endOfHost) {
-            uri.limit(endOfAuthority);
+        if (endOfAuthorityPos > endOfHost) {
+            uri.limit(endOfAuthorityPos);
             uri.position(endOfHost + 1);
             parsePort(builder, uri);
         }
@@ -464,12 +465,12 @@ public class Rfc3986Parser implements Parser {
 
     void parseIpv6(UriBuilder builder, String host) {
         BigInteger ipv6Value = IpUtil.parseIpv6(host);
-        if (builder.config.isNormalizeIpv6()) {
-            if (builder.config.isUseIpv6Base85Encoding()) {
+        if (builder.config().isNormalizeIpv6()) {
+            if (builder.config().isUseIpv6Base85Encoding()) {
                 builder.host(IpUtil.serializeIpv6Base85(ipv6Value));
             } else {
-                boolean upperCaseIpv6Values = builder.config.isCaseNormalization()
-                        && builder.config.isUpperCaseIpv6HexValues();
+                boolean upperCaseIpv6Values = builder.config().isCaseNormalization()
+                        && builder.config().isUpperCaseIpv6HexValues();
                 builder.host(IpUtil.serializeIpv6(ipv6Value, upperCaseIpv6Values));
             }
         }
@@ -480,7 +481,7 @@ public class Rfc3986Parser implements Parser {
     }
 
     void parseIpv4(UriBuilder builder, String ipv4Address) {
-        if (builder.config.isNormalizeIpv4()) {
+        if (builder.config().isNormalizeIpv4()) {
             builder.host(IpUtil.checkAndNormalizeIpv4(ipv4Address));
         } else {
             builder.host(IpUtil.checkIpv4(ipv4Address));
@@ -492,18 +493,19 @@ public class Rfc3986Parser implements Parser {
 
     void parseRegistryName(ParserState parserState, String registryName) {
         UriBuilder builder = parserState.builder;
+        UriBuilderConfig config = builder.config();
 
-        if (builder.config.isCaseNormalization()) {
+        if (config.isCaseNormalization()) {
             registryName = registryName.toLowerCase();
         }
 
-        for (InParseNormalizer normalizer : parserState.config.getInParseNormalizers()) {
+        for (InParseNormalizer normalizer : config.getInParseNormalizers()) {
             if (normalizer.validFor(parserState.builder)) {
                 registryName = normalizer.preParseHost(parserState, registryName);
             }
         }
-        if (builder.config.isSchemeBasedNormalization()) {
-            if (builder.config.isPunycodeUnknownScheme() || builder.schemeType().isPunycodedHost()) {
+        if (config.isSchemeBasedNormalization()) {
+            if (config.isPunycodeUnknownScheme() || builder.schemeType().isPunycodedHost()) {
                 // apply IDN-punycoding, as necessary
                 try {
                     builder.host(IDN.toASCII(registryName, IDN.USE_STD3_ASCII_RULES));
@@ -516,15 +518,14 @@ public class Rfc3986Parser implements Parser {
                         throw new UriException("Invalid hostname: " + builder.host());
                     } else {
                         builder.host(validateAndNormalize(
-                                builder.config, builder.charset(), registryName, allowedInRegistryName));
+                                config, builder.charset(), registryName, allowedInRegistryName));
                     }
                 }
             } else {
-                builder.host(validateAndNormalize(
-                        builder.config, builder.charset(), registryName, allowedInRegistryName));
+                builder.host(validateAndNormalize(config, builder.charset(), registryName, allowedInRegistryName));
             }
         } else {
-            builder.host(validateAndNormalize(builder.config, builder.charset(), registryName, allowedInRegistryName));
+            builder.host(validateAndNormalize(config, builder.charset(), registryName, allowedInRegistryName));
         }
 
         // Set flag
@@ -548,7 +549,7 @@ public class Rfc3986Parser implements Parser {
         }
 
         // Normalize known port numbers
-        if (builder.config.isSchemeBasedNormalization() && builder.port() != Uri.DEFAULT_PORT_MARKER) {
+        if (builder.config().isSchemeBasedNormalization() && builder.port() != Uri.DEFAULT_PORT_MARKER) {
             if (builder.port() == builder.schemeType().defaultPort()) {
                 builder.port(Uri.DEFAULT_PORT_MARKER);
             }
@@ -570,14 +571,14 @@ public class Rfc3986Parser implements Parser {
         if (path == null) {
             throw new UriException("Illegal path: " + parserState.uri);
         }
-        if (parserState.config.isSchemeBasedNormalization() && parserState.builder.isAuthority()
+        if (parserState.builder.config().isSchemeBasedNormalization() && parserState.builder.isAuthority()
                 && path.isEmpty()) {
             path = "/";
         }
 
         if (!path.isEmpty() && path.charAt(0) == '/') {
             parserState.builder.isAbsPath(true);
-            if (parserState.config.isPathSegmentNormalization()) {
+            if (parserState.builder.config().isPathSegmentNormalization()) {
                 path = parserState.builder.resolver().removeDotSegments(path);
             }
         } else {
@@ -589,7 +590,7 @@ public class Rfc3986Parser implements Parser {
     }
 
     String validatePath(ParserState parserState) {
-        return validateAndNormalize(parserState.config, parserState.charset, parserState.uri, allowedInPath);
+        return validateAndNormalize(parserState.builder.config(), parserState.charset, parserState.uri, allowedInPath);
     }
 
     void parseQuery(ParserState parserState) {
@@ -601,7 +602,8 @@ public class Rfc3986Parser implements Parser {
             }
             parserState.uri.limit(end);
 
-            parserState.builder.rawQuery(validateQuery(parserState.config, parserState.charset, parserState.uri));
+            parserState.builder.rawQuery(
+                    validateQuery(parserState.builder.config(), parserState.charset, parserState.uri));
             if (parserState.builder.query() == null) {
                 throw new UriException("Illegal query: " + parserState.uriToString());
             }
@@ -619,7 +621,7 @@ public class Rfc3986Parser implements Parser {
         if (parserState.uri.hasRemaining() && parserState.uri.charAt(0) == '#') {
             parserState.incrementOffset(1);
             parserState.builder.rawFragment(
-                    validateFragment(parserState.config, parserState.charset, parserState.uri));
+                    validateFragment(parserState.builder.config(), parserState.charset, parserState.uri));
             if (parserState.builder.fragment() == null) {
                 throw new UriException("Illegal fragment: " + parserState.uri);
             }
@@ -635,18 +637,13 @@ public class Rfc3986Parser implements Parser {
     }
 
     /**
-     * Validate the URI characters within a specific component. The component must be performed after escape encoding.
-     * Or it doesn't include escaped characters.
-     * <p>
-     * It's not that much strict, generous. The strict validation might be performed before being called this method.
+     * Validate and normalize the URI characters within a specific component.
      * <p>
      * @param config the UriBuilderConfig to use for determining what normalization to do
      * @param charset the character set of the URI
-     * @param component the characters sequence within the component
-     * @param from the starting offset of the given component
-     * @param to the ending offset (exclusive) of the given component if -1, it means the length of the component
-     * @param generous those characters that are allowed within a component
-     * @return if true, it's the correct URI character sequence
+     * @param component the character sequence within the component
+     * @param generous characters allowed within the component
+     * @return the validated and normalized component
      */
     String validateAndNormalize(UriBuilderConfig config, Charset charset, CharBuffer component, BitSet generous) {
         if (component == null) {
@@ -756,8 +753,11 @@ public class Rfc3986Parser implements Parser {
     }
 
     /**
-     * Encodes an array of bytes into an array of URL safe 7-bit characters. Unsafe characters are escaped.
+     * Encodes an array of bytes into an array of URL safe 7-bit characters.
+     *
+     * Unsafe characters are escaped.
      * <p>
+     * @param config the config object
      * @param urlsafe bitset of characters deemed URL safe
      * @param bytes array of bytes to convert to URL safe characters
      * @return array of bytes containing URL safe characters
@@ -799,6 +799,7 @@ public class Rfc3986Parser implements Parser {
     /**
      * Add a human readable description of the normalization done by this class.
      * <p>
+     * @param builder the UriBuilder using this parser
      * @param descriptions A list of descriptions which this class can add its own descriptions to.
      */
     public void describeNormalization(UriBuilder builder, List<NormalizationDescription> descriptions) {
@@ -806,15 +807,16 @@ public class Rfc3986Parser implements Parser {
                 .name("Missing")
                 .description("The description of normalization done by the parser is not complete")
                 .build());
-        if (builder.config.isCaseNormalization()) {
+        if (builder.config().isCaseNormalization()) {
             descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
                     .name("Case normalization")
-                    .description("Converts scheme and hostname to lower case. Percent encoded characters are converted to upper case.")
+                    .description("Converts scheme and hostname to lower case. "
+                            + "Percent encoded characters are converted to upper case.")
                     .example(NormalizationExample.builder().uri("HtTp://eXample.COM/a%20%2fpath")
                             .normalizedUri("http://example.com/a%20%2Fpath").build())
                     .build());
         }
-        if (builder.config.isEncodeIllegalCharacters()) {
+        if (builder.config().isEncodeIllegalCharacters()) {
             descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
                     .name("Encode illegal characters")
                     .description("Converts characters not allowed in a certain part of the URI to percent encoding.")

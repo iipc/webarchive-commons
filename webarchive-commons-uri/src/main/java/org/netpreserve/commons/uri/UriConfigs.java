@@ -16,9 +16,9 @@
 package org.netpreserve.commons.uri;
 
 import org.netpreserve.commons.uri.parser.Parser;
-import org.netpreserve.commons.uri.parser.MimicBrowserReferenceResolver;
+import org.netpreserve.commons.uri.parser.WhatwgConformantReferenceResolver;
 import org.netpreserve.commons.uri.parser.LegacyWaybackSurtEncoder;
-import org.netpreserve.commons.uri.parser.MimicBrowserParser;
+import org.netpreserve.commons.uri.parser.WhatwgConformantParser;
 import org.netpreserve.commons.uri.parser.Rfc3986Parser;
 import org.netpreserve.commons.uri.parser.Rfc3986ReferenceResolver;
 import org.netpreserve.commons.uri.parser.LaxRfc3986Parser;
@@ -32,23 +32,28 @@ import org.netpreserve.commons.uri.normalization.StripSessionId;
 import org.netpreserve.commons.uri.normalization.StripTrailingEscapedSpaceOnAuthority;
 import org.netpreserve.commons.uri.normalization.StripSlashAtEndOfPath;
 import org.netpreserve.commons.uri.normalization.StripWwwN;
-import org.netpreserve.commons.uri.normalization.MimicBrowserNormalizer;
+import org.netpreserve.commons.uri.normalization.WhatwgPreTrimming;
+import org.netpreserve.commons.uri.normalization.RemoveLocalhost;
 import org.netpreserve.commons.uri.normalization.TrimHost;
+import org.netpreserve.commons.uri.normalization.WhatwgNormalizeHostAndPath;
 
 /**
  * Common configurations to use with UriBuilder.
  */
 public final class UriConfigs {
 
+    /**
+     * The default RFC3986 conformant parser.
+     */
     public static final Parser STRICT_PARSER = new Rfc3986Parser();
 
     public static final Parser LAX_PARSER = new LaxRfc3986Parser();
 
-    public static final Parser MIMIC_BROWSER_PARSER = new MimicBrowserParser();
+    public static final Parser WHATWG_PARSER = new WhatwgConformantParser();
 
     public static final ReferenceResolver REFERENCE_RESOLVER = new Rfc3986ReferenceResolver();
 
-    public static final ReferenceResolver MIMIC_BROWSER_REFERENCE_RESOLVER = new MimicBrowserReferenceResolver();
+    public static final ReferenceResolver WHATWG_REFERENCE_RESOLVER = new WhatwgConformantReferenceResolver();
 
     public static final UriFormat DEFAULT_FORMAT = new UriFormat();
 
@@ -77,6 +82,12 @@ public final class UriConfigs {
             .decodeHost(false)
             .surtEncoder(new LegacyWaybackSurtEncoder());
 
+    /**
+     * A Uri config which only allows URI's which conforms to the RFC 3986.
+     * <p>
+     * It does some normalizing, but only normalizing which doesn't alter semantics. Case is normalized in places where
+     * the URI is case insensitive. Path is normalized for constructs like '{@code foo/../bar/.}'.
+     */
     public static final UriBuilderConfig STRICT = new UriBuilderConfig()
             .parser(UriConfigs.STRICT_PARSER)
             .referenceResolver(UriConfigs.REFERENCE_RESOLVER)
@@ -94,8 +105,8 @@ public final class UriConfigs {
      * <a herf="https://url.spec.whatwg.org/">whatwg.org</a>.
      */
     public static final UriBuilderConfig WHATWG = new UriBuilderConfig()
-            .parser(UriConfigs.MIMIC_BROWSER_PARSER)
-            .referenceResolver(UriConfigs.MIMIC_BROWSER_REFERENCE_RESOLVER)
+            .parser(UriConfigs.WHATWG_PARSER)
+            .referenceResolver(UriConfigs.WHATWG_REFERENCE_RESOLVER)
             .requireAbsoluteUri(false)
             .strictReferenceResolution(false)
             .caseNormalization(true)
@@ -106,7 +117,9 @@ public final class UriConfigs {
             .encodeIllegalCharacters(true)
             .punycodeUnknownScheme(true)
             .defaultFormat(UriConfigs.DEFAULT_FORMAT)
-            .addNormalizer(new MimicBrowserNormalizer());
+            .addNormalizer(new WhatwgPreTrimming())
+            .addNormalizer(new WhatwgNormalizeHostAndPath())
+            .addNormalizer(new RemoveLocalhost());
 
     /**
      * A forgiving URI config.
@@ -161,7 +174,7 @@ public final class UriConfigs {
      */
     public static final UriBuilderConfig WAYBACK = new UriBuilderConfig()
             .parser(UriConfigs.LAX_PARSER)
-            .referenceResolver(UriConfigs.MIMIC_BROWSER_REFERENCE_RESOLVER)
+            .referenceResolver(UriConfigs.WHATWG_REFERENCE_RESOLVER)
             .requireAbsoluteUri(true)
             .strictReferenceResolution(false)
             .caseNormalization(true)

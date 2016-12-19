@@ -67,7 +67,11 @@ public class Uri {
     Uri(final UriBuilder uriBuilder) {
         // There are usually only a little number of schemes. Interning the field reuses the same
         // string to reduce memory footprint.
-        this.scheme = uriBuilder.scheme() != null ? uriBuilder.scheme().intern() : null;
+        if (uriBuilder.scheme() != null) {
+            this.scheme = uriBuilder.scheme().intern();
+        } else {
+            this.scheme = null;
+        }
 
         this.user = uriBuilder.user();
         this.password = uriBuilder.password();
@@ -83,7 +87,7 @@ public class Uri {
         this.isAbsPath = uriBuilder.isAbsPath;
 
         this.charset = uriBuilder.charset;
-        this.defaultFormat = uriBuilder.config.getDefaultFormat();
+        this.defaultFormat = uriBuilder.config().getDefaultFormat();
     }
 
     public String getScheme() {

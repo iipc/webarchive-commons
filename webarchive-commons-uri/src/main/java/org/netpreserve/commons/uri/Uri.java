@@ -76,24 +76,36 @@ public class Uri {
         this.user = uriBuilder.user();
         this.password = uriBuilder.password();
         this.host = uriBuilder.host();
-        this.port = uriBuilder.port;
-        this.path = uriBuilder.path;
-        this.query = uriBuilder.query;
+        this.port = uriBuilder.port();
+        this.path = uriBuilder.path();
+        this.query = uriBuilder.query();
         this.parsedQuery = uriBuilder.parsedQuery;
-        this.fragment = uriBuilder.fragment;
-        this.isRegName = uriBuilder.isRegName;
-        this.isIPv4address = uriBuilder.isIPv4address;
-        this.isIPv6reference = uriBuilder.isIPv6reference;
-        this.isAbsPath = uriBuilder.isAbsPath;
+        this.fragment = uriBuilder.fragment();
+        this.isRegName = uriBuilder.isRegName();
+        this.isIPv4address = uriBuilder.isIPv4address();
+        this.isIPv6reference = uriBuilder.isIPv6reference();
+        this.isAbsPath = uriBuilder.isAbsPath();
 
-        this.charset = uriBuilder.charset;
+        this.charset = uriBuilder.charset();
         this.defaultFormat = uriBuilder.config().getDefaultFormat();
     }
 
+    /**
+     * Get the URI's scheme.
+     * <p>
+     * @return the scheme or null is URI is not absolute
+     */
     public String getScheme() {
         return scheme;
     }
 
+    /**
+     * Get the URI's user info.
+     * <p>
+     * The userinfo consists of user + ':' + password.
+     * <p>
+     * @return the user info
+     */
     public String getUserinfo() {
         StringBuilder sb = new StringBuilder();
         if (user != null) {
@@ -105,10 +117,20 @@ public class Uri {
         return sb.toString();
     }
 
+    /**
+     * Get the URI's user.
+     * <p>
+     * @return the user
+     */
     public String getUser() {
         return user;
     }
 
+    /**
+     * Get the URI's password.
+     * <p>
+     * @return the password
+     */
     public String getPassword() {
         return password;
     }
@@ -146,10 +168,24 @@ public class Uri {
         return decode(host);
     }
 
+    /**
+     * Get the URI's port.
+     * <p>
+     * If the URI uses the scheme's default port, {@link #DEFAULT_PORT_MARKER} is returned.
+     * <p>
+     * @return the port or {@link #DEFAULT_PORT_MARKER} if scheme's default port.
+     */
     public int getPort() {
         return port;
     }
 
+    /**
+     * Get the URI's decoded port.
+     * <p>
+     * If this URI has no port, but the scheme defines a default port, the scheme's default port is returned.
+     * <p>
+     * @return the port
+     */
     public int getDecodedPort() {
         if (port == DEFAULT_PORT_MARKER) {
             return Scheme.forName(scheme).defaultPort();
@@ -258,10 +294,20 @@ public class Uri {
         return isRegName;
     }
 
+    /**
+     * Returns true if this URI's host is an IPv4 address.
+     * <p>
+     * @return true if this URI's host is an IPv4 address
+     */
     public boolean isIPv4address() {
         return isIPv4address;
     }
 
+    /**
+     * Returns true if this URI's host is an IPv6 reference.
+     * <p>
+     * @return true if this URI's host is an IPv6 reference
+     */
     public boolean isIPv6reference() {
         return isIPv6reference;
     }
@@ -302,6 +348,11 @@ public class Uri {
         return defaultFormat;
     }
 
+    /**
+     * Returns a string with this URI's fields for debugging.
+     * <p>
+     * @return a descriptive string of this URI's fields
+     */
     public String toDebugString() {
         StringBuilder buf = new StringBuilder("Details for '" + toString() + "'\n");
         buf.append("  Scheme: ").append(scheme).append('\n');
@@ -322,6 +373,11 @@ public class Uri {
         return buf.toString();
     }
 
+    /**
+     * Get this URI as a string using the default format.
+     * <p>
+     * @return this URI as a string
+     */
     @Override
     public String toString() {
         if (toStringCache == null) {
@@ -340,6 +396,12 @@ public class Uri {
         return toCustomString(format);
     }
 
+    /**
+     * Get this URI as a string using a custom format.
+     * <p>
+     * @param format the format used for creating the string.
+     * @return this URI as a string
+     */
     public String toCustomString(UriFormat format) {
         try {
             StringBuilder buf = new StringBuilder();

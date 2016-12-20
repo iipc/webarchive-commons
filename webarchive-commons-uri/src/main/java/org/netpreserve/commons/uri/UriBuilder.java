@@ -29,6 +29,8 @@ import static org.netpreserve.commons.uri.Uri.DEFAULT_PORT_MARKER;
 
 /**
  * Class for build instances of {@link Uri}.
+ *
+ * Instances of this class are not thread safe.
  */
 public final class UriBuilder {
 
@@ -44,25 +46,25 @@ public final class UriBuilder {
 
     private String host;
 
-    int port = Uri.DEFAULT_PORT_MARKER;
+    private int port = Uri.DEFAULT_PORT_MARKER;
 
-    String path;
+    private String path;
 
-    String query;
+    private String query;
 
-    ParsedQuery parsedQuery;
+    transient ParsedQuery parsedQuery;
 
-    String fragment;
+    private String fragment;
 
-    boolean isRegName;
+    private boolean isRegName;
 
-    boolean isIPv4address;
+    private boolean isIPv4address;
 
-    boolean isIPv6reference;
+    private boolean isIPv6reference;
 
-    boolean isAbsPath;
+    private boolean isAbsPath;
 
-    Charset charset = StandardCharsets.UTF_8;
+    private Charset charset = StandardCharsets.UTF_8;
 
     /**
      * Construct a new UriBuilder.

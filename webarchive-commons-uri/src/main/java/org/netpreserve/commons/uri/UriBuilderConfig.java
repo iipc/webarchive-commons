@@ -360,55 +360,132 @@ public final class UriBuilderConfig {
         this.defaultFormat = src.getDefaultFormat();
     }
 
+    /**
+     * Create a new immutable Uri object using this UriBuilderConfig.
+     * <p>
+     * This is a shortcut for: {@code new UriBuilder(this).uri(uri).build()}
+     * <p>
+     * @param uri the uri string
+     * @return the parsed and normalized URI
+     */
     public Uri buildUri(String uri) {
         return new UriBuilder(this).uri(uri).build();
     }
 
+    /**
+     * Create a new UriBuilder using this UriBuilderConfig.
+     * <p>
+     * This is a shortcut for: {@code new UriBuilder(this)}
+     * <p>
+     * @param uri the uri string
+     * @return the parsed and normalized URI
+     */
     public UriBuilder builder() {
         return new UriBuilder(this);
     }
 
+    /**
+     * Create a new UriBuilder using this UriBuilderConfig, initialized with a URI.
+     * <p>
+     * This is a shortcut for: {@code new UriBuilder(this).uri(uri)}
+     * <p>
+     * @param uri the uri string
+     * @return the parsed and normalized URI
+     */
     public UriBuilder builder(String uri) {
         return new UriBuilder(this).uri(uri);
     }
 
+    /**
+     * Create a new UriBuilder using this UriBuilderConfig, initialized with a URI.
+     * <p>
+     * This is a shortcut for: {@code new UriBuilder(this).uri(uri)}
+     * <p>
+     * @param uri the uri string
+     * @return the parsed and normalized URI
+     */
     public UriBuilder builder(Uri uri) {
         return new UriBuilder(this).uri(uri);
     }
 
+    /**
+     * Resolve a URI against a base.
+     * <p>
+     * Both the base and the reference are parsed using this UriBuilderConfig before reference resolution.
+     * <p>
+     * @param base the base uri
+     * @param reference the reference uri
+     * @return the uri result from resolving the reference against the base
+     * @throws UriException is thrown if reference resolution failed.
+     */
     public Uri resolve(String base, String reference) {
         return new UriBuilder(this).uri(base).resolve(reference).build();
     }
 
+    /**
+     * Resolve a URI against a base.
+     * <p>
+     * The base is parsed using this UriBuilderConfig before reference resolution.
+     * <p>
+     * @param base the base uri
+     * @param reference the reference uri
+     * @return the uri result from resolving the reference against the base
+     * @throws UriException is thrown if reference resolution failed.
+     */
     public Uri resolve(String base, Uri reference) {
         return new UriBuilder(this).uri(base).resolve(reference).build();
     }
 
+    /**
+     * Resolve a URI against a base.
+     * <p>
+     * The base is parsed using this UriBuilderConfig before reference resolution.
+     * <p>
+     * @param base the base uri
+     * @param reference the reference uri
+     * @return the uri result from resolving the reference against the base
+     * @throws UriException is thrown if reference resolution failed.
+     */
     public Uri resolve(String base, UriBuilder reference) {
         return new UriBuilder(this).uri(base).resolve(reference).build();
     }
 
+    /**
+     * Resolve a URI against a base.
+     * <p>
+     * The reference is parsed using this UriBuilderConfig before reference resolution.
+     * <p>
+     * @param base the base uri
+     * @param reference the reference uri
+     * @return the uri result from resolving the reference against the base
+     * @throws UriException is thrown if reference resolution failed.
+     */
     public Uri resolve(Uri base, String reference) {
         return new UriBuilder(this).uri(base).resolve(reference).build();
     }
 
+    /**
+     * Resolve a URI against a base.
+     * <p>
+     * @param base the base uri
+     * @param reference the reference uri
+     * @return the uri result from resolving the reference against the base
+     * @throws UriException is thrown if reference resolution failed.
+     */
     public Uri resolve(Uri base, Uri reference) {
         return new UriBuilder(this).uri(base).resolve(reference).build();
     }
 
+    /**
+     * Resolve a URI against a base.
+     * <p>
+     * @param base the base uri
+     * @param reference the reference uri
+     * @return the uri result from resolving the reference against the base
+     * @throws UriException is thrown if reference resolution failed.
+     */
     public Uri resolve(Uri base, UriBuilder reference) {
         return new UriBuilder(this).uri(base).resolve(reference).build();
     }
 
-    public Uri resolve(UriBuilder base, String reference) {
-        return base.resolve(reference).build();
-    }
-
-    public Uri resolve(UriBuilder base, Uri reference) {
-        return base.resolve(reference).build();
-    }
-
-    public Uri resolve(UriBuilder base, UriBuilder reference) {
-        return base.resolve(reference).build();
-    }
 }

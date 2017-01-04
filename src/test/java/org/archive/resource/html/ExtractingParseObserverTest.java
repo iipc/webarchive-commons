@@ -19,7 +19,9 @@ public class ExtractingParseObserverTest extends TestCase {
 				"url (' ')",
 				"url('\")",
 				"url(')",
-				"url('\"')"
+				"url('\"')",
+                "url('\\\"\"')",
+                "url(''''')"
 		};
 		boolean except = false;
 		HTMLMetaData md = new HTMLMetaData(new MetaData());
@@ -37,6 +39,7 @@ public class ExtractingParseObserverTest extends TestCase {
 			assertFalse(except);
 		}
 	}
+
 	public void testHandleStyleNode() throws Exception {
 		String[][] tests = {
 				{""},
@@ -45,31 +48,35 @@ public class ExtractingParseObserverTest extends TestCase {
 				{"url(\"foo.gif\")","foo.gif"},
 				{"url(\\\"foo.gif\\\")","foo.gif"},
 				{"url(\\'foo.gif\\')","foo.gif"},
-				
-		};
+				{"url(''foo.gif'')","foo.gif"},
+				{"url(  foo.gif  )","foo.gif"},
+				{"url('''')"}
+				};
 		for(String[] testa : tests) {
 			checkExtract(testa);
 		}
-		//		boolean except = false;
-//		HTMLMetaData md = new HTMLMetaData(new MetaData());
-//		ExtractingParseObserver epo = new ExtractingParseObserver(md);
-//		for(String css : tests) {
-//			try {
-//				TextNode tn = new TextNode(css);
-//				epo.handleStyleNode(tn);
-//			} catch(Exception e) {
-//				System.err.format("And the winner is....(%s)\n", css);
-//				e.printStackTrace();
-//				except = true;
-//				throw e;
-//			}
-//			assertFalse(except);
-//		}
 	}
+
+	/**
+	 * Test whether the pattern matcher does extract nothing and also does not
+	 * not hang-up if an overlong CSS link is truncated.
+	 */
+	public void testHandleStyleNodeNoHangupTruncated() throws Exception {
+		StringBuilder sb = new StringBuilder();
+		sb.append("url(");
+		for (int i = 0; i < 500000; i++)
+			sb.append('\'');
+		sb.append("foo.gif");
+		for (int i = 0; i < 499000; i++)
+			sb.append('\'');
+		String[] test = new String[1];
+		test[0] = sb.toString();
+		checkExtract(test);
+	}
+
 	private void checkExtract(String[] data) throws JSONException {
 //		System.err.format("CSS(%s) want[0](%s)\n",css,want[0]);
 		String css = data[0];
-		boolean except = false;
 		HTMLMetaData md = new HTMLMetaData(new MetaData());
 		ExtractingParseObserver epo = new ExtractingParseObserver(md);
 		try {
@@ -87,7 +94,8 @@ public class ExtractingParseObserverTest extends TestCase {
 				
 				assertTrue(o instanceof JSONObject);
 				JSONObject jo = (JSONObject) o;
-				assertEquals(data[i],jo.getString("href"));
+				assertEquals("CSS link extraction failed for <" + css + ">",
+						data[i], jo.getString("href"));
 			}
 		} else {
 			assertNull(a);

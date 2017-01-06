@@ -469,10 +469,10 @@ public class Rfc3986Parser implements Parser {
             if (builder.config().isUseIpv6Base85Encoding()) {
                 builder.host(IpUtil.serializeIpv6Base85(ipv6Value));
             } else {
-                boolean upperCaseIpv6Values = builder.config().isCaseNormalization()
-                        && builder.config().isUpperCaseIpv6HexValues();
-                builder.host(IpUtil.serializeIpv6(ipv6Value, upperCaseIpv6Values));
+                builder.host(IpUtil.serializeIpv6(ipv6Value, builder.config().getIpv6Case()));
             }
+        } else {
+            builder.host(builder.config().getIpv6Case().convert(host));
         }
 
         if (builder.host() != null) {
@@ -482,11 +482,13 @@ public class Rfc3986Parser implements Parser {
 
     void parseIpv4(UriBuilder builder, String ipv4Address) {
         if (builder.config().isNormalizeIpv4()) {
-            builder.host(IpUtil.checkAndNormalizeIpv4(ipv4Address));
-        } else {
-            builder.host(IpUtil.checkIpv4(ipv4Address));
-        }
-        if (builder.host() != null) {
+            String normalizedAddress = IpUtil.checkAndNormalizeIpv4(ipv4Address);
+            if (normalizedAddress != null) {
+                builder.host(normalizedAddress);
+                builder.setIPv4addressFlag();
+            }
+        } else if (IpUtil.checkIpv4(ipv4Address)) {
+            builder.host(ipv4Address);
             builder.setIPv4addressFlag();
         }
     }
@@ -504,32 +506,28 @@ public class Rfc3986Parser implements Parser {
                 registryName = normalizer.preParseHost(parserState, registryName);
             }
         }
-        if (config.isSchemeBasedNormalization()) {
-            if (config.isPunycodeUnknownScheme() || builder.schemeType().isPunycodedHost()) {
-                // apply IDN-punycoding, as necessary
-                try {
-                    builder.host(IDN.toASCII(registryName, IDN.USE_STD3_ASCII_RULES));
-                } catch (IllegalArgumentException e) {
+        if ((config.isSchemeBasedNormalization() && builder.schemeType().isPunycodedHost())
+                || config.isPunycodeUnknownScheme()) {
+            try {
+                builder.host(IDN.toASCII(registryName, IDN.USE_STD3_ASCII_RULES));
+            } catch (IllegalArgumentException e) {
 
-                    // check if domain name has ACE prefix, leading/trailing dash, or underscore
-                    // we still wish to tolerate those;
-                    builder.host(validate(registryName, allowedInRegistryName));
-                    if (builder.host() == null) {
-                        throw new UriException("Invalid hostname: " + builder.host());
-                    } else {
-                        builder.host(validateAndNormalize(
-                                config, builder.charset(), registryName, allowedInRegistryName));
-                    }
+                // check if domain name has ACE prefix, leading/trailing dash, or underscore
+                // we still wish to tolerate those;
+                builder.host(validate(registryName, allowedInRegistryName));
+                if (builder.host() == null) {
+                    throw new UriException("Invalid hostname: " + builder.host());
+                } else {
+                    builder.host(validateAndNormalize(
+                            config, builder.charset(), registryName, allowedInRegistryName));
                 }
-            } else {
-                builder.host(validateAndNormalize(config, builder.charset(), registryName, allowedInRegistryName));
             }
         } else {
             builder.host(validateAndNormalize(config, builder.charset(), registryName, allowedInRegistryName));
         }
 
         // Set flag
-        if (!builder.host().isEmpty()) {
+        if (builder.host() != null && !builder.host().isEmpty()) {
             builder.setRegNameFlag();
         }
     }
@@ -654,29 +652,28 @@ public class Rfc3986Parser implements Parser {
         boolean illegalChar = false;
 
         for (int i = 0; i < result.length(); i++) {
-            if (result.charAt(i) == '%' && config.isPercentEncodingNormalization()
+            if (result.charAt(i) == '%'
                     && result.length() > i + 2
+                    && config.isPercentEncodingNormalization()
                     && HEX.get(result.charAt(i + 1))
                     && HEX.get(result.charAt(i + 2))) {
-
                 String hexString = result.substring(i + 1, i + 3);
                 int val = Integer.parseInt(hexString, RADIX);
-
                 if (generous.get(val) && val != '%') {
                     // decode unnecessarry encoded char
                     result.setCharAt(i, (char) val);
                     result.delete(i + 1, i + 3);
-                } else if (config.isCaseNormalization()) {
+                } else {
                     // convert percent encoded to upper case
-                    result.replace(i + 1, i + 3, hexString.toUpperCase());
+                    result.replace(i + 1, i + 3, config.getPercentEncodingCase().convert(hexString));
                 }
             }
 
-            if (!generous.get(result.charAt(i))) {
+            if (!illegalChar && !generous.get(result.charAt(i))) {
                 if (config.isEncodeIllegalCharacters()) {
                     illegalChar = true;
                 } else {
-                    return null;
+                    throw new UriException("Illegal character '" + result.charAt(i) + "'");
                 }
             }
         }
@@ -754,7 +751,7 @@ public class Rfc3986Parser implements Parser {
 
     /**
      * Encodes an array of bytes into an array of URL safe 7-bit characters.
-     *
+     * <p>
      * Unsafe characters are escaped.
      * <p>
      * @param config the config object
@@ -780,17 +777,10 @@ public class Rfc3986Parser implements Parser {
                 buffer.write(b);
             } else {
                 buffer.write('%');
-                final char hex1;
-                final char hex2;
-                if (config.isCaseNormalization()) {
-                    hex1 = Character.toUpperCase(Character.forDigit((b >> 4) & 0xF, RADIX));
-                    hex2 = Character.toUpperCase(Character.forDigit(b & 0xF, RADIX));
-                } else {
-                    hex1 = Character.forDigit((b >> 4) & 0xF, RADIX);
-                    hex2 = Character.forDigit(b & 0xF, RADIX);
-                }
-                buffer.write(hex1);
-                buffer.write(hex2);
+                final int hex1 = Character.forDigit((b >> 4) & 0xF, RADIX);
+                final int hex2 = Character.forDigit(b & 0xF, RADIX);
+                buffer.write(config.getPercentEncodingCase().convert(hex1));
+                buffer.write(config.getPercentEncodingCase().convert(hex2));
             }
         }
         return buffer.toByteArray();
@@ -803,24 +793,147 @@ public class Rfc3986Parser implements Parser {
      * @param descriptions A list of descriptions which this class can add its own descriptions to.
      */
     public void describeNormalization(UriBuilder builder, List<NormalizationDescription> descriptions) {
-        descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
-                .name("Missing")
-                .description("The description of normalization done by the parser is not complete")
-                .build());
         if (builder.config().isCaseNormalization()) {
             descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
-                    .name("Case normalization")
-                    .description("Converts scheme and hostname to lower case. "
-                            + "Percent encoded characters are converted to upper case.")
-                    .example(NormalizationExample.builder().uri("HtTp://eXample.COM/a%20%2fpath")
-                            .normalizedUri("http://example.com/a%20%2Fpath").build())
+                    .name("Case normalization").description("Converts scheme and hostname to lower case.")
+                    .example(NormalizationExample.builder().uri("HtTp://eXample.COM/a%2fpath")
+                            .normalizedUri("http://example.com/a%2fpath").build())
                     .build());
         }
         if (builder.config().isEncodeIllegalCharacters()) {
+            switch (builder.config().getPercentEncodingCase()) {
+                case UPPER:
+                    descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
+                            .name("Encode illegal characters (upper case)")
+                            .description("Converts characters not allowed in URI to percent encoding.")
+                            .example(NormalizationExample.builder().uri("http://eøample.com/a]path")
+                                    .normalizedUri("http://e%C3%B8ample.com/a%5Dpath").build())
+                            .build());
+                    break;
+                default:
+                    descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
+                            .name("Encode illegal characters (lower case)")
+                            .description("Converts characters not allowed in URI to percent encoding.")
+                            .example(NormalizationExample.builder().uri("http://eøample.com/a]path")
+                                    .normalizedUri("http://e%c3%b8ample.com/a%5dpath").build())
+                            .build());
+            }
+        }
+        if (builder.config().isNormalizeIpv4()) {
             descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
-                    .name("Encode illegal characters")
-                    .description("Converts characters not allowed in a certain part of the URI to percent encoding.")
+                    .name("Normalize IPv4")
+                    .description("Normalizes fullwidth Unicode and decodes percent encoded addresses. "
+                            + "Decodes hex and octal encoded numbers.")
+                    .example(NormalizationExample.builder().uri("http://%30%78%63%30%2e%30%32%35%30.01")
+                            .normalizedUri("http://192.168.0.1").build())
+                    .example(NormalizationExample.builder().uri("http://%30%78%63%30%2e%30%32%35%30.01%2e")
+                            .normalizedUri("http://192.168.0.1").build())
+                    .example(NormalizationExample.builder().uri("http://０Ｘｃ０．０２５０．０１")
+                            .normalizedUri("http://192.168.0.1").build())
                     .build());
+        }
+        if (builder.config().isNormalizeIpv6()) {
+            if (!builder.config().isUseIpv6Base85Encoding()) {
+                descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
+                        .name("Normalize IPv6")
+                        .description("Shortens consecutive zero segments and decodes IPv4 address in last segment.")
+                        .example(NormalizationExample.builder().uri("http://[1080:0:0:0:8:800:200C:417a]")
+                                .normalizedUri("http://[1080::8:800:200C:417A]").build())
+                        .example(NormalizationExample.builder().uri("http://[0:0:0:0:0:0:13.1.68.3]")
+                                .normalizedUri("http://[::D01:4403]").build())
+                        .example(NormalizationExample.builder().uri("http://[::8:0:0:0:0:417a]")
+                                .normalizedUri("http://[0:0:8::417A]").build())
+                        .build());
+            } else {
+                descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
+                        .name("Normalize IPv6 Base85 encoding")
+                        .description("Encodes IPv6 references with the Base85 encoding described in RFC 1924.")
+                        .example(NormalizationExample.builder().uri("http://[1080:0:0:0:8:800:200C:417A]")
+                                .normalizedUri("http://[4)+k&C#VzJ4br>0wv%Yp]").build())
+                        .example(NormalizationExample.builder().uri("http://[0:0:0:0:0:0:13.1.68.3]")
+                                .normalizedUri("http://[0000000000000004FN<0]").build())
+                        .build());
+            }
+        }
+        if (builder.config().isPathSegmentNormalization()) {
+            descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
+                    .name("Normalize path segments")
+                    .description("Removes dot segments '.' and '..' as described in RFC 3986 section 5.2.4.")
+                    .example(NormalizationExample.builder().uri("http://example.com/a/./abc/../path")
+                            .normalizedUri("http://example.com/a/path").build())
+                    .build());
+        }
+        if (builder.config().isPercentEncodingNormalization()) {
+            switch (builder.config().getPercentEncodingCase()) {
+                case LOWER:
+                    descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
+                            .name("Percent encoding normalization (lower case)")
+                            .description("Decodes unnecessary encoded characters. "
+                                    + "Converts percent encoded characters to lower case.")
+                            .example(NormalizationExample.builder().uri("http://example.com/a%20%3F%3f%2fpath")
+                                    .normalizedUri("http://example.com/a%20%3f%3f/path").build())
+                            .build());
+                    break;
+                case UPPER:
+                    descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
+                            .name("Percent encoding normalization (upper case)")
+                            .description("Decodes unnecessary encoded characters. "
+                                    + "Converts percent encoded characters to upper case.")
+                            .example(NormalizationExample.builder().uri("http://example.com/a%20%3F%3f%2fpath")
+                                    .normalizedUri("http://example.com/a%20%3F%3F/path").build())
+                            .build());
+                    break;
+                default:
+                    descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
+                            .name("Percent encoding normalization")
+                            .description("Decodes unnecessary encoded characters.")
+                            .example(NormalizationExample.builder().uri("http://example.com/a%20%3F%3f%2fpath")
+                                    .normalizedUri("http://example.com/a%20%3F%3f/path").build())
+                            .build());
+            }
+        }
+        if (builder.config().isPunycodeUnknownScheme()) {
+            descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
+                    .name("Punycode unknown scheme").description("Punycode authority for all schemes.")
+                    .example(NormalizationExample.builder().uri("http://eøample.com/")
+                            .normalizedUri("http://xn--eample-bya.com/").build())
+                    .example(NormalizationExample.builder().uri("io://eøample.com/")
+                            .normalizedUri("io://xn--eample-bya.com/").build())
+                    .build());
+        }
+        if (builder.config().isSchemeBasedNormalization()) {
+            descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
+                    .name("Punycode known schemes").description("Punycode host for schemes know to support it.")
+                    .example(NormalizationExample.builder().uri("http://eøample.com/a/path")
+                            .normalizedUri("http://xn--eample-bya.com/a/path").build())
+                    .build());
+            descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
+                    .name("Remove default port").description("Remove port if same as scheme's default port.")
+                    .example(NormalizationExample.builder().uri("http://example.com:80/a/path")
+                            .normalizedUri("http://example.com/a/path").build())
+                    .build());
+            descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
+                    .name("Add slash for empty path").description("Let path be a single '/' if path is empty")
+                    .example(NormalizationExample.builder().uri("http://example.com")
+                            .normalizedUri("http://example.com/").build())
+                    .build());
+        }
+        switch (builder.config().getIpv6Case()) {
+            case LOWER:
+                descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
+                        .name("Lower case IPv6").description("Lower case HEX values")
+                        .example(NormalizationExample.builder().uri("http://[1080:0:0:0:8:800:200C:417a]")
+                                .normalizedUri("http://[1080:0:0:0:8:800:200c:417a]").build())
+                        .build());
+                break;
+            case UPPER:
+                descriptions.add(NormalizationDescription.builder(Rfc3986Parser.class)
+                        .name("Upper case IPv6").description("Upper case HEX values")
+                        .example(NormalizationExample.builder().uri("http://[1080:0:0:0:8:800:200C:417a]")
+                                .normalizedUri("http://[1080:0:0:0:8:800:200C:417A]").build())
+                        .build());
+                break;
+            default:
         }
     }
 

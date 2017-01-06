@@ -41,10 +41,6 @@ public interface Parser {
 
     String validateFragment(UriBuilderConfig config, Charset charset, CharBuffer uri);
 
-    default void describeNormalization(List<NormalizationDescription> descriptions) {
-
-    }
-
     void describeNormalization(UriBuilder uriBuilder, List<NormalizationDescription> descriptions);
 
     class ParserState {

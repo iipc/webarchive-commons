@@ -21,6 +21,7 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.netpreserve.commons.uri.UriBuilderConfig;
 import org.netpreserve.commons.uri.UriException;
 
 import static org.netpreserve.commons.uri.parser.Rfc3986Parser.HEX;
@@ -155,7 +156,7 @@ public final class IpUtil {
         return ipv6Number;
     }
 
-    public static String serializeIpv6(BigInteger ipv6Number, boolean normalizeCase) {
+    public static String serializeIpv6(BigInteger ipv6Number, UriBuilderConfig.HexCase hexCase) {
         BigInteger[] numbers = new BigInteger[8];
         int nullRunStart = -1;
         int longestNullRunStart = -1;
@@ -190,37 +191,36 @@ public final class IpUtil {
         if (longestNullRunLength > 1) {
             // Handle consecutive nulls
             if (longestNullRunStart > 0) {
-                result.append(numberToHex(numbers[0], normalizeCase));
+                result.append(numberToHex(numbers[0], hexCase));
             }
             for (int i = 1; i < longestNullRunStart; i++) {
-                result.append(':').append(numberToHex(numbers[i], normalizeCase));
+                result.append(':').append(numberToHex(numbers[i], hexCase));
             }
             result.append("::");
             if (longestNullRunStart + longestNullRunLength < 8) {
-                result.append(numberToHex(numbers[longestNullRunStart + longestNullRunLength], normalizeCase));
+                result.append(numberToHex(numbers[longestNullRunStart + longestNullRunLength], hexCase));
             }
             for (int i = longestNullRunStart + longestNullRunLength + 1; i < 8; i++) {
-                result.append(':').append(numberToHex(numbers[i], normalizeCase));
+                result.append(':').append(numberToHex(numbers[i], hexCase));
             }
         } else {
-            result.append(numberToHex(numbers[0], normalizeCase));
+            result.append(numberToHex(numbers[0], hexCase));
             for (int i = 1; i < 8; i++) {
-                result.append(':').append(numberToHex(numbers[i], normalizeCase));
+                result.append(':').append(numberToHex(numbers[i], hexCase));
             }
         }
         return result.toString();
     }
 
-    private static String numberToHex(BigInteger num, boolean normalizeCase) {
-        if (normalizeCase) {
-            return num.toString(16).toUpperCase();
-        } else {
+    private static String numberToHex(BigInteger num, UriBuilderConfig.HexCase hexCase) {
+        if (hexCase == UriBuilderConfig.HexCase.LOWER) {
             return num.toString(16);
+        } else {
+            return num.toString(16).toUpperCase();
         }
     }
 
     public static String serializeIpv6Base85(BigInteger ipv6Number) {
-        System.out.println(ipv6Number);
         BigInteger val85 = BigInteger.valueOf(85);
         BigInteger curVal = ipv6Number;
         char[] buf = new char[20];
@@ -233,24 +233,44 @@ public final class IpUtil {
         return new String(buf);
     }
 
-    public static String checkIpv4(String ipv4Address) {
+    /**
+     * Check if a string is a legal IPv4 address.
+     * <p>
+     * This method is a strict check which only accepts four dot-separated decimal numbers between 0 and 255.
+     * <p>
+     * For a more liberal parsing of IPv4 addresses see {@link #checkAndNormalizeIpv4(java.lang.String)}.
+     * <p>
+     * @param ipv4Address the string to check
+     * @return true if the string is an IPv4 address
+     * @throws UriException is thrown if address is IPv4 address, but values are out of bounds.
+     * @see #checkAndNormalizeIpv4(java.lang.String)
+     */
+    public static boolean checkIpv4(String ipv4Address) {
         String[] octets = ipv4Address.split("\\.");
         if (octets.length != 4) {
-            return null;
+            return false;
         }
         for (String octet : octets) {
             try {
                 int value = Integer.parseInt(octet);
                 if (value < 0 || value > 255) {
-                    return null;
+                    throw new UriException("Illegal IPv4 address: " + ipv4Address);
                 }
             } catch (NumberFormatException e) {
-                return null;
+                return false;
             }
         }
-        return ipv4Address;
+        return true;
     }
 
+    /**
+     * Check and normalize a possible IPv4 address.
+     * <p>
+     * @param ipv4Address the string to check
+     * @return the normalized address or null if the string is not an IPv4 address
+     * @throws UriException is thrown if address contains illegal percent encoding or values are out of bounds.
+     * @see #checkIpv4(java.lang.String)
+     */
     public static String checkAndNormalizeIpv4(String ipv4Address) {
         try {
             ipv4Address = URLDecoder.decode(ipv4Address, "UTF-8");

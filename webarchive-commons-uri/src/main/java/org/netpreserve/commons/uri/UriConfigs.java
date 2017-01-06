@@ -45,13 +45,13 @@ public final class UriConfigs {
     /**
      * The default RFC3986 conformant parser.
      */
-    public static final Parser STRICT_PARSER = new Rfc3986Parser();
+    public static final Parser DEFAULT_PARSER = new Rfc3986Parser();
 
     public static final Parser LAX_PARSER = new LaxRfc3986Parser();
 
     public static final Parser WHATWG_PARSER = new WhatwgConformantParser();
 
-    public static final ReferenceResolver REFERENCE_RESOLVER = new Rfc3986ReferenceResolver();
+    public static final ReferenceResolver DEFAULT_REFERENCE_RESOLVER = new Rfc3986ReferenceResolver();
 
     public static final ReferenceResolver WHATWG_REFERENCE_RESOLVER = new WhatwgConformantReferenceResolver();
 
@@ -89,12 +89,14 @@ public final class UriConfigs {
      * the URI is case insensitive. Path is normalized for constructs like '{@code foo/../bar/.}'.
      */
     public static final UriBuilderConfig STRICT = new UriBuilderConfig()
-            .parser(UriConfigs.STRICT_PARSER)
-            .referenceResolver(UriConfigs.REFERENCE_RESOLVER)
+            .parser(UriConfigs.DEFAULT_PARSER)
+            .referenceResolver(UriConfigs.DEFAULT_REFERENCE_RESOLVER)
             .requireAbsoluteUri(false)
             .strictReferenceResolution(true)
             .caseNormalization(true)
             .percentEncodingNormalization(true)
+            .percentEncodingCase(UriBuilderConfig.HexCase.UPPER)
+            .ipv6Case(UriBuilderConfig.HexCase.UPPER)
             .pathSegmentNormalization(true)
             .schemeBasedNormalization(true)
             .encodeIllegalCharacters(false)
@@ -111,7 +113,8 @@ public final class UriConfigs {
             .strictReferenceResolution(false)
             .caseNormalization(true)
             .percentEncodingNormalization(false)
-            .upperCaseIpv6HexValues(false)
+            .percentEncodingCase(UriBuilderConfig.HexCase.UPPER)
+            .ipv6Case(UriBuilderConfig.HexCase.LOWER)
             .pathSegmentNormalization(true)
             .schemeBasedNormalization(true)
             .encodeIllegalCharacters(true)
@@ -128,11 +131,13 @@ public final class UriConfigs {
      */
     public static final UriBuilderConfig LAX_URI = new UriBuilderConfig()
             .parser(UriConfigs.LAX_PARSER)
-            .referenceResolver(UriConfigs.REFERENCE_RESOLVER)
+            .referenceResolver(UriConfigs.DEFAULT_REFERENCE_RESOLVER)
             .requireAbsoluteUri(false)
             .strictReferenceResolution(false)
             .caseNormalization(true)
             .percentEncodingNormalization(true)
+            .percentEncodingCase(UriBuilderConfig.HexCase.UPPER)
+            .ipv6Case(UriBuilderConfig.HexCase.UPPER)
             .pathSegmentNormalization(true)
             .schemeBasedNormalization(true)
             .encodeIllegalCharacters(true)
@@ -149,17 +154,18 @@ public final class UriConfigs {
      */
     public static final UriBuilderConfig HERITRIX = new UriBuilderConfig()
             .parser(UriConfigs.LAX_PARSER)
-            .referenceResolver(UriConfigs.REFERENCE_RESOLVER)
+            .referenceResolver(UriConfigs.DEFAULT_REFERENCE_RESOLVER)
             .requireAbsoluteUri(true)
             .strictReferenceResolution(false)
             .caseNormalization(true)
-            .upperCaseIpv6HexValues(true)
+            .ipv6Case(UriBuilderConfig.HexCase.UPPER)
+            .percentEncodingCase(UriBuilderConfig.HexCase.UPPER)
             .percentEncodingNormalization(true)
             .pathSegmentNormalization(true)
             .schemeBasedNormalization(true)
             .encodeIllegalCharacters(true)
             // Consider URIs too long for IE as illegal.
-            .maxUrlLength(2083)
+            .maxUriLength(2083)
             .defaultFormat(UriConfigs.USABLE_URI_FORMAT)
             .addNormalizer(new LaxTrimming())
             .addNormalizer(new StripErrorneousExtraSlashes())
@@ -183,7 +189,7 @@ public final class UriConfigs {
             .schemeBasedNormalization(true)
             .encodeIllegalCharacters(true)
             // Consider URIs too long for IE as illegal.
-            .maxUrlLength(2083)
+            .maxUriLength(2083)
             .defaultFormat(UriConfigs.CANONICALIZED_URI_FORMAT)
             .addNormalizer(new LaxTrimming())
             .addNormalizer(new StripWwwN())
@@ -196,16 +202,20 @@ public final class UriConfigs {
 
     public static final UriBuilderConfig SURT_KEY = new UriBuilderConfig()
             .parser(UriConfigs.LAX_PARSER)
-            .referenceResolver(UriConfigs.REFERENCE_RESOLVER)
+            .referenceResolver(UriConfigs.DEFAULT_REFERENCE_RESOLVER)
             .requireAbsoluteUri(true)
             .strictReferenceResolution(false)
             .caseNormalization(true)
             .percentEncodingNormalization(true)
+            .percentEncodingCase(UriBuilderConfig.HexCase.UPPER)
+            .normalizeIpv4(true)
+            .normalizeIpv6(true)
+            .ipv6Case(UriBuilderConfig.HexCase.UPPER)
             .pathSegmentNormalization(true)
             .schemeBasedNormalization(true)
             .encodeIllegalCharacters(true)
             // Consider URIs too long for IE as illegal.
-            .maxUrlLength(2083)
+            .maxUriLength(2083)
             .defaultFormat(UriConfigs.SURT_KEY_FORMAT)
             .addNormalizer(new LaxTrimming())
             .addNormalizer(new StripWwwN())
@@ -219,16 +229,20 @@ public final class UriConfigs {
 
     public static final UriBuilderConfig LEGACY_SURT_KEY = new UriBuilderConfig()
             .parser(UriConfigs.LAX_PARSER)
-            .referenceResolver(UriConfigs.REFERENCE_RESOLVER)
+            .referenceResolver(UriConfigs.DEFAULT_REFERENCE_RESOLVER)
             .requireAbsoluteUri(true)
             .strictReferenceResolution(false)
             .caseNormalization(true)
             .percentEncodingNormalization(true)
+            .percentEncodingCase(UriBuilderConfig.HexCase.UPPER)
+            .normalizeIpv4(true)
+            .normalizeIpv6(true)
+            .ipv6Case(UriBuilderConfig.HexCase.UPPER)
             .pathSegmentNormalization(true)
             .schemeBasedNormalization(true)
             .encodeIllegalCharacters(true)
             // Consider URIs too long for IE as illegal.
-            .maxUrlLength(2083)
+            .maxUriLength(2083)
             .defaultFormat(UriConfigs.LEGACY_SURT_KEY_FORMAT)
             .addNormalizer(new LaxTrimming())
             .addNormalizer(new AllLowerCase())

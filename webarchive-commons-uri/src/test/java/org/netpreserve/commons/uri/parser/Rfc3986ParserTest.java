@@ -20,6 +20,7 @@ import org.netpreserve.commons.uri.UriConfigs;
 import org.netpreserve.commons.uri.Uri;
 import org.netpreserve.commons.uri.UriBuilder;
 import org.netpreserve.commons.uri.UriBuilderConfig;
+import org.netpreserve.commons.uri.normalization.NormalizationTestUtil;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -128,7 +129,8 @@ public class Rfc3986ParserTest {
         parser.parseFragment(parserState);
         assertThat(parserState.builder.fragment()).isNull();
 
-        parserState = new Rfc3986Parser.ParserState(new UriBuilder(config), "docs/guide/collections/designfaq.html#28", 0);
+        parserState = new Rfc3986Parser.ParserState(
+                new UriBuilder(config), "docs/guide/collections/designfaq.html#28", 0);
         parser.parseScheme(parserState);
         assertThat(parserState.builder.scheme()).isNull();
         parser.parseAuthority(parserState);
@@ -143,7 +145,8 @@ public class Rfc3986ParserTest {
         parser.parseFragment(parserState);
         assertThat(parserState.builder.fragment()).isEqualTo("28");
 
-        parserState = new Rfc3986Parser.ParserState(new UriBuilder(config), "../../../demo/jfc/SwingSet2/src/SwingSet2.java", 0);
+        parserState = new Rfc3986Parser.ParserState(
+                new UriBuilder(config), "../../../demo/jfc/SwingSet2/src/SwingSet2.java", 0);
         parser.parseScheme(parserState);
         assertThat(parserState.builder.scheme()).isNull();
         parser.parseAuthority(parserState);
@@ -188,7 +191,8 @@ public class Rfc3986ParserTest {
         parser.parseFragment(parserState);
         assertThat(parserState.builder.fragment()).isNull();
 
-        parserState = new Rfc3986Parser.ParserState(new UriBuilder(config), "example.html;jsessionid=deadbeef:deadbeed?parameter=this:value", 0);
+        parserState = new Rfc3986Parser.ParserState(
+                new UriBuilder(config), "example.html;jsessionid=deadbeef:deadbeed?parameter=this:value", 0);
         parser.parseScheme(parserState);
         assertThat(parserState.builder.scheme()).isNull();
         parser.parseAuthority(parserState);
@@ -221,6 +225,11 @@ public class Rfc3986ParserTest {
         Uri uri2 = builder.build();
 
         assertThat(uri1).isEqualTo(uri2);
+    }
+
+    @Test
+    public void testExamples() {
+        NormalizationTestUtil.testParserNormalizationExamples(new Rfc3986Parser());
     }
 
 }

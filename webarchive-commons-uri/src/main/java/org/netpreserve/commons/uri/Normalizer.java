@@ -16,12 +16,18 @@
 package org.netpreserve.commons.uri;
 
 /**
- * A Normalizer that can be added to the Uri parsing process.
+ * Base interface for Normalizers that can be added to the Uri parsing process.
+ * <p>
+ * A normalizer should implement one of the sub-interfaces instead of implementing this one directly.
+ * <p>
+ * All normalizers must be state less and thread safe.
  */
 public interface Normalizer {
 
     /**
      * Gives the Normalizer an opportunity to decide if this Normalizer should be run for the submitted builder.
+     * <p>
+     * The default implementation just returns {@code true}
      * <p>
      * @param builder the builder to check
      * @return true if this normalizer should be used for this builder.

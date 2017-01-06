@@ -58,5 +58,5 @@ As a convenience, several configurations already exist in the UriConfigs class. 
 Uri uri = UriConfigs.WHATWG.buildUri("http://example.com/path");
 ```
 
-The `UriConfigs.WHATWG`-configuration normalizes URIs in compliance with how [WHATWG's URL spec](https://url.spec.whatwg.org/)
+The `UriConfigs.WHATWG`-configuration normalizes URIs in compliance with [WHATWG's URL spec](https://url.spec.whatwg.org/)
 

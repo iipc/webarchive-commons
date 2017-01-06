@@ -18,6 +18,7 @@ package org.netpreserve.commons.uri.parser;
 import java.math.BigInteger;
 
 import org.junit.Test;
+import org.netpreserve.commons.uri.UriBuilderConfig;
 import org.netpreserve.commons.uri.UriException;
 
 import static org.assertj.core.api.Assertions.*;
@@ -38,30 +39,30 @@ public class IpUtilTest {
 
     @Test
     public void testSerializeIpv6() {
-        boolean normalizeCase = true;
+        UriBuilderConfig.HexCase hexCase = UriBuilderConfig.HexCase.UPPER;
 
         BigInteger ipv6Number = IpUtil.parseIpv6("1080:0:0:0:8:800:200C:417A");
-        assertThat(IpUtil.serializeIpv6(ipv6Number, normalizeCase)).isEqualTo("1080::8:800:200C:417A");
+        assertThat(IpUtil.serializeIpv6(ipv6Number, hexCase)).isEqualTo("1080::8:800:200C:417A");
 
         ipv6Number = IpUtil.parseIpv6("FEDC:BA98:7654:3210:FEDC:BA98:7654:3210");
-        assertThat(IpUtil.serializeIpv6(ipv6Number, normalizeCase)).isEqualTo("FEDC:BA98:7654:3210:FEDC:BA98:7654:3210");
+        assertThat(IpUtil.serializeIpv6(ipv6Number, hexCase)).isEqualTo("FEDC:BA98:7654:3210:FEDC:BA98:7654:3210");
 
         ipv6Number = IpUtil.parseIpv6("FEDC:BA98:7654:3210:FEDC:BA98:7654:0");
-        assertThat(IpUtil.serializeIpv6(ipv6Number, normalizeCase)).isEqualTo("FEDC:BA98:7654:3210:FEDC:BA98:7654:0");
+        assertThat(IpUtil.serializeIpv6(ipv6Number, hexCase)).isEqualTo("FEDC:BA98:7654:3210:FEDC:BA98:7654:0");
 
         ipv6Number = IpUtil.parseIpv6("FEDC:BA98:7654:3210:FEDC:BA98:0:0");
-        assertThat(IpUtil.serializeIpv6(ipv6Number, normalizeCase)).isEqualTo("FEDC:BA98:7654:3210:FEDC:BA98::");
+        assertThat(IpUtil.serializeIpv6(ipv6Number, hexCase)).isEqualTo("FEDC:BA98:7654:3210:FEDC:BA98::");
 
         ipv6Number = IpUtil.parseIpv6("0:BA98:7654:3210:FEDC:BA98:7654:0");
-        assertThat(IpUtil.serializeIpv6(ipv6Number, normalizeCase)).isEqualTo("0:BA98:7654:3210:FEDC:BA98:7654:0");
+        assertThat(IpUtil.serializeIpv6(ipv6Number, hexCase)).isEqualTo("0:BA98:7654:3210:FEDC:BA98:7654:0");
 
         ipv6Number = IpUtil.parseIpv6("0:0:7654:3210:FEDC:BA98:0:0");
-        assertThat(IpUtil.serializeIpv6(ipv6Number, normalizeCase)).isEqualTo("::7654:3210:FEDC:BA98:0:0");
+        assertThat(IpUtil.serializeIpv6(ipv6Number, hexCase)).isEqualTo("::7654:3210:FEDC:BA98:0:0");
 
         ipv6Number = IpUtil.parseIpv6("FEDC:0:7654:0:0:BA98:7654:3210");
-        assertThat(IpUtil.serializeIpv6(ipv6Number, normalizeCase)).isEqualTo("FEDC:0:7654::BA98:7654:3210");
+        assertThat(IpUtil.serializeIpv6(ipv6Number, hexCase)).isEqualTo("FEDC:0:7654::BA98:7654:3210");
 
-        assertThat(IpUtil.serializeIpv6(BigInteger.ZERO, normalizeCase)).isEqualTo("::");
+        assertThat(IpUtil.serializeIpv6(BigInteger.ZERO, hexCase)).isEqualTo("::");
     }
 
     /**
@@ -99,27 +100,23 @@ public class IpUtilTest {
     /**
      * Test of checkIpv4 method, of class IpUtil.
      */
-//    @Test
-//    public void testCheckIpv4() {
-//        System.out.println("checkIpv4");
-//        String ipv4Address = "";
-//        String expResult = "";
-//        String result = IpUtil.checkIpv4(ipv4Address);
-////        assertEquals(expResult, result);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
+    @Test
+    public void testCheckIpv4() {
+        assertThat(IpUtil.checkIpv4("192.168.0.1")).isTrue();
+        assertThatExceptionOfType(UriException.class).isThrownBy(() -> IpUtil.checkIpv4("192.168.0.257"));
+        assertThat(IpUtil.checkIpv4("0Xc0.0250.01")).isFalse();
+    }
+
     /**
      * Test of checkAndNormalizeIpv4 method, of class IpUtil.
      */
-//    @Test
-//    public void testCheckAndNormalizeIpv4() {
-//        System.out.println("checkAndNormalizeIpv4");
-//        String ipv4Address = "";
-//        String expResult = "";
-//        String result = IpUtil.checkAndNormalizeIpv4(ipv4Address);
-////        assertEquals(expResult, result);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
+    @Test
+    public void testCheckAndNormalizeIpv4() {
+        assertThat(IpUtil.checkAndNormalizeIpv4("192.168.0.1")).isEqualTo("192.168.0.1");
+        assertThat(IpUtil.checkAndNormalizeIpv4("0Xc0.0250.01")).isEqualTo("192.168.0.1");
+        assertThat(IpUtil.checkAndNormalizeIpv4("%30%78%63%30%2e%30%32%35%30.01")).isEqualTo("192.168.0.1");
+        assertThat(IpUtil.checkAndNormalizeIpv4("%30%78%63%30%2e%30%32%35%30.01%2e")).isEqualTo("192.168.0.1");
+        assertThatExceptionOfType(UriException.class).isThrownBy(() -> IpUtil.checkAndNormalizeIpv4("192.168.0.257"));
+        assertThat(IpUtil.checkAndNormalizeIpv4("not an ip 192.168.0.1")).isNull();
+    }
 }

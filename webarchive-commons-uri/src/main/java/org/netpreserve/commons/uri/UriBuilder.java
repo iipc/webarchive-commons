@@ -642,7 +642,7 @@ public final class UriBuilder {
 
         Uri uri = new Uri(this);
 
-        if (uri.toString().length() > config.getMaxUrlLength()) {
+        if (uri.toString().length() > config.getMaxUriLength()) {
             throw new UriException("Created (escaped) uuri > too long");
         }
 

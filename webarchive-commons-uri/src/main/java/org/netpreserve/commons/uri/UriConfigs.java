@@ -24,6 +24,7 @@ import org.netpreserve.commons.uri.parser.Rfc3986ReferenceResolver;
 import org.netpreserve.commons.uri.parser.LaxRfc3986Parser;
 import org.netpreserve.commons.uri.normalization.AllLowerCase;
 import org.netpreserve.commons.uri.normalization.CheckLongEnough;
+import org.netpreserve.commons.uri.normalization.ConvertSlashes;
 import org.netpreserve.commons.uri.normalization.InferCommonSchemesForSchemelessUri;
 import org.netpreserve.commons.uri.normalization.LaxTrimming;
 import org.netpreserve.commons.uri.normalization.OptimisticDnsScheme;
@@ -57,7 +58,7 @@ public final class UriConfigs {
 
     public static final UriFormat DEFAULT_FORMAT = new UriFormat();
 
-    public static final UriFormat USABLE_URI_FORMAT = new UriFormat()
+    public static final UriFormat HERITRIX_URI_FORMAT = new UriFormat()
             .ignoreFragment(true);
 
     public static final UriFormat CANONICALIZED_URI_FORMAT = new UriFormat()
@@ -143,6 +144,7 @@ public final class UriConfigs {
             .encodeIllegalCharacters(true)
             .defaultFormat(UriConfigs.DEFAULT_FORMAT)
             .addNormalizer(new LaxTrimming())
+            .addNormalizer(new ConvertSlashes())
             .addNormalizer(new StripErrorneousExtraSlashes())
             .addNormalizer(new StripSlashAtEndOfPath())
             .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
@@ -166,8 +168,9 @@ public final class UriConfigs {
             .encodeIllegalCharacters(true)
             // Consider URIs too long for IE as illegal.
             .maxUriLength(2083)
-            .defaultFormat(UriConfigs.USABLE_URI_FORMAT)
+            .defaultFormat(UriConfigs.HERITRIX_URI_FORMAT)
             .addNormalizer(new LaxTrimming())
+            .addNormalizer(new ConvertSlashes())
             .addNormalizer(new StripErrorneousExtraSlashes())
             .addNormalizer(new StripSlashAtEndOfPath())
             .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
@@ -192,6 +195,7 @@ public final class UriConfigs {
             .maxUriLength(2083)
             .defaultFormat(UriConfigs.CANONICALIZED_URI_FORMAT)
             .addNormalizer(new LaxTrimming())
+            .addNormalizer(new ConvertSlashes())
             .addNormalizer(new StripWwwN())
             .addNormalizer(new StripSessionId())
             .addNormalizer(new StripErrorneousExtraSlashes())
@@ -201,8 +205,8 @@ public final class UriConfigs {
             .addNormalizer(new CheckLongEnough());
 
     public static final UriBuilderConfig SURT_KEY = new UriBuilderConfig()
-            .parser(UriConfigs.LAX_PARSER)
-            .referenceResolver(UriConfigs.DEFAULT_REFERENCE_RESOLVER)
+            .parser(UriConfigs.WHATWG_PARSER)
+            .referenceResolver(UriConfigs.WHATWG_REFERENCE_RESOLVER)
             .requireAbsoluteUri(true)
             .strictReferenceResolution(false)
             .caseNormalization(true)
@@ -214,8 +218,7 @@ public final class UriConfigs {
             .pathSegmentNormalization(true)
             .schemeBasedNormalization(true)
             .encodeIllegalCharacters(true)
-            // Consider URIs too long for IE as illegal.
-            .maxUriLength(2083)
+            .punycodeUnknownScheme(true)
             .defaultFormat(UriConfigs.SURT_KEY_FORMAT)
             .addNormalizer(new LaxTrimming())
             .addNormalizer(new StripWwwN())
@@ -225,6 +228,9 @@ public final class UriConfigs {
             .addNormalizer(new StripTrailingEscapedSpaceOnAuthority())
             .addNormalizer(new InferCommonSchemesForSchemelessUri())
             .addNormalizer(new OptimisticDnsScheme())
+            .addNormalizer(new WhatwgPreTrimming())
+            .addNormalizer(new WhatwgNormalizeHostAndPath())
+            .addNormalizer(new RemoveLocalhost())
             .addNormalizer(new CheckLongEnough());
 
     public static final UriBuilderConfig LEGACY_SURT_KEY = new UriBuilderConfig()
@@ -255,6 +261,9 @@ public final class UriConfigs {
             .addNormalizer(new OptimisticDnsScheme())
             .addNormalizer(new CheckLongEnough());
 
+    /**
+     * Avoid instantiation.
+     */
     private UriConfigs() {
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 The International Internet Preservation Consortium.
+ * Copyright 2017 The International Internet Preservation Consortium.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,16 @@ package org.netpreserve.commons.uri.normalization;
 import org.junit.Test;
 
 /**
- * Test the LaxTrimming normalizer.
+ * Test the ConvertSlashes normalizer.
  */
-public class LaxTrimmingTest {
+public class ConvertSlashesTest {
 
     /**
      * Test against examples in normalizer's annotation.
      */
     @Test
     public void testExamples() {
-        NormalizationTestUtil.testNormalizerExamples(new LaxTrimming());
+        NormalizationTestUtil.testNormalizerExamples(new ConvertSlashes());
     }
 
 }

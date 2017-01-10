@@ -20,7 +20,10 @@ import org.netpreserve.commons.uri.normalization.report.Description;
 import org.netpreserve.commons.uri.normalization.report.Example;
 
 /**
- *
+ * Lax trimming.
+ * <p>
+ * Remove angle brackets and stray TAB/CR/LF. Convert backslashes to forward slashes except in query. Replace nbsp with
+ * normal spaces
  */
 public class LaxTrimming implements PreParseNormalizer {
 
@@ -28,15 +31,12 @@ public class LaxTrimming implements PreParseNormalizer {
 
     static final char NBSP = '\u00A0';
 
-    static final String EMPTY_STRING = "";
-
     static final String BACKSLASH = "\\";
 
     @Override
     @Description(name = "Lax trimming",
-                 description = "Remove angle brackets and stray TAB/CR/LF. Convert backslashes to forward slashes "
-                 + "except in query. Replace nbsp with normal spaces")
-    @Example(uri = "<http://foo.com/bar>", normalizedUri = "http://foo.com/bar")
+                 description = "Remove angle brackets and stray TAB/CR/LF. Replace nbsp with normal spaces.")
+    @Example(uri = "<http://foo.com/ba\tr>", normalizedUri = "http://foo.com/bar")
     public String normalize(String uriString) {
 
         /*
@@ -71,6 +71,13 @@ public class LaxTrimming implements PreParseNormalizer {
         return uriString.trim();
     }
 
+    /**
+     * Remove all occurrences of a set of characters.
+     * <p>
+     * @param src the string to process
+     * @param ch the characters to remove
+     * @return the result after removal
+     */
     String remove(String src, char... ch) {
         final int len = src.length();
         int i = -1;
@@ -97,6 +104,14 @@ public class LaxTrimming implements PreParseNormalizer {
         }
     }
 
+    /**
+     * Remove a pair of characters if they are at the beginning and end of the string.
+     * <p>
+     * @param string the string to process
+     * @param ch1 the first character in the pair
+     * @param ch2 the second character in the pair
+     * @return the result after removal
+     */
     private String trimPair(String string, String ch1, String ch2) {
         if (string.startsWith(ch1) && string.endsWith(ch2)) {
             return string.substring(1, string.length() - 1);

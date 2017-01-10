@@ -13,28 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.netpreserve.commons.uri;
+package org.netpreserve.commons.uri.parser;
+
+import org.netpreserve.commons.uri.Uri;
+import org.netpreserve.commons.uri.UriFormat;
 
 /**
- * A SURT encoder which encodes the SURT as in the OpenWayback before 3.0.0.
- * <p>
- * This encoder removes the first '(' when scheme is not output and skips the
- * last ','.
- * <p>
- * This SURT format is obsolete as of OpenWayback 3.0.0.
+ * A SURT encoder which follows the original implementation as used in Heritrix.
  */
-public class LegacyWaybackSurtEncoder implements SurtEncoder {
+public class StrictSurtEncoder implements SurtEncoder {
 
     @Override
     public void encode(StringBuilder sb, Uri uri, UriFormat uriFormat) {
-        if (!uriFormat.ignoreHost && uri.host != null) {
-            if (uri.isRegName) {
-                String host;
-                if (uriFormat.decodeHost) {
-                    host = uri.getDecodedHost();
-                } else {
-                    host = uri.host;
-                }
+        sb.append("(");
+
+        String host = uriFormat.getHost(uri);
+        if (host != null) {
+            if (uri.isRegistryName()) {
+
                 // other hostname match: do reverse
                 int hostSegEnd = host.length();
                 for (int i = hostSegEnd; i >= 0; i--) {
@@ -42,23 +38,27 @@ public class LegacyWaybackSurtEncoder implements SurtEncoder {
                         continue;
                     }
                     sb.append(host, i, hostSegEnd); // rev getHost segment
-                    if (i > 0) {
-                        sb.append(',');
-                    }     // ','
+                    sb.append(',');     // ','
                     hostSegEnd = i - 1;
                 }
             } else {
-                sb.append(uri.host);
+                sb.append(host);
             }
         }
 
-        if (!uriFormat.ignorePort && uri.port != -1) {
-            sb.append(':').append(uri.port);
+        if (uriFormat.getPort(uri) != null) {
+            sb.append(':').append(uriFormat.getPort(uri));
         }
 
-        if (!uriFormat.ignoreUserInfo && uri.userinfo != null) {
+        if (uriFormat.getUser(uri) != null || uriFormat.getPassword(uri) != null) {
             sb.append('@');
-            sb.append(uri.userinfo);
+        }
+        if (uriFormat.getUser(uri) != null) {
+            sb.append(uriFormat.getUser(uri));
+        }
+        if (uriFormat.getPassword(uri) != null) {
+            sb.append(':');
+            sb.append(uriFormat.getPassword(uri));
         }
 
         sb.append(')');

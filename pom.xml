@@ -92,6 +92,7 @@
                 <reportSets>
                     <reportSet>
                         <reports>
+                            <report>javadoc</report>
                         </reports>
                     </reportSet>
                     <reportSet>

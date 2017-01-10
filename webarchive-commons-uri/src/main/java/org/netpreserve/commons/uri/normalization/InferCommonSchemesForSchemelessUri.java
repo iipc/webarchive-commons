@@ -15,26 +15,30 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
-import java.util.List;
-
 import org.netpreserve.commons.uri.InParseNormalizer;
-import org.netpreserve.commons.uri.Rfc3986Parser;
-import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
+import org.netpreserve.commons.uri.normalization.report.Description;
+import org.netpreserve.commons.uri.normalization.report.Example;
+import org.netpreserve.commons.uri.parser.Parser;
 
 /**
  * Try to make a Uri absolute like the browsers do.
  * <p>
  * Mimics common browser behavior by adding file schema for uri's starting with '/' and http schema for others.
  */
-public class InsertCommonSchemesForSchemelessUri implements InParseNormalizer {
+public class InferCommonSchemesForSchemelessUri implements InParseNormalizer {
 
     @Override
-    public void preParseAuthority(Rfc3986Parser.ParserState parserState) {
+    @Description(name = "Infer common schemes for schemeless URI",
+                 description = "Mimics common browser behavior by adding file schema for uri's starting with '/'"
+                 + " and http schema for others. This effectively turns every relative URI into absolute.")
+    @Example(uri = "/path", normalizedUri = "file:///path")
+    @Example(uri = "host", normalizedUri = "http://host/")
+    public void preParseAuthority(Parser.ParserState parserState) {
         if (parserState.getBuilder().scheme() == null) {
-            if (parserState.getUri().startsWith("/", parserState.getOffset())) {
+            if (parserState.getUri().charAt(0) == '/') {
                 parserState.setHasAuthority(true);
                 parserState.getBuilder().scheme("file");
-                if (parserState.getUri().startsWith("/", parserState.getOffset() + 1)) {
+                if (parserState.getUri().charAt(1) == '/') {
                     parserState.incrementOffset(1);
                 }
             } else {
@@ -42,15 +46,6 @@ public class InsertCommonSchemesForSchemelessUri implements InParseNormalizer {
                 parserState.setHasAuthority(true);
             }
         }
-    }
-
-    @Override
-    public void describeNormalization(List<NormalizationDescription> descriptions) {
-        descriptions.add(NormalizationDescription.builder(InsertCommonSchemesForSchemelessUri.class)
-                .name("Insert common schemes for schemeless URI")
-                .description("Mimics common browser behavior by adding file schema for uri's starting with '/'"
-                        + " and http schema for others.")
-                .build());
     }
 
 }

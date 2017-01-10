@@ -16,28 +16,30 @@
 package org.netpreserve.commons.uri.normalization.report;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Documentation of a step in URI normalization.
  */
-public class NormalizationDescription {
+public final class NormalizationDescription {
 
     private final String name;
 
     private final String description;
 
-    private final Class implementingClass;
+    private final String implementingClass;
 
-    private final NormalizationExample[] example;
+    private final NormalizationExample[] examples;
 
-    public static class Builder {
+    public static final class Builder {
 
         private String name = "Missing";
 
         private String description = "No description";
 
-        private Class implementingClass;
+        private String implementingClass;
 
         private List<NormalizationExample> example = new ArrayList<>();
 
@@ -55,7 +57,7 @@ public class NormalizationDescription {
         }
 
         public Builder implementingClass(final Class value) {
-            this.implementingClass = value;
+            this.implementingClass = value.getName();
             return this;
         }
 
@@ -78,13 +80,40 @@ public class NormalizationDescription {
     private NormalizationDescription(
             final String name,
             final String description,
-            final Class implementingClass,
+            final String implementingClass,
             final NormalizationExample[] example) {
 
         this.name = name;
         this.description = description;
         this.implementingClass = implementingClass;
-        this.example = example;
+        this.examples = example;
+    }
+
+    public NormalizationDescription(Class implementingClass, Description descriptionAnnotation,
+            Example... exampleAnnotations) {
+        this.name = descriptionAnnotation.name();
+        this.description = descriptionAnnotation.description();
+        this.implementingClass = implementingClass.getName();
+        this.examples = new NormalizationExample[exampleAnnotations.length];
+        for (int i = 0; i < exampleAnnotations.length; i++) {
+            this.examples[i] = new NormalizationExample(exampleAnnotations[i]);
+        }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getImplementingClass() {
+        return implementingClass;
+    }
+
+    public NormalizationExample[] getExamples() {
+        return Arrays.copyOf(examples, examples.length);
     }
 
     @Override
@@ -95,20 +124,42 @@ public class NormalizationDescription {
     public String toString(String indent) {
         StringBuilder sb = new StringBuilder(indent + name)
                 .append("\n  " + indent + "Description: " + description)
-                .append("\n  " + indent + "Implemented by: " + implementingClass.getName());
+                .append("\n  " + indent + "Implemented by: " + implementingClass);
 
-        if (example.length > 0) {
+        if (examples.length > 0) {
             sb.append("\n  " + indent + "Example");
-            if (example.length > 1) {
+            if (examples.length > 1) {
                 sb.append("s:");
             } else {
                 sb.append(":");
             }
-            for (NormalizationExample ex : example) {
+            for (NormalizationExample ex : examples) {
                 sb.append("\n    " + indent + ex.toString());
             }
         }
         return sb.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 41 * hash + Objects.hashCode(this.name);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final NormalizationDescription other = (NormalizationDescription) obj;
+        if (!Objects.equals(this.name, other.name)) {
+            return false;
+        }
+        return true;
     }
 
 }

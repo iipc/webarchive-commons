@@ -13,9 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.netpreserve.commons.uri;
+package org.netpreserve.commons.uri.parser;
 
 import org.junit.Test;
+import org.netpreserve.commons.uri.UriConfigs;
+import org.netpreserve.commons.uri.Uri;
+import org.netpreserve.commons.uri.UriBuilder;
+import org.netpreserve.commons.uri.UriBuilderConfig;
+
 import static org.assertj.core.api.Assertions.*;
 
 /**
@@ -169,9 +174,8 @@ public class Rfc3986ReferenceResolverTest {
     }
 
     UriBuilder createUriBuilder(String uriString) {
-        UriBuilderConfig config = Configurations.STRICT_URI.toBuilder()
-                .schemeBasedNormalization(false).build();
-        UriBuilder uriBuilder = UriBuilder.builder(config);
+        UriBuilderConfig config = UriConfigs.STRICT.schemeBasedNormalization(false);
+        UriBuilder uriBuilder = new UriBuilder(config);
         Rfc3986Parser parser = new Rfc3986Parser();
         Rfc3986Parser.ParserState parserState = new Rfc3986Parser.ParserState(uriBuilder, uriString, 0);
         parser.parseScheme(parserState);

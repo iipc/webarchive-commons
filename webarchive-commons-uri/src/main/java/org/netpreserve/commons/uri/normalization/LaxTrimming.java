@@ -15,25 +15,28 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
-import java.util.List;
-
 import org.netpreserve.commons.uri.PreParseNormalizer;
-import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
-import org.netpreserve.commons.uri.normalization.report.NormalizationExample;
+import org.netpreserve.commons.uri.normalization.report.Description;
+import org.netpreserve.commons.uri.normalization.report.Example;
 
 /**
- *
+ * Lax trimming.
+ * <p>
+ * Remove angle brackets and stray TAB/CR/LF. Convert backslashes to forward slashes except in query. Replace nbsp with
+ * normal spaces
  */
 public class LaxTrimming implements PreParseNormalizer {
+
     static final char SPACE = ' ';
 
     static final char NBSP = '\u00A0';
 
-    static final String EMPTY_STRING = "";
-
     static final String BACKSLASH = "\\";
 
     @Override
+    @Description(name = "Lax trimming",
+                 description = "Remove angle brackets and stray TAB/CR/LF. Replace nbsp with normal spaces.")
+    @Example(uri = "<http://foo.com/ba\tr>", normalizedUri = "http://foo.com/bar")
     public String normalize(String uriString) {
 
         /*
@@ -68,6 +71,13 @@ public class LaxTrimming implements PreParseNormalizer {
         return uriString.trim();
     }
 
+    /**
+     * Remove all occurrences of a set of characters.
+     * <p>
+     * @param src the string to process
+     * @param ch the characters to remove
+     * @return the result after removal
+     */
     String remove(String src, char... ch) {
         final int len = src.length();
         int i = -1;
@@ -94,6 +104,14 @@ public class LaxTrimming implements PreParseNormalizer {
         }
     }
 
+    /**
+     * Remove a pair of characters if they are at the beginning and end of the string.
+     * <p>
+     * @param string the string to process
+     * @param ch1 the first character in the pair
+     * @param ch2 the second character in the pair
+     * @return the result after removal
+     */
     private String trimPair(String string, String ch1, String ch2) {
         if (string.startsWith(ch1) && string.endsWith(ch2)) {
             return string.substring(1, string.length() - 1);
@@ -102,28 +120,4 @@ public class LaxTrimming implements PreParseNormalizer {
         }
     }
 
-    @Override
-    public void describeNormalization(List<NormalizationDescription> descriptions) {
-        descriptions.add(NormalizationDescription.builder(LaxTrimming.class)
-                .name("Remove angle brackets")
-                .description("Remove angle brackets around an URI.")
-                .example(NormalizationExample.builder()
-                        .uri("<http://foo.com/bar>").normalizedUri("http://foo.com/bar").build())
-                .build());
-        descriptions.add(NormalizationDescription.builder(LaxTrimming.class)
-                .name("Replace nbsp")
-                .description("Replace nbsp with normal spaces so that they get stripped if at ends,"
-                        + " or encoded if in middle.")
-                .build());
-        descriptions.add(NormalizationDescription.builder(LaxTrimming.class)
-                .name("Convert backslashes")
-                .description("IE converts backslashes preceding the query string to slashes, rather than to %5C. "
-                        + "Since URIs that have backslashes usually work only with IE, the we will convert "
-                        + "backslashes to slashes as well.")
-                .build());
-        descriptions.add(NormalizationDescription.builder(LaxTrimming.class)
-                .name("Remove stray whitespace")
-                .description("Remove stray TAB/CR/LF.")
-                .build());
-    }
 }

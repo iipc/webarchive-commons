@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.netpreserve.commons.uri;
+package org.netpreserve.commons.uri.parser;
+
+import org.netpreserve.commons.uri.Uri;
+import org.netpreserve.commons.uri.UriFormat;
 
 /**
  * An encoder capable of turning a host name/ip-address into SURT format.
@@ -32,5 +35,5 @@ public interface SurtEncoder {
      * @param uri the Uri whose host name should be SURT encoded.
      * @param uriFormat the uriFormat used to format the Uri.
      */
-    abstract void encode(StringBuilder sb, Uri uri, UriFormat uriFormat);
+    void encode(StringBuilder sb, Uri uri, UriFormat uriFormat);
 }

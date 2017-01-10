@@ -37,7 +37,7 @@ final class SearchKeySurtHostFilter implements SearchKeyFilter<SearchKeyFilter<U
      */
     SearchKeySurtHostFilter(SearchKeyFilter<Uri> filter) {
         this.searchKeyUriFilter = filter;
-        String surtHost = filter.getOriginalValue().getFormattedAuthority();
+        String surtHost = filter.getOriginalValue().getAuthority();
         filterString = surtHost.substring(0, surtHost.length() - 1);
         filterArray = filterString.getBytes(StandardCharsets.UTF_8);
     }

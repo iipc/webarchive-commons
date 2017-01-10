@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.netpreserve.commons.uri;
+package org.netpreserve.commons.uri.parser;
 
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.util.Objects;
+import org.netpreserve.commons.uri.Uri;
+import org.netpreserve.commons.uri.UriFormat;
 
 /**
  * Assertion class for Uri.
@@ -34,7 +36,7 @@ public class UriAssert extends AbstractAssert<UriAssert, Uri> {
      */
     public UriAssert(Uri actual) {
         super(actual, UriAssert.class);
-        uriFormat = actual.defaultFormat;
+        uriFormat = actual.getDefaultFormat();
     }
 
     /**

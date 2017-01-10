@@ -20,6 +20,7 @@ import java.util.ServiceLoader;
 
 import org.netpreserve.commons.uri.Uri;
 import org.netpreserve.commons.uri.UriBuilder;
+import org.netpreserve.commons.uri.UriConfigs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +55,7 @@ public abstract class CdxSourceFactory {
      * @return a matching {@link CdsxSource} descriptor or null if none could be found
      */
     public static final CdxSource getCdxSource(String identifier) {
-        Uri uri = UriBuilder.strictUriBuilder().uri(identifier).build();
+        Uri uri = UriConfigs.STRICT.buildUri(identifier);
         String scheme = Objects.requireNonNull(uri.getScheme(), "CDX Source Identifier must start with a scheme");
 
         for (CdxSourceFactory csf : SERVICE_LOADER) {

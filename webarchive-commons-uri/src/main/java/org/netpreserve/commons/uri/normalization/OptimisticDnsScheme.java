@@ -15,44 +15,41 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
-import java.util.List;
 import java.util.Set;
 
 import org.netpreserve.commons.uri.PostParseNormalizer;
+import org.netpreserve.commons.uri.Scheme;
 import org.netpreserve.commons.uri.UriBuilder;
-import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
+import org.netpreserve.commons.uri.normalization.report.Description;
+import org.netpreserve.commons.uri.normalization.report.Example;
 
-import static org.netpreserve.commons.uri.Schemes.DNS;
+import static org.netpreserve.commons.uri.Scheme.DNS;
 import static org.netpreserve.commons.uri.normalization.SchemeBasedNormalizer.immutableSetOf;
 
 public class OptimisticDnsScheme extends SchemeBasedNormalizer implements PostParseNormalizer {
 
-    private static final Set<String> SUPPORTED_SCHEMES = immutableSetOf(DNS.name);
+    private static final Set<Scheme> SUPPORTED_SCHEMES = immutableSetOf(DNS);
 
     @Override
+    @Description(name = "Optimistic DNS scheme",
+                 description = "If dns host is found in the authority, then it is moved to the path. "
+                 + "If dns host is found in the path, then it is trimmed for leading and trailing slashes.")
+    @Example(uri = "dns:www.example.com", normalizedUri = "dns:www.example.com")
+    @Example(uri = "dns://www.example.com/one.html", normalizedUri = "dns:www.example.com")
+    @Example(uri = "dns:///www.example.com/", normalizedUri = "dns:www.example.com")
     public void normalize(UriBuilder builder) {
-        if (builder.host() != null) {
-            builder.path("");
-        } else if (!builder.path().isEmpty()) {
-            builder.config.getParser().decomposeAuthority(builder, builder.path());
-            if (builder.host() != null) {
-                builder.path("");
-            }
+        if (builder.host() != null && !builder.host().isEmpty()) {
+            builder.path(builder.host());
+            builder.clearAuthority();
+        } else if (!builder.path().isEmpty() && builder.isAbsPath()) {
+            builder.clearAuthority();
+            builder.path(builder.path().replaceFirst("^/*(.*?)/*$", "$1"));
         }
     }
 
     @Override
-    public Set<String> getSupportedSchemes() {
+    public Set<Scheme> getSupportedSchemes() {
         return SUPPORTED_SCHEMES;
-    }
-
-    @Override
-    public void describeNormalization(List<NormalizationDescription> descriptions) {
-        descriptions.add(NormalizationDescription.builder(OptimisticDnsScheme.class)
-                .name("Optimistic DNS scheme")
-                .description("If dns host is found in the authority, the path is removed. "
-                        + "If dns host is found in the path, it is moved to the authority.")
-                .build());
     }
 
 }

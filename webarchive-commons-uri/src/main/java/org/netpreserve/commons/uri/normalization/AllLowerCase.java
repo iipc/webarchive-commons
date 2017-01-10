@@ -15,10 +15,9 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
-import java.util.List;
-
 import org.netpreserve.commons.uri.PreParseNormalizer;
-import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
+import org.netpreserve.commons.uri.normalization.report.Description;
+import org.netpreserve.commons.uri.normalization.report.Example;
 
 /**
  * Normalizer which turn the URI string into lower case before parsing.
@@ -26,16 +25,11 @@ import org.netpreserve.commons.uri.normalization.report.NormalizationDescription
 public class AllLowerCase implements PreParseNormalizer {
 
     @Override
+    @Description(name = "All lower case",
+                 description = "Turns all the characters of the URI into lower case.")
+    @Example(uri = "HTTP://example.COM/path/Index.HTM", normalizedUri = "http://example.com/path/index.htm")
     public String normalize(String uriString) {
         return uriString.toLowerCase();
-    }
-
-    @Override
-    public void describeNormalization(List<NormalizationDescription> descriptions) {
-        descriptions.add(NormalizationDescription.builder(AllLowerCase.class)
-                .name("All lower case")
-                .description("Turns all the characters of the URI into lower case.")
-                .build());
     }
 
 }

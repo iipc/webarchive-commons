@@ -15,35 +15,28 @@
  */
 package org.netpreserve.commons.uri.normalization;
 
-import java.util.List;
-
 import org.netpreserve.commons.uri.InParseNormalizer;
-import org.netpreserve.commons.uri.Rfc3986Parser;
-import org.netpreserve.commons.uri.normalization.report.NormalizationDescription;
-
-import static org.netpreserve.commons.uri.UriBuilder.ESCAPED_SPACE;
+import org.netpreserve.commons.uri.normalization.report.Description;
+import org.netpreserve.commons.uri.normalization.report.Example;
+import org.netpreserve.commons.uri.parser.Parser;
 
 /**
- *
+ * Normalizer for stripping trailing escaped space on authority.
  */
 public class StripTrailingEscapedSpaceOnAuthority implements InParseNormalizer {
+    private static final String ESCAPED_SPACE = "%20";
+
 
     @Override
-    public void postParseAuthority(Rfc3986Parser.ParserState parserState) {
+    @Description(name = "Strip trailing escaped space on authority",
+                 description = "Removes escaped space i.e. %20, from end of authority.")
+    @Example(uri = "http://www.example.com%20/path", normalizedUri = "http://www.example.com/path")
+    public String preParseHost(Parser.ParserState parserState, String host) {
         // Remove trailing escaped space
-        String authority = parserState.getAuthority();
-        while (authority.endsWith(ESCAPED_SPACE)) {
-            authority = authority.substring(0, authority.length() - 3);
+        while (host.endsWith(ESCAPED_SPACE)) {
+            host = host.substring(0, host.length() - 3);
         }
-        parserState.setAuthority(authority);
-    }
-
-    @Override
-    public void describeNormalization(List<NormalizationDescription> descriptions) {
-        descriptions.add(NormalizationDescription.builder(StripTrailingEscapedSpaceOnAuthority.class)
-                .name("Strip trailing escaped space on authority")
-                .description("Removes escaped space i.e. %20, from end of authority.")
-                .build());
+        return host;
     }
 
 }

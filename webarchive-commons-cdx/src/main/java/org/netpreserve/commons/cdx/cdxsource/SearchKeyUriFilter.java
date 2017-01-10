@@ -19,9 +19,7 @@ import org.netpreserve.commons.cdx.SearchKeyTemplate;
 
 import java.nio.charset.StandardCharsets;
 
-import org.netpreserve.commons.uri.PostParseNormalizer;
 import org.netpreserve.commons.uri.Uri;
-import org.netpreserve.commons.uri.UriBuilder;
 import org.netpreserve.commons.uri.UriBuilderConfig;
 import org.netpreserve.commons.uri.normalization.StripSlashAtEndOfPath;
 

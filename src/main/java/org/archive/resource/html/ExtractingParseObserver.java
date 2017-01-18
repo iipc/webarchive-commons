@@ -22,13 +22,18 @@ public class ExtractingParseObserver implements ParseObserver {
 
 	protected static String cssUrlPatString = 
 		"url\\s*\\(\\s*((?:\\\\?[\"'])?.+?(?:\\\\?[\"'])?)\\s*\\)";
+	protected static String cssUrlTrimPatString =
+			"^(?:\\\\?[\"'])+|(?:\\\\?[\"'])+$";
 	protected static String cssImportNoUrlPatString = 
-	        "@import\\s+((?:'[^']+')|(?:\"[^\"]+\")|(?:\\('[^']+'\\))|(?:\\(\"[^\"]+\"\\))|(?:\\([^)]+\\))|(?:[a-z0-9_.:/\\\\-]+))\\s*;";
+			"@import\\s+((?:'[^']+')|(?:\"[^\"]+\")|(?:\\('[^']+'\\))|(?:\\(\"[^\"]+\"\\))|(?:\\([^)]+\\))|(?:[a-z0-9_.:/\\\\-]+))\\s*;";
 
 	protected static Pattern cssImportNoUrlPattern = Pattern
 			.compile(cssImportNoUrlPatString);
 
 	protected static Pattern cssUrlPattern = Pattern.compile(cssUrlPatString);
+
+	protected static Pattern cssUrlTrimPattern = Pattern.compile(cssUrlTrimPatString);
+
 	private final static int MAX_TEXT_LEN = 100;
 
 //	private static String GLOBAL_ATTR[] = {"background"};
@@ -368,45 +373,20 @@ public class ExtractingParseObserver implements ParseObserver {
 			}
 		}
 	}
-    private void patternCSSExtract(HTMLMetaData data, Pattern pattern, String content) {
-        Matcher m = pattern.matcher(content);
-        int idx = 0;
-        int contentLen = content.length();
-        if (contentLen > 100000)
-            // extract URLs only from the first 100 kB
-            contentLen = 100000;
-        FIND:
-        while((idx < contentLen) && m.find()) {
-            idx = m.end();
-            String url = m.group(1);
-            if(url.length() < 2) {
-                continue;
-            }
-            if ((url.charAt(0) == '(')
-                    && (url.charAt(url.length()-1) == ')')) {
-                url = url.substring(1, url.length() - 1);
-            }
-            CLIP:
-            while (url.length() > 1) {
-                if ((url.charAt(0) == '"' || url.charAt(0) == '\'')
-                        && (url.charAt(url.length() - 1) == '"'
-                                || url.charAt(url.length() - 1) == '\'')) {
-                    if(url.length() <= 2) {
-                        // empty URL
-                        continue FIND;
-                    }
-                    url = url.substring(1, url.length() - 1);
-                } else if (url.charAt(0) == '\\') {
-                    if(url.length() <= 4) {
-                        // empty URL
-                        continue FIND;
-                    }
-                    url = url.substring(2, url.length() - 2);
-                } else {
-                    break CLIP;
-                }
-            }
-            data.addHref("path","STYLE/#text","href",url);
-        }
-    }
+	private void patternCSSExtract(HTMLMetaData data, Pattern pattern, String content) {
+		Matcher m = pattern.matcher(content);
+		int idx = 0;
+		int contentLen = content.length();
+		if (contentLen > 100000)
+			// extract URLs only from the first 100 kB
+			contentLen = 100000;
+		while((idx < contentLen) && m.find()) {
+			idx = m.end();
+			String url = m.group(1);
+			url = cssUrlTrimPattern.matcher(url).replaceAll("");
+			if (!url.isEmpty()) {
+				data.addHref("path","STYLE/#text","href", url);
+			}
+		}
+	}
 }

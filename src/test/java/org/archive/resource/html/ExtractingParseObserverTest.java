@@ -20,8 +20,8 @@ public class ExtractingParseObserverTest extends TestCase {
 				"url('\")",
 				"url(')",
 				"url('\"')",
-                "url('\\\"\"')",
-                "url(''''')"
+				"url('\\\"\"')",
+				"url(''''')"
 		};
 		boolean except = false;
 		HTMLMetaData md = new HTMLMetaData(new MetaData());
@@ -50,7 +50,8 @@ public class ExtractingParseObserverTest extends TestCase {
 				{"url(\\'foo.gif\\')","foo.gif"},
 				{"url(''foo.gif'')","foo.gif"},
 				{"url(  foo.gif  )","foo.gif"},
-				{"url('''')"}
+				{"url('''')"},
+				{"url('foo.gif'')","foo.gif"},
 				};
 		for(String[] testa : tests) {
 			checkExtract(testa);
@@ -98,7 +99,7 @@ public class ExtractingParseObserverTest extends TestCase {
 						data[i], jo.getString("href"));
 			}
 		} else {
-			assertNull(a);
+			assertNull("Expected no extracted link for <" + css + ">", a);
 		}
 	}
 	

@@ -21,14 +21,19 @@ public class ExtractingParseObserver implements ParseObserver {
 	boolean inTitle = false;
 
 	protected static String cssUrlPatString = 
-		"url\\s*\\(\\s*([\\\\\"']*.+?[\\\\\"']*)\\s*\\)";
+		"url\\s*\\(\\s*((?:\\\\?[\"'])?.+?(?:\\\\?[\"'])?)\\s*\\)";
+	protected static String cssUrlTrimPatString =
+			"^(?:\\\\?[\"'])+|(?:\\\\?[\"'])+$";
 	protected static String cssImportNoUrlPatString = 
-		"@import\\s+(('[^']+')|(\"[^\"]+\")|(\\('[^']+'\\))|(\\(\"[^\"]+\"\\))|(\\([^)]+\\))|([a-z0-9_.:/\\\\-]+))\\s*;";
+			"@import\\s+((?:'[^']+')|(?:\"[^\"]+\")|(?:\\('[^']+'\\))|(?:\\(\"[^\"]+\"\\))|(?:\\([^)]+\\))|(?:[a-z0-9_.:/\\\\-]+))\\s*;";
 
 	protected static Pattern cssImportNoUrlPattern = Pattern
 			.compile(cssImportNoUrlPatString);
 
 	protected static Pattern cssUrlPattern = Pattern.compile(cssUrlPatString);
+
+	protected static Pattern cssUrlTrimPattern = Pattern.compile(cssUrlTrimPatString);
+
 	private final static int MAX_TEXT_LEN = 100;
 
 //	private static String GLOBAL_ATTR[] = {"background"};
@@ -372,36 +377,16 @@ public class ExtractingParseObserver implements ParseObserver {
 		Matcher m = pattern.matcher(content);
 		int idx = 0;
 		int contentLen = content.length();
-		while((idx < contentLen) && m.find(idx)) {
+		if (contentLen > 100000)
+			// extract URLs only from the first 100 kB
+			contentLen = 100000;
+		while((idx < contentLen) && m.find()) {
+			idx = m.end();
 			String url = m.group(1);
-			int origUrlLength = url.length();
-			int urlStart = m.start(1);
-			int urlEnd = m.end(1);
-			idx = urlEnd;
-			if(url.length() < 2) {
-				continue;
+			url = cssUrlTrimPattern.matcher(url).replaceAll("");
+			if (!url.isEmpty()) {
+				data.addHref("path","STYLE/#text","href", url);
 			}
-			if ((url.charAt(0) == '(') 
-					&& (url.charAt(origUrlLength-1) == ')')) {
-				url = url.substring(1, origUrlLength - 1);
-				urlStart += 1;
-				origUrlLength -= 2;
-			}
-			if (url.charAt(0) == '"') {
-				url = url.substring(1, origUrlLength - 1);
-				urlStart += 1;
-			} else if (url.charAt(0) == '\'') {
-				url = url.substring(1, origUrlLength - 1);
-				urlStart += 1;
-			} else if (url.charAt(0) == '\\') {
-				if(url.length() == 2)
-					continue;
-				url = url.substring(2, origUrlLength - 2);
-				urlStart += 2;
-			}
-			int urlLength = url.length();
-			data.addHref("path","STYLE/#text","href",url);
-			idx += urlLength;
 		}
 	}
 }

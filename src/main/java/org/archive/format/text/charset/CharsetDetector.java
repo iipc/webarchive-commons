@@ -60,7 +60,8 @@ public abstract class CharsetDetector {
 	private final static String META_CONTENT_ATTR_PATTERN_STRING = "\\b" + 
 		META_CONTENT_ATTRIBUTE + "\\s*=\\s*(" + ANY_ATTR_VALUE + ")(?:\\s|>)?";
 	private final static String META_HTTP_EQUIV_ATTR_PATTERN_STRING = "\\b" + 
-		META_HTTP_EQUIV_ATTRIBUTE + "\\s*=\\s*(" + ANY_ATTR_VALUE + ")(?:\\s|>)?";
+		META_HTTP_EQUIV_ATTRIBUTE + "\\s*=\\s*(" + META_CONTENT_TYPE + "|" +
+		ANY_ATTR_VALUE + ")(?:\\s|>)?";
 
 	
 	
@@ -230,7 +231,6 @@ public abstract class CharsetDetector {
 	protected String getCharsetFromBytes(byte buffer[], int len) 
 	throws IOException {
 		String charsetName = null;
-
 	    UniversalDetector detector = new UniversalDetector(null);
 		detector.handleData(buffer, 0, len);
 		detector.dataEnd();

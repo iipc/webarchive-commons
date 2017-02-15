@@ -22,6 +22,7 @@ public class WaybackURLKeyMakerTest extends TestCase {
 		assertEquals("org,archive)/goo", km.makeKey("http://archive.org/goo/?"));
 		assertEquals("org,archive)/goo?a&b", km.makeKey("http://archive.org/goo/?b&a"));
 		assertEquals("org,archive)/goo?a=1&a=2&b", km.makeKey("http://archive.org/goo/?a=2&b&a=1"));
+		assertEquals("org,archive)/", km.makeKey("http://archive.org:/"));
 	}
 
 }

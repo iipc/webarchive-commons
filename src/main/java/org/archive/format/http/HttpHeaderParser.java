@@ -231,6 +231,7 @@ public class HttpHeaderParser implements HttpConstants {
 			if(b == LF) {
 				// TODO: this is lax, is LFLF an OK terminator?
 				// that's all folks!
+				parser.headerFinished();
 				parser.parseFinished();
 				return parser.endState;
 			}

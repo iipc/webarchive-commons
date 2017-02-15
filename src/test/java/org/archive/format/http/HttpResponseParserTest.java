@@ -38,4 +38,23 @@ public class HttpResponseParserTest extends TestCase {
 		
 	}
 
+	public void testParseWithLf() throws IOException {
+
+		HttpResponseParser parser = new HttpResponseParser();
+		String message = "200 OK\nContent-Type: text/plain\n\nHi there";
+		try {
+			HttpResponse response = 
+				parser.parse(new ByteArrayInputStream(message.getBytes(IAUtils.UTF8)));
+			assertNotNull(response);
+			HttpHeaders headers = response.getHeaders();
+			assertNotNull(headers);
+			assertEquals(1,headers.size());
+			
+		} catch (HttpParseException e) {
+			e.printStackTrace();
+			fail();
+		}
+		
+	}
+
 }

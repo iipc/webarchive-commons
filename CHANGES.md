@@ -1,3 +1,11 @@
+1.1.8
+-----
+* [Strip empty port via URLParser](https://github.com/iipc/webarchive-commons/pull/69/)
+* [Use CharsetDetector to guess encoding of HTML documents](https://github.com/iipc/webarchive-commons/pull/68/)
+* [Fix last header was lost if LF LF](https://github.com/iipc/webarchive-commons/pull/65/)
+* [Make regular expression to extract URLs from CSS more restrictive](https://github.com/iipc/webarchive-commons/pull/63)
+* [Remove invalid constant `PROFILE_REVISIT_URI_AGNOSTIC_IDENTICAL_DIGEST`](https://github.com/iipc/webarchive-commons/pull/62)
+
 1.1.7
 -----
 * [Make canonicalizer be able to strip session id params even if they are the first params in the query string](https://github.com/iipc/webarchive-commons/pull/54)
@@ -36,10 +44,10 @@
 
 1.1.2
 -----
-* Fixed support for reading uncompressed WARCs, along with some unit testing. (https://github.com/iipc/webarchive-commons/pull/12)
+* [Fixed support for reading uncompressed WARCs, along with some unit testing.](https://github.com/iipc/webarchive-commons/pull/12)
 
 1.1.1
 -----
-* Renamed from commons-webarchive to webarchive-commons (https://github.com/iipc/webarchive-commons/pull/8)
-* Cope with malformed GZip extra fields as produced by wget 1.14 (https://github.com/iipc/webarchive-commons/pull/10)
-* Switch to httpcomponents, and add IA deployment information. (https://github.com/iipc/webarchive-commons/pull/11)
+* [Renamed from commons-webarchive to webarchive-commons](https://github.com/iipc/webarchive-commons/pull/8)
+* [Cope with malformed GZip extra fields as produced by wget 1.14](https://github.com/iipc/webarchive-commons/pull/10)
+* [Switch to httpcomponents, and add IA deployment information.](https://github.com/iipc/webarchive-commons/pull/11)

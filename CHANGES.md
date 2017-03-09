@@ -1,5 +1,6 @@
 1.1.8
 -----
+* [Move unit tests over from heritrix3 to webarchive-commons](https://github.com/iipc/webarchive-commons/issues/25)
 * [Strip empty port via URLParser](https://github.com/iipc/webarchive-commons/pull/69/)
 * [Use CharsetDetector to guess encoding of HTML documents](https://github.com/iipc/webarchive-commons/pull/68/)
 * [Fix last header was lost if LF LF](https://github.com/iipc/webarchive-commons/pull/65/)

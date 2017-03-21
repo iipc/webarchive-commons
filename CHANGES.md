@@ -1,5 +1,6 @@
 1.1.8
 -----
+* [Improve HTML link extraction](https://github.com/iipc/webarchive-commons/pull/72)
 * [Move unit tests over from heritrix3 to webarchive-commons](https://github.com/iipc/webarchive-commons/issues/25)
 * [Strip empty port via URLParser](https://github.com/iipc/webarchive-commons/pull/69/)
 * [Use CharsetDetector to guess encoding of HTML documents](https://github.com/iipc/webarchive-commons/pull/68/)

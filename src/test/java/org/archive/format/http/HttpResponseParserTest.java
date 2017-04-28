@@ -57,4 +57,28 @@ public class HttpResponseParserTest extends TestCase {
 		
 	}
 
+	public void testParseEmptyHeaderField() throws IOException {
+
+		HttpResponseParser parser = new HttpResponseParser();
+		String message = "200 OK\r\nContent-Type: text/plain\r\nServer: \r\n\r\nHi there";
+		try {
+			HttpResponse response = 
+				parser.parse(new ByteArrayInputStream(message.getBytes(IAUtils.UTF8)));
+			assertNotNull(response);
+			HttpHeaders headers = response.getHeaders();
+			assertNotNull(headers);
+			assertEquals(2, headers.size());
+			HttpHeader header = headers.get(1);
+			assertEquals("Server",header.getName());
+			System.err.println(header.getValue());
+			assertFalse("text/plain".equals(header.getValue()));
+			TestUtils.assertStreamEquals(response, "Hi there".getBytes(IAUtils.UTF8));
+			
+		} catch (HttpParseException e) {
+			e.printStackTrace();
+			fail();
+		}
+		
+	}
+
 }

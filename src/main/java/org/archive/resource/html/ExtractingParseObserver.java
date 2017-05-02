@@ -406,7 +406,7 @@ public class ExtractingParseObserver implements ParseObserver {
 
 	private static class MetaTagExtractor implements TagExtractor {
 		public void extract(HTMLMetaData data, TagNode node, ExtractingParseObserver obs) {
-			ArrayList<String> l = getAttrList(node,"name","rel","content","http-equiv");
+			ArrayList<String> l = getAttrList(node,"name","rel","content","http-equiv","property");
 			if(l != null) {
 				data.addMeta(l);
 			}

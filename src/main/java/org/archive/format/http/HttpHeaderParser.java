@@ -301,8 +301,9 @@ public class HttpHeaderParser implements HttpConstants {
 			if(isLWSP(b)) {
 				return parser.postColonState;
 			}
+			// reset previous value also in case the header value is empty
+			parser.setValueStartIdx();
 			if(b == CR) {
-				// TODO: THINK more...
 				parser.valuePreCRState = parser.postColonState;
 				return parser.valuePostCRState;
 			}
@@ -310,7 +311,6 @@ public class HttpHeaderParser implements HttpConstants {
 				// TODO: this is lax, is LFLF an OK terminator?
 				return parser.lineStartState;
 			}
-			parser.setValueStartIdx();
 			parser.addValueByte(b);
 			return parser.valueState;
 		}

@@ -1,3 +1,9 @@
+1.1.9
+-----
+* [Extract `property` attributes of HTML meta elements](https://github.com/iipc/webarchive-commons/pull/75)
+* [Do not add value of preceding HTTP header field if there is no value](https://github.com/iipc/webarchive-commons/pull/74)
+* [Fix WAT records corresponding to response records of Wget generated WARCs](https://github.com/iipc/webarchive-commons/pull/74)
+
 1.1.8
 -----
 * [Improve HTML link extraction](https://github.com/iipc/webarchive-commons/pull/72)

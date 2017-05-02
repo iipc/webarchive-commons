@@ -209,7 +209,9 @@ public interface WARCConstants extends ArchiveFileConstants {
     	"application/http; msgtype=request";
     public static final String HTTP_RESPONSE_MIMETYPE =
     	"application/http; msgtype=response";
-    
+    public static final String HTTP_RESPONSE_MIMETYPE_NS =
+        "application/http;msgtype=response";                   // wget does this
+
     public static final String FTP_CONTROL_CONVERSATION_MIMETYPE =
         "text/x-ftp-control-conversation";
     

@@ -1,5 +1,6 @@
 1.1.9
 -----
+* [Use commons-collections v3.2.2 to avoid v3.2.1 vulnerability](https://github.com/iipc/webarchive-commons/pull/77)
 * [Extract `property` attributes of HTML meta elements](https://github.com/iipc/webarchive-commons/pull/75)
 * [Do not add value of preceding HTTP header field if there is no value](https://github.com/iipc/webarchive-commons/pull/74)
 * [Fix WAT records corresponding to response records of Wget generated WARCs](https://github.com/iipc/webarchive-commons/pull/74)

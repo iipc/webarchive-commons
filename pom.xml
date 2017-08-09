@@ -100,6 +100,7 @@
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-core</artifactId>
       <version>0.20.2-cdh3u4</version>
+	  <scope>provided</scope>
       <exclusions>
         <exclusion>
           <groupId>commons-httpclient</groupId>

@@ -39,6 +39,15 @@ public class ExtractingParseObserver implements ParseObserver {
 
 	protected static Pattern cssUrlTrimPattern = Pattern.compile(cssUrlTrimPatString);
 
+	protected static String jsOnClickUrl1PatString = 
+			"(?i)^(?:javascript:)?(?:(?:window|top|document|self|parent)\\.)?location(?:\\.href)?\\s*=\\s*('|&#39;)([^'\"]{3,256})\\1$";
+	protected static String jsOnClickUrl2PatString = 
+			"(?i)^(?:javascript:)?(?:window|parent)\\.open\\((['\"]|&#39;)([^\"']{3,256}?)\\1[,)]";
+	protected static Pattern[] jsOnClickUrlPatterns = {
+			Pattern.compile(jsOnClickUrl1PatString),
+			Pattern.compile(jsOnClickUrl2PatString)
+	};
+
 	private final static int MAX_TEXT_LEN = 100;
 
 	private static final String PATH = "path";
@@ -51,6 +60,7 @@ public class ExtractingParseObserver implements ParseObserver {
 		extractors.put("APPLET", new AppletTagExtractor());
 		extractors.put("AREA", new AreaTagExtractor());
 		extractors.put("BASE", new BaseTagExtractor());
+		extractors.put("DIV", new DivTagExtractor());
 		extractors.put("EMBED", new EmbedTagExtractor());
 		extractors.put("FORM", new FormTagExtractor());
 		extractors.put("FRAME", new FrameTagExtractor());
@@ -268,7 +278,20 @@ public class ExtractingParseObserver implements ParseObserver {
 		if(l != null) {
 			data.addHref(l);
 		}
-	}	
+	}
+
+	private static void addHrefsOnclick(HTMLMetaData data, TagNode node) {
+		String onclick = node.getAttribute("onclick");
+		if (onclick != null) {
+			String path = makePath(node.getTagName(), "onclick");
+			for (Pattern pattern : jsOnClickUrlPatterns) {
+				String url = patternJSExtract(pattern, onclick);
+				if (url != null) {
+					data.addHref(PATH, path, "url", url);
+				}
+			}
+		}
+	}
 
 	private interface TagExtractor {
 		public void extract(HTMLMetaData data, TagNode node, ExtractingParseObserver obs);
@@ -330,6 +353,12 @@ public class ExtractingParseObserver implements ParseObserver {
 		}
 	}
 
+	private static class DivTagExtractor implements TagExtractor {
+		public void extract(HTMLMetaData data, TagNode node, ExtractingParseObserver obs) {
+			addHrefsOnclick(data,node);
+		}
+	}
+
 	private static class EmbedTagExtractor implements TagExtractor {
 		public void extract(HTMLMetaData data, TagNode node, ExtractingParseObserver obs) {
 			addBasicHrefs(data,node,"src");
@@ -386,6 +415,7 @@ public class ExtractingParseObserver implements ParseObserver {
 	private static class InputTagExtractor implements TagExtractor {
 		public void extract(HTMLMetaData data, TagNode node, ExtractingParseObserver obs) {
 			addBasicHrefs(data,node,"src","formaction");
+			addHrefsOnclick(data,node);
 		}
 	}
 
@@ -449,5 +479,13 @@ public class ExtractingParseObserver implements ParseObserver {
 				data.addHref("path","STYLE/#text","href", url);
 			}
 		}
+	}
+
+	private static String patternJSExtract(Pattern pattern, String content) {
+		Matcher m = pattern.matcher(content);
+		if (m.find()) {
+			return m.group(2);
+		}
+		return null;
 	}
 }

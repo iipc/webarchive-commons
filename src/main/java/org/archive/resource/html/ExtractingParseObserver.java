@@ -284,7 +284,7 @@ public class ExtractingParseObserver implements ParseObserver {
 				l.add(makePath("A","href"));
 				l.add("url");
 				l.add(url);
-				for(String a : new String[] {"target","alt","title"}) {
+				for(String a : new String[] {"target","alt","title","rel","hreflang","type"}) {
 					String v = node.getAttribute(a);
 					if(v != null) {
 						l.add(a);
@@ -311,7 +311,22 @@ public class ExtractingParseObserver implements ParseObserver {
 
 	private static class AreaTagExtractor implements TagExtractor {
 		public void extract(HTMLMetaData data, TagNode node, ExtractingParseObserver obs) {
-			addBasicHrefs(data,node,"href");
+			String url = node.getAttribute("href");
+			if(url != null) {
+				ArrayList<String> l = new ArrayList<String>();
+				l.add(PATH);
+				l.add(makePath("AREA","href"));
+				l.add("url");
+				l.add(url);
+				for(String a : new String[] {"rel"}) {
+					String v = node.getAttribute(a);
+					if(v != null) {
+						l.add(a);
+						l.add(v);
+					}
+				}
+				data.addHref(l);
+			}
 		}
 	}
 

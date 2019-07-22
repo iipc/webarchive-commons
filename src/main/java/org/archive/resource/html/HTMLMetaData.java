@@ -5,9 +5,9 @@ import java.util.logging.Logger;
 
 import org.archive.resource.MetaData;
 import org.archive.resource.ResourceConstants;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.github.openjson.JSONArray;
+import com.github.openjson.JSONException;
+import com.github.openjson.JSONObject;
 
 public class HTMLMetaData extends MetaData implements ResourceConstants {
 

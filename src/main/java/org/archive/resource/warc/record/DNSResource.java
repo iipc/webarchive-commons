@@ -9,8 +9,8 @@ import org.archive.resource.AbstractEmptyResource;
 import org.archive.resource.MetaData;
 import org.archive.resource.ResourceConstants;
 import org.archive.resource.ResourceContainer;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.github.openjson.JSONException;
+import com.github.openjson.JSONObject;
 
 public class DNSResource extends AbstractEmptyResource implements ResourceConstants {
 	private static final Logger LOG = 

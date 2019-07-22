@@ -2,10 +2,10 @@ package org.archive.resource;
 
 import java.util.logging.Logger;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import com.github.openjson.JSONArray;
+import com.github.openjson.JSONException;
+import com.github.openjson.JSONObject;
+import com.github.openjson.JSONTokener;
 
 public class MetaData extends JSONObject {
 

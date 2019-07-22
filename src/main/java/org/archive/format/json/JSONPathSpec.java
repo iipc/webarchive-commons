@@ -2,7 +2,7 @@ package org.archive.format.json;
 
 import java.util.List;
 
-import org.json.JSONObject;
+import com.github.openjson.JSONObject;
 
 public interface JSONPathSpec {
 	public static final String EMPTY = "";

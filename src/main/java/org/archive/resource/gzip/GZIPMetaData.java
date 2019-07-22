@@ -12,8 +12,8 @@ import org.archive.format.gzip.GZIPStaticHeader;
 import org.archive.resource.MetaData;
 import org.archive.resource.ResourceConstants;
 import org.archive.util.ByteOp;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.github.openjson.JSONException;
+import com.github.openjson.JSONObject;
 
 public class GZIPMetaData extends MetaData implements ResourceConstants {
 	private static final Logger LOG = Logger.getLogger(GZIPMetaData.class.getName());

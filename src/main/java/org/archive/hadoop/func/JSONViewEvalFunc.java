@@ -8,8 +8,8 @@ import org.apache.pig.EvalFunc;
 import org.apache.pig.data.Tuple;
 import org.apache.pig.data.TupleFactory;
 import org.archive.format.json.JSONUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.github.openjson.JSONException;
+import com.github.openjson.JSONObject;
 
 public class JSONViewEvalFunc extends EvalFunc<Tuple> {
 	private static final Logger LOG =

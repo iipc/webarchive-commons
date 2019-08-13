@@ -1,7 +1,13 @@
+dist: trusty
 language: java
+# sudo required for OpenJDK7 support per:
+# https://github.com/travis-ci/travis-ci/issues/7884#issuecomment-309689557
+sudo: required
 
 jdk:
-  - oraclejdk7
+  - openjdk7
+  - oraclejdk8
+  - openjdk8
 
 before_install:
   - "git clone https://github.com/iipc/travis.git target/travis"
@@ -11,8 +17,8 @@ before_script:
  - "export MAVEN_OPTS=-Xmx512m"
  - "ulimit -u 2048"
 
-script: 
-  - "target/travis/deploy-if.sh"
+script:
+  - mvn install -B -V
 
 # whitelist in the master branch only
 branches:
@@ -23,4 +29,3 @@ env:
   global:
     - secure: "qDKjVdoe4Qcz4WfXiQydU7tyl51T62FUJrjqu4FUPBcgeQhFQiggwhpaE6xCOzOpxbsuBi2R1c8gMQf5esE5iDL5jZMu+kz++dYbuzMTd13ttvZWMW5wRPH0H8iHk609FP/RDtVKKBr7WO0JvvIAZEhWNHZrLXBrrKgdTey171g="
     - secure: "FXGBKJNP9X7ePJfS4eYTZtoFo4RT1sxor34XxncSJr7uV6ggtZb4B4WNd16IlLcDk6E32sx8YoWdltaOGwQ5Vg/kux5Ko/wKZCoccS018Ln1bRT86dD1KoPY34rGoNJVQxe7J/1MPqpBKwmi2XCKfzpsEh3W7bbIqg8w9MEOOZA="
-

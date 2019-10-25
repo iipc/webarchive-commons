@@ -263,6 +263,16 @@ public class ExtractingParseObserverTest extends TestCase {
 				{"http://www.your-domain.com/your-page.html", "DIV@/data-href"}
 		};
 		checkLinks(extractor.getNext(), fbSocialLinks);
+		String[][] onClickLinks = {
+				{"webpage.html", "DIV@/onclick"},
+				{"index.html", "INPUT@/onclick"},
+				{"http://www.x.com/", "INPUT@/onclick"},
+				{"button-child.php", "INPUT@/onclick"},
+				{"http://example.com/", "INPUT@/onclick"},
+				{"http://example.com/location/href/1.html", "INPUT@/onclick"},
+				{"http://example.com/location/href/2.html", "INPUT@/onclick"}
+		};
+		checkLinks(extractor.getNext(), onClickLinks);
 	}
 
 }

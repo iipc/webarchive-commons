@@ -318,3 +318,45 @@ Content-Type: text/html
   </div>
 
 
+WARC/1.0
+WARC-Type: response
+WARC-Date: 2017-08-23T13:54:59Z
+Content-Type: application/http;msgtype=response
+Content-Length: 1279
+
+HTTP/1.1 200 OK
+Date: Wed, 23 Aug 2017 13:54:59 GMT
+Server: Apache/2.4.18 (Ubuntu)
+Last-Modified: Wed, 23 Aug 2017 13:54:03 GMT
+ETag: "3ca-5576c0b718ab3"
+Accept-Ranges: bytes
+Content-Length: 971
+Vary: Accept-Encoding
+Keep-Alive: timeout=5, max=100
+Connection: Keep-Alive
+Content-Type: text/html
+
+<!DOCTYPE html>
+<head>
+<title>Test Extraction of URLs from INPUT onClick Attributes</title>
+<meta charset="utf-8">
+</head>
+
+<body>
+  <div onclick="location.href='webpage.html'">Click to load webpage</div>
+  
+  <form>
+    <input type=button onClick="parent.location='index.html'" value='click here'/>
+    <input type=button onClick="parent.open('http://www.x.com/')" value='new window'/>
+    <input type=button onClick=window.open("button-child.php","demo","width=550,height=300,left=150,top=200,toolbar=0,status=0,");
+           value="Open child Window"/>
+    <input type="button" value="Open Window 2" onclick="window.open(&#39;http://example.com/&#39;, #39;width=500&#39;);"/>
+    <input type="button" value="Open href 1" onclick="window.location.href='http://example.com/location/href/1.html'"/>
+    <input type="button" value="Open href 2" onclick="Javascript:document.location.href=&#39;http://example.com/location/href/2.html&#39;"/>
+  </form>
+
+  
+</body>
+</html>
+
+

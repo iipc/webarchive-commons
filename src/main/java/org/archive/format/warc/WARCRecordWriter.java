@@ -88,7 +88,10 @@ public class WARCRecordWriter implements WARCConstants, HttpConstants
   {
     HttpHeaders headers = new HttpHeaders();
     headers.add(HEADER_KEY_TYPE, WARCRecordType.metadata.name());
-    headers.add(HEADER_KEY_URI, targetURI);
+    if (targetURI != null) {
+        // WARC-Target-URI is optional in metadata records
+        headers.add(HEADER_KEY_URI, targetURI);
+    }
     headers.add(HEADER_KEY_DATE, DateUtils.getLog14Date(originalDate));
     headers.add(HEADER_KEY_ID, makeRecordId());
     headers.add(HEADER_KEY_REFERS_TO, origRecordId);

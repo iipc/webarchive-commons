@@ -1,3 +1,10 @@
+1.1.10
+------
+* [WAT extractor: do not fail on missing WARC-Filename in warcinfo record](https://github.com/iipc/webarchive-commons/pull/89)
+* [ExtractingParseObserver: extract rel, hreflang and type attributes](https://github.com/iipc/webarchive-commons/pull/86)
+* [ExtractingParseObserver: extract links from onClick attributes](https://github.com/iipc/webarchive-commons/pull/85)
+* [Update TravisCI config](https://github.com/iipc/webarchive-commons/pull/83)
+
 1.1.9
 -----
 * [Use commons-collections v3.2.2 to avoid v3.2.1 vulnerability](https://github.com/iipc/webarchive-commons/pull/77)

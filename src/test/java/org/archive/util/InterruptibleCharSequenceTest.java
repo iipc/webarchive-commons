@@ -107,14 +107,24 @@ public class InterruptibleCharSequenceTest extends TestCase {
     }
     
     public void testInterruptibility() throws InterruptedException {
-        BlockingQueue<Object> q = new LinkedBlockingQueue<Object>();
-        Thread t = tryMatchInThread(new InterruptibleCharSequence(INPUT), BACKTRACKER, q);
-        Thread.sleep(500);
-        t.interrupt();
-        Object result = q.take(); 
-        if(result instanceof Boolean) {
-            System.err.println(result+" match beat interrupt");
+        long sleepMillis = 512;
+        while (sleepMillis > 0) {
+            BlockingQueue<Object> q = new LinkedBlockingQueue<Object>();
+            Thread t = tryMatchInThread(new InterruptibleCharSequence(INPUT), BACKTRACKER, q);
+            Thread.sleep(sleepMillis);
+            if (t.getState() == Thread.State.TERMINATED) {
+                sleepMillis /= 2;
+                System.err.println("already done, retrying with shorter sleep time: " + sleepMillis + "ms");
+                continue;
+            }
+            t.interrupt();
+            Object result = q.take();
+            if(result instanceof Boolean) {
+                System.err.println(result+" match beat interrupt");
+            }
+            assertTrue("exception not thrown",result instanceof RuntimeException);
+            return;
         }
-        assertTrue("exception not thrown",result instanceof RuntimeException);
+        fail("failed to interrupt InterruptibleCharSequence with given sleeping intervals");
     }
 }

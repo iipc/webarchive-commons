@@ -11,8 +11,8 @@ import org.archive.resource.ResourceConstants;
 import org.archive.resource.ResourceContainer;
 import org.archive.resource.ResourceFactory;
 import org.archive.resource.ResourceParseException;
-import org.json.JSONException;
-import org.json.JSONTokener;
+import com.github.openjson.JSONException;
+import com.github.openjson.JSONTokener;
 
 public class WARCJSONMetaDataResourceFactory implements ResourceFactory, ResourceConstants {
 	private static final Charset UTF8 = Charset.forName("UTF-8");

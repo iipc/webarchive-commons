@@ -20,8 +20,8 @@ import org.archive.resource.warc.WARCResource;
 import org.archive.resource.warc.record.DNSResourceFactory;
 import org.archive.resource.warc.record.WARCJSONMetaDataResourceFactory;
 import org.archive.resource.warc.record.WARCMetaDataResourceFactory;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.github.openjson.JSONException;
+import com.github.openjson.JSONObject;
 
 public class ExtractingResourceFactoryMapper implements ResourceFactoryMapper {
 

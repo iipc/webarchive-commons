@@ -3,7 +3,7 @@ package org.archive.format.json;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONObject;
+import com.github.openjson.JSONObject;
 
 public class CompoundORJSONPathSpec implements JSONPathSpec {
 	ArrayList<JSONPathSpec> parts;

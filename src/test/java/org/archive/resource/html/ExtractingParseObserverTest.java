@@ -14,10 +14,10 @@ import org.archive.resource.Resource;
 import org.archive.resource.ResourceParseException;
 import org.archive.resource.ResourceProducer;
 import org.htmlparser.nodes.TextNode;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
+import com.github.openjson.JSONArray;
+import com.github.openjson.JSONException;
+import com.github.openjson.JSONObject;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 

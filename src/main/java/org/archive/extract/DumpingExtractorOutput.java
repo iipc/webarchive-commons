@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 
 import org.archive.resource.Resource;
 import org.archive.util.StreamCopy;
-import org.json.JSONException;
+import com.github.openjson.JSONException;
 
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CountingOutputStream;

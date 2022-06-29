@@ -1,8 +1,8 @@
 package org.archive.format.json;
 
 import org.archive.util.TestUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.github.openjson.JSONException;
+import com.github.openjson.JSONObject;
 
 import junit.framework.TestCase;
 

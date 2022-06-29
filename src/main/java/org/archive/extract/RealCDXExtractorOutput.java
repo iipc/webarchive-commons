@@ -21,9 +21,9 @@ import org.archive.url.URLKeyMaker;
 import org.archive.url.WaybackURLKeyMaker;
 import org.archive.util.IAUtils;
 import org.archive.util.StreamCopy;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.github.openjson.JSONArray;
+import com.github.openjson.JSONException;
+import com.github.openjson.JSONObject;
 
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CountingOutputStream;

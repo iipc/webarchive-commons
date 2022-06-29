@@ -20,8 +20,8 @@ import org.archive.resource.ResourceFactory;
 import org.archive.resource.ResourceParseException;
 import org.htmlparser.lexer.Page;
 import org.htmlparser.util.ParserException;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.github.openjson.JSONException;
+import com.github.openjson.JSONObject;
 
 public class HTMLResourceFactory implements ResourceFactory {
 

@@ -1,8 +1,8 @@
 package org.archive.resource.html;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.github.openjson.JSONArray;
+import com.github.openjson.JSONException;
+import com.github.openjson.JSONObject;
 
 import junit.framework.TestCase;
 

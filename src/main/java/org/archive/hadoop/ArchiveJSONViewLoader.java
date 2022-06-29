@@ -11,8 +11,8 @@ import org.apache.pig.backend.executionengine.ExecException;
 import org.apache.pig.data.Tuple;
 import org.apache.pig.data.TupleFactory;
 import org.archive.format.json.JSONView;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.github.openjson.JSONException;
+import com.github.openjson.JSONObject;
 
 public class ArchiveJSONViewLoader extends ArchiveMetadataLoader {
 	private final static Logger LOG = 

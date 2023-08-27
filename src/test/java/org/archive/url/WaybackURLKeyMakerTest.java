@@ -26,6 +26,10 @@ public class WaybackURLKeyMakerTest extends TestCase {
 		assertEquals("192,211,203,34)/robots.txt", km.makeKey("https://34.203.211.192/robots.txt"));
 		assertEquals("2600:1f18:200d:fb00:2b74:867c:ab0c:150a)/robots.txt",
 				km.makeKey("https://[2600:1f18:200d:fb00:2b74:867c:ab0c:150a]/robots.txt"));
+		assertEquals("ua,1kr)/newslist.html?tag=%e4%ee%f8%ea%ee%eb%fc%ed%ee%e5",
+				km.makeKey("http://1kr.ua/newslist.html?tag=%E4%EE%F8%EA%EE%EB%FC%ED%EE%E5"));
+		assertEquals("com,aluroba)/tags/%c3%ce%ca%c7%d1%e5%c7.htm",
+				km.makeKey("http://www.aluroba.com/tags/%C3%CE%CA%C7%D1%E5%C7.htm"));
 	}
 
 }

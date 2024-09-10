@@ -19,14 +19,8 @@
 
 package org.archive.net;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.regex.Matcher;
 
 import junit.framework.TestCase;
-
-import org.archive.net.PublicSuffixes.Node;
 
 /**
  * Test cases for PublicSuffixes utility. Confirm expected matches/nonmatches
@@ -35,90 +29,6 @@ import org.archive.net.PublicSuffixes.Node;
  * @author gojomo
  */
 public class PublicSuffixesTest extends TestCase {
-    // test of low level implementation
-    private final String NL = System.getProperty("line.separator");
-    
-    public void testCompare() {
-        Node n = new Node("hoge");
-        assertTrue(n.compareTo('a') > 0);
-        assertEquals(-1, n.compareTo('*'));
-        assertEquals(-1, n.compareTo('!'));
-        assertEquals(-1, n.compareTo(new Node("*,")));
-        assertEquals(-1, n.compareTo(new Node("!muga,")));
-        assertEquals(-1, n.compareTo(new Node("")));
-        
-        n = new Node("*,");
-        assertEquals(1, n.compareTo('a'));
-        assertEquals(0, n.compareTo('*'));
-        assertEquals(1, n.compareTo('!'));
-        assertEquals(0, n.compareTo(new Node("*,")));
-        assertEquals(1, n.compareTo(new Node("!muga,")));
-        assertEquals(-1, n.compareTo(new Node("")));
-        
-        n = new Node("!hoge");
-        assertEquals(1, n.compareTo('a'));
-        assertEquals(-1, n.compareTo('*'));
-        assertEquals(0, n.compareTo('!'));
-        assertEquals(-1, n.compareTo(new Node("*,")));
-        assertEquals(0, n.compareTo(new Node("!muga,")));
-        assertEquals(-1, n.compareTo(new Node("")));
-        
-        n = new Node("");
-        assertEquals(1, n.compareTo('a'));
-        assertEquals(1, n.compareTo('*'));
-        assertEquals(1, n.compareTo('!'));
-        assertEquals(0, n.compareTo(new Node("")));
-    }
-    
-    protected String dump(Node alt) {
-        StringWriter w = new StringWriter();
-        PublicSuffixes.dump(alt, 0, new PrintWriter(w));
-        return w.toString();
-    }
-    public void testTrie1()  {
-        Node alt = new Node(null, new ArrayList<Node>());
-        alt.addBranch("ac,");
-        // specifically, should not have empty string as match.
-        assertEquals("(null)" + NL + "  \"ac,\"" + NL, dump(alt));
-        alt.addBranch("ac,com,");
-        assertEquals("(null)" + NL +
-        		"  \"ac,\"" + NL +
-        		"    \"com,\"" + NL +
-        		"    \"\"" + NL, dump(alt));
-        alt.addBranch("ac,edu,");
-        assertEquals("(null)" + NL +
-        		"  \"ac,\"" + NL +
-        		"    \"com,\"" + NL +
-        		"    \"edu,\"" + NL +
-        		"    \"\"" + NL, dump(alt));
-    }
-    public void testTrie2() {
-        Node alt = new Node(null, new ArrayList<Node>());
-        alt.addBranch("ac,");
-        alt.addBranch("*,");
-        assertEquals("(null)" + NL +
-        		"  \"ac,\"" + NL +
-        		"  \"*,\"" + NL, dump(alt));
-    }
-
-    public void testTrie3() {
-        Node alt = new Node(null, new ArrayList<Node>());
-        alt.addBranch("ac,");
-        alt.addBranch("ac,!hoge,");
-        alt.addBranch("ac,*,");
-        // exception goes first.
-        assertEquals("(null)" + NL +
-        		"  \"ac,\"" + NL +
-        		"    \"!hoge,\"" + NL +
-        		"    \"*,\"" + NL +
-        		"    \"\"" + NL, dump(alt));
-    }
-
-    // test of higher-level functionality
-    
-    Matcher m = PublicSuffixes.getTopmostAssignedSurtPrefixPattern()
-            .matcher("");
-
     public void testBasics() {
         matchPrefix("com,example,www,", "com,example,");
         matchPrefix("com,example,", "com,example,");
@@ -135,6 +45,9 @@ public class PublicSuffixesTest extends TestCase {
         matchPrefix("jp,yokohama,public,assigned,www,",
                 "jp,yokohama,public,assigned,");
         matchPrefix("jp,yokohama,public,assigned,", "jp,yokohama,public,assigned,");
+        
+        // Test UTF-8 domain
+        matchPrefix("com,øx,ũber,", "com,øx,");
     }
 
     public void testDomainWithDash() {
@@ -170,24 +83,14 @@ public class PublicSuffixesTest extends TestCase {
         // this is preferable for our grouping purpose but might not be
         // for a cookie-assigning browser (original purpose of publicsuffixlist)
         matchPrefix("zzz,example,www,", "zzz,example,");
+        matchPrefix("zzz,example,", "zzz,example,");
     }
 
     public void testUnsegmentedHostname() {
-        m.reset("example");
-        assertFalse("unexpected match found in 'example'", m.find());
+        assertEquals("Unexpected rewriting of unsegmented hostname", "example", PublicSuffixes.reduceSurtToAssignmentLevel("example"));
     }
-
-    public void testTopmostAssignedCaching() {
-        assertSame("topmostAssignedSurtPrefixPattern not cached",PublicSuffixes.getTopmostAssignedSurtPrefixPattern(),PublicSuffixes.getTopmostAssignedSurtPrefixPattern());
-        assertSame("topmostAssignedSurtPrefixRegex not cached",PublicSuffixes.getTopmostAssignedSurtPrefixRegex(),PublicSuffixes.getTopmostAssignedSurtPrefixRegex()); 
-    }
-    
-    // TODO: test UTF domains?
 
     protected void matchPrefix(String surtDomain, String expectedAssignedPrefix) {
-        m.reset(surtDomain);
-        assertTrue("expected match not found in '" + surtDomain, m.find());
-        assertEquals("expected match not found", expectedAssignedPrefix, m
-                .group());
+        assertEquals("expected match not found", expectedAssignedPrefix, PublicSuffixes.reduceSurtToAssignmentLevel(surtDomain));
     }
 }

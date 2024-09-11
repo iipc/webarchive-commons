@@ -1,9 +1,25 @@
 1.1.10
 ------
+
+#### Fixes
+
 * [WAT extractor: do not fail on missing WARC-Filename in warcinfo record](https://github.com/iipc/webarchive-commons/pull/89)
 * [ExtractingParseObserver: extract rel, hreflang and type attributes](https://github.com/iipc/webarchive-commons/pull/86)
 * [ExtractingParseObserver: extract links from onClick attributes](https://github.com/iipc/webarchive-commons/pull/85)
-* [Update TravisCI config](https://github.com/iipc/webarchive-commons/pull/83)
+
+#### Dependency Upgrades
+
+* commons-collections 3.2.2
+* commons-io 2.7
+* dsiutils 2.2.8
+* guava 33.3.0-jre
+* hadoop 3.4.0 (now optional)
+* pig 0.17.0
+* org.json 20231013
+
+#### Dependency Removals
+
+* joda-time (was unused)
 
 1.1.9
 -----

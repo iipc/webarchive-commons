@@ -7,6 +7,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+/**
+ * A nested structure of {@linkplain JSONObject}s to hold the metadata of
+ * content in nested containers, e.g. a HTML page as payload of a HTTP response
+ * in a WARC record stored as gzip "member".
+ * 
+ * MetaData is multi-valued: if a second value is added under the same "key"
+ * ("name"), both values are stored in a {@linkplain JSONArray} as value. This
+ * allows to hold all values of repeating WARC or HTTP headers.
+ */
 public class MetaData extends JSONObject {
 
 	private static final Logger LOG = 
@@ -68,6 +77,19 @@ public class MetaData extends JSONObject {
 	}
 
 	@Override
+	public int optInt(String key, int defaultValue) {
+		if (has(key)) {
+			try {
+				return super.getInt(key);
+			} catch(JSONException e) {
+				LOG.severe(e.getMessage());
+				return defaultValue;
+			}
+		}
+		return defaultValue;
+	}
+
+	@Override
 	public long getLong(String key) {
 		try {
 			return super.getLong(key);
@@ -75,6 +97,19 @@ public class MetaData extends JSONObject {
 			LOG.severe(e.getMessage());
 			return -1;
 		}
+	}
+
+	@Override
+	public long optLong(String key, long defaultValue) {
+		if (has(key)) {
+			try {
+				return super.getLong(key);
+			} catch(JSONException e) {
+				LOG.severe(e.getMessage());
+				return defaultValue;
+			}
+		}
+		return defaultValue;
 	}
 
 	@Override
@@ -102,9 +137,49 @@ public class MetaData extends JSONObject {
 		this.topMetaData = topMetaData;
 	}
 
+	@Override
+	public JSONObject put(String name, boolean value) throws JSONException {
+		return super.accumulate(name, value);
+	}
+
+	@Override
+	public JSONObject put(String name, double value) throws JSONException {
+		return super.accumulate(name, value);
+	}
+
+	@Override
+	public JSONObject put(String name, int value) throws JSONException {
+		return super.accumulate(name, value);
+	}
+
+	@Override
+	public JSONObject put(String name, long value) throws JSONException {
+		return super.accumulate(name, value);
+	}
+
+	@Override
+	public JSONObject put(String key, Object value) {
+		if (value instanceof JSONArray) {
+			super.remove(key);
+			super.put(key, value);
+		} else if (has(key)) {
+			if (super.get(key) instanceof JSONArray) {
+				((JSONArray) super.get(key)).put(value);
+				return this;
+			} else {
+	            JSONArray array = new JSONArray();
+	            array.put(super.get(key));
+	            array.put(value);
+	            super.put(key, array);
+			}
+			return super.accumulate(key, value);
+		}
+		return super.put(key, value);
+	}
+
 	public JSONObject putString(String key, String val) {
 		try {
-			return super.put(key,val);
+			return super.accumulate(key,val);
 		} catch(JSONException e) {
 			LOG.severe(e.getMessage());
 			return null;
@@ -113,7 +188,7 @@ public class MetaData extends JSONObject {
 
 	public JSONObject putLong(String key, long val) {
 		try {
-			return super.put(key,String.valueOf(val));
+			return super.accumulate(key,String.valueOf(val));
 		} catch(JSONException e) {
 			LOG.severe(e.getMessage());
 			return null;
@@ -122,7 +197,7 @@ public class MetaData extends JSONObject {
 
 	public JSONObject putBoolean(String key, boolean val) {
 		try {
-			return super.put(key,val);
+			return super.accumulate(key,val);
 		} catch(JSONException e) {
 			LOG.severe(e.getMessage());
 			return null;

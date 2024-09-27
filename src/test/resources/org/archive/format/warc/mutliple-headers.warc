@@ -1,0 +1,47 @@
+WARC/1.0
+WARC-Type: response
+WARC-Date: 2024-09-27T10:47:02Z
+WARC-Record-ID: <urn:uuid:7a10b628-4d3b-6f2e-8b73-c65d80646310>
+Content-Length: 971
+Content-Type: application/http; msgtype=response
+WARC-Warcinfo-ID: <urn:uuid:824d10d3-4f67-131a-9cbf-e40ecb5f0fa5>
+WARC-Concurrent-To: <urn:uuid:51776b84-429e-53cb-a335-b53cf855c57a>
+WARC-IP-Address: 172.67.184.105
+WARC-Target-URI: https://www.example.com/index.html/
+WARC-Protocol: h2
+WARC-Protocol: tls/1.3
+WARC-Cipher-Suite: TLS_AES_256_GCM_SHA384
+WARC-Payload-Digest: sha1:70FB81039DCE25916E0E0CB48CF6662E3F27FFFC
+WARC-Block-Digest: sha1:80573371A8271BE6B3AA26FD9DB72E9AD9F316D9
+WARC-Identified-Payload-Type: text/html
+
+HTTP/1.1 200 
+date: Fri, 27 Sep 2024 10:47:02 GMT
+content-type: text/html; charset=UTF-8
+x-powered-by: PHP/8.3.11
+x-powered-by: PleskLin
+x-pingback: https://www.example.com/xmlrpc.php
+link: <https://www.example.com/wp-json/>; rel="https://api.w.org/"
+link: <https://www.example.com/wp-json/wp/v2/posts/00000>; rel="alternate"; title="JSON"; type="application/json"
+link: <https://www.example.com/?p=00000>; rel=shortlink
+x-litespeed-cache: miss
+vary: Accept-Encoding
+x-turbo-charged-by: LiteSpeed
+cf-cache-status: DYNAMIC
+report-to: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=XXtestYY"}],"group":"cf-nel","max_age":604800}
+nel: {"success_fraction":0,"report_to":"cf-nel","max_age":604800}
+server: cloudflare
+cf-ray: 8bf61e4afb9e7f9e-IAD
+X-Crawler-content-encoding: br
+alt-svc: h3=":443"; ma=86400
+Content-Length: 108
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Test</title>
+</head>
+<body/>
+</html>
+

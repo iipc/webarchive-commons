@@ -59,7 +59,7 @@ public interface ReplayCharSequence extends CharSequence, Closeable {
     public long getDecodeExceptionCount(); 
     
     /**
-     * Return the first coding-exception encountered, if the count > 0. 
+     * Return the first coding-exception encountered, if the count &gt; 0.
      * @return CharacterCodingException
      */
     public CharacterCodingException getCodingException();

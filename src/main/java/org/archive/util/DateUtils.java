@@ -557,7 +557,7 @@ public class DateUtils {
      * Takes a byte size and formats it for display with 'friendly' units. 
      * <p>
      * This involves converting it to the largest unit 
-     * (of B, KiB, MiB, GiB, TiB) for which the amount will be > 1.
+     * (of B, KiB, MiB, GiB, TiB) for which the amount will be &gt; 1.
      * <p>
      * Additionally, at least 2 significant digits are always displayed. 
      * <p>

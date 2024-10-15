@@ -13,7 +13,7 @@ import org.archive.util.ByteOp;
  * @author Brad
  * 
  * +---+---+---+---+---+---+---+---+---+---+
- * |ID1|ID2|CM |FLG|     MTIME     |XFL|OS | (more-->)
+ * |ID1|ID2|CM |FLG|     MTIME     |XFL|OS | (more--&gt;)
  * +---+---+---+---+---+---+---+---+---+---+
  */
 public class GZIPStaticHeader implements GZIPConstants {

@@ -26,8 +26,8 @@ import org.apache.commons.lang.StringUtils;
 /**
  * Utilities for dealing with Java Properties (incl. System Properties)
  * 
- * @contributor stack
- * @contributor gojomo
+ * @author stack
+ * @author gojomo
  * @version $Date$ $Revision$
  */
 public class PropertyUtils {
@@ -67,7 +67,6 @@ public class PropertyUtils {
      * the expression is replaced with the empty-string. 
      * 
      * @param original String
-     * @param properties Properties to try in order; first value found (if any) is used
      * @return modified String
      */
     public static String interpolateWithProperties(String original) {

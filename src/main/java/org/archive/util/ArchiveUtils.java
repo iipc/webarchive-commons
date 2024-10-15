@@ -52,7 +52,7 @@ import org.archive.format.gzip.GZIPFormatException;
 /**
  * Miscellaneous useful methods.
  *
- * @author gojomo & others
+ * @author gojomo &amp; others
  */
 public class ArchiveUtils {
     private static final Logger LOGGER = Logger.getLogger(ArchiveUtils.class.getName());
@@ -317,11 +317,6 @@ public class ArchiveUtils {
     
     /**
      * A version of getDate which returns the default instead of throwing an exception if parsing fails
-     * 
-     * @param d
-     * @param defaultDate
-     * @return
-     * @throws ParseException
      */
     public static Date getDate(String d, Date defaultDate)
     {
@@ -337,14 +332,13 @@ public class ArchiveUtils {
     }
     
     /**
-     * Parses an ARC-style date.  If passed String is < 12 characters in length,
-     * we pad.  At a minimum, String should contain a year (>=4 characters).
+     * Parses an ARC-style date.  If passed String is &lt; 12 characters in length,
+     * we pad.  At a minimum, String should contain a year (&gt;=4 characters).
      * Parse will also fail if day or month are incompletely specified.  Depends
      * on the above getXXDigitDate methods.
-     * @param A 4-17 digit date in ARC style (<code>yyyy</code> to
+     * @param d A 4-17 digit date in ARC style (<code>yyyy</code> to
      * <code>yyyyMMddHHmmssSSS</code>) formatting.  
      * @return A Date object representing the passed String. 
-     * @throws ParseException
      */
     public static Date getDate(String d) throws ParseException {
         Date date = null;
@@ -605,7 +599,7 @@ public class ArchiveUtils {
     /**
      * Converts a double to a string.
      * @param val The double to convert
-     * @param precision How many characters to include after '.'
+     * @param maxFractionDigits How many characters to include after '.'
      * @return the double as a string.
      */
     public static String doubleToString(double val, int maxFractionDigits){
@@ -628,7 +622,7 @@ public class ArchiveUtils {
      * Takes a byte size and formats it for display with 'friendly' units. 
      * <p>
      * This involves converting it to the largest unit 
-     * (of B, KiB, MiB, GiB, TiB) for which the amount will be > 1.
+     * (of B, KiB, MiB, GiB, TiB) for which the amount will be &gt; 1.
      * <p>
      * Additionally, at least 2 significant digits are always displayed. 
      * <p>
@@ -807,7 +801,6 @@ public class ArchiveUtils {
     /**
      * Provide a improved String of a Map's entries
      * 
-     * @param Map
      * @return prettified (in curly brackets) string of Map contents
      */
     public static String prettyString(Map<?, ?> map) {
@@ -830,7 +823,6 @@ public class ArchiveUtils {
     /**
      * Provide a slightly-improved String of Object[]
      * 
-     * @param Object[]
      * @return prettified (in square brackets) of Object[]
      */
     public static String prettyString(Object[] array) {

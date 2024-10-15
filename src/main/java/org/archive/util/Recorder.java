@@ -310,8 +310,7 @@ public class Recorder {
     }
 
     /**
-     * @param characterEncoding Character encoding of input recording.
-     * @return actual charset in use after attempt to set
+     * @param cs Character encoding of input recording.
      */
     public void setCharset(Charset cs) {
         this.charset = cs;
@@ -324,9 +323,6 @@ public class Recorder {
         return this.charset; 
     }
     
-    /**
-     * @param characterEncoding Character encoding of input recording.
-     */
     public void setInputIsChunked(boolean chunked) {
         this.inputIsChunked = chunked;
     }
@@ -374,7 +370,7 @@ public class Recorder {
      *         processing has finished; in that context it's preferable not
      *         to close, so that processors can reuse the same instance.
      * @throws IOException
-     * @see {@link #endReplays()}
+     * @see #endReplays()
      */
     public ReplayCharSequence getContentReplayCharSequence() throws IOException {
         if (replayCharSequence == null || !replayCharSequence.isOpen() 
@@ -390,7 +386,7 @@ public class Recorder {
     
     
     /**
-     * @param characterEncoding Encoding of recorded stream.
+     * @param requestedCharset Encoding of recorded stream.
      * @return A ReplayCharSequence  Will return null if an IOException.  Call
      * close on returned RCS when done.
      * @throws IOException

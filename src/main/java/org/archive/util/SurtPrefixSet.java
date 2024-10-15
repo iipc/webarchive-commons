@@ -56,7 +56,6 @@ public class SurtPrefixSet extends PrefixSet {
      * with redundant entries removed.
      * 
      * @param r reader over file of SURT_format strings
-     * @throws IOException
      */
     public void importFrom(Reader r) {
         BufferedReader reader = new BufferedReader(r);
@@ -236,7 +235,7 @@ public class SurtPrefixSet extends PrefixSet {
      * Calculate the SURT form URI to use as a candidate against prefixes
      * from the given Object (CandidateURI or UURI)
      * 
-     * @param object CandidateURI or UURI
+     * @param u CandidateURI or UURI
      * @return SURT form of URI for evaluation, or null if unavailable
      */
     public static String getCandidateSurt(UsableURI u) {

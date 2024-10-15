@@ -30,7 +30,7 @@ public class URLParser {
      * The numbers in the second line above are only to assist readability;
      * they indicate the reference points for each subexpression (i.e., each
      * paired parenthesis).  We refer to the value matched for subexpression
-     * <n> as $<n>.  For example, matching the above expression to
+     * &lt;n&gt; as $&lt;n&gt;.  For example, matching the above expression to
      *
      * http://www.ics.uci.edu/pub/ietf/uri/#Related
      *
@@ -41,12 +41,12 @@ public class URLParser {
      * $3 = //www.ics.uci.edu
      * $4 = www.ics.uci.edu
      * $5 = /pub/ietf/uri/
-     * $6 = <undefined>
-     * $7 = <undefined>
+     * $6 = &lt;undefined&gt;
+     * $7 = &lt;undefined&gt;
      * $8 = #Related
      * $9 = Related
      *
-     * where <undefined> indicates that the component is not present, as is
+     * where &lt;undefined&gt; indicates that the component is not present, as is
      * the case for the query component in the above example.  Therefore, we
      * can determine the value of the four components and fragment as
      *

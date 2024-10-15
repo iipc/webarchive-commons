@@ -26,8 +26,8 @@ import org.archive.io.WriterPoolMember;
 
 /**
  * A pool of WARCWriters.
- * @contributor stack
- * @contributor gojomo
+ * @author stack
+ * @author gojomo
  * @version $Revision: 4566 $ $Date: 2006-08-31 09:51:41 -0700 (Thu, 31 Aug 2006) $
  */
 public class WARCWriterPool extends WriterPool {

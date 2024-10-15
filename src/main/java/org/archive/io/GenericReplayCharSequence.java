@@ -45,13 +45,11 @@ import com.google.common.primitives.Ints;
 
 /**
  * (Replay)CharSequence view on recorded streams.
+ **
+ * <p>Call {@link #close()} on this class when done to clean up resources.
  *
- * For small streams, use {@link InMemoryReplayCharSequence}.
- *
- * <p>Call {@link close()} on this class when done to clean up resources.
- *
- * @contributor stack
- * @contributor nlevitt
+ * @author stack
+ * @author nlevitt
  * @version $Revision$, $Date$
  */
 public class GenericReplayCharSequence implements ReplayCharSequence {
@@ -67,7 +65,7 @@ public class GenericReplayCharSequence implements ReplayCharSequence {
      * decodings.  The name of the file that holds the decoding is the name
      * of the backing file w/ this encoding for a suffix.
      *
-     * <p>See <a ref="http://java.sun.com/j2se/1.4.2/docs/guide/intl/encoding.doc.html">Encoding</a>.
+     * <p>See <a href="http://java.sun.com/j2se/1.4.2/docs/guide/intl/encoding.doc.html">Encoding</a>.
      */
     public static final Charset WRITE_ENCODING = Charsets.UTF_16BE;
 

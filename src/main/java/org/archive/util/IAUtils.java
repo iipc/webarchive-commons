@@ -32,7 +32,7 @@ import java.util.Properties;
 /**
  * Miscellaneous useful methods.
  *
- * @author gojomo & others
+ * @author gojomo &amp; others
  */
 public class IAUtils {
     public final static Charset UTF8 = Charset.forName("utf-8");

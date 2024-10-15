@@ -24,7 +24,7 @@ import org.archive.format.ArchiveFileConstants;
 /**
  * WARC Constants used by WARC readers and writers.
  * 
- * @contributor stack
+ * @author stack
  */
 public interface WARCConstants extends ArchiveFileConstants {
     /**
@@ -175,8 +175,8 @@ public interface WARCConstants extends ArchiveFileConstants {
     /**
      * These fields help a consumer of the warc to locate the warc record that
      * {@value #HEADER_KEY_REFERS_TO} refers to.
-     * 
-     * @see WARCWriterProcessor
+     * <p>
+     * See WARCWriterProcessor
      */
     public static final String HEADER_KEY_REFERS_TO_TARGET_URI = "WARC-Refers-To-Target-URI";
     public static final String HEADER_KEY_REFERS_TO_DATE = "WARC-Refers-To-Date";

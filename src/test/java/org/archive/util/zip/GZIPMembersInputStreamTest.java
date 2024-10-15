@@ -35,7 +35,7 @@ import com.google.common.primitives.Bytes;
 
 /**
  * Tests for GZIPMembersInputStream
- * @contributor gojomo
+ * @author gojomo
  * @version $ $
  */
 public class GZIPMembersInputStreamTest extends TestCase {

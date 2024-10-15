@@ -190,11 +190,11 @@ public class ANVLRecord extends LinkedList<Element> implements UTF8Bytes {
         return load(new String(baos.toByteArray(), UTF8));
     }
     
-    /** 
+    /**
      * Parse passed String for an ANVL Record.
      * Looked at writing javacc grammer but preprocessing is required to
      * handle folding: See
-     * https://javacc.dev.java.net/servlets/BrowseList?list=users&by=thread&from=56173.
+     * <a href="https://javacc.dev.java.net/servlets/BrowseList?list=users&by=thread&from=56173">here</a>.
      * Looked at Terence Parr's ANTLR.  More capable.  Can set lookahead count.
      * A value of 3 would help with folding.  But its a pain defining UNICODE
      * grammers -- needed by ANVL -- and support seems incomplete
@@ -202,7 +202,7 @@ public class ANVLRecord extends LinkedList<Element> implements UTF8Bytes {
      * For now, go with the below hand-rolled parser.
      * @param s String with an ANVLRecord.
      * @return ANVLRecord parsed from passed String.
-     * @throws IOException 
+     * @throws IOException
      */
     public static ANVLRecord load(final String s)
     throws IOException {

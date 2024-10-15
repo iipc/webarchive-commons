@@ -230,7 +230,7 @@ public class TextUtils {
      * escaping it for HTML display, without constructing another large String
      * of the whole content. 
      * @param s String to write
-     * @param out destination JspWriter
+     * @param w destination Writer
      * @throws IOException
      */
     public static void writeEscapedForHTML(String s, Writer w)

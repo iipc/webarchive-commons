@@ -37,7 +37,7 @@ import java.nio.channels.FileChannel.MapMode;
  * <p>Java's {@linkplain FileChannel#map(MapMode, long, long) memory-mapping facilities} have
  * the severe limitation of mapping at most {@link Integer#MAX_VALUE} bytes, as they
  * expose the content of a file using a {@link MappedByteBuffer}. This class can {@linkplain  #map(FileChannel, FileChannel.MapMode) expose
- * a file of arbitrary length} as a {@linkplain RepositionableStream repositionable} {@link MeasurableInputStream}
+ * a file of arbitrary length} as a repositionable input stream
  * that is actually based on an array of {@link MappedByteBuffer}s, each mapping
  * a <em>chunk</em> of {@link #CHUNK_SIZE} bytes.
  * 

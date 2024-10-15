@@ -27,7 +27,7 @@ import java.io.OutputStream;
  * A filter stream that both counts bytes written, and optionally swallows 
  * flush() requests. 
  * 
- * @contributor gojomo
+ * @author gojomo
  */
 public class MiserOutputStream extends FilterOutputStream {
     protected long count;

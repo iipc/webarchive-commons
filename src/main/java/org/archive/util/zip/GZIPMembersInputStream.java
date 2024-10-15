@@ -61,7 +61,7 @@ import com.google.common.io.CountingInputStream;
  * position. Calling nextMember() after receiving an EOF will allow reading
  * to proceed into the next member (if any). 
  * 
- *  @contributor gojomo
+ *  @author gojomo
  */
 public class GZIPMembersInputStream extends OpenJDK7GZIPInputStream {
     protected long memberNumber = 0; 
@@ -273,7 +273,6 @@ public class GZIPMembersInputStream extends OpenJDK7GZIPInputStream {
      * stream from next() should finish (reaching EOF) before the iterator's
      * hasNext() or next() is called.  
      * 
-     * @return Iterator<GZIPMembersInputStream> of 
      * @deprecated for backward compatibility; better to use direct facilities in future
      */
     public Iterator<GZIPMembersInputStream> memberIterator() {

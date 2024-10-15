@@ -18,7 +18,7 @@ public class MultiBlockIterator extends AbstractPeekableIterator<String> {
 	private CloseableIterator<CloseableIterator<String>> blockItr = null;
 
 	/**
-	 * @param blocks which should be fetched and unzipped, one after another
+	 * @param blockItr blocks which should be fetched and unzipped, one after another
 	 */
 	public MultiBlockIterator(CloseableIterator<CloseableIterator<String>> blockItr) {
 		this.blockItr = blockItr;

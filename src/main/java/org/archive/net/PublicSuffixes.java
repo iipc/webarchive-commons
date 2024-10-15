@@ -74,7 +74,7 @@ public class PublicSuffixes {
      * prefix tree node. each Node represents sequence of letters (prefix)
      * and alternative sequences following it (list of Node's). Nodes in 
      * {@code branches} are sorted for skip list like lookup and for generating
-     * effective regular expression (see {@link #compareTo(Node)} and {@link #compareTo(char).)
+     * effective regular expression (see {@link #compareTo(Node)} and {@link #compareTo(char)}.
      * 
      * as is intended for internal use only, there's no access methods. procedures for updating
      * prefix tree with new input are defined within this class ({@link #addBranch(CharSequence)}).

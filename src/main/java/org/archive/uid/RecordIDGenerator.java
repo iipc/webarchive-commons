@@ -25,14 +25,13 @@ import java.util.Map;
 /**
  * A <code>record-id</code> generator.
  *
- * @contributor stack
- * @contributor gojomo
+ * @author stack
+ * @author gojomo
  * @version $Revision$ $Date$
  */
 public interface RecordIDGenerator {
 	/**
 	 * @return A URI that can serve as a record-id.
-	 * @throws URISyntaxException
 	 */
 	public URI getRecordID();
 	

@@ -139,7 +139,6 @@ public abstract class CharsetDetector {
 	 * Attempt to divine the character encoding of the document from the 
 	 * Content-Type HTTP header (with a "charset=")
 	 * 
-	 * @param resource
 	 * @return String character set found or null if the header was not present
 	 * @throws IOException 
 	 */
@@ -161,7 +160,6 @@ public abstract class CharsetDetector {
 	 * Attempt to find a META tag in the HTML that hints at the character set
 	 * used to write the document.
 	 * 
-	 * @param resource
 	 * @return String character set found from META tags in the HTML
 	 * @throws IOException
 	 */
@@ -224,9 +222,7 @@ public abstract class CharsetDetector {
 	 * Attempts to figure out the character set of the document using
 	 * the excellent juniversalchardet library.
 	 * 
-	 * @param resource
 	 * @return String character encoding found, or null if nothing looked good.
-	 * @throws IOException
 	 */
 	protected String getCharsetFromBytes(byte buffer[], int len) 
 	throws IOException {
@@ -242,9 +238,6 @@ public abstract class CharsetDetector {
 	    return null;
 	}
 	/**
-	 * @param resource (presumably text) Resource to determine the charset
-	 * @param request WaybackRequest which may contain additional hints to
-	 *        processing
 	 * @return String charset name for the Resource
 	 * @throws IOException if there are problems reading the Resource
 	 */

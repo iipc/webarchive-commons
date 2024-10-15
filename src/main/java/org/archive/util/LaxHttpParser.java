@@ -66,7 +66,7 @@ public class LaxHttpParser {
 
     /**
      * Return byte array from an (unchunked) input stream.
-     * Stop reading when <tt>"\n"</tt> terminator encountered 
+     * Stop reading when <code>"\n"</code> terminator encountered
      * If the stream ends before the line terminator is found,
      * the last part of the string will still be returned. 
      * If no input data available, <code>null</code> is returned.
@@ -94,7 +94,7 @@ public class LaxHttpParser {
     }
 
     /**
-     * Read up to <tt>"\n"</tt> from an (unchunked) input stream.
+     * Read up to <code>"\n"</code> from an (unchunked) input stream.
      * If the stream ends before the line terminator is found,
      * the last part of the string will still be returned.
      * If no input data available, <code>null</code> is returned.
@@ -130,7 +130,7 @@ public class LaxHttpParser {
     }
 
     /**
-     * Read up to <tt>"\n"</tt> from an (unchunked) input stream.
+     * Read up to <code>"\n"</code> from an (unchunked) input stream.
      * If the stream ends before the line terminator is found,
      * the last part of the string will still be returned.
      * If no input data available, <code>null</code> is returned

@@ -88,10 +88,7 @@ public abstract class WriterPool {
     /**
      * Constructor
      * @param serial  Used to generate unique filename sequences
-     * @param factory Factory that knows how to make a {@link WriterPoolMember}.
      * @param settings Settings for this pool.
-     * @param poolMaximumActive
-     * @param poolMaximumWait
      */
     public WriterPool(final AtomicInteger serial,
     		final WriterPoolSettings settings,

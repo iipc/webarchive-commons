@@ -9,7 +9,7 @@ import org.apache.commons.io.LineIterator;
  * A LineIterator that also implements Iterable, so that it can be used with
  * the java enhanced for-each loop syntax.
  * 
- * @contributor nlevitt
+ * @author nlevitt
  */
 public class IterableLineIterator extends LineIterator 
     implements Iterable<String> {

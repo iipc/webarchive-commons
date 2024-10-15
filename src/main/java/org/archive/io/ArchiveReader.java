@@ -711,9 +711,7 @@ public abstract class ArchiveReader implements ArchiveFileConstants, Iterable<Ar
 
     /**
      * Dump this file on STDOUT
-     * @throws compress True if dumped output is compressed.
-     * @throws IOException
-     * @throws java.text.ParseException
+     * @param compress True if dumped output is compressed.
      */
     public abstract void dump(final boolean compress)
     throws IOException, java.text.ParseException;

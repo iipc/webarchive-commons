@@ -225,7 +225,7 @@ public class RecordingInputStream
     
     /**
      * Read all of a stream (Or read until we timeout or have read to the max).
-     * @param softMaxLength Maximum length to read; if zero or < 0, then no 
+     * @param softMaxLength Maximum length to read; if zero or &lt; 0, then no
      * limit. If met, return normally. 
      * @throws IOException failed read.
      * @throws RecorderLengthExceededException

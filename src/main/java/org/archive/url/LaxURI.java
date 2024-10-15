@@ -243,8 +243,8 @@ public class LaxURI extends URI {
      *               $3 = //jakarta.apache.org
      *  authority =  $4 = jakarta.apache.org
      *  path      =  $5 = /ietf/uri/
-     *               $6 = <undefined>
-     *  query     =  $7 = <undefined>
+     *               $6 = &lt;undefined&gt;
+     *  query     =  $7 = &lt;undefined&gt;
      *               $8 = #Related
      *  fragment  =  $9 = Related
      * </pre></blockquote><p>

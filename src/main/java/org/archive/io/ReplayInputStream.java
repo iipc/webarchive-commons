@@ -64,7 +64,7 @@ public class ReplayInputStream extends SeekInputStream
      * @param size Size of data to replay.
      * @param responseBodyStart Start of the response body.
      * @param backingFilename Backing file that sits behind the buffer.  If
-     * <code>size<code> > than buffer then we go to backing file to read
+     * <code>size</code> &gt; than buffer then we go to backing file to read
      * data that is beyond buffer.length.
      *
      * @throws IOException If we fail to open an input stream on
@@ -84,7 +84,7 @@ public class ReplayInputStream extends SeekInputStream
      * @param buffer Buffer to read from.
      * @param size Size of data to replay.
      * @param backingFilename Backing file that sits behind the buffer.  If
-     * <code>size<code> > than buffer then we go to backing file to read
+     * <code>size</code> &gt; than buffer then we go to backing file to read
      * data that is beyond buffer.length.
      * @throws IOException If we fail to open an input stream on
      * backing file.
@@ -130,7 +130,7 @@ public class ReplayInputStream extends SeekInputStream
     }
     
     /**
-     * Close & destroy any internally-generated temporary files. 
+     * Close &amp; destroy any internally-generated temporary files.
      */
     public void destroy() {
         IOUtils.closeQuietly(this); 

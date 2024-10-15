@@ -29,7 +29,7 @@ import java.io.InputStream;
  * stream. Uses a {@link BufferedInputStream}.  Calls mark on every read so
  * we'll remember at least the last thing read (You can only backup on the
  * last thing read -- not last 2 or 3 things read).  Used by
- * {@link GzippedInputStream} when reading streams over a network.  Wraps a
+ * GzippedInputStream when reading streams over a network.  Wraps a
  * HTTP, etc., stream so we can back it up if needs be after the
  * GZIP inflater has done a fill of its full buffer though it only needed
  * the first few bytes to finish decompressing the current GZIP member.

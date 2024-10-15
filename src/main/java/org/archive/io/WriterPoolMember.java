@@ -125,9 +125,6 @@ public abstract class WriterPoolMember implements ArchiveFileConstants {
      * @param serialNo  used to create unique filename sequences
      * @param out Where to write.
      * @param file File the <code>out</code> is connected to.
-     * @param cmprs Compress the content written.
-     * @param a14DigitDate If null, we'll write current time.
-     * @throws IOException
      */
     protected WriterPoolMember(AtomicInteger serialNo, 
             final OutputStream out, final File file,
@@ -145,11 +142,6 @@ public abstract class WriterPoolMember implements ArchiveFileConstants {
      * Constructor.
      *
      * @param serialNo  used to create unique filename sequences
-     * @param dirs Where to drop files.
-     * @param prefix File prefix to use.
-     * @param cmprs Compress the records written. 
-     * @param maxSize Maximum size for ARC files written.
-     * @param template filenaming template to use
      * @param extension Extension to give file.
      */
     public WriterPoolMember(AtomicInteger serialNo,
@@ -361,7 +353,6 @@ public abstract class WriterPoolMember implements ArchiveFileConstants {
      * Position in raw output (typically, physical file).
      * Used making accounting of bytes written.
 	 * @return Position in final media (assuming all flushing completes)
-	 * @throws IOException
 	 */
     public long getPosition() {
         return (countOut==null)? 0L : this.countOut.getCount();

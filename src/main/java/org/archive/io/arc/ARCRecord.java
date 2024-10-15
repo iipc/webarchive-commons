@@ -190,12 +190,10 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
      * formatted).
      * @param parseHttpHeaders True if we are to parse HTTP headers.  Costs
      * about ~20% of CPU during an ARC parse.
-     * @param isAllignedOnFirstRecord True if this is the first record to be
+     * @param isAlignedOnFirstRecord True if this is the first record to be
      * read from an archive
-     * @param String version Version information to be returned to the
+     * @param version Version information to be returned to the
      * ARCReader constructing this record 
-     * 
-     * @throws IOException
      */
     public ARCRecord(InputStream in, final String identifier, 
                 final long offset, boolean digest,      boolean strict, 

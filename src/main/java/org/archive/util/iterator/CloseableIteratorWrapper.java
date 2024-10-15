@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 /**
- * Wrap a regular Iterator<S> to create a CloseableIterator<S> where the close() is a no-op
+ * Wrap a regular Iterator&lt;S&gt; to create a CloseableIterator&lt;S&gt; where the close() is a no-op
  * @author ilya
  *
  * @param <S>

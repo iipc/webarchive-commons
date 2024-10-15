@@ -53,7 +53,7 @@ import org.archive.util.anvl.Element;
  * 
  * <p>While being written, WARCs have a '.open' suffix appended.
  *
- * @contributor stack
+ * @author stack
  * @version $Revision: 4604 $ $Date: 2006-09-05 22:38:18 -0700 (Tue, 05 Sep 2006) $
  */
 public class WARCWriter extends WriterPoolMember
@@ -81,7 +81,7 @@ implements WARCConstants {
 
     /**
      * Temporarily accumulates stats managed externally by
-     * {@link WARCWriterProcessor}. WARCWriterProcessor will call
+     * WARCWriterProcessor. WARCWriterProcessor will call
      * {@link #resetTmpStats()}, write some records, then add
      * {@link #getTmpStats()} into its long-term running totals.
      */
@@ -97,9 +97,6 @@ implements WARCConstants {
      * @param serialNo  used to generate unique file name sequences
      * @param out Where to write.
      * @param f File the <code>out</code> is connected to.
-     * @param cmprs Compress the content written.
-     * @param a14DigitDate If null, we'll write current time.
-     * @throws IOException
      */
     public WARCWriter(final AtomicInteger serialNo,
     		final OutputStream out, final File f,
@@ -110,13 +107,6 @@ implements WARCConstants {
             
     /**
      * Constructor.
-     *
-     * @param dirs Where to drop files.
-     * @param prefix File prefix to use.
-     * @param cmprs Compress the records written. 
-     * @param maxSize Maximum size for ARC files written.
-     * @param suffix File tail to use.  If null, unused.
-     * @param warcinfoData File metadata for warcinfo record.
      */
     public WARCWriter(final AtomicInteger serialNo,
             final WARCWriterPoolSettings settings) {

@@ -165,7 +165,7 @@ public class DateUtils {
      * in the format yyyyMMddHHmmss.
      * Date stamps are in the UTC time zone
      *
-     * @param date Date for timestamp
+     * @param d Date for timestamp
      * @return the date stamp
      */
     public static String get14DigitDate(Date d) {
@@ -203,7 +203,7 @@ public class DateUtils {
      * in the format yyyyMMddHHmm.
      * Date stamps are in the UTC time zone
      *
-     * @param date Date object to format
+     * @param d Date object to format
      * @return the date stamp
      */    
     public static String get12DigitDate(Date d) {
@@ -301,11 +301,11 @@ public class DateUtils {
      */
     
     /**
-     * Parses an ARC-style date.  If passed String is < 12 characters in length,
-     * we pad.  At a minimum, String should contain a year (>=4 characters).
+     * Parses an ARC-style date.  If passed String is &lt; 12 characters in length,
+     * we pad.  At a minimum, String should contain a year (&gt;=4 characters).
      * Parse will also fail if day or month are incompletely specified.  Depends
      * on the above getXXDigitDate methods.
-     * @param A 4-17 digit date in ARC style (<code>yyyy</code> to
+     * @param d A 4-17 digit date in ARC style (<code>yyyy</code> to
      * <code>yyyyMMddHHmmssSSS</code>) formatting.  
      * @return A Date object representing the passed String. 
      * @throws ParseException
@@ -539,7 +539,7 @@ public class DateUtils {
     /**
      * Converts a double to a string.
      * @param val The double to convert
-     * @param precision How many characters to include after '.'
+     * @param maxFractionDigits How many characters to include after '.'
      * @return the double as a string.
      */
     public static String doubleToString(double val, int maxFractionDigits){

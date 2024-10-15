@@ -44,8 +44,8 @@ import org.apache.commons.lang.math.LongRange;
 
 /** Utility methods for manipulating files and directories.
  *
- * @contributor John Erik Halse
- * @contributor gojomo
+ * @author John Erik Halse
+ * @author gojomo
  */
 public class FileUtils {
     private static final Logger LOGGER =
@@ -384,7 +384,7 @@ public class FileUtils {
      *        want this number of lines ending with a line containing
      *        the position; if positive, want this number of lines,
      *        all starting at or after position. 
-     * @param lines List<String> to insert found lines
+     * @param lines list to insert found lines
      * @param lineEstimate int estimate of line size, 0 means use default
      *        of 128
      * @return LongRange indicating the file offsets corresponding to 

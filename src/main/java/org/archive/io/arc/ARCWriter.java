@@ -129,12 +129,7 @@ public class ARCWriter extends WriterPoolMember implements ARCConstants, Closeab
      * @param serialNo  used to generate unique file name sequences
      * @param out Where to write.
      * @param arc File the <code>out</code> is connected to.
-     * @param cmprs Compress the content written.
-     * @param metadata File meta data.  Can be null.  Is list of File and/or
-     * String objects.
-     * @param a14DigitDate If null, we'll write current time.
-     * @throws IOException
-     */
+2     */
     public ARCWriter(final AtomicInteger serialNo, final PrintStream out,
     	final File arc, final WriterPoolSettings settings)
     throws IOException {

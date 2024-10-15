@@ -41,7 +41,7 @@ import java.util.zip.ZipException;        // IA ADDED IMPORT
  * This class implements a stream filter for reading compressed data in
  * the GZIP file format.
  *
- * @see         InflaterInputStream
+ * @see         OpenJDK7InflaterInputStream
  * @author      David Connelly
  *
  */
@@ -76,7 +76,7 @@ class OpenJDK7GZIPInputStream extends OpenJDK7InflaterInputStream { // IA RENAMI
      * @exception ZipException if a GZIP format error has occurred or the
      *                         compression method used is unsupported
      * @exception IOException if an I/O error has occurred
-     * @exception IllegalArgumentException if size is <= 0
+     * @exception IllegalArgumentException if size is &lt;= 0
      */
     public OpenJDK7GZIPInputStream(InputStream in, int size) throws IOException {
         super(in, new Inflater(true), size);

@@ -178,7 +178,7 @@ public class ByteOp {
 	 * @return array of bytes read, INCLUDING TRAILING NULL
 	 * @throws IOException if the underlying stream throws on, OR if the default
 	 * maximum buffer size is reached before a null byte is found
-	 * @throws ShortByteReadException if EOF is encountered before a null byte
+	 * @throws EOFException if EOF is encountered before a null byte
 	 */
 	public static byte[] readToNull(InputStream is) throws IOException {
 		return readToNull(is,MAX_READ_SIZE);
@@ -191,7 +191,7 @@ public class ByteOp {
 	 * @return array of bytes read, INCLUDING TRAILING NULL
 	 * @throws IOException if the underlying stream throws on, OR if the 
 	 * specified maximum buffer size is reached before a null byte is found
-	 * @throws ShortByteReadException if EOF is encountered before a null byte
+	 * @throws EOFException if EOF is encountered before a null byte
 	 */
 	public static byte[] readToNull(InputStream is, int maxSize)
 		throws IOException {

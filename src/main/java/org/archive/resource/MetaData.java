@@ -83,7 +83,6 @@ public class MetaData extends JSONObject {
 				return super.getInt(key);
 			} catch(JSONException e) {
 				LOG.severe(e.getMessage());
-				return defaultValue;
 			}
 		}
 		return defaultValue;
@@ -106,7 +105,6 @@ public class MetaData extends JSONObject {
 				return super.getLong(key);
 			} catch(JSONException e) {
 				LOG.severe(e.getMessage());
-				return defaultValue;
 			}
 		}
 		return defaultValue;
@@ -167,10 +165,10 @@ public class MetaData extends JSONObject {
 				((JSONArray) super.get(key)).put(value);
 				return this;
 			} else {
-	            JSONArray array = new JSONArray();
-	            array.put(super.get(key));
-	            array.put(value);
-	            super.put(key, array);
+				JSONArray array = new JSONArray();
+				array.put(super.get(key));
+				array.put(value);
+				super.put(key, array);
 			}
 			return super.accumulate(key, value);
 		}

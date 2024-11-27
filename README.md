@@ -1,7 +1,6 @@
 IIPC Web Archive Commons
 ========================
-
-[![Build Status](https://travis-ci.org/iipc/webarchive-commons.png?branch=master)](https://travis-ci.org/iipc/webarchive-commons/)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.netpreserve.commons/webarchive-commons/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.netpreserve.commons/webarchive-commons) [![Javadoc](https://javadoc.io/badge2/org.netpreserve.commons/webarchive-commons/javadoc.svg)](https://www.javadoc.io/doc/org.netpreserve.commons/webarchive-commons)
 
 This repository contains common utility code for [OpenWayback][1] and other projects.
 

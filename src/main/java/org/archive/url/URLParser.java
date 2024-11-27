@@ -226,7 +226,16 @@ public class URLParser {
         String colonPort = null;
 
         int atIndex = uriAuthority.indexOf(COMMERCIAL_AT);
-        int portColonIndex = uriAuthority.indexOf(COLON,(atIndex<0)?0:atIndex);
+        int portColonIndex = -1;
+        int startColonIndex = 0;
+        if (atIndex > -1) {
+            startColonIndex = atIndex;
+        }
+        if (uriAuthority.charAt(startColonIndex) == '[') {
+            // IPv6 address
+            startColonIndex = uriAuthority.indexOf(']', (startColonIndex + 1));
+        }
+        portColonIndex = uriAuthority.indexOf(COLON, startColonIndex);
 
         if(atIndex<0 && portColonIndex<0) {
             // most common case: neither userinfo nor port

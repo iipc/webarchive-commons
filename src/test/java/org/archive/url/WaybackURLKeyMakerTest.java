@@ -23,6 +23,9 @@ public class WaybackURLKeyMakerTest extends TestCase {
 		assertEquals("org,archive)/goo?a&b", km.makeKey("http://archive.org/goo/?b&a"));
 		assertEquals("org,archive)/goo?a=1&a=2&b", km.makeKey("http://archive.org/goo/?a=2&b&a=1"));
 		assertEquals("org,archive)/", km.makeKey("http://archive.org:/"));
+		assertEquals("192,211,203,34)/robots.txt", km.makeKey("https://34.203.211.192/robots.txt"));
+		assertEquals("2600:1f18:200d:fb00:2b74:867c:ab0c:150a)/robots.txt",
+				km.makeKey("https://[2600:1f18:200d:fb00:2b74:867c:ab0c:150a]/robots.txt"));
 	}
 
 }

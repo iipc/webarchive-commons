@@ -8,6 +8,7 @@
 
   <name>webarchive-commons</name>
   <url>https://github.com/iipc/webarchive-commons</url>
+  <description>Common web archive utility code</description>
 
    <organization>
       <name>The International Internet Preservation Consortium</name>

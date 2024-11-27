@@ -121,6 +121,10 @@ public class URLRegexTransformer {
 		// TODO: ensure we DONT reverse IP addresses!
 		String parts[] = host.split("\\.",-1);
 		if(parts.length == 1) {
+			// strip enclosing "[" and "]" from IPv6 hosts
+			if (host.charAt(0) == '[' && host.charAt(host.length() - 1) == ']') {
+				return host.substring(1, host.length() - 1);
+			}
 			return host;
 		}
 		StringBuilder sb = new StringBuilder(host.length());

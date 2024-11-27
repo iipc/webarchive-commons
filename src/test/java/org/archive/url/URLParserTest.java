@@ -86,6 +86,9 @@ public class URLParserTest extends TestCase {
 		checkParse(" \n http://:****@www.archive.org:8080/inde\rx.html?query#foo \r\n \t ",
 				null, "http", "", "****", "www.archive.org", 8080, "/index.html", "query", "foo",
 				"http://:****@www.archive.org:8080/index.html?query#foo", "/index.html?query");
+		checkParse("https://[2600:1f18:200d:fb00:2b74:867c:ab0c:150a]/robots.txt", null, "https", null, null,
+				"[2600:1f18:200d:fb00:2b74:867c:ab0c:150a]", -1, "/robots.txt", null, null,
+				"https://[2600:1f18:200d:fb00:2b74:867c:ab0c:150a]/robots.txt", "/robots.txt");
 	}
 
 	private void checkParse(String s, String opaque, String scheme, String authUser,

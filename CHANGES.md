@@ -1,7 +1,14 @@
+1.1.11
+------
+
+#### Bug fixes
+
+* Fixed URLParser and WaybackURLKeyMaker failing on URLs with IPv6 address hostnames [#100](https://github.com/iipc/webarchive-commons/pull/100)
+
 1.1.10
 ------
 
-#### Fixes
+#### Bug fixes
 
 * [WAT extractor: do not fail on missing WARC-Filename in warcinfo record](https://github.com/iipc/webarchive-commons/pull/89)
 * [ExtractingParseObserver: extract rel, hreflang and type attributes](https://github.com/iipc/webarchive-commons/pull/86)

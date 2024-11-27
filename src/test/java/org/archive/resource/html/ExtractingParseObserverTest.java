@@ -93,6 +93,24 @@ public class ExtractingParseObserverTest extends TestCase {
 		checkExtract(test);
 	}
 
+	/**
+	 * Test whether the pattern matcher does not stack overflow with overlong
+	 * sequence of quote characters around a CSS link.
+	 */
+	public void testHandleStyleNodeNoStackOverflow() throws Exception {
+		StringBuilder sb = new StringBuilder();
+		sb.append("url(");
+		for (int i = 0; i < 20000; i++)
+			sb.append('\'');
+		sb.append("foos.gif");
+		for (int i = 0; i < 20000; i++)
+			sb.append('\'');
+		sb.append(");");
+		String[] test = new String[1];
+		test[0] = sb.toString();
+		checkExtract(test);
+	}
+
 	private void checkExtract(String[] data) throws JSONException {
 //		System.err.format("CSS(%s) want[0](%s)\n",css,want[0]);
 		String css = data[0];

@@ -20,7 +20,6 @@ package org.archive.url;
 
 import gnu.inet.encoding.IDNA;
 import gnu.inet.encoding.IDNAException;
-import it.unimi.dsi.lang.MutableString;
 
 import java.io.UnsupportedEncodingException;
 import java.util.BitSet;
@@ -485,7 +484,7 @@ public class UsableURIFactory extends URI {
 
         // Preallocate.  The '1's and '2's in below are space for ':',
         // '//', etc. URI characters.
-        MutableString s = new MutableString(
+        StringBuilder s = new StringBuilder(
             ((uriScheme != null)? uriScheme.length(): 0)
             + 1 // ';' 
             + ((uriAuthority != null)? uriAuthority.length(): 0)
@@ -707,7 +706,7 @@ public class UsableURIFactory extends URI {
      * @param substr Suffix or prefix to use if <code>str</code> is not null.
      * @param suffix True if <code>substr</code> is a suffix.
      */
-    private void appendNonNull(MutableString b, String str, String substr,
+    private void appendNonNull(StringBuilder b, String str, String substr,
             boolean suffix) {
         if (str != null && str.length() > 0) {
             if (!suffix) {

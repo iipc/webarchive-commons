@@ -150,20 +150,8 @@
     </dependency>
     <dependency>
       <groupId>it.unimi.dsi</groupId>
-      <artifactId>dsiutils</artifactId>
-      <version>2.2.8</version>
-      <scope>compile</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>ch.qos.logback</groupId>
-          <artifactId>logback-classic</artifactId>
-        </exclusion>
-        <!-- exclude the vulnerable commons-collections v3.2.1 -->
-        <exclusion>
-          <groupId>commons-collections</groupId>
-          <artifactId>commons-collections</artifactId>
-        </exclusion>
-      </exclusions>
+      <artifactId>fastutil</artifactId>
+      <version>7.0.10</version>
     </dependency>
 
     <!-- explicitly require a patched commons-collections to avoid vulnerable v3.2.1 -->

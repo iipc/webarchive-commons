@@ -18,10 +18,8 @@
  */
 package org.archive.io;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.nio.file.Files;
 import java.util.LinkedList;
 
 import org.archive.util.FileUtils;
@@ -116,19 +114,10 @@ public class ObjectPlusFilesOutputStream extends ObjectOutputStream {
      * @throws IOException
 	 */
 	private void hardlinkOrCopy(File file, File destination) throws IOException {
-		// For Linux/UNIX, try a hard link first.
-        Process link = Runtime.getRuntime().exec("ln "+file.getAbsolutePath()+" "+destination.getAbsolutePath());
-        // TODO NTFS also supports hard links; add appropriate try
         try {
-			link.waitFor();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        if(link.exitValue()!=0) {
-        	// hard link failed
+            Files.createLink(destination.toPath(), file.toPath());
+        } catch (UnsupportedEncodingException e) {
             FileUtils.copyFile(file,destination);
         }
 	}
-
 }

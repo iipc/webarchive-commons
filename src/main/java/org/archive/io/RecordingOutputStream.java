@@ -19,8 +19,7 @@
 
 package org.archive.io;
 
-import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
-
+import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -207,7 +206,7 @@ public class RecordingOutputStream extends OutputStream {
     protected OutputStream ensureDiskStream() throws FileNotFoundException {
         if (this.diskStream == null) {
             FileOutputStream fis = new FileOutputStream(this.backingFilename);
-            this.diskStream = new FastBufferedOutputStream(fis);
+            this.diskStream = new BufferedOutputStream(fis);
         }
         return this.diskStream;
     }

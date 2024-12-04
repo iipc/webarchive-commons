@@ -19,8 +19,7 @@
 
 package org.archive.io;
 
-import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
-
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -200,7 +199,7 @@ public abstract class WriterPoolMember implements ArchiveFileConstants {
     	close();
         this.f = file;
         FileOutputStream fos = new FileOutputStream(this.f);
-        this.countOut = new MiserOutputStream(new FastBufferedOutputStream(fos),settings.getFrequentFlushes());
+        this.countOut = new MiserOutputStream(new BufferedOutputStream(fos),settings.getFrequentFlushes());
         this.out = this.countOut; 
         logger.fine("Opened " + this.f.getAbsolutePath());
         return this.f.getName();

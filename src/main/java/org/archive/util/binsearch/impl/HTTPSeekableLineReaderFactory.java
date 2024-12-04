@@ -20,6 +20,7 @@ public abstract class HTTPSeekableLineReaderFactory implements SeekableLineReade
 	
 	public enum HttpLibs
 	{
+		@Deprecated
 		APACHE_31,
 		APACHE_43,
 		URLCONN,

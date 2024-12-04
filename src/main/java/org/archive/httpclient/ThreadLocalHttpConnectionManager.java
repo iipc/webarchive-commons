@@ -36,8 +36,10 @@ import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
  * 
  * <b>Java &gt;= 1.4 is recommended.</b>
  * 
- * @author Christian Kohlschuetter 
+ * @author Christian Kohlschuetter
+ * @deprecated Commons HttpClient 3 is end of life, this will be removed in webarchive-commons 2.0
  */
+@Deprecated
 public final class ThreadLocalHttpConnectionManager implements
     HttpConnectionManager {
 

@@ -70,7 +70,9 @@ import org.archive.util.Recorder;
  *
  * @author stack
  * @version $Revision$, $Date$
+ * @deprecated Commons HttpClient 3 is end of life, this will be removed in webarchive-commons 2.0
  */
+@Deprecated
 public class HttpRecorderGetMethod extends GetMethod {
     
     protected static Logger logger =

@@ -15,6 +15,11 @@ import org.apache.commons.httpclient.params.HttpClientParams;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReader;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReaderFactory;
 
+/**
+ *
+ * @deprecated Commons HttpClient 3 is end of life, this will be removed in webarchive-commons 2.0
+ */
+@Deprecated
 public class ApacheHttp31SLRFactory extends HTTPSeekableLineReaderFactory {
 	private final static Logger LOGGER = Logger.getLogger(ApacheHttp31SLRFactory.class.getName());
 	

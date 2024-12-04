@@ -14,6 +14,10 @@ import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.io.input.CountingInputStream;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReader;
 
+/**
+ * @deprecated Commons HttpClient 3 is end of life, this will be removed in webarchive-commons 2.0
+ */
+@Deprecated
 public class ApacheHttp31SLR extends HTTPSeekableLineReader {
 	
 	private HttpClient http;

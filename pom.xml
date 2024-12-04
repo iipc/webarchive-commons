@@ -149,13 +149,6 @@
       <version>1.15</version>
     </dependency>
 
-    <!-- explicitly require a patched commons-collections to avoid vulnerable v3.2.1 -->
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-      <version>3.2.2</version>
-    </dependency>
-
     <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpcore</artifactId>

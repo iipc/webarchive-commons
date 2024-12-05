@@ -15,18 +15,18 @@ import com.google.common.net.InetAddresses;
 /**
  * Canonicalizer that does more or less basic fixup. Based initially on rules
  * specified at <a href=
- * "https://developers.google.com/safe-browsing/developers_guide_v2#Canonicalization"
+ * "https://web.archive.org/web/20130306015559/https://developers.google.com/safe-browsing/developers_guide_v2#Canonicalization"
  * >https://developers.google.com/safe-browsing/developers_guide_v2#
- * Canonicalization</a>. These rules are designed for clients of google's
+ * Canonicalization</a>. These rules are designed for clients of Google's
  * "experimental" Safe Browsing API to "check URLs against Google's
  * constantly-updated blacklists of suspected phishing and malware pages".
  * 
  * <p>
- * This class differs from google in treatment of non-ascii input. Google's
+ * This class differs from Google in treatment of non-ascii input. Google's
  * rules don't really address this except with one example test case, which
  * seems to suggest taking raw input bytes and pct-encoding them byte for byte.
  * Since the input to this class consists of java strings, not raw bytes, that
- * wouldn't be possible, even if deemed preferable. Instead
+ * wouldn't be possible, even if deemed preferable. Instead,
  * BasicURLCanonicalizer expresses non-ascii characters pct-encoded UTF-8.
  */
 public class BasicURLCanonicalizer implements URLCanonicalizer {
@@ -212,6 +212,10 @@ public class BasicURLCanonicalizer implements URLCanonicalizer {
 		return _UTF8;
 	}
 
+	/**
+	 * @param input String to be percent-encoded. Assumed to be fully unescaped.
+	 * @return percent-encoded string
+	 */
 	public String escapeOnce(String input) {
 		if (input == null) {
 			return null;
@@ -242,6 +246,19 @@ public class BasicURLCanonicalizer implements URLCanonicalizer {
 					 * not needing escaping
 					 */
 					sb = new StringBuilder(input.substring(0, i));
+				}
+				if (b == '%' && i < utf8bytes.length - 2) {
+					// Any hex escapes left at this point represent non-UTF-8 encoded characters
+					// Unescape them, so they don't get double escaped
+					int hex1 = getHex(utf8bytes[i + 1]);
+					if (hex1 >= 0) {
+						int hex2 = getHex(utf8bytes[i + 2]);
+						if (hex2 >= 0) {
+							i = i+2;
+							b = hex1 * 16 + hex2;
+						}
+					}
+
 				}
 				sb.append("%");
 				String hex = Integer.toHexString(b).toUpperCase();
@@ -337,7 +354,7 @@ public class BasicURLCanonicalizer implements URLCanonicalizer {
 	 * Decodes bytes in bbuf as utf-8 and appends decoded characters to sb. If
 	 * decoding of any portion fails, appends the un-decodable %xx%xx sequence
 	 * extracted from inputStr instead of decoded characters. See "bad unicode"
-	 * tests in GoogleCanonicalizerTest#testDecode(). Variables only make sense
+	 * tests in BasicURLCanonicalizerTest#testDecode(). Variables only make sense
 	 * within context of {@link #decode(String)}.
 	 * 
 	 * @param sb

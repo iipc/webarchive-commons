@@ -143,6 +143,9 @@ public class BasicURLCanonicalizerTest extends TestCase {
 		assertEquals("%",guc.unescapeRepeatedly("%25%32%35"));
 		
 		assertEquals("168.188.99.26",guc.unescapeRepeatedly("%31%36%38%2e%31%38%38%2e%39%39%2e%32%36"));
+
+		assertEquals("tag=%E4%EE%F8%EA%EE%EB%FC%ED%EE%E5",
+				guc.unescapeRepeatedly("tag=%E4%EE%F8%EA%EE%EB%FC%ED%EE%E5"));
 	}
 	
 	public void testAttemptIPFormats() throws URIException {

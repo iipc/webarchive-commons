@@ -64,10 +64,12 @@ implements ResourceConstants, ARCConstants, EOFObserver {
 		}
 	}
 
+	@Override
 	public InputStream getInputStream() {
 		return new EOFNotifyingInputStream(digIS, this);
 	}
 
+	@Override
 	public void notifyEOF() throws IOException {
 		metaData.putLong(PAYLOAD_LENGTH, countingIS.getCount());
 		String digString = Base32.encode(digIS.getMessageDigest().digest());

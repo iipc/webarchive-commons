@@ -21,6 +21,7 @@ public class WARCMetaDataResourceFactory implements ResourceFactory, ResourceCon
 		parser = new HttpHeaderParser();
 	}
 
+	@Override
 	public Resource getResource(InputStream is, MetaData parentMetaData,
 			ResourceContainer container) throws ResourceParseException,
 			IOException {
@@ -33,8 +34,13 @@ public class WARCMetaDataResourceFactory implements ResourceFactory, ResourceCon
 			if(headers.isCorrupt()) {
 				md.putBoolean(WARC_META_FIELDS_CORRUPT, true);
 			}
-			parentMetaData.putLong(PAYLOAD_SLOP_BYTES, StreamCopy.readToEOF(is));		
-			parentMetaData.putLong(PAYLOAD_LENGTH, bytes);
+			long trailingSlopBytes = StreamCopy.readToEOF(is);
+			if (!parentMetaData.has(PAYLOAD_SLOP_BYTES) || trailingSlopBytes > 0) {
+				parentMetaData.putLong(PAYLOAD_SLOP_BYTES, trailingSlopBytes);
+			}
+			if (!parentMetaData.has(PAYLOAD_LENGTH) || bytes != parentMetaData.getLong(PAYLOAD_LENGTH)) {
+				parentMetaData.putLong(PAYLOAD_LENGTH, bytes);
+			}
 			return new WARCMetaDataResource(md,container, headers);
 			
 		} catch (HttpParseException e) {

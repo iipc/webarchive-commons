@@ -31,6 +31,7 @@ implements ResourceFactory, ResourceConstants {
 		parser = new HttpHeaderParser();
 	}
 
+	@Override
 	public Resource getResource(InputStream is, MetaData parentMetaData,
 			ResourceContainer container) throws ResourceParseException,
 			IOException {
@@ -40,9 +41,13 @@ implements ResourceFactory, ResourceConstants {
 			if(headers.isCorrupt()) {
 				parentMetaData.putBoolean(HTTP_HEADERS_CORRUPT, true);
 			}
-			parentMetaData.putLong(PAYLOAD_LENGTH, bytes);
-			
-			parentMetaData.putLong(PAYLOAD_SLOP_BYTES, StreamCopy.readToEOF(is));
+			if (!parentMetaData.has(PAYLOAD_LENGTH) || bytes != parentMetaData.getLong(PAYLOAD_LENGTH)) {
+				parentMetaData.putLong(PAYLOAD_LENGTH, bytes);
+			}
+			long trailingSlopBytes = StreamCopy.readToEOF(is);
+			if (!parentMetaData.has(PAYLOAD_SLOP_BYTES) || trailingSlopBytes > 0) {
+				parentMetaData.putLong(PAYLOAD_SLOP_BYTES, trailingSlopBytes);
+			}
 			if(type != null) {
 				parentMetaData.putString(PAYLOAD_CONTENT_TYPE, type);
 			}

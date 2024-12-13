@@ -53,7 +53,7 @@ public class WARCResource extends AbstractResource implements EOFObserver, Resou
 			countingIS = new CountingInputStream(
 					ByteStreams.limit(response, length));
 		} else {
-			throw new ResourceParseException(null);
+			throw new ResourceParseException(new Exception("Zero or negative length: " + length));
 		}
 		try {
 			digIS = new DigestInputStream(countingIS, 
@@ -63,14 +63,18 @@ public class WARCResource extends AbstractResource implements EOFObserver, Resou
 		}
 	}
 
+	@Override
 	public InputStream getInputStream() {
 		return new EOFNotifyingInputStream(digIS, this);
 	}
 
+	@Override
 	public void notifyEOF() throws IOException {
 		String digString = Base32.encode(digIS.getMessageDigest().digest());
 		if(container.isCompressed()) {
-			metaData.putLong(PAYLOAD_LENGTH, countingIS.getCount());
+			if (!metaData.has(PAYLOAD_LENGTH) || countingIS.getCount() != metaData.getLong(PAYLOAD_LENGTH)) {
+				metaData.putLong(PAYLOAD_LENGTH, countingIS.getCount());
+			}
 			metaData.putLong(PAYLOAD_SLOP_BYTES, StreamCopy.readToEOF(response));
 			metaData.putString(PAYLOAD_DIGEST, "sha1:"+digString);
 		} else {
@@ -81,13 +85,17 @@ public class WARCResource extends AbstractResource implements EOFObserver, Resou
 					(PushBackOneByteInputStream) raw;
 				long numNewlines = StreamCopy.skipChars(pb1bis, CR_NL_CHARS);
 				if(numNewlines > 0) {
-					metaData.putLong(PAYLOAD_LENGTH, countingIS.getCount());
+					long payloadLength = countingIS.getCount();
+					if (!metaData.has(PAYLOAD_LENGTH) || payloadLength != metaData.getLong(PAYLOAD_LENGTH)) {
+						metaData.putLong(PAYLOAD_LENGTH, payloadLength);
+					}
 					metaData.putLong(PAYLOAD_SLOP_BYTES, numNewlines);
 					metaData.putString(PAYLOAD_DIGEST, "sha1:"+digString);
 				}
 			}
 		}
 	}
+
 	public MetaData getEnvelopeMetaData() {
 		return envelope;
 	}

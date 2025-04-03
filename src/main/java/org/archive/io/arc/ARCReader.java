@@ -164,7 +164,7 @@ implements ARCConstants, Closeable {
         }
         return (ARCRecord)getCurrentRecord();
     }
-    
+
     /**
      * Returns version of this ARC file.  Usually read from first record of ARC.
      * If we're reading without having first read the first record -- e.g.

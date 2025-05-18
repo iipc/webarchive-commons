@@ -4,9 +4,9 @@ import org.archive.util.TestUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class JSONPathSpecFactoryTest extends TestCase {
+public class JSONPathSpecFactoryTest {
 	String json1S = "{\"a\":\"A\"}";
 	String json2S = "{\"b\":\"B\"}";
 
@@ -14,6 +14,7 @@ public class JSONPathSpecFactoryTest extends TestCase {
 
 	String json4S = "{\"b\":[{\"x\":\"x1\", \"y\":\"y1\"},{\"x\":\"x2\", \"y\":\"y2\"}]}";
 
+	@Test
 	public void testGet() throws JSONException {
 		JSONObject json1 = new JSONObject(json1S);
 		JSONObject json2 = new JSONObject(json2S);

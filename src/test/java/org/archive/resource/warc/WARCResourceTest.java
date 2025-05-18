@@ -2,6 +2,8 @@ package org.archive.resource.warc;
 
 import static org.archive.resource.ResourceConstants.PAYLOAD_LENGTH;
 import static org.archive.resource.ResourceConstants.PAYLOAD_SLOP_BYTES;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 
@@ -16,10 +18,11 @@ import org.archive.util.StreamCopy;
 
 import org.json.JSONObject;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class WARCResourceTest extends TestCase {
+public class WARCResourceTest  {
 
+	@Test
 	public void testWARCResource() throws ResourceParseException, IOException {
 		String testFileName = "../../format/warc/IAH-urls-wget.warc";
 		ResourceProducer producer = ProducerUtils.getProducer(getClass().getResource(testFileName).getPath());

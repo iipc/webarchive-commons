@@ -21,26 +21,31 @@ package org.archive.io.arc;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 import org.archive.io.WriterPool;
 import org.archive.io.WriterPoolMember;
 import org.archive.io.WriterPoolSettings;
-import org.archive.util.TmpDirTestCase;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
  * Test ARCWriterPool
  */
 @SuppressWarnings("deprecation")
-public class ARCWriterPoolTest extends TmpDirTestCase {
-    private static final String PREFIX = "TEST";
-    
+public class ARCWriterPoolTest {
+    @TempDir
+    Path tempDir;
+
+    @Test
     public void testARCWriterPool()
     throws Exception {
         final int MAX_ACTIVE = 3;
         final int MAX_WAIT_MILLISECONDS = 100;
-        cleanUpOldFiles(PREFIX);
         WriterPool pool = new ARCWriterPool(getSettings(true),
             MAX_ACTIVE, MAX_WAIT_MILLISECONDS);
         WriterPoolMember [] writers = new WriterPoolMember[MAX_ACTIVE];
@@ -49,7 +54,7 @@ public class ARCWriterPoolTest extends TmpDirTestCase {
         baos.write(CONTENT.getBytes());
         for (int i = 0; i < MAX_ACTIVE; i++) {
             writers[i] = pool.borrowFile();
-            assertEquals("Number active", i + 1, pool.getNumActive());
+            assertEquals(i + 1, pool.getNumActive(), "Number active");
             ((ARCWriter)writers[i]).write("http://one.two.three", "no-type",
             	"0.0.0.0", 1234567890, CONTENT.length(), baos);
         }
@@ -60,17 +65,17 @@ public class ARCWriterPoolTest extends TmpDirTestCase {
         
         for (int i = (MAX_ACTIVE - 1); i >= 0; i--) {
             pool.returnFile(writers[i]);
-            assertEquals("Number active", i, pool.getNumActive());
-            assertEquals("Number idle", MAX_ACTIVE - pool.getNumActive(),
-                    pool.getNumIdle());
+            assertEquals(i, pool.getNumActive(), "Number active");
+            assertEquals(MAX_ACTIVE - pool.getNumActive(), pool.getNumIdle(),
+                    "Number idle");
         }
         pool.close();
     }
-    
+
+    @Test
     public void testInvalidate() throws Exception {
         final int MAX_ACTIVE = 3;
         final int MAX_WAIT_MILLISECONDS = 100;
-        cleanUpOldFiles(PREFIX);
         WriterPool pool = new ARCWriterPool(getSettings(true),
             MAX_ACTIVE, MAX_WAIT_MILLISECONDS);
         WriterPoolMember [] writers = new WriterPoolMember[MAX_ACTIVE];
@@ -79,7 +84,7 @@ public class ARCWriterPoolTest extends TmpDirTestCase {
         baos.write(CONTENT.getBytes());
         for (int i = 0; i < MAX_ACTIVE; i++) {
             writers[i] = pool.borrowFile();
-            assertEquals("Number active", i + 1, pool.getNumActive());
+            assertEquals(i + 1, pool.getNumActive(), "Number active");
             ((ARCWriter)writers[i]).write("http://one.two.three", "no-type",
             	"0.0.0.0", 1234567890, CONTENT.length(), baos);
         }
@@ -96,23 +101,23 @@ public class ARCWriterPoolTest extends TmpDirTestCase {
         
         for (int i = 0; i < MAX_ACTIVE; i++) {
             writers[i] = pool.borrowFile();
-            assertEquals("Number active", i + 1, pool.getNumActive());
+            assertEquals(i + 1, pool.getNumActive(), "Number active");
             ((ARCWriter)writers[i]).write("http://one.two.three", "no-type",
             	"0.0.0.0", 1234567890, CONTENT.length(), baos);
         }
         for (int i = (MAX_ACTIVE - 1); i >= 0; i--) {
             pool.returnFile(writers[i]);
-            assertEquals("Number active", i, pool.getNumActive());
-            assertEquals("Number idle", MAX_ACTIVE - pool.getNumActive(),
-                    pool.getNumIdle());
+            assertEquals(i, pool.getNumActive(), "Number active");
+            assertEquals(MAX_ACTIVE - pool.getNumActive(), pool.getNumIdle(),
+                    "Number idle");
         }
         pool.close();
     }
     
     private WriterPoolSettings getSettings(final boolean isCompressed) {
-        File [] files = {getTmpDir()};
+        File [] files = {tempDir.toFile()};
         return new WriterPoolSettingsData(
-                PREFIX,
+                "TEST",
                 "${prefix}-${timestamp17}-${serialno}-${heritrix.hostname}",
                 ARCConstants.DEFAULT_MAX_ARC_FILE_SIZE,
                 isCompressed,

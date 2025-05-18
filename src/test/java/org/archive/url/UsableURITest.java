@@ -22,16 +22,20 @@ import java.net.URISyntaxException;
 
 import org.apache.commons.httpclient.URIException;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class UsableURITest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class UsableURITest {
+    @Test
     public void testHasScheme() {
         assertTrue(UsableURI.hasScheme("http://www.archive.org"));
         assertTrue(UsableURI.hasScheme("http:"));
         assertFalse(UsableURI.hasScheme("ht/tp://www.archive.org"));
         assertFalse(UsableURI.hasScheme("/tmp"));
     }
-    
+
+    @Test
     public void testGetFileName() throws URISyntaxException {
         final String filename = "x.arc.gz";
         assertEquals(filename,
@@ -43,11 +47,12 @@ public class UsableURITest extends TestCase {
             UsableURI.parseFilename("rsync://archive.org/tmp/one.two/" +
                     filename)); 
     }
-    
+
+    @Test
     public void testSchemalessRelative() throws URIException {
         UsableURI base = new UsableURI("http://www.archive.org/a", true, "UTF-8");
         UsableURI relative = new UsableURI("//www.facebook.com/?href=http://www.archive.org/a", true, "UTF-8");
-        assertEquals(null, relative.getScheme());
+        assertNull(relative.getScheme());
         assertEquals("www.facebook.com", relative.getAuthority());
         UsableURI test = new UsableURI(base, relative);
         assertEquals("http://www.facebook.com/?href=http://www.archive.org/a", test.toString());
@@ -56,6 +61,7 @@ public class UsableURITest extends TestCase {
     /**
      * Test of toUnicodeHostString method, of class UsableURI.
      */
+    @Test
     public void testToUnicodeHostString() throws URIException {
         assertEquals("http://øx.dk", new UsableURI("http://xn--x-4ga.dk", true, "UTF-8").toUnicodeHostString());
         assertEquals("xn--x-4ga.dk", new UsableURI("xn--x-4ga.dk", true, "UTF-8").toUnicodeHostString());

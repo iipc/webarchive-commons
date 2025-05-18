@@ -7,10 +7,12 @@ import java.io.PrintWriter;
 
 import org.archive.util.binsearch.impl.RandomAccessFileSeekableLineReaderFactory;
 import org.archive.util.iterator.CloseableIterator;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class SortedTextFileTest extends TestCase {
+public class SortedTextFileTest {
 	private static String formatS(int i) {
 		return String.format("%07d",i);
 	}
@@ -23,7 +25,7 @@ public class SortedTextFileTest extends TestCase {
 		pw.close();
 	}
 
-
+	@Test
 	public void testGetRecordIteratorStringBoolean() throws IOException {
 		File test = File.createTempFile("test", null);
 		int max = 1000000;

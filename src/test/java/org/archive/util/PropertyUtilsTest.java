@@ -23,7 +23,9 @@ package org.archive.util;
 import java.io.IOException;
 import java.util.Properties;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -32,14 +34,15 @@ import junit.framework.TestCase;
  * @author gojomo
  * @version $Date: 2009-11-19 14:39:53 -0800 (Thu, 19 Nov 2009) $, $Revision: 6674 $
  */
-public class PropertyUtilsTest extends TestCase {
-    
+public class PropertyUtilsTest {
+
+    @Test
     public void testSimpleInterpolate() throws IOException {
         Properties props = new Properties(); 
         props.put("foo", "OOF");
         props.put("bar","RAB");
         String original = "FOO|${foo}  BAR|${bar}";
         String expected = "FOO|OOF  BAR|RAB";
-        assertEquals("interpalation problem",expected,PropertyUtils.interpolateWithProperties(original,props));
+        assertEquals(expected,PropertyUtils.interpolateWithProperties(original,props),"interpalation problem");
     }
 }

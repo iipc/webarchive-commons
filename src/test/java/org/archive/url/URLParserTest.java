@@ -4,13 +4,15 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.httpclient.URIException;
 
 import com.google.common.net.InetAddresses;
+import org.junit.jupiter.api.Test;
 
-public class URLParserTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class URLParserTest {
+	@Test
 	public void testGuava() throws URIException, UnsupportedEncodingException {
 		Long l = Long.parseLong("3279880203");
 		int i2 = l.intValue();
@@ -18,6 +20,7 @@ public class URLParserTest extends TestCase {
 		System.err.format("FromNum(%s)\n", InetAddresses.fromInteger(i2).getHostAddress());
 	}
 
+	@Test
 	public void testAddDefaultSchemeIfNeeded() {
 		assertEquals(null,URLParser.addDefaultSchemeIfNeeded(null));
 		assertEquals("http://",URLParser.addDefaultSchemeIfNeeded(""));
@@ -27,7 +30,7 @@ public class URLParserTest extends TestCase {
 		assertEquals("http://www.fool.com/",URLParser.addDefaultSchemeIfNeeded("www.fool.com/"));
 	}
 
-
+	@Test
 	public void testParse() throws UnsupportedEncodingException, URISyntaxException {
 		System.out.format("O(%s) E(%s)\n","%66",URLDecoder.decode("%66","UTF-8"));
 		checkParse("http://www.archive.org/index.html#foo", 

@@ -18,46 +18,51 @@
  */
 package org.archive.util;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author stack
  * @version $Date$, $Revision$
  */
-public class MimetypeUtilsTest extends TestCase {
+public class MimetypeUtilsTest {
 
+    @Test
 	public void testStraightTruncate() {
-        assertTrue("Straight broken",
-            MimetypeUtils.truncate("text/html").equals("text/html"));
+        assertTrue(MimetypeUtils.truncate("text/html").equals("text/html"),
+            "Straight broken");
 	}
-    
+
+    @Test
     public void testWhitespaceTruncate() {
-        assertTrue("Null broken",
-            MimetypeUtils.truncate(null).equals("no-type"));
-        assertTrue("Empty broken",
-                MimetypeUtils.truncate("").equals("no-type"));
-        assertTrue("Tab broken",
-                MimetypeUtils.truncate("    ").equals("no-type"));
-        assertTrue("Multispace broken",
-                MimetypeUtils.truncate("    ").equals("no-type"));
-        assertTrue("NL broken",
-                MimetypeUtils.truncate("\n").equals("no-type"));
+        assertTrue(MimetypeUtils.truncate(null).equals("no-type"),
+            "Null broken");
+        assertTrue(MimetypeUtils.truncate("").equals("no-type"),
+                "Empty broken");
+        assertTrue(MimetypeUtils.truncate("    ").equals("no-type"),
+                "Tab broken");
+        assertTrue(MimetypeUtils.truncate("    ").equals("no-type"),
+                "Multispace broken");
+        assertTrue(MimetypeUtils.truncate("\n").equals("no-type"),
+                "NL broken");
     }
-    
+
+    @Test
     public void testCommaTruncate() {
-        assertTrue("Comma broken",
-            MimetypeUtils.truncate("text/html,text/html").equals("text/html"));
-        assertTrue("Comma space broken",
-            MimetypeUtils.truncate("text/html, text/html").
-                equals("text/html"));
-        assertTrue("Charset broken",
-            MimetypeUtils.truncate("text/html;charset=iso9958-1").
-                equals("text/html"));
-        assertTrue("Charset space broken",
-            MimetypeUtils.truncate("text/html; charset=iso9958-1").
-                equals("text/html"));
-        assertTrue("dbl text/html space charset broken", MimetypeUtils.
+        assertTrue(MimetypeUtils.truncate("text/html,text/html").equals("text/html"),
+            "Comma broken");
+        assertTrue(MimetypeUtils.truncate("text/html, text/html").
+                equals("text/html"),
+            "Comma space broken");
+        assertTrue(MimetypeUtils.truncate("text/html;charset=iso9958-1").
+                equals("text/html"),
+            "Charset broken");
+        assertTrue(MimetypeUtils.truncate("text/html; charset=iso9958-1").
+                equals("text/html"),
+            "Charset space broken");
+        assertTrue(MimetypeUtils.
             truncate("text/html, text/html; charset=iso9958-1").
-                equals("text/html"));
+                equals("text/html"), "dbl text/html space charset broken");
     }
 }

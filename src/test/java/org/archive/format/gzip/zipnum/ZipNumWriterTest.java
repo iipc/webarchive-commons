@@ -10,19 +10,21 @@ import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.archive.format.gzip.GZIPMemberSeries;
 import org.archive.format.gzip.GZIPSeriesMember;
 import org.archive.streamcontext.SimpleStream;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class ZipNumWriterTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+public class ZipNumWriterTest {
+
+	@Test
 	public void testAddRecord() throws IOException {
-		Charset UTF8 = Charset.forName("UTF-8");
-		File main = File.createTempFile("test-znw",".main");
+        File main = File.createTempFile("test-znw",".main");
 		File summ = File.createTempFile("test-znw",".summ");
 		main.deleteOnExit();
 		summ.deleteOnExit();
@@ -31,11 +33,11 @@ public class ZipNumWriterTest extends TestCase {
 		ZipNumWriter znw = new ZipNumWriter(new FileOutputStream(main,false), 
 				new FileOutputStream(summ,false), limit);
 		for(int i = 0; i < 1000; i++) {
-			znw.addRecord(String.format("%06d\n",i).getBytes(UTF8));
+			znw.addRecord(String.format("%06d\n",i).getBytes(StandardCharsets.UTF_8));
 		}
 		znw.close();
 		InputStreamReader isr =
-			new InputStreamReader(new FileInputStream(summ),UTF8);
+			new InputStreamReader(new FileInputStream(summ), StandardCharsets.UTF_8);
 		BufferedReader br = new BufferedReader(isr);
 		String line = null;
 		int count = 0;

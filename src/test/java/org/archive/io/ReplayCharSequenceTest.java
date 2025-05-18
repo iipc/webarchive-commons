@@ -19,17 +19,24 @@
 
 package org.archive.io;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.util.Date;
 import java.util.Random;
 import java.util.logging.Logger;
 
 import org.archive.util.FileUtils;
-import org.archive.util.TmpDirTestCase;
 
 import com.google.common.base.Charsets;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test ReplayCharSequences.
@@ -37,8 +44,7 @@ import com.google.common.base.Charsets;
  * @author stack, gojomo
  * @version $Revision$, $Date$
  */
-public class ReplayCharSequenceTest extends TmpDirTestCase
-{
+public class ReplayCharSequenceTest {
     /**
      * Logger.
      */
@@ -56,16 +62,17 @@ public class ReplayCharSequenceTest extends TmpDirTestCase
      */
     private byte [] regularBuffer = null;
 
-    /*
-     * @see TestCase#setUp()
-     */
+    @TempDir
+    File tempDir;
+
+    @BeforeEach
     protected void setUp() throws Exception
     {
-        super.setUp();
         this.regularBuffer =
             fillBufferWithRegularContent(new byte [BUFFER_SIZE]);
     }
-    
+
+    @Test
     public void testShiftjis() throws IOException {
 
         // Here's the bytes for the JIS encoding of the Japanese form of Nihongo
@@ -86,19 +93,18 @@ public class ReplayCharSequenceTest extends TmpDirTestCase
             
         // Now check that start of the rcs comes back in as nihongo string.
         String rcsStr = rcs.subSequence(0, nihongo.length()).toString();
-        assertTrue("Nihongo " + nihongo + " does not equal converted string" +
-                " from rcs " + rcsStr,
-            nihongo.equals(rcsStr));
+        assertEquals(nihongo, rcsStr, "Nihongo " + nihongo + " does not equal converted string" +
+                " from rcs " + rcsStr);
         // And assert next string is also properly nihongo.
         if (rcs.length() >= (nihongo.length() * 2)) {
             rcsStr = rcs.subSequence(nihongo.length(),
                 nihongo.length() + nihongo.length()).toString();
-            assertTrue("Nihongo " + nihongo + " does not equal converted " +
-                " string from rcs (2nd time)" + rcsStr,
-                nihongo.equals(rcsStr));
+            assertEquals(nihongo, rcsStr, "Nihongo " + nihongo + " does not equal converted " +
+                    " string from rcs (2nd time)" + rcsStr);
         }
     }
 
+    @Test
     public void testGetReplayCharSequenceByteZeroOffset() throws IOException {
 
         RecordingOutputStream ros = writeTestStream(
@@ -120,7 +126,7 @@ public class ReplayCharSequenceTest extends TmpDirTestCase
                 ros.getBufferLength()/2, ros.backingFilename, charset);
     }
 
-
+    @Test
     public void testGetReplayCharSequenceMultiByteZeroOffset()
         throws IOException {
 
@@ -133,7 +139,8 @@ public class ReplayCharSequenceTest extends TmpDirTestCase
             accessingCharacters(rcs);
         }
     }
-    
+
+    @Test
     public void testReplayCharSequenceByteToString() throws IOException {
         String fileContent = "Some file content";
         byte [] buffer = fileContent.getBytes();
@@ -142,7 +149,7 @@ public class ReplayCharSequenceTest extends TmpDirTestCase
                 "testReplayCharSequenceByteToString.txt",0);
         ReplayCharSequence rcs = getReplayCharSequence(ros);
         String result = rcs.toString();
-        assertEquals("Strings don't match",result,fileContent);
+        assertEquals(fileContent, result,"Strings don't match");
     }
     
     private String toHexString(String str)
@@ -160,7 +167,8 @@ public class ReplayCharSequenceTest extends TmpDirTestCase
         else 
             return "null";
     }
-     
+
+    @Test
     public void testSingleByteEncodings() throws IOException {
         byte[] bytes = {
             (byte) 0x61, (byte) 0x62, (byte) 0x63, (byte) 0x64,
@@ -175,7 +183,7 @@ public class ReplayCharSequenceTest extends TmpDirTestCase
         String result = rcs.toString();
         logger.fine("latin1[0] " + toHexString(latin1String));
         logger.fine("latin1[1] " + toHexString(result));
-        assertEquals("latin1 strings don't match", result, latin1String);
+        assertEquals(result, latin1String, "latin1 strings don't match");
         
         String w1252String = new String(bytes, "windows-1252");
         ros = writeTestStream(
@@ -184,18 +192,19 @@ public class ReplayCharSequenceTest extends TmpDirTestCase
         result = rcs.toString();
         logger.fine("windows-1252[0] " + toHexString(w1252String));
         logger.fine("windows-1252[1] " + toHexString(result));
-        assertEquals("windows-1252 strings don't match", result, w1252String);
+        assertEquals(result, w1252String, "windows-1252 strings don't match");
 
-        String asciiString = new String(bytes, "ascii");
+        String asciiString = new String(bytes, StandardCharsets.US_ASCII);
         ros = writeTestStream(
                 bytes, 1, "testSingleByteEncodings-ascii.txt", 0);
-        rcs = getReplayCharSequence(ros,Charset.forName("ascii"));
+        rcs = getReplayCharSequence(ros, StandardCharsets.US_ASCII);
         result = rcs.toString();
         logger.fine("ascii[0] " + toHexString(asciiString));
         logger.fine("ascii[1] " + toHexString(result));
-        assertEquals("ascii strings don't match", result, asciiString);
+        assertEquals(result, asciiString, "ascii strings don't match");
     }
-    
+
+    @Test
     public void testReplayCharSequenceByteToStringOverflow() throws IOException {
         String fileContent = "Some file content. "; // ascii
         byte [] buffer = fileContent.getBytes();
@@ -212,15 +221,16 @@ public class ReplayCharSequenceTest extends TmpDirTestCase
         ReplayCharSequence rcs1252 = getReplayCharSequence(ros,Charset.forName("windows-1252"));
 
         String result = rcsUtf8.toString();
-        assertEquals("Strings don't match", expectedContent, result);
+        assertEquals(expectedContent, result, "Strings don't match");
 
         result = rcs1252.toString();
-        assertEquals("Strings don't match", expectedContent, result);
+        assertEquals(expectedContent, result, "Strings don't match");
     }
-    
+
+    @Test
     public void testReplayCharSequenceByteToStringMulti() throws IOException {
         String fileContent = "Some file content";
-        byte [] buffer = fileContent.getBytes("UTF-8");
+        byte [] buffer = fileContent.getBytes(StandardCharsets.UTF_8);
         final int MULTIPLICAND = 10;
         StringBuilder sb =
             new StringBuilder(MULTIPLICAND * fileContent.length());
@@ -232,15 +242,17 @@ public class ReplayCharSequenceTest extends TmpDirTestCase
                 buffer,1,
                 "testReplayCharSequenceByteToStringMulti.txt",MULTIPLICAND-1);
         for (int i = 0; i < 3; i++) {
-            ReplayCharSequence rcs = getReplayCharSequence(ros,Charsets.UTF_8);
+            ReplayCharSequence rcs = getReplayCharSequence(ros,StandardCharsets.UTF_8);
             String result = rcs.toString();
-            assertEquals("Strings don't match", result, expectedResult);
+            assertEquals(result, expectedResult, "Strings don't match");
             rcs.close();
             System.gc();
             System.runFinalization();
         }
     }
-    
+
+    @Test
+    @Disabled
     public void xestHugeReplayCharSequence() throws IOException {
         String fileContent = "01234567890123456789";
         String characterEncoding = "ascii";
@@ -255,14 +267,13 @@ public class ReplayCharSequenceTest extends TmpDirTestCase
         ReplayCharSequence rcs = getReplayCharSequence(ros,Charset.forName(characterEncoding));
 
         if (reps * fileContent.length() > (long) Integer.MAX_VALUE) {
-            assertTrue("ReplayCharSequence has wrong length (length()="
-                    + rcs.length() + ") (should be " + Integer.MAX_VALUE + ")",
-                    rcs.length() == Integer.MAX_VALUE);
+            assertEquals(Integer.MAX_VALUE, rcs.length(), "ReplayCharSequence has wrong length (length()="
+                    + rcs.length() + ") (should be " + Integer.MAX_VALUE + ")");
         } else {
-            assertEquals("ReplayCharSequence has wrong length (length()="
+            assertEquals(rcs.length(), reps * (long) fileContent.length(),
+                    "ReplayCharSequence has wrong length (length()="
                     + rcs.length() + ") (should be "
-                    + (reps * fileContent.length()) + ")", (long) rcs.length(),
-                    reps * (long) fileContent.length());
+                    + (reps * fileContent.length()) + ")");
         }
 
         // boundary cases or something
@@ -270,10 +281,9 @@ public class ReplayCharSequenceTest extends TmpDirTestCase
                 rcs.length() - 1, rcs.length() / 4 }) {
             // logger.info("testing char at index=" +
             // NumberFormat.getInstance().format(index));
-            assertEquals("Characters don't match (index="
-                    + NumberFormat.getInstance().format(index) + ")",
-                    fileContent.charAt(index % fileContent.length()), rcs
-                            .charAt(index));
+            assertEquals(fileContent.charAt(index % fileContent.length()),
+                    rcs.charAt(index), "Characters don't match (index="
+                    + NumberFormat.getInstance().format(index) + ")");
         }
 
         // check that out of bounds indices throw exception
@@ -295,10 +305,9 @@ public class ReplayCharSequenceTest extends TmpDirTestCase
             int index = rand.nextInt(rcs.length());
             // logger.info(i + ". testing char at index=" +
             // NumberFormat.getInstance().format(index));
-            assertEquals("Characters don't match (index="
-                    + NumberFormat.getInstance().format(index) + ")",
-                    fileContent.charAt(index % fileContent.length()), rcs
-                            .charAt(index));
+            assertEquals(fileContent.charAt(index % fileContent.length()),
+                    rcs.charAt(index), "Characters don't match (index="
+                    + NumberFormat.getInstance().format(index) + ")");
         }
     }
     
@@ -338,8 +347,8 @@ public class ReplayCharSequenceTest extends TmpDirTestCase
      */
     private void checkCharacter(CharSequence rcs, int i) {
         int c = rcs.charAt(i);
-        assertTrue("Character " + Integer.toString(c) + " at offset " + i +
-            " unexpected.", (c % SEQUENCE_LENGTH) == (i % SEQUENCE_LENGTH));
+        assertEquals((c % SEQUENCE_LENGTH), (i % SEQUENCE_LENGTH), "Character " + Integer.toString(c) + " at offset " + i +
+                " unexpected.");
     }
 
     /**
@@ -349,7 +358,7 @@ public class ReplayCharSequenceTest extends TmpDirTestCase
      */
     private RecordingOutputStream writeTestStream(byte[] content, 
             int memReps, String baseName, long fileReps) throws IOException {
-        String backingFilename = FileUtils.maybeRelative(getTmpDir(),baseName).getAbsolutePath();
+        String backingFilename = FileUtils.maybeRelative(tempDir,baseName).getAbsolutePath();
         RecordingOutputStream ros = new RecordingOutputStream(
                 content.length * memReps,
                 backingFilename);
@@ -382,10 +391,5 @@ public class ReplayCharSequenceTest extends TmpDirTestCase
             }
         }
         return buffer;
-    }
-
-    public void testCheckParameters()
-    {
-        // TODO.
     }
 }

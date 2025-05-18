@@ -4,13 +4,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class HTMLMetaDataTest extends TestCase {
+public class HTMLMetaDataTest {
 
-	public void testHTMLParseData() {
-//		fail("Not yet implemented");
-	}
+	@Test
 	public void testJSON() throws JSONException {
 		JSONObject data = new JSONObject();
 		JSONObject links = new JSONObject();
@@ -30,6 +28,8 @@ public class HTMLMetaDataTest extends TestCase {
 		System.out.println(data.toString());
 
 	}
+
+	@Test
 	public void testJSON2() throws JSONException {
 		String sa[][] = {{"one","1"},{"two","2"},{"three","3"}};
 		JSONObject jo = new JSONObject();
@@ -37,6 +37,8 @@ public class HTMLMetaDataTest extends TestCase {
 		appendStrArr(jo,sa);
 		System.out.println(jo.toString(1));
 	}
+
+	@Test
 	public void testJSON3() throws JSONException {
 		JSONObject jo = new JSONObject();
 		appendStrArr2(jo,"k",new String[] {"1","2","3","4"});

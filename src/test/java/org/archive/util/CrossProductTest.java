@@ -3,11 +3,9 @@ package org.archive.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.archive.util.CrossProduct;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
-
-public class CrossProductTest extends TestCase {
+public class CrossProductTest {
 	private void dumpC(List<Object> a) {
 		StringBuilder sb = new StringBuilder();
 		boolean first = false;
@@ -26,10 +24,12 @@ public class CrossProductTest extends TestCase {
 			dumpC(co);
 		}
 	}
+	@Test
 	public void testVersion() {
 		String version = IAUtils.loadCommonsVersion();
 		System.out.format("Loaded version(%s)\n", version);
 	}
+	@Test
 	public void testCrossProduct() {
 		ArrayList<List<Object>> input = new ArrayList<List<Object>>();
 		CrossProduct<Object> xp = new CrossProduct<Object>();

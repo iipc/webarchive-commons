@@ -1,8 +1,9 @@
 package org.archive.util.iterator;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class CachingStringFilterTest extends TestCase {
+public class CachingStringFilterTest {
+	@Test
 	public void testCache() {
 		StringFilter tf = new StringFilter() {
 			public boolean isFiltered(String text) {

@@ -4,14 +4,15 @@ import org.archive.util.TestUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class JSONViewTest extends TestCase {
+public class JSONViewTest  {
 	
 	public int getInt(byte b[]) {
 		return b[0] & 0xff;
 	}
-	
+
+	@Test
 	public void testBytes() throws JSONException {
 		JSONObject o = new JSONObject();
 		o.append("name1", "val\\rue1");
@@ -28,6 +29,8 @@ public class JSONViewTest extends TestCase {
 			System.out.format("I(%d) gi(%d)\n",i,gi);
 		}
 	}
+
+	@Test
 	public void testApply() throws JSONException {
 		String json1S = "{\"url\":\"a\",\"link\":[{\"zz\":\"1\",\"qq\":\"qa\"},{\"zz2\":\"2\",\"qq\":\"qb\"},{\"zz\":\"3\",\"qq\":\"qc\"},{\"zz\":\"4\"}]}";
 		JSONObject json1 = new JSONObject(json1S);

@@ -3,16 +3,16 @@ package org.archive.format.http;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.archive.format.http.HttpConstants;
-import org.archive.format.http.HttpParseException;
-import org.archive.format.http.HttpRequestMessage;
-import org.archive.format.http.HttpRequestMessageParser;
 import org.archive.util.IAUtils;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class HttpRequestMessageParserTest extends TestCase implements HttpConstants {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class HttpRequestMessageParserTest implements HttpConstants {
 	HttpRequestMessageParser parser = new HttpRequestMessageParser();
+
+	@Test
 	public void testParse() throws IOException {
 		assertParse("GET / HTTP/1.0\r\n", METHOD_GET, "/", VERSION_0);
 		assertParse("GET / HTTP/1.1\r\n", METHOD_GET, "/", VERSION_1);

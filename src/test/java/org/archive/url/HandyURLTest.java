@@ -1,9 +1,12 @@
 package org.archive.url;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class HandyURLTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+public class HandyURLTest {
+
+	@Test
 	public void testGetPublicSuffix() {
 		HandyURL h = new HandyURL();
 		h.setHost("www.fool.com");
@@ -23,10 +26,4 @@ public class HandyURLTest extends TestCase {
 		assertEquals("funky-images",h.getPublicPrefix());
 	
 	}
-
-	public void testGetPublicPrefix() {
-//		
-//		fail("Not yet implemented");
-	}
-
 }

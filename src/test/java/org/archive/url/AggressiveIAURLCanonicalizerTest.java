@@ -2,10 +2,13 @@ package org.archive.url;
 
 import java.net.URISyntaxException;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class AggressiveIAURLCanonicalizerTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class AggressiveIAURLCanonicalizerTest {
 	static AggressiveIAURLCanonicalizer ia = new AggressiveIAURLCanonicalizer();
+	@Test
 	public void testCanonicalize() throws URISyntaxException {
 		// FULL end-to-end tests:
 		check("http://www.alexa.com/","http://alexa.com/");
@@ -26,6 +29,6 @@ public class AggressiveIAURLCanonicalizerTest extends TestCase {
 		HandyURL u2 = URLParser.parse(got);
 		ia.canonicalize(u2);
 		String got2 = u2.getURLString();
-		assertEquals("Second passs changed!",got,got2);
+		assertEquals(got,got2,"Second passs changed!");
 	}
 }

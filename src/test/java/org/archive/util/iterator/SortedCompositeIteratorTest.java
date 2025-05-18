@@ -8,10 +8,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Comparator;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class SortedCompositeIteratorTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+public class SortedCompositeIteratorTest {
+
+	@Test
 	public void testHasNext() throws FileNotFoundException, IOException {
 		
 		File a = File.createTempFile("filea", null); 

@@ -10,9 +10,11 @@ import org.archive.format.json.JSONUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class MetaDataTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class MetaDataTest {
 
 	private static String[] testFilePaths = {
 			"src/test/resources/org/archive/format/warc/IAH-urls-wget.warc",
@@ -59,13 +61,13 @@ public class MetaDataTest extends TestCase {
 	private void verifyMultiValuedMetaData(MetaData m) {
 		// boolean
 		assertEquals(JSONArray.class, m.get("boolean-1").getClass());
-		assertEquals(false, ((JSONArray) m.get("boolean-1")).getBoolean(0));
-		assertEquals(true, ((JSONArray) m.get("boolean-1")).getBoolean(1));
-		assertEquals(true, m.getBoolean("boolean-2"));
-		assertEquals(true, m.getBoolean("boolean-3"));
+        assertFalse(((JSONArray) m.get("boolean-1")).getBoolean(0));
+        assertTrue(((JSONArray) m.get("boolean-1")).getBoolean(1));
+        assertTrue(m.getBoolean("boolean-2"));
+        assertTrue(m.getBoolean("boolean-3"));
 		assertEquals(Boolean.class, m.get("boolean-3").getClass());
-		assertEquals(true, m.optBoolean("boolean-3", false));
-		assertEquals(false, m.optBoolean("boolean-99", false));
+        assertTrue(m.optBoolean("boolean-3", false));
+        assertFalse(m.optBoolean("boolean-99", false));
 
 		// double
 		assertEquals(JSONArray.class, m.get("double-1").getClass());
@@ -121,6 +123,7 @@ public class MetaDataTest extends TestCase {
 		assertEquals("world", ((JSONObject) m.get("obj-2")).get("hello"));
 	}
 
+	@Test
 	public void testMultiValued() {
 		MetaData m = new MetaData();
 		m = putMetaData(m);
@@ -151,6 +154,7 @@ public class MetaDataTest extends TestCase {
 	 * Verify that in the legacy test file all WARC and HTTP headers are
 	 * single-valued, i.e. {@linkplain String}s.
 	 */
+	@Test
 	public void testSingleHeaders() throws IOException, ResourceParseException {
 		MetaData m = readNextWARCResponseAsMetaData(testFilePaths[0]);
 
@@ -166,6 +170,7 @@ public class MetaDataTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testMultipleHeaders() throws IOException, ResourceParseException {
 		MetaData m = readNextWARCResponseAsMetaData(testFilePaths[1]);
 

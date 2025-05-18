@@ -4,15 +4,16 @@ import org.archive.util.TestUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class SimpleJSONPathSpecTest extends TestCase {
+public class SimpleJSONPathSpecTest {
 	String json1 = "{\"a\": {  \"b\": \"Foo\" }}";
 	String json2 = "{\"a\": {  \"b\": [{\"a\":\"1\"},{\"a\":\"2\"}] }}";
 
 	String json3 = "{\"a\": {  \"b\": {\"A\":\"11\",\"B\":\"22\"} }}";
 	String json4 = "{\"a\": {  \"b\": [{\"A\":\"11\",\"B\":\"22\"},{\"A\":\"33\",\"B\":\"44\"}] }}";
 
+	@Test
 	public void testExtract() throws JSONException {
 		JSONObject json = new JSONObject(json1);
 		JSONPathSpec spec = new SimpleJSONPathSpec("a.b");

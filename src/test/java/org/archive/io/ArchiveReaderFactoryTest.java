@@ -21,29 +21,34 @@ package org.archive.io;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 
 import org.apache.commons.lang.StringUtils;
-import org.archive.io.ArchiveRecord;
 import org.archive.io.arc.ARCWriterTest;
-import org.archive.util.TmpDirTestCase;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-public class ArchiveReaderFactoryTest extends TmpDirTestCase { 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class ArchiveReaderFactoryTest {
+    @TempDir
+    File tempDir;
+
     /**
      * Test local file as URL
      * @throws IOException
      */
+    @Test
     public void testGetFileURL() throws IOException {
-        File arc = ARCWriterTest.createARCFile(getTmpDir(), true);
+        File arc = ARCWriterTest.createARCFile(tempDir, true);
         ArchiveReader reader = null;
         try {
             reader = ArchiveReaderFactory.
                 get(new URL("file:////" + arc.getAbsolutePath()));
             for (Iterator<ArchiveRecord> i = reader.iterator(); i.hasNext();) {
                 ArchiveRecord r = (ArchiveRecord)i.next();
-                assertTrue("mime unread",StringUtils.isNotBlank(r.getHeader().getMimetype()));
+                assertTrue(StringUtils.isNotBlank(r.getHeader().getMimetype()),"mime unread");
             }
         } finally {
             if (reader != null) {
@@ -56,14 +61,15 @@ public class ArchiveReaderFactoryTest extends TmpDirTestCase {
      * Test local file as File
      * @throws IOException
      */
+    @Test
     public void testGetFile() throws IOException {
-        File arc = ARCWriterTest.createARCFile(getTmpDir(), true);
+        File arc = ARCWriterTest.createARCFile(tempDir, true);
         ArchiveReader reader = null;
         try {
             reader = ArchiveReaderFactory.get(arc.getAbsoluteFile());
             for (Iterator<ArchiveRecord> i = reader.iterator(); i.hasNext();) {
                 ArchiveRecord r = (ArchiveRecord)i.next();
-                assertTrue("mime unread",StringUtils.isNotBlank(r.getHeader().getMimetype()));
+                assertTrue(StringUtils.isNotBlank(r.getHeader().getMimetype()),"mime unread");
             }
         } finally {
             if (reader != null) {
@@ -76,14 +82,15 @@ public class ArchiveReaderFactoryTest extends TmpDirTestCase {
      * Test local file as String path
      * @throws IOException
      */
+    @Test
     public void testGetPath() throws IOException {
-        File arc = ARCWriterTest.createARCFile(getTmpDir(), true);
+        File arc = ARCWriterTest.createARCFile(tempDir, true);
         ArchiveReader reader = null;
         try {
             reader = ArchiveReaderFactory.get(arc.getAbsoluteFile().getAbsolutePath());
             for (Iterator<ArchiveRecord> i = reader.iterator(); i.hasNext();) {
                 ArchiveRecord r = (ArchiveRecord)i.next();
-                assertTrue("mime unread",StringUtils.isNotBlank(r.getHeader().getMimetype()));
+                assertTrue(StringUtils.isNotBlank(r.getHeader().getMimetype()),"mime unread");
             }
         } finally {
             if (reader != null) {

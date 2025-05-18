@@ -2,10 +2,13 @@ package org.archive.util;
 
 import org.archive.util.StringFieldExtractor.StringTuple;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class StringFieldExtractorTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+public class StringFieldExtractorTest {
+
+	@Test
 	public void testExtract() {
 		StringFieldExtractor ex1 = new StringFieldExtractor(' ', 0);
 		StringFieldExtractor ex2 = new StringFieldExtractor(' ', 1);
@@ -29,7 +32,8 @@ public class StringFieldExtractorTest extends TestCase {
 		assertEquals(f,t.first);
 		assertEquals(s,t.second);
 	}
-	
+
+	@Test
 	public void testSplit() {
 		StringFieldExtractor sfx = new StringFieldExtractor(' ',2);
 		checkSplit("a b","x y",sfx.split("a b x y"));

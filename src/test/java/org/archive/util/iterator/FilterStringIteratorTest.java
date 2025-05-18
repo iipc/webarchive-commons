@@ -5,12 +5,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.TreeSet;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-public class FilterStringIteratorTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
 
-	public void t2estHasNext() {
-		String blocks[] = {"a","ab","ba","cc"};
+public class FilterStringIteratorTest {
+
+	@Test
+	public void testHasNext() {
+		String[] blocks = {"a","ab","ba","cc"};
 		
 		List<String> bl = Arrays.asList(blocks);
 		TransformingPrefixStringFilter f = new TransformingPrefixStringFilter(bl);
@@ -26,23 +30,20 @@ public class FilterStringIteratorTest extends TestCase {
 		assertBlocked(true,"cc",f);
 		assertBlocked(true,"cca",f);
 	}
-	
+
+	@Test
 	public void testTreeSet() {
-		String blocks[] = {"a","ab","ba","cc"};
+		String[] blocks = {"a","ab","ba","cc"};
 		TreeSet<String> s = TransformingPrefixStringFilter.makeTreeSet(Arrays.asList(blocks),null);
 		assertTrue(s.contains("a"));
 		assertFalse(s.contains("ab"));
 
-		String blocks2[] = {"ab","a","ba","cc"};
+		String[] blocks2 = {"ab","a","ba","cc"};
 		TreeSet<String> s2 = TransformingPrefixStringFilter.makeTreeSet(Arrays.asList(blocks2),null);
 		assertTrue(s2.contains("a"));
 		assertFalse(s2.contains("ab"));
-
-		
-		
 	}
-	
-	
+
 	private void assertBlocked(boolean blocked, String s, StringFilter f) {
 		ArrayList<String> l = new ArrayList<String>();
 		l.add(s);

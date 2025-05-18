@@ -2,14 +2,16 @@ package org.archive.io.arc;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 
 import org.archive.io.ArchiveReader;
 import org.archive.io.ArchiveRecord;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * 
@@ -18,7 +20,7 @@ import junit.framework.TestCase;
  * @author csr@statsbiblioteket.dk (Colin Rosenthal)
  *
  */
-public class ARCReaderFactoryTest extends TestCase {
+public class ARCReaderFactoryTest {
 
     private File testfile1 = new File("src/test/resources/org/archive/format/arc/IAH-20080430204825-00000-blackbook-truncated.arc");
 
@@ -27,6 +29,7 @@ public class ARCReaderFactoryTest extends TestCase {
      * https://github.com/iipc/openwayback/issues/101
      * @throws Exception
      */
+	@Test
     public void testGetResource() throws Exception {
     	this.offsetResourceTest(testfile1, 1515, "http://www.archive.org/robots.txt" );
     	this.offsetResourceTest(testfile1, 36420, "http://www.archive.org/services/collection-rss.php" );
@@ -43,11 +46,11 @@ public class ARCReaderFactoryTest extends TestCase {
 		ArchiveRecord record = reader.get();
 
 		final String url = record.getHeader().getUrl();
-		assertEquals("URL of record is not as expected.", uri, url);
+		assertEquals(uri, url, "URL of record is not as expected.");
 		
         final long position = record.getPosition();
         final long recordLength = record.getHeader().getLength();
-        assertTrue("Position " + position + " is after end of record " + recordLength, position <= recordLength);
+        assertTrue(position <= recordLength, "Position " + position + " is after end of record " + recordLength);
 
         // Clean up:
         if( raf != null )

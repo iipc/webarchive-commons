@@ -24,9 +24,10 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 
-import junit.framework.TestCase;
-
 import org.archive.net.PublicSuffixes.Node;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test cases for PublicSuffixes utility. Confirm expected matches/nonmatches
@@ -34,10 +35,11 @@ import org.archive.net.PublicSuffixes.Node;
  * 
  * @author gojomo
  */
-public class PublicSuffixesTest extends TestCase {
+public class PublicSuffixesTest {
     // test of low level implementation
     private final String NL = System.getProperty("line.separator");
-    
+
+    @Test
     public void testCompare() {
         Node n = new Node("hoge");
         assertTrue(n.compareTo('a') > 0);
@@ -75,6 +77,8 @@ public class PublicSuffixesTest extends TestCase {
         PublicSuffixes.dump(alt, 0, new PrintWriter(w));
         return w.toString();
     }
+
+    @Test
     public void testTrie1()  {
         Node alt = new Node(null, new ArrayList<Node>());
         alt.addBranch("ac,");
@@ -92,6 +96,8 @@ public class PublicSuffixesTest extends TestCase {
         		"    \"edu,\"" + NL +
         		"    \"\"" + NL, dump(alt));
     }
+
+    @Test
     public void testTrie2() {
         Node alt = new Node(null, new ArrayList<Node>());
         alt.addBranch("ac,");
@@ -101,6 +107,7 @@ public class PublicSuffixesTest extends TestCase {
         		"  \"*,\"" + NL, dump(alt));
     }
 
+    @Test
     public void testTrie3() {
         Node alt = new Node(null, new ArrayList<Node>());
         alt.addBranch("ac,");
@@ -119,6 +126,7 @@ public class PublicSuffixesTest extends TestCase {
     Matcher m = PublicSuffixes.getTopmostAssignedSurtPrefixPattern()
             .matcher("");
 
+    @Test
     public void testBasics() {
         matchPrefix("com,example,www,", "com,example,");
         matchPrefix("com,example,", "com,example,");
@@ -137,27 +145,32 @@ public class PublicSuffixesTest extends TestCase {
         matchPrefix("jp,yokohama,public,assigned,", "jp,yokohama,public,assigned,");
     }
 
+    @Test
     public void testDomainWithDash() {
         matchPrefix("de,bad-site,www", "de,bad-site,");
     }
-    
+
+    @Test
     public void testDomainWithNumbers() {
         matchPrefix("de,archive4u,www", "de,archive4u,");
     }
-    
+
+    @Test
     public void testIPV4() {
-        assertEquals("unexpected reduction", 
-                "1.2.3.4",
-                PublicSuffixes.reduceSurtToAssignmentLevel("1.2.3.4"));
+        assertEquals("1.2.3.4",
+                PublicSuffixes.reduceSurtToAssignmentLevel("1.2.3.4"),
+                "unexpected reduction");
     }
-    
+
+    @Test
     public void testIPV6() {
-        assertEquals("unexpected reduction", 
-                "[2001:0db8:85a3:08d3:1319:8a2e:0370:7344]",
+        assertEquals("[2001:0db8:85a3:08d3:1319:8a2e:0370:7344]",
                 PublicSuffixes.reduceSurtToAssignmentLevel(
-                        "[2001:0db8:85a3:08d3:1319:8a2e:0370:7344]"));
+                        "[2001:0db8:85a3:08d3:1319:8a2e:0370:7344]"),
+                "unexpected reduction");
     }
-    
+
+    @Test
     public void testExceptions() {
         matchPrefix("uk,bl,www,", "uk,bl,");
         matchPrefix("uk,bl,", "uk,bl,");
@@ -165,6 +178,7 @@ public class PublicSuffixesTest extends TestCase {
         matchPrefix("jp,tokyo,city,", "jp,tokyo,city,");
     }
 
+    @Test
     public void testFakeTLD() {
         // we assume any new/unknonwn TLD should be assumed as 2-level;
         // this is preferable for our grouping purpose but might not be
@@ -172,22 +186,23 @@ public class PublicSuffixesTest extends TestCase {
         matchPrefix("zzz,example,www,", "zzz,example,");
     }
 
+    @Test
     public void testUnsegmentedHostname() {
         m.reset("example");
-        assertFalse("unexpected match found in 'example'", m.find());
+        assertFalse(m.find(), "unexpected match found in 'example'");
     }
 
+    @Test
     public void testTopmostAssignedCaching() {
-        assertSame("topmostAssignedSurtPrefixPattern not cached",PublicSuffixes.getTopmostAssignedSurtPrefixPattern(),PublicSuffixes.getTopmostAssignedSurtPrefixPattern());
-        assertSame("topmostAssignedSurtPrefixRegex not cached",PublicSuffixes.getTopmostAssignedSurtPrefixRegex(),PublicSuffixes.getTopmostAssignedSurtPrefixRegex()); 
+        assertSame(PublicSuffixes.getTopmostAssignedSurtPrefixPattern(),PublicSuffixes.getTopmostAssignedSurtPrefixPattern(),"topmostAssignedSurtPrefixPattern not cached");
+        assertSame(PublicSuffixes.getTopmostAssignedSurtPrefixRegex(),PublicSuffixes.getTopmostAssignedSurtPrefixRegex(),"topmostAssignedSurtPrefixRegex not cached");
     }
     
     // TODO: test UTF domains?
 
     protected void matchPrefix(String surtDomain, String expectedAssignedPrefix) {
         m.reset(surtDomain);
-        assertTrue("expected match not found in '" + surtDomain, m.find());
-        assertEquals("expected match not found", expectedAssignedPrefix, m
-                .group());
+        assertTrue(m.find(), "expected match not found in '" + surtDomain);
+        assertEquals(expectedAssignedPrefix, m.group(), "expected match not found");
     }
 }

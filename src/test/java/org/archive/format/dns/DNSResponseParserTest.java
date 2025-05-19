@@ -3,15 +3,13 @@ package org.archive.format.dns;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.archive.format.dns.DNSParseException;
-import org.archive.format.dns.DNSRecord;
-import org.archive.format.dns.DNSResponse;
-import org.archive.format.dns.DNSResponseParser;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class DNSResponseParserTest extends TestCase {
+public class DNSResponseParserTest {
 	DNSResponseParser parser = new DNSResponseParser();
+	@Test
 	public void testParse() throws DNSParseException, IOException {
 		verifyResults("20110328212258\nfarm6.static.flickr.a06.yahoodns.net.\t300\tIN\tA\t98.136.170.121\n",
 				"20110328212258",new String[][] {{"farm6.static.flickr.a06.yahoodns.net.","300","IN","A","98.136.170.121"}});

@@ -25,7 +25,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.archive.util.Base32;
-import org.archive.util.TmpDirTestCase;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 /**
@@ -33,8 +37,7 @@ import org.archive.util.TmpDirTestCase;
  *
  * @author stack
  */
-public class RecordingOutputStreamTest extends TmpDirTestCase
-{
+public class RecordingOutputStreamTest {
     /**
      * Size of buffer used in tests.
      */
@@ -45,14 +48,9 @@ public class RecordingOutputStreamTest extends TmpDirTestCase
      */
     private static final int WRITE_TOTAL = 10;
 
+    @TempDir
+    File tempDir;
 
-    /*
-     * @see TmpDirTestCase#setUp()
-     */
-    protected void setUp() throws Exception
-    {
-        super.setUp();
-    }
 
     /**
      * Test reusing instance of RecordingOutputStream.
@@ -60,13 +58,13 @@ public class RecordingOutputStreamTest extends TmpDirTestCase
      * @throws IOException Failed open of backing file or opening of
      * input streams verifying recording.
      */
+    @Test
     public void testReuse()
         throws IOException
     {
         final String BASENAME = "testReuse";
-        cleanUpOldFiles(BASENAME);
         RecordingOutputStream ros = new RecordingOutputStream(BUFFER_SIZE,
-            (new File(getTmpDir(), BASENAME + "Bkg.txt")).getAbsolutePath());
+            (new File(tempDir, BASENAME + "Bkg.txt")).getAbsolutePath());
         for (int i = 0; i < 3; i++)
         {
             reuse(BASENAME, ros, i);
@@ -92,13 +90,13 @@ public class RecordingOutputStreamTest extends TmpDirTestCase
      * @throws IOException Failed open of backing file or opening of
      * input streams verifying recording.
      */
+    @Test
     public void testWriteint()
         throws IOException
     {
         final String BASENAME = "testWriteint";
-        cleanUpOldFiles(BASENAME);
         RecordingOutputStream ros = new RecordingOutputStream(BUFFER_SIZE,
-           (new File(getTmpDir(), BASENAME + "Backing.txt")).getAbsolutePath());
+           (new File(tempDir, BASENAME + "Backing.txt")).getAbsolutePath());
         File f = writeIntRecordedFile(ros, BASENAME, WRITE_TOTAL);
         verifyRecording(ros, f, WRITE_TOTAL);
         // Do again to test that I can get a new ReplayInputStream on same
@@ -114,13 +112,13 @@ public class RecordingOutputStreamTest extends TmpDirTestCase
      * @throws IOException Failed open of backing file or opening of
      * input streams verifying recording.
      */
+    @Test
     public void testWritebytearray()
         throws IOException
     {
         final String BASENAME = "testWritebytearray";
-        cleanUpOldFiles(BASENAME);
         RecordingOutputStream ros = new RecordingOutputStream(BUFFER_SIZE,
-           (new File(getTmpDir(), BASENAME + "Backing.txt")).getAbsolutePath());
+           (new File(tempDir, BASENAME + "Backing.txt")).getAbsolutePath());
         File f = writeByteRecordedFile(ros, BASENAME, WRITE_TOTAL);
         verifyRecording(ros, f, WRITE_TOTAL);
         // Do again to test that I can get a new ReplayInputStream on same
@@ -132,12 +130,12 @@ public class RecordingOutputStreamTest extends TmpDirTestCase
      * Test mark and reset.
      * @throws IOException
      */
+    @Test
     public void testMarkReset() throws IOException
     {
         final String BASENAME = "testMarkReset";
-        cleanUpOldFiles(BASENAME);
         RecordingOutputStream ros = new RecordingOutputStream(BUFFER_SIZE,
-                (new File(getTmpDir(), BASENAME + "Backing.txt")).getAbsolutePath());
+                (new File(tempDir, BASENAME + "Backing.txt")).getAbsolutePath());
         File f = writeByteRecordedFile(ros, BASENAME, WRITE_TOTAL);
         verifyRecording(ros, f, WRITE_TOTAL);
         ReplayInputStream ris = ros.getReplayInputStream();
@@ -148,15 +146,15 @@ public class RecordingOutputStreamTest extends TmpDirTestCase
         ris.read();
         // Reset it.  It should be back at zero.
         ris.reset();
-        assertEquals("Reset to zero", ris.read(), 0);
-        assertEquals("Reset to zero char 1", ris.read(), 1);
-        assertEquals("Reset to zero char 2", ris.read(), 2);
+        assertEquals(0, ris.read(), "Reset to zero");
+        assertEquals(1, ris.read(), "Reset to zero char 1");
+        assertEquals(2, ris.read(), "Reset to zero char 2");
         // Mark stream.  Here.  Next character should be '3'.
         ris.mark(10 /* Arbitrary value*/);
         ris.read();
         ris.read();
         ris.reset();
-        assertEquals("Reset to zero char 3", ris.read(), 3);
+        assertEquals(3, ris.read(), "Reset to zero char 3");
     }
 
     /**
@@ -179,7 +177,7 @@ public class RecordingOutputStreamTest extends TmpDirTestCase
             String basename, int size)
         throws IOException
     {
-        File f = new File(getTmpDir(), basename + ".txt");
+        File f = new File(tempDir, basename + ".txt");
         FileOutputStream fos = new FileOutputStream(f);
         ros.open(fos);
         for (int i = 0; i < WRITE_TOTAL; i++)
@@ -188,8 +186,8 @@ public class RecordingOutputStreamTest extends TmpDirTestCase
         }
         ros.close();
         fos.close();
-        assertEquals("Content-Length test", size,
-            ros.getResponseContentLength());
+        assertEquals(size, ros.getResponseContentLength(),
+            "Content-Length test");
         return f;
     }
 
@@ -213,7 +211,7 @@ public class RecordingOutputStreamTest extends TmpDirTestCase
             String basename, int size)
     throws IOException
     {
-        File f = new File(getTmpDir(), basename + ".txt");
+        File f = new File(tempDir, basename + ".txt");
         FileOutputStream fos = new FileOutputStream(f);
         ros.open(fos);
         byte [] b = new byte[size];
@@ -224,8 +222,8 @@ public class RecordingOutputStreamTest extends TmpDirTestCase
         ros.write(b);
         ros.close();
         fos.close();
-        assertEquals("Content-Length test", size,
-                ros.getResponseContentLength());
+        assertEquals(size, ros.getResponseContentLength(),
+                "Content-Length test");
         return f;
     }
 
@@ -243,28 +241,28 @@ public class RecordingOutputStreamTest extends TmpDirTestCase
     private void verifyRecording(RecordingOutputStream ros, File f,
          int size) throws IOException
     {
-        assertEquals("Recorded file size.", size, f.length());
+        assertEquals(size, f.length(), "Recorded file size.");
         FileInputStream fis = new FileInputStream(f);
-        assertNotNull("FileInputStream not null", fis);
+        assertNotNull(fis, "FileInputStream not null");
         ReplayInputStream ris = ros.getReplayInputStream();
-        assertNotNull("ReplayInputStream not null", ris);
+        assertNotNull(ris, "ReplayInputStream not null");
         for (int i = 0; i < size; i++)
         {
-            assertEquals("ReplayInputStream content verification", i,
-                    ris.read());
-            assertEquals("Recorded file content verification", i,
-                    fis.read());
+            assertEquals(i, ris.read(),
+                    "ReplayInputStream content verification");
+            assertEquals(i, fis.read(),
+                    "Recorded file content verification");
         }
-        assertEquals("ReplayInputStream at EOF", -1, ris.read());
+        assertEquals(-1, ris.read(), "ReplayInputStream at EOF");
         fis.close();
         ris.close();
     }
 
+    @Test
     public void testMessageBodyBegin() throws IOException {
         final String BASENAME = "testMessageBodyBegin";
-        cleanUpOldFiles(BASENAME);
         RecordingOutputStream ros = new RecordingOutputStream(BUFFER_SIZE,
-                (new File(getTmpDir(), BASENAME + "Backing.txt")).getAbsolutePath());
+                (new File(tempDir, BASENAME + "Backing.txt")).getAbsolutePath());
         ros.setSha1Digest();
 
         ros.open(new ByteArrayOutputStream());

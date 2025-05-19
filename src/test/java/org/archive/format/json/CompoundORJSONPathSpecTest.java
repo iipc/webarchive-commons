@@ -6,11 +6,12 @@ import org.archive.util.TestUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class CompoundORJSONPathSpecTest extends TestCase {
+public class CompoundORJSONPathSpecTest {
 	String json1S = "{\"a\":\"A\"}";
 	String json2S = "{\"b\":\"B\"}";
+	@Test
 	public void testExtract() throws JSONException {
 		JSONObject json1 = new JSONObject(json1S);
 		JSONObject json2 = new JSONObject(json2S);

@@ -21,13 +21,16 @@ import org.json.JSONObject;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class ExtractingParseObserverTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class ExtractingParseObserverTest {
 
 	private static final Logger LOG =
 			Logger.getLogger(ExtractingParseObserverTest.class.getName());
 
+	@Test
 	public void testHandleStyleNodeExceptions() throws Exception {
 		String[] tests = {
 				"some css",
@@ -58,6 +61,7 @@ public class ExtractingParseObserverTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testHandleStyleNode() throws Exception {
 		String[][] tests = {
 				{""},
@@ -80,6 +84,7 @@ public class ExtractingParseObserverTest extends TestCase {
 	 * Test whether the pattern matcher does extract nothing and also does not
 	 * not hang-up if an overlong CSS link is truncated.
 	 */
+	@Test
 	public void testHandleStyleNodeNoHangupTruncated() throws Exception {
 		StringBuilder sb = new StringBuilder();
 		sb.append("url(");
@@ -113,22 +118,22 @@ public class ExtractingParseObserverTest extends TestCase {
 				
 				assertTrue(o instanceof JSONObject);
 				JSONObject jo = (JSONObject) o;
-				assertEquals("CSS link extraction failed for <" + css + ">",
-						data[i], jo.getString("href"));
+				assertEquals(data[i], jo.getString("href"),
+						"CSS link extraction failed for <" + css + ">");
 			}
 		} else {
-			assertNull("Expected no extracted link for <" + css + ">", a);
+			assertNull(a, "Expected no extracted link for <" + css + ">");
 		}
 	}
 	
 	private void checkLink(Multimap<String,String> links, String url, String path) {
-		assertTrue("Link with URL " + url + " not found", links.containsKey(url));
-		assertTrue("Wrong path " + path + " for " + url, links.get(url).contains(path));
+		assertTrue(links.containsKey(url), "Link with URL " + url + " not found");
+		assertTrue(links.get(url).contains(path), "Wrong path " + path + " for " + url);
 	}
 
 	private void checkLinks(Resource resource, String[][] expectedLinks) {
 		assertNotNull(resource);
-		assertTrue("Wrong instance type of Resource: " + resource.getClass(), resource instanceof HTMLResource);
+        assertInstanceOf(HTMLResource.class, resource, "Wrong instance type of Resource: " + resource.getClass());
 		MetaData md = resource.getMetaData();
 		LOG.info(md.toString());
 		Multimap<String, String> links = ArrayListMultimap.create();
@@ -178,12 +183,13 @@ public class ExtractingParseObserverTest extends TestCase {
 				}
 			}
 		}
-		assertEquals("Unexpected number of links", expectedLinks.length, links.size());
+		assertEquals(expectedLinks.length, links.size(), "Unexpected number of links");
 		for (String[] l : expectedLinks) {
 			checkLink(links, l[0], l[1]);
 		}
 	}
 
+	@Test
 	public void testLinkExtraction() throws ResourceParseException, IOException {
 		String testFileName = "link-extraction-test.warc";
 		ResourceProducer producer = ProducerUtils.getProducer(getClass().getResource(testFileName).getPath());

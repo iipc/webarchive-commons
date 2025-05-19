@@ -8,9 +8,11 @@ import org.archive.format.warc.WARCConstants.WARCRecordType;
 import org.archive.io.ArchiveReader;
 import org.archive.io.ArchiveRecord;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class WARCReaderFactoryTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class WARCReaderFactoryTest {
 	
 	// Test files:
 	String[] files = new String[] {
@@ -18,6 +20,7 @@ public class WARCReaderFactoryTest extends TestCase {
 			"src/test/resources/org/archive/format/warc/IAH-urls-wget.warc"
 	};
 
+	@Test
 	public void testGetStringInputstreamBoolean() throws IOException {
 		// Check the test files can be opened:
 		for( String file : files ) {

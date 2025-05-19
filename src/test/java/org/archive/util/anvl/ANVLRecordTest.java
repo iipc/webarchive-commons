@@ -22,15 +22,19 @@ package org.archive.util.anvl;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class ANVLRecordTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class ANVLRecordTest {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
 
-    public void testAdd() throws Exception {
+    @Test
+    public void testAdd() {
         ANVLRecord am = new ANVLRecord();
         am.add(new Element(new Label("entry")));
         am.add(new Element(new Label("who"),
@@ -49,14 +53,16 @@ public class ANVLRecordTest extends TestCase {
         Map<String,String> m = am.asMap();
         logger.fine(m.toString());
     }
-    
+
+    @Test
     public void testEmptyRecord() throws Exception {
     	byte [] b = ANVLRecord.EMPTY_ANVL_RECORD.getUTF8Bytes();
-    	assertEquals(b.length, 2);
-    	assertEquals(b[0], '\r');
-    	assertEquals(b[1], '\n');
+    	assertEquals(2, b.length);
+    	assertEquals('\r', b[0]);
+    	assertEquals('\n', b[1]);
     }
-    
+
+    @Test
     public void testFolding() throws Exception {
         ANVLRecord am = new ANVLRecord();
         Exception e = null;
@@ -65,42 +71,45 @@ public class ANVLRecordTest extends TestCase {
         } catch (IllegalArgumentException iae) {
             e = iae;
         }
-        assertTrue(e != null && e instanceof IllegalArgumentException);
+        assertInstanceOf(IllegalArgumentException.class, e);
         am.addLabelValue("label", "value with \n in it");
     }
-    
+
+    @Test
     public void testParse() throws UnsupportedEncodingException, IOException {
         String record = "   a: b\r\n#c#\r\nc:d\r\n \t\t\r\t\n\te" +
                 "\r\nx:\r\n  # z\r\n\r\n";
         ANVLRecord r = ANVLRecord.load(new ByteArrayInputStream(
-                record.getBytes("ISO-8859-1")));
+                record.getBytes(StandardCharsets.ISO_8859_1)));
         logger.fine(r.toString());
-        assertEquals(r.get(0).toString(), "a: b");
+        assertEquals("a: b", r.get(0).toString());
         record = "   a: b\r\n\r\nsdfsdsdfds";
         r = ANVLRecord.load(new ByteArrayInputStream(
-            record.getBytes("ISO-8859-1")));
+            record.getBytes(StandardCharsets.ISO_8859_1)));
         logger.fine(r.toString());
         record = "x:\r\n  # z\r\ny:\r\n\r\n";
         r = ANVLRecord.load(new ByteArrayInputStream(
-            record.getBytes("ISO-8859-1")));
+            record.getBytes(StandardCharsets.ISO_8859_1)));
         logger.fine(r.toString());
-        assertEquals(r.get(0).toString(), "x:");
+        assertEquals("x:", r.get(0).toString());
     }
-    
+
+    @Test
     public void testExampleParse()
-    throws UnsupportedEncodingException, IOException {
+    throws IOException {
     	final String sample = "entry:\t\t\r\n# first ###draft\r\n" +
     		"who:\tGilbert, W.S. | Sullivan, Arthur\r\n" +
     		"what:\tThe Yeoman of\r\n" +
     		"\t\tthe Guard\r\n" +
     		"when/created:\t 1888\r\n\r\n";
         ANVLRecord r = ANVLRecord.load(new ByteArrayInputStream(
-        		sample.getBytes("ISO-8859-1")));
+        		sample.getBytes(StandardCharsets.ISO_8859_1)));
         logger.fine(r.toString());
     }
-    
+
+    @Test
     public void testPoundLabel()
-    throws UnsupportedEncodingException, IOException {
+    throws IOException {
     	final String sample = "ent#ry:\t\t\r\n# first ###draft\r\n" +
     		"who:\tGilbert, W.S. | Sullivan, Arthur\r\n" +
     		"what:\tThe Yeoman of\r\n" +
@@ -109,9 +118,10 @@ public class ANVLRecordTest extends TestCase {
         ANVLRecord r = ANVLRecord.load(sample);
         logger.fine(r.toString());
     }
-    
+
+    @Test
     public void testNewlineLabel()
-    throws UnsupportedEncodingException, IOException {
+    throws IOException {
     	final String sample = "ent\nry:\t\t\r\n# first ###draft\r\n" +
     		"who:\tGilbert, W.S. | Sullivan, Arthur\r\n" +
     		"what:\tThe Yeoman of\r\n" +
@@ -123,6 +133,6 @@ public class ANVLRecordTest extends TestCase {
     	} catch(IllegalArgumentException e) {
     		iae = e;
     	}
-    	assertTrue(iae != null);
+        assertNotNull(iae);
     }
 }

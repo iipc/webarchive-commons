@@ -23,13 +23,16 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 /**
  * @author stack
  * @version $Revision$ $Date$
  */
-public class UUIDGeneratorTest extends TestCase {
+public class UUIDGeneratorTest {
+	@Test
 	public void testQualifyRecordID() throws URISyntaxException {
 		RecordIDGenerator g = new UUIDGenerator();
 		URI uri = g.getRecordID();

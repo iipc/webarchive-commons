@@ -22,13 +22,16 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Pattern;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests (and 
  * @author gojomo
  */
-public class InterruptibleCharSequenceTest extends TestCase {
+public class InterruptibleCharSequenceTest {
     // this regex takes many seconds to fail on the input
     // (~20 seconds on 2Ghz Athlon64 JDK 1.6)
     public static String BACKTRACKER = "^(((((a+)*)*)*)*)*$";
@@ -45,6 +48,8 @@ public class InterruptibleCharSequenceTest extends TestCase {
      * The runtime overhead of checking interrupt status in this
      * extreme case is around 5% in my tests.
      */
+    @Test
+    @Disabled
     public void xestOverhead() {
         String regex = BACKTRACKER;
         String inputNormal = INPUT;
@@ -96,16 +101,18 @@ public class InterruptibleCharSequenceTest extends TestCase {
         t.start();
         return t; 
     }
-    
+
+    @Test
     public void testNoninterruptible() throws InterruptedException {
         BlockingQueue<Object> q = new LinkedBlockingQueue<Object>();
         Thread t = tryMatchInThread(INPUT, BACKTRACKER, q);
         Thread.sleep(1000);
         t.interrupt();
-        Object result = q.take(); 
-        assertTrue("mismatch uncompleted",Boolean.FALSE.equals(result));
+        Object result = q.take();
+        assertEquals(Boolean.FALSE, result, "mismatch uncompleted");
     }
-    
+
+    @Test
     public void testInterruptibility() throws InterruptedException {
         long sleepMillis = 512;
         while (sleepMillis > 0) {
@@ -122,7 +129,7 @@ public class InterruptibleCharSequenceTest extends TestCase {
             if(result instanceof Boolean) {
                 System.err.println(result+" match beat interrupt");
             }
-            assertTrue("exception not thrown",result instanceof RuntimeException);
+            assertTrue(result instanceof RuntimeException,"exception not thrown");
             return;
         }
         fail("failed to interrupt InterruptibleCharSequence with given sleeping intervals");

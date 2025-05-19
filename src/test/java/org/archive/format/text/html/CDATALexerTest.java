@@ -1,17 +1,16 @@
 package org.archive.format.text.html;
 
-import org.archive.format.text.html.CDATALexer;
-import org.archive.format.text.html.NodeUtils;
 import org.htmlparser.Node;
 import org.htmlparser.lexer.Page;
-//import org.htmlparser.nodes.RemarkNode;
 import org.htmlparser.nodes.TagNode;
 import org.htmlparser.nodes.TextNode;
 import org.htmlparser.util.ParserException;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class CDATALexerTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class CDATALexerTest {
 	CDATALexer l;
 	Node n;
 	private CDATALexer makeLexer(String html) {
@@ -19,7 +18,8 @@ public class CDATALexerTest extends TestCase {
 		t.setPage(new Page(html));
 		return t;
 	}
-	
+
+	@Test
 	public void testNextNode() throws ParserException {
 		l = makeLexer("<a href=\"foo\">blem</a>");
 		n = l.nextNode();
@@ -35,6 +35,7 @@ public class CDATALexerTest extends TestCase {
 		assertNull(l.nextNode());
 	}
 
+	@Test
 	public void testInJS() throws ParserException {
 		l = makeLexer("<script>foo bar baz</script>");
 		assertFalse(l.inCSS());
@@ -54,6 +55,7 @@ public class CDATALexerTest extends TestCase {
 		assertTrue(NodeUtils.isCloseTagNodeNamed(n, "SCRIPT"));
 	}
 
+	@Test
 	public void testInCSS() throws ParserException {
 		l = makeLexer("<style>foo bar baz</style>");
 		assertFalse(l.inCSS());

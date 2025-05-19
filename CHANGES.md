@@ -1,3 +1,10 @@
+Unreleased
+----------
+
+#### Dependency upgrades
+
+- **junit**: 4.13.2 → 5.12.2
+
 1.3.0
 -----
 

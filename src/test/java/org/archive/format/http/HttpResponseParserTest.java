@@ -5,16 +5,14 @@ import java.io.IOException;
 
 import org.archive.util.IAUtils;
 import org.archive.util.TestUtils;
-import org.archive.format.http.HttpHeader;
-import org.archive.format.http.HttpHeaders;
-import org.archive.format.http.HttpParseException;
-import org.archive.format.http.HttpResponse;
-import org.archive.format.http.HttpResponseParser;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class HttpResponseParserTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
 
+public class HttpResponseParserTest {
+
+	@Test
 	public void testParse() throws IOException {
 
 		HttpResponseParser parser = new HttpResponseParser();
@@ -38,6 +36,7 @@ public class HttpResponseParserTest extends TestCase {
 		
 	}
 
+	@Test
 	public void testParseWithLf() throws IOException {
 
 		HttpResponseParser parser = new HttpResponseParser();
@@ -57,6 +56,7 @@ public class HttpResponseParserTest extends TestCase {
 		
 	}
 
+	@Test
 	public void testParseEmptyHeaderField() throws IOException {
 
 		HttpResponseParser parser = new HttpResponseParser();

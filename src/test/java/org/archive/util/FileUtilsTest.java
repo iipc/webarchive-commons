@@ -21,12 +21,20 @@ package org.archive.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.math.LongRange;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 /**
@@ -36,7 +44,7 @@ import org.apache.commons.lang.math.LongRange;
  * @author gojomo
  * @version $Date$, $Revision$
  */
-public class FileUtilsTest extends TmpDirTestCase {
+public class FileUtilsTest {
     private String srcDirName = FileUtilsTest.class.getName() + ".srcdir";
     private File srcDirFile = null;
     private String tgtDirName = FileUtilsTest.class.getName() + ".tgtdir";
@@ -51,13 +59,15 @@ public class FileUtilsTest extends TmpDirTestCase {
     protected File largeLinesWindows;
     protected File nakedLastLineUnix;
     protected File nakedLastLineWindows;
-    
-    
+
+    @TempDir
+    Path tempDir;
+
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
-        this.srcDirFile = new File(getTmpDir(), srcDirName);
+        this.srcDirFile = new File(tempDir.toFile(), srcDirName);
         FileUtils.ensureWriteableDirectory(srcDirFile);
-        this.tgtDirFile = new File(getTmpDir(), tgtDirName);
+        this.tgtDirFile = new File(tempDir.toFile(), tgtDirName);
         FileUtils.ensureWriteableDirectory(tgtDirFile);
         addFiles();
         
@@ -76,7 +86,7 @@ public class FileUtilsTest extends TmpDirTestCase {
     }
  
     private void addFiles() throws IOException {
-        addFiles(3, this.getName());
+        addFiles(3, FileUtilsTest.class.getName());
     }
     
     private void addFiles(final int howMany, final String baseName)
@@ -104,9 +114,9 @@ public class FileUtilsTest extends TmpDirTestCase {
         return file; 
         
     }
-    
+
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
         org.apache.commons.io.FileUtils.deleteQuietly(this.srcDirFile);
         org.apache.commons.io.FileUtils.deleteQuietly(this.tgtDirFile);
         org.apache.commons.io.FileUtils.deleteQuietly(zeroLengthLinesUnix);
@@ -119,7 +129,8 @@ public class FileUtilsTest extends TmpDirTestCase {
         org.apache.commons.io.FileUtils.deleteQuietly(nakedLastLineWindows);
         
     }
-    
+
+    @Test
     public void testCopyFile() {
         // Test exception copying nonexistent file.
         File [] srcFiles = this.srcDirFile.listFiles();
@@ -131,37 +142,45 @@ public class FileUtilsTest extends TmpDirTestCase {
         } catch (IOException ioe) {
             e = ioe;
         }
-        assertNotNull("Didn't get expected IOE", e);
+        assertNotNull(e, "Didn't get expected IOE");
     }
-    
+
+    @Test
     public void testTailLinesZeroLengthUnix() throws IOException {
         verifyTailLines(zeroLengthLinesUnix);
     }
-    
+
+    @Test
     public void testTailLinesZeroLengthWindows() throws IOException {
         verifyTailLines(zeroLengthLinesWindows);
     }
-    
+
+    @Test
     public void testTailLinesSmallUnix() throws IOException {
         verifyTailLines(smallLinesUnix);
     }
 
+    @Test
     public void testTailLinesLargeUnix() throws IOException {
         verifyTailLines(largeLinesUnix);
     }
 
+    @Test
     public void testTailLinesSmallWindows() throws IOException {
         verifyTailLines(smallLinesWindows);
     }
 
+    @Test
     public void testTailLinesLargeWindows() throws IOException {
         verifyTailLines(largeLinesWindows);
     }
 
+    @Test
     public void testTailLinesNakedUnix() throws IOException {
         verifyTailLines(nakedLastLineUnix);
     }
 
+    @Test
     public void testTailLinesNakedWindows() throws IOException {
         verifyTailLines(nakedLastLineWindows);
     }
@@ -185,8 +204,8 @@ public class FileUtilsTest extends TmpDirTestCase {
     private void verifyTailLines(File file, List<String> lines, int count, int estimate) throws IOException {
         List<String> testLines; 
         testLines = getTestTailLines(file,count,estimate); 
-        assertEquals("line counts not equal:"+file.getName()+" "+count+" "+estimate,lines.size(),testLines.size()); 
-        assertEquals("lines not equal: "+file.getName()+" "+count+" "+estimate,lines,testLines); 
+        assertEquals(lines.size(),testLines.size(),"line counts not equal:"+file.getName()+" "+count+" "+estimate);
+        assertEquals(lines,testLines,"lines not equal: "+file.getName()+" "+count+" "+estimate);
     }
 
     private List<String> getTestTailLines(File file, int count, int estimate) throws IOException {
@@ -202,35 +221,43 @@ public class FileUtilsTest extends TmpDirTestCase {
         Collections.reverse(testLines); 
         return testLines;
     }
-    
+
+    @Test
     public void testHeadLinesZeroLengthUnix() throws IOException {
         verifyHeadLines(zeroLengthLinesUnix);
     }
-    
+
+    @Test
     public void testHeadLinesZeroLengthWindows() throws IOException {
         verifyHeadLines(zeroLengthLinesWindows);
     }
-    
+
+    @Test
     public void testHeadLinesSmallUnix() throws IOException {
         verifyHeadLines(smallLinesUnix);
     }
 
+    @Test
     public void testHeadLinesLargeUnix() throws IOException {
         verifyHeadLines(largeLinesUnix);
     }
 
+    @Test
     public void testHeadLinesSmallWindows() throws IOException {
         verifyHeadLines(smallLinesWindows);
     }
 
+    @Test
     public void testHeadLinesLargeWindows() throws IOException {
         verifyHeadLines(largeLinesWindows);
     }
 
+    @Test
     public void testHeadLinesNakedUnix() throws IOException {
         verifyHeadLines(nakedLastLineUnix);
     }
 
+    @Test
     public void testHeadLinesNakedWindows() throws IOException {
         verifyHeadLines(nakedLastLineWindows);
     }
@@ -255,8 +282,8 @@ public class FileUtilsTest extends TmpDirTestCase {
     private void verifyHeadLines(File file, List<String> lines, int count, int estimate) throws IOException {
         List<String> testLines; 
         testLines = getTestHeadLines(file,count,estimate); 
-        assertEquals("line counts not equal:"+file.getName()+" "+count+" "+estimate,lines.size(),testLines.size()); 
-        assertEquals("lines not equal: "+file.getName()+" "+count+" "+estimate,lines,testLines); 
+        assertEquals(lines.size(),testLines.size(),"line counts not equal:"+file.getName()+" "+count+" "+estimate);
+        assertEquals(lines,testLines,"lines not equal: "+file.getName()+" "+count+" "+estimate);
     }
 
     private List<String> getTestHeadLines(File file, int count, int estimate) throws IOException {

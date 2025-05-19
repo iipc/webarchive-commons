@@ -7,10 +7,11 @@ import java.io.IOException;
 
 import org.archive.util.IAUtils;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class GZIPMemberWriterTest extends TestCase {
+public class GZIPMemberWriterTest {
 
+	@Test
 	public void testWrite() throws IOException {
                 File outFile = File.createTempFile("tmp", ".gz");
 		GZIPMemberWriter gzw = new GZIPMemberWriter(new FileOutputStream(outFile));

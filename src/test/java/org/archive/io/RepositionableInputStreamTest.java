@@ -23,23 +23,29 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 
-import org.archive.util.TmpDirTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
-public class RepositionableInputStreamTest extends TmpDirTestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class RepositionableInputStreamTest {
     private File testFile;
     private static final String LINE = "0123456789abcdefghijklmnopqrstuv";
+    @TempDir
+    File tempDir;
+
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
-        this.testFile = new File(getTmpDir(), this.getClass().getName());
+        this.testFile = new File(tempDir, this.getClass().getName());
         PrintWriter pw = new PrintWriter(new FileOutputStream(testFile));
         for (int i = 0; i < 100; i++) {
             pw.print(LINE);
         }
         pw.close();
     }
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
+
+    @Test
     public void testname() throws Exception {
         // Make buffer awkward size so we run into buffers spanning issues.
         RepositionableInputStream ris =

@@ -18,9 +18,11 @@
  */
 package org.archive.io;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.Random;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 /**
@@ -29,11 +31,12 @@ import junit.framework.TestCase;
  * 
  * @author pjack
  */
-public class BufferedSeekInputStreamTest extends TestCase {
+public class BufferedSeekInputStreamTest {
 
     
     private static byte[] TEST_DATA = makeTestData();
-    
+
+    @Test
     public void testPosition() throws Exception {
         Random random = new Random(); 
         ArraySeekInputStream asis = new ArraySeekInputStream(TEST_DATA);

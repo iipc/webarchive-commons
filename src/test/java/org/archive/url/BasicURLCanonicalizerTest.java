@@ -4,11 +4,15 @@ import java.net.URISyntaxException;
 
 import org.apache.commons.httpclient.URIException;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class BasicURLCanonicalizerTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+public class BasicURLCanonicalizerTest {
 	BasicURLCanonicalizer guc = new BasicURLCanonicalizer();
-	
+
+	@Test
 	public void testGetHex() {
 		assertEquals(0,guc.getHex('0'));
 		assertEquals(1,guc.getHex('1'));
@@ -37,7 +41,8 @@ public class BasicURLCanonicalizerTest extends TestCase {
 		assertEquals(-1,guc.getHex('q'));
 		assertEquals(-1,guc.getHex(' '));
 	}
-	
+
+	@Test
 	public void testDecode() {
 		assertEquals("A",guc.decode("A"));
 		assertEquals("AA",guc.decode("AA"));
@@ -131,7 +136,7 @@ public class BasicURLCanonicalizerTest extends TestCase {
 		assertEquals("\u2691%E2%9A!\u2691%E2%9A", guc.decode("%E2%9A%91%E2%9A%21%E2%9A%91%E2%9A"));
 	}
 	
-
+	@Test
 	public void testUnescapeRepeatedly() {
 		assertEquals("%!A!!%",guc.unescapeRepeatedly("%!A%21%21%25"));
 		assertEquals("%",guc.unescapeRepeatedly("%"));
@@ -147,10 +152,11 @@ public class BasicURLCanonicalizerTest extends TestCase {
 		assertEquals("tag=%E4%EE%F8%EA%EE%EB%FC%ED%EE%E5",
 				guc.unescapeRepeatedly("tag=%E4%EE%F8%EA%EE%EB%FC%ED%EE%E5"));
 	}
-	
+
+	@Test
 	public void testAttemptIPFormats() throws URIException {
-		assertEquals(null,guc.attemptIPFormats(null));
-		assertEquals(null,guc.attemptIPFormats("www.foo.com"));
+        assertNull(guc.attemptIPFormats(null));
+        assertNull(guc.attemptIPFormats("www.foo.com"));
 		assertEquals("127.0.0.1",guc.attemptIPFormats("127.0.0.1"));
 		assertEquals("15.0.0.1",guc.attemptIPFormats("017.0.0.1"));
 		assertEquals("168.188.99.26",guc.attemptIPFormats("168.188.99.26"));
@@ -190,11 +196,12 @@ public class BasicURLCanonicalizerTest extends TestCase {
 		 *  For now, we'll enforce some strictness:
 		 */
 
-		assertEquals(null,guc.attemptIPFormats("10.0.258"));
-		assertEquals(null,guc.attemptIPFormats("1.2.3.256"));
+        assertNull(guc.attemptIPFormats("10.0.258"));
+        assertNull(guc.attemptIPFormats("1.2.3.256"));
 		
 	}
-		
+
+	@Test
 	public void testFoo() {
 		String path = "/a/b/c/";
 		String[] paths = path.split("/",-1);
@@ -212,6 +219,7 @@ public class BasicURLCanonicalizerTest extends TestCase {
 	/*
 	 * Tests copied from https://developers.google.com/safe-browsing/developers_guide_v2#Canonicalization
 	 */
+	@Test
 	public void testGoogleExamples() throws URISyntaxException  {
 		checkCanonicalization("http://host/%25%32%35", "http://host/%25");
 		checkCanonicalization("http://host/%25%32%35%25%32%35", "http://host/%25%25");
@@ -249,19 +257,22 @@ public class BasicURLCanonicalizerTest extends TestCase {
 		checkCanonicalization("http://host.com/ab%23cd", "http://host.com/ab%23cd");
 		checkCanonicalization("http://host.com//twoslashes?more//slashes", "http://host.com/twoslashes?more//slashes");
 	}
-	
+
+	@Test
 	public void testStraySpacing() throws URISyntaxException {
 		checkCanonicalization("http://example.org/\u2028", "http://example.org/");
 		checkCanonicalization("\nhttp://examp\rle.org/", "http://example.org/");
 		checkCanonicalization("\nhttp://examp\u2029\t\rle.org/         ", "http://example.org/");
 	}
-	
+
+	@Test
 	public void testSchemeCapitalsPreserved() throws URISyntaxException {
 		checkCanonicalization("Http://example.com", "Http://example.com/");
 		checkCanonicalization("HTTP://example.com", "HTTP://example.com/");
 		checkCanonicalization("ftP://example.com", "ftP://example.com/");
 	}
-	
+
+	@Test
 	public void testUnicodeEscaping() throws URISyntaxException {
 		checkCanonicalization("http://example.org/\u2691", "http://example.org/%E2%9A%91");
 		checkCanonicalization("http://example.org/%e2%9a%91", "http://example.org/%E2%9A%91");

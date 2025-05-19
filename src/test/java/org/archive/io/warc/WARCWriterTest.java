@@ -38,16 +38,18 @@ import org.archive.io.WriterPoolMember;
 import org.archive.uid.RecordIDGenerator;
 import org.archive.uid.UUIDGenerator;
 import org.archive.util.ArchiveUtils;
-import org.archive.util.TmpDirTestCase;
 import org.archive.util.anvl.ANVLRecord;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test Writer and Reader.
  * @author stack
  * @version $Date: 2006-08-29 19:35:48 -0700 (Tue, 29 Aug 2006) $ $Version$
  */
-public class WARCWriterTest
-extends TmpDirTestCase implements WARCConstants {
+public class WARCWriterTest implements WARCConstants {
     
     private static final AtomicInteger SERIAL_NO = new AtomicInteger();
     
@@ -59,8 +61,12 @@ extends TmpDirTestCase implements WARCConstants {
     private static final String SUFFIX = "JUNIT";
     
     private static final String SOME_URL = "http://www.archive.org/test/";
-    
+
+    @TempDir
+    File tempDir;
+
     @SuppressWarnings("unchecked")
+    @Test
     public void testCheckHeaderLineValue() throws Exception {
         WARCWriter writer = new WARCWriter(
                 SERIAL_NO, 
@@ -85,21 +91,23 @@ extends TmpDirTestCase implements WARCConstants {
     }
 
     @SuppressWarnings("unchecked")
+    @Test
     public void testMimetypes() throws IOException {
         WARCWriter writer = new WARCWriter(SERIAL_NO, 
             new WARCWriterPoolSettingsData(
                     "m","testM",1,false,Collections.EMPTY_LIST,Collections.EMPTY_LIST,generator));
         writer.checkHeaderLineMimetypeParameter("text/xml");
         writer.checkHeaderLineMimetypeParameter("text/xml+rdf");
-        assertEquals(writer.checkHeaderLineMimetypeParameter(
-        	"text/plain; charset=SHIFT-JIS"), "text/plain; charset=SHIFT-JIS");
-        assertEquals(writer.checkHeaderLineMimetypeParameter(
-    		"multipart/mixed; \r\n        boundary=\"simple boundary\""),
-            "multipart/mixed; boundary=\"simple boundary\"");
+        assertEquals("text/plain; charset=SHIFT-JIS", writer.checkHeaderLineMimetypeParameter(
+        	"text/plain; charset=SHIFT-JIS"));
+        assertEquals("multipart/mixed; boundary=\"simple boundary\"",
+                writer.checkHeaderLineMimetypeParameter(
+                    "multipart/mixed; \r\n        boundary=\"simple boundary\""));
     }
-    
+
+    @Test
     public void testWriteRecord() throws IOException {
-    	File [] files = {getTmpDir()};
+    	File [] files = {tempDir};
 
     	// Write uncompressed.
         WARCWriter writer =
@@ -245,8 +253,7 @@ extends TmpDirTestCase implements WARCConstants {
     private File writeRecords(String baseName, boolean compress,
         int maxSize, int recordCount)
     throws IOException {
-        cleanUpOldFiles(baseName);
-        File [] files = {getTmpDir()};
+        File [] files = {tempDir};
         WARCWriter w = new WARCWriter(SERIAL_NO, new WARCWriterPoolSettingsData(
                 baseName + '-' + SUFFIX, "${prefix}", maxSize, compress, Arrays.asList(files), null, generator));
             
@@ -255,8 +262,8 @@ extends TmpDirTestCase implements WARCConstants {
             writeRandomHTTPRecord(w, i);
         }
         w.close();
-        assertTrue("Doesn't exist: " +  w.getFile().getAbsolutePath(), 
-            w.getFile().exists());
+        assertTrue(w.getFile().exists(),
+            "Doesn't exist: " +  w.getFile().getAbsolutePath());
         return w.getFile();
     }
 
@@ -288,18 +295,19 @@ extends TmpDirTestCase implements WARCConstants {
             ArchiveRecordHeader h = (ArchiveRecordHeader)headers.get(i);
             ArchiveRecord r = reader.get(h.getOffset());
             String mimeType = r.getHeader().getMimetype();
-            assertTrue("Record is bogus",
-                mimeType != null && mimeType.length() > 0);
+            assertTrue(mimeType != null && mimeType.length() > 0,
+                "Record is bogus");
             reader.close();
         }
         
-        assertTrue("Metadatas not equal", headers.size() == recordCount);
+        assertTrue(headers.size() == recordCount, "Metadatas not equal");
         for (Iterator<ArchiveRecordHeader> i = headers.iterator(); i.hasNext();) {
             ArchiveRecordHeader r = (ArchiveRecordHeader)i.next();
-            assertTrue("Record is empty", r.getLength() > 0);
+            assertTrue(r.getLength() > 0, "Record is empty");
         }
     }
 
+    @Test
     public void testWriteRecords() throws IOException {
         final int recordCount = 2;
         File f = writeRecords("writeRecords", false, DEFAULT_MAX_WARC_FILE_SIZE,
@@ -307,6 +315,7 @@ extends TmpDirTestCase implements WARCConstants {
      	validate(f, recordCount  + 1); // Header record.
     }
 
+    @Test
     public void testRandomAccess() throws IOException {
         final int recordCount = 3;
         File f = writeRecords("randomAccess", true, DEFAULT_MAX_WARC_FILE_SIZE,
@@ -348,7 +357,8 @@ extends TmpDirTestCase implements WARCConstants {
         reader.close();
         assertEquals(totalRecords - 1, count);
     }
-    
+
+    @Test
     public void testWriteRecordCompressed() throws IOException {
         final int recordCount = 2;
         File arcFile = writeRecords("writeRecordCompressed", true,
@@ -358,7 +368,7 @@ extends TmpDirTestCase implements WARCConstants {
     
     protected WARCWriter createWARCWriter(String name,
             boolean compress) {
-        File [] files = {getTmpDir()};
+        File [] files = {tempDir};
         return new WARCWriter(SERIAL_NO, 
                               new WARCWriterPoolSettingsData(
                                       name, 
@@ -401,8 +411,8 @@ extends TmpDirTestCase implements WARCConstants {
             ArchiveRecord ar = i.next();
             ar.close();
             if (count != 0) {
-                assertTrue("Unexpected URL " + ar.getHeader().getUrl(),
-                    ar.getHeader().getUrl().equals(SOME_URL));
+                assertTrue(ar.getHeader().getUrl().equals(SOME_URL),
+                    "Unexpected URL " + ar.getHeader().getUrl());
             }
             count++;
         }
@@ -418,15 +428,17 @@ extends TmpDirTestCase implements WARCConstants {
             content.length(), getBaos(content));
         return writer;
     }
-    
+
+    @Test
     public void testSpaceInURL() throws IOException {
         long bytesWritten = holeyUrl("testSpaceInURL", false, " ");
-        assertEquals("Unexpected successful writing occurred",0,bytesWritten);
+        assertEquals(0,bytesWritten,"Unexpected successful writing occurred");
     }
 
+    @Test
     public void testTabInURL() throws IOException {
         long bytesWritten = holeyUrl("testTabInURL", false, "\t");
-        assertEquals("Unexpected successful writing occurred",0,bytesWritten);
+        assertEquals(0,bytesWritten,"Unexpected successful writing occurred");
     }
     
     protected long holeyUrl(String name, boolean compress, String urlInsert)
@@ -483,7 +495,8 @@ extends TmpDirTestCase implements WARCConstants {
 //        writer.close();
 //        logger.info("Finished speed write test.");
 //    }
-    
+
+    @Test
     public void testArcRecordOffsetReads() throws Exception {
     	// Get an ARC with one record.
 		WriterPoolMember w =

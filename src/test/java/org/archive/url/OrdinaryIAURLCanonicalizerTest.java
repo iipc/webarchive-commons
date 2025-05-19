@@ -2,11 +2,14 @@ package org.archive.url;
 
 import java.net.URISyntaxException;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class OrdinaryIAURLCanonicalizerTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class OrdinaryIAURLCanonicalizerTest {
 	private OrdinaryIAURLCanonicalizer canon = new OrdinaryIAURLCanonicalizer();
-	
+
+	@Test
 	public void testMisc() throws URISyntaxException {
 		checkCanonicalization("http://...host..com..", "http://host.com/");
 		checkCanonicalization("http://example.org:80/", "http://example.org/");
@@ -17,6 +20,7 @@ public class OrdinaryIAURLCanonicalizerTest extends TestCase {
 		checkCanonicalization("http://example.org/foo/?", "http://example.org/foo/");
 	}
 
+	@Test
 	public void testSchemeCapitals() throws URISyntaxException {
 		checkCanonicalization("Http://example.com", "http://example.com/");
 		checkCanonicalization("HTTP://example.com", "http://example.com/");

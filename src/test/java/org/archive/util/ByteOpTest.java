@@ -5,14 +5,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import org.archive.util.ByteOp;
-
 import com.google.common.io.LittleEndianDataOutputStream;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class ByteOpTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+public class ByteOpTest {
+
+	@Test
 	public void testReadShort() throws IOException {
 		byte a[] = new byte[]{0,1,2,3};
 		ByteArrayInputStream bais = new ByteArrayInputStream(a);
@@ -31,6 +32,7 @@ public class ByteOpTest extends TestCase {
 		}
 	}
 
+	@Test
 	public void testAppend() {
 		byte a[] = new byte[]{1};
 		byte b[] = new byte[]{2};
@@ -48,8 +50,4 @@ public class ByteOpTest extends TestCase {
 		assertEquals(5,n2[4]);
 		
 	}
-
-	public void testReadInt() {
-	}
-
 }

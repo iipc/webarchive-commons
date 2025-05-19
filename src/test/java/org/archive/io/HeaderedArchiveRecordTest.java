@@ -26,13 +26,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.httpclient.Header;
 import org.archive.io.arc.ARCRecord;
 import org.archive.io.warc.WARCRecord;
+import org.junit.jupiter.api.Test;
 
-public class HeaderedArchiveRecordTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class HeaderedArchiveRecordTest {
     private static final String HTTPHEADER = "HTTP/1.1 200 OK\r\n"
             + "Last-Modified: Sun, 28 Aug 2005 14:10:55 GMT\r\n"
             + "Content-Length: 108\r\n" + "Connection: close\r\n"
@@ -41,6 +43,7 @@ public class HeaderedArchiveRecordTest extends TestCase {
             + "    <title>Neue Seite 1</title>\r\n" + "  </head>\r\n"
             + "  <body bgcolor=\"#000066\">\r\n" + "  </body>\r\n" + "</html>";
 
+    @Test
     public void testParseHttpHeadersInWARC() throws IOException {
         final String url = "http://foo.maths.uq.edu.au/index.html";
         // final String warcHeader = "WARC/0.10 000000000486 response " +
@@ -76,8 +79,8 @@ public class HeaderedArchiveRecordTest extends TestCase {
         String bodyRead = new String(b);
         assertEquals(BODY, bodyRead);
         assertHeaderCorrectlyParsed(har.getContentHeaders());
-        assertEquals("failed to retrieve Url from metadata", har.getHeader()
-                .getUrl(), url);
+        assertEquals(har.getHeader().getUrl(), url,
+                "failed to retrieve Url from metadata");
     }
 
     public void testParseHttpHeadersInARC() throws IOException {
@@ -165,6 +168,7 @@ public class HeaderedArchiveRecordTest extends TestCase {
         assertHeaderCorrectlyParsed(har.getContentHeaders());
     }
 
+    @Test
     public void testEasierParseHttpHeadersInARC() throws IOException {
         final String url = "http://www.archive.org/index.htm";
         final String arcHeader = url
@@ -181,14 +185,13 @@ public class HeaderedArchiveRecordTest extends TestCase {
         String bodyRead = new String(b);
         assertEquals(BODY, bodyRead);
         assertHeaderCorrectlyParsed(har.getContentHeaders());
-        assertEquals("failed to retrieve Url from metadata", har.getHeader()
-                .getUrl(), url);
+        assertEquals(har.getHeader().getUrl(), url, "failed to retrieve Url from metadata");
     }
 
     private void assertHeaderCorrectlyParsed(Header[] headers) {
         final List<String> orgHeaders = Arrays.asList(HTTPHEADER.split("\r\n"));
-        assertEquals("not all HTTP header entries have been retrieved",
-                orgHeaders.size(), headers.length + 1);
+        assertEquals(orgHeaders.size(), headers.length + 1,
+                "not all HTTP header entries have been retrieved");
 
         for (Header header : headers) {
             assertTrue(orgHeaders.contains(header.getName() + ": "
@@ -196,6 +199,7 @@ public class HeaderedArchiveRecordTest extends TestCase {
         }
     }
 
+    @Test
     public void testNoheaderWARC() throws IOException {
         String b = "hello world";
         String c = "WARC/0.12\r\nContent-Type: text/plain\r\n"

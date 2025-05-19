@@ -2,10 +2,13 @@ package org.archive.url;
 
 import java.net.URISyntaxException;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class WaybackURLKeyMakerTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+public class WaybackURLKeyMakerTest {
+
+	@Test
 	public void testMakeKey() throws URISyntaxException {
 		WaybackURLKeyMaker km = new WaybackURLKeyMaker();
 		assertEquals("-", km.makeKey(null));

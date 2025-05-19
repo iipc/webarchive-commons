@@ -3,6 +3,7 @@ package org.archive.resource.arc;
 
 import static org.archive.resource.ResourceConstants.PAYLOAD_LENGTH;
 import static org.archive.resource.ResourceConstants.PAYLOAD_SLOP_BYTES;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 
@@ -17,10 +18,11 @@ import org.archive.util.StreamCopy;
 
 import org.json.JSONObject;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class ARCResourceTest extends TestCase {
+public class ARCResourceTest {
 
+	@Test
 	public void testARCResource() throws ResourceParseException, IOException {
 		String testFileName = "../../format/arc/IAH-20080430204825-00000-blackbook-truncated.arc";
 		ResourceProducer producer = ProducerUtils.getProducer(getClass().getResource(testFileName).getPath());

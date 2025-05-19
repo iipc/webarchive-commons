@@ -26,10 +26,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpParser;
-import org.apache.commons.httpclient.StatusLine;
-import org.apache.commons.httpclient.util.EncodingUtil;
+import org.archive.format.http.HttpHeader;
 import org.archive.io.arc.ARCConstants;
 import org.archive.util.LaxHttpParser;
 
@@ -59,7 +56,7 @@ public class HeaderedArchiveRecord extends ArchiveRecord {
      * 
      * Only available after the reading of headers.
      */
-    private Header [] contentHeaders = null;
+    private HttpHeader[] contentHeaders = null;
     
 
     public HeaderedArchiveRecord(final ArchiveRecord ar) throws IOException {
@@ -149,13 +146,14 @@ public class HeaderedArchiveRecord extends ArchiveRecord {
             throw new IOException("Failed to read raw lie where one " +
                 " was expected: " + new String(statusBytes));
         }
-        String statusLine = EncodingUtil.getString(statusBytes, 0,
+        String statusLine = new String(statusBytes, 0,
             statusBytes.length - eolCharCount, ARCConstants.DEFAULT_ENCODING);
         if (statusLine == null) {
             throw new NullPointerException("Expected status line is null");
         }
+        statusLine = statusLine.trim();
         // TODO: Tighten up this test.
-        boolean isHttpResponse = StatusLine.startsWithHTTP(statusLine);
+        boolean isHttpResponse = statusLine.startsWith("HTTP");
         boolean isHttpRequest = false;
         if (!isHttpResponse) {
             isHttpRequest = statusLine.toUpperCase().startsWith("GET") ||
@@ -165,9 +163,13 @@ public class HeaderedArchiveRecord extends ArchiveRecord {
             throw new UnexpectedStartLineIOException("Failed parse of " +
                 "status line: " + statusLine);
         }
-        this.statusCode = isHttpResponse?
-            (new StatusLine(statusLine)).getStatusCode(): -1;
-        
+
+        if (isHttpResponse) {
+            this.statusCode = parseStatusCode(statusLine);
+        } else {
+            this.statusCode = -1;
+        }
+
         // Save off all bytes read.  Keep them as bytes rather than
         // convert to strings so we don't have to worry about encodings
         // though this should never be a problem doing http headers since
@@ -210,7 +212,19 @@ public class HeaderedArchiveRecord extends ArchiveRecord {
         bais.reset();
         return bais;
     }
-    
+
+    public static int parseStatusCode(String statusLine) {
+        int i = statusLine.indexOf(' ');
+        if (i < 0) return -1;
+        int j = statusLine.indexOf(' ', i + 1);
+        if (j < 0) j = statusLine.length();
+        try {
+            return Integer.parseInt(statusLine.substring(i + 1, j));
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
     public static class UnexpectedStartLineIOException
     extends RecoverableIOException {
         private static final long serialVersionUID = 1L;
@@ -252,7 +266,7 @@ public class HeaderedArchiveRecord extends ArchiveRecord {
         return this.contentHeadersLength;
     }
 
-    public Header[] getContentHeaders() {
+    public HttpHeader[] getContentHeaders() {
         return contentHeaders;
     }
     

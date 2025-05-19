@@ -6,7 +6,6 @@ import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.logging.Logger;
 
-import org.apache.commons.httpclient.URIException;
 import org.archive.util.iterator.AbstractPeekableIterator;
 
 public class SURT {

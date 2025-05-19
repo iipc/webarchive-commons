@@ -26,14 +26,13 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.apache.commons.httpclient.URIException;
 import org.archive.util.SURT;
 import org.archive.util.TextUtils;
 
 /**
  * Usable URI.
  * 
- * This class wraps {@link org.apache.commons.httpclient.URI} adding caching
+ * This class wraps {@link org.archive.url.URI} adding caching
  * and methods. It cannot be instantiated directly.  Go via UURIFactory.
  * 
  *  <p>We used to use {@link java.net.URI} for parsing URIs but ran across
@@ -50,7 +49,7 @@ import org.archive.util.TextUtils;
  * @author gojomo
  * @author stack
  *
- * @see org.apache.commons.httpclient.URI
+ * @see org.archive.url.URI
  */
 public class UsableURI extends LaxURI
 implements CharSequence, Serializable {
@@ -121,7 +120,6 @@ implements CharSequence, Serializable {
      * @param uri String representation of an absolute URI.
      * @param escaped If escaped.
      * @param charset Charset to use.
-     * @throws org.apache.commons.httpclient.URIException
      */
     protected UsableURI(String uri, boolean escaped, String charset)
     throws URIException {
@@ -132,7 +130,6 @@ implements CharSequence, Serializable {
     /**
      * @param relative String representation of URI.
      * @param base Parent UURI to use derelativizing.
-     * @throws org.apache.commons.httpclient.URIException
      */
     protected UsableURI(UsableURI base, UsableURI relative) throws URIException {
         super(base, relative);
@@ -275,7 +272,7 @@ implements CharSequence, Serializable {
     /**
      * In the case of a puny encoded IDN, this method returns the decoded Unicode version.
      * <p>
-     * Most of this implementation is copied from {@link org.apache.commons.httpclient.URI#setURI()}.
+     * Most of this implementation is copied from {@link org.archive.url.URI#setURI()}.
      * 
      * @return decoded IDN version of URI
      */

@@ -31,7 +31,7 @@ public class ZipNumBlockLoader {
 	protected int signDurationSecs = DEFAULT_SIG_DURATION_SECS;
 	
 	protected boolean useNio = false;
-	protected String httpLib = HttpLibs.APACHE_31.name();
+	protected String httpLib = HttpLibs.APACHE_43.name();
 	
 	protected boolean bufferFully = true;
 	protected boolean noKeepAlive = true;

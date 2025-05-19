@@ -35,13 +35,11 @@ package org.archive.util;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.util.EncodingUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.archive.format.http.HttpHeader;
 
 /**
  * A Modified version of HttpParser which doesn't throw exceptions on bad header lines
@@ -57,7 +55,7 @@ import org.apache.commons.logging.LogFactory;
 public class LaxHttpParser {
 
     /** Log object for this class. */
-    private static final Log LOG = LogFactory.getLog(LaxHttpParser.class);
+    private static final Logger LOG = Logger.getLogger(LaxHttpParser.class.getName());
     
     /**
      * Constructor for LaxHttpParser.
@@ -77,7 +75,7 @@ public class LaxHttpParser {
      * @return a byte array from the stream
      */
     public static byte[] readRawLine(InputStream inputStream) throws IOException {
-        LOG.trace("enter LaxHttpParser.readRawLine()");
+        LOG.finest("enter LaxHttpParser.readRawLine()");
 
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
         int ch;
@@ -108,7 +106,7 @@ public class LaxHttpParser {
      * @since 3.0
      */
     public static String readLine(InputStream inputStream, String charset) throws IOException {
-        LOG.trace("enter LaxHttpParser.readLine(InputStream, String)");
+        LOG.finest("enter LaxHttpParser.readLine(InputStream, String)");
         byte[] rawdata = readRawLine(inputStream);
         if (rawdata == null) {
             return null;
@@ -126,7 +124,11 @@ public class LaxHttpParser {
                 }
             }
         }
-        return EncodingUtil.getString(rawdata, 0, len - offset, charset);
+        try {
+            return new String(rawdata, 0, len - offset, charset);
+        } catch (UnsupportedEncodingException e) {
+            return new String(rawdata, 0, len - offset);
+        }
     }
 
     /**
@@ -144,7 +146,7 @@ public class LaxHttpParser {
      */
 
     public static String readLine(InputStream inputStream) throws IOException {
-        LOG.trace("enter LaxHttpParser.readLine(InputStream)");
+        LOG.finest("enter LaxHttpParser.readLine(InputStream)");
         return readLine(inputStream, "US-ASCII");
     }
     
@@ -158,14 +160,13 @@ public class LaxHttpParser {
      * @return an array of headers in the order in which they were parsed
      * 
      * @throws IOException if an IO error occurs while reading from the stream
-     * @throws HttpException if there is an error parsing a header value
-     * 
+     *
      * @since 3.0
      */
-    public static Header[] parseHeaders(InputStream is, String charset) throws IOException, HttpException {
-        LOG.trace("enter HeaderParser.parseHeaders(InputStream, String)");
+    public static HttpHeader[] parseHeaders(InputStream is, String charset) throws IOException {
+        LOG.finest("enter HeaderParser.parseHeaders(InputStream, String)");
 
-        ArrayList<Header> headers = new ArrayList<Header>();
+        ArrayList<HttpHeader> headers = new ArrayList<>();
         String name = null;
         StringBuffer value = null;
         for (; ;) {
@@ -188,7 +189,7 @@ public class LaxHttpParser {
             } else {
                 // make sure we save the previous name,value pair if present
                 if (name != null) {
-                    headers.add(new Header(name, value.toString()));
+                    headers.add(new HttpHeader(name, value.toString()));
                 }
 
                 // Otherwise we should have normal HTTP header line
@@ -216,10 +217,10 @@ public class LaxHttpParser {
 
         // make sure we save the last name,value pair if present
         if (name != null) {
-            headers.add(new Header(name, value.toString()));
+            headers.add(new HttpHeader(name, value.toString()));
         }
         
-        return (Header[]) headers.toArray(new Header[headers.size()]);    
+        return headers.toArray(new HttpHeader[0]);
     }
 
     /**
@@ -231,12 +232,11 @@ public class LaxHttpParser {
      * @return an array of headers in the order in which they were parsed
      * 
      * @throws IOException if an IO error occurs while reading from the stream
-     * @throws HttpException if there is an error parsing a header value
-     * 
+     *
      * @deprecated use #parseHeaders(InputStream, String)
      */
-    public static Header[] parseHeaders(InputStream is) throws IOException, HttpException {
-        LOG.trace("enter HeaderParser.parseHeaders(InputStream, String)");
+    public static HttpHeader[] parseHeaders(InputStream is) throws IOException {
+        LOG.finest("enter HeaderParser.parseHeaders(InputStream, String)");
         return parseHeaders(is, "US-ASCII");
     }
 }

@@ -4,8 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 
-import org.apache.commons.httpclient.URIException;
-
 import com.google.common.net.InetAddresses;
 import org.junit.jupiter.api.Test;
 

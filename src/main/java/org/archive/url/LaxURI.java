@@ -18,12 +18,10 @@
  */
 package org.archive.url;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.BitSet;
-
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.util.EncodingUtil;
 
 /**
  * URI subclass which allows partial/inconsistent encoding, matching
@@ -121,13 +119,12 @@ public class LaxURI extends URI {
                     "Component array of chars may not be null");
         }
         byte[] rawdata = null;
-        //     try {
-        rawdata = LaxURLCodec.decodeUrlLoose(EncodingUtil
-                .getAsciiBytes(component));
-        //     } catch (DecoderException e) {
-        //         throw new URIException(e.getMessage());
-        //     }
-        return EncodingUtil.getString(rawdata, charset);
+        rawdata = LaxURLCodec.decodeUrlLoose(component.getBytes(StandardCharsets.US_ASCII));
+        try {
+            return new String(rawdata, charset);
+        } catch (UnsupportedEncodingException e) {
+            return new String(rawdata);
+        }
     }
     
     // overidden to lax() the acceptable-char BitSet passed in
@@ -183,7 +180,7 @@ public class LaxURI extends URI {
      * two instances to one where possible, slimming 
      * instances.  
      * 
-     * @see org.apache.commons.httpclient.URI#parseAuthority(java.lang.String, boolean)
+     * @see URI#parseAuthority(java.lang.String, boolean)
      */
     protected void parseAuthority(String original, boolean escaped)
             throws URIException {
@@ -204,7 +201,7 @@ public class LaxURI extends URI {
      * long-lived instance from a static field, saving 12-14 bytes
      * per instance. 
      * 
-     * @see org.apache.commons.httpclient.URI#setURI()
+     * @see URI#setURI()
      */
     protected void setURI() {
         if (_scheme != null) {

@@ -19,7 +19,6 @@
  */
 package org.archive.url;
 
-import org.apache.commons.httpclient.URIException;
 import org.archive.util.SURT;
 
 /**

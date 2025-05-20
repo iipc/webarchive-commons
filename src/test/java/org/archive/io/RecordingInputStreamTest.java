@@ -41,7 +41,6 @@ public class RecordingInputStreamTest {
     @TempDir
     File tempDir;
 
-
     /**
      * Test readFullyOrUntil soft (no exception) and hard (exception) 
      * length cutoffs, timeout, and rate-throttling. 
@@ -127,5 +126,17 @@ public class RecordingInputStreamTest {
             }
         }.start();
         
+    }
+
+    @Test
+    public void testAsOutputStream() throws IOException {
+        RecordingInputStream ris = new RecordingInputStream(16384, (new File(
+                tempDir, "testAsOutputStream").getAbsolutePath()));
+        ris.open(null);
+        ris.asOutputStream().write("hello".getBytes());
+        ris.close();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ris.getReplayInputStream().readFullyTo(baos);
+        assertEquals("hello", baos.toString());
     }
 }

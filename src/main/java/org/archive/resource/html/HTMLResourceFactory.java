@@ -4,9 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.logging.Logger;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.archive.format.http.HttpHeaders;
 import org.archive.format.json.JSONUtils;
 import org.archive.format.text.charset.CharsetDetector;
@@ -25,7 +24,7 @@ import org.json.JSONObject;
 
 public class HTMLResourceFactory implements ResourceFactory {
 
-	public static final Log LOG = LogFactory.getLog(HTMLResourceFactory.class);
+	private static final Logger LOG = Logger.getLogger(HTMLResourceFactory.class.getName());
 
 	protected static final int CHARSET_GUESS_CHUNK_SIZE = 8192;
 	protected static final String HTTP_HEADER_PATH = "Envelope.Payload-Metadata.HTTP-Response-Metadata.Headers";
@@ -58,7 +57,7 @@ public class HTMLResourceFactory implements ResourceFactory {
 			try {
 				charset = charSetDetector.getCharset(chunk, chunkSize, httpHeaders);
 			} catch (Exception e) {
-				LOG.error("Failed to guess charset: " + e.getMessage());
+				LOG.severe("Failed to guess charset: " + e.getMessage());
 			}
 		}
 

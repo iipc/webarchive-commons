@@ -22,14 +22,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Date;
-import java.util.Iterator;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.zip.GZIPOutputStream;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HeaderGroup;
-import org.apache.commons.httpclient.util.DateParseException;
-import org.apache.commons.httpclient.util.DateUtil;
+import org.archive.format.http.HttpHeader;
 import org.archive.io.ArchiveRecord;
 import org.archive.util.ArchiveUtils;
 import org.archive.util.SURT;
@@ -95,12 +93,15 @@ public class ARC2WCDX {
                 ARCRecord record = (ARCRecord) iter.next();
                 record.close();
                 ARCRecordMetaData h = (ARCRecordMetaData) record.getHeader();
-                Header[] httpHeaders = record.getHttpHeaders();
+                HttpHeader[] httpHeaders = record.getHttpHeaders();
                 if(httpHeaders==null) {
-                    httpHeaders = new Header[0];
+                    httpHeaders = new HttpHeader[0];
                 }
-                HeaderGroup hg = new HeaderGroup();
-                hg.setHeaders(httpHeaders);
+                Map<String, HttpHeader> headerMap = new HashMap<>();
+                for (HttpHeader header : httpHeaders) {
+                    headerMap.putIfAbsent(header.getName().toLowerCase(Locale.ROOT), header);
+                }
+
                 StringBuilder builder = new StringBuilder();
 
                 // SURT-form URI
@@ -108,7 +109,7 @@ public class ARC2WCDX {
                 // record timestamp ('b')
                 appendField(builder,h.getDate());
                 // http header date
-                appendTimeField(builder,hg.getFirstHeader("Date"));
+                appendTimeField(builder, headerMap.get("date"));
                 // response code ('s')
                 appendField(builder,h.getStatusCode());
                 // media type ('m')
@@ -131,17 +132,17 @@ public class ARC2WCDX {
                 // uncompressed (declared in ARC headerline) record length
                 appendField(builder,h.getLength());
                 // http header content-length
-                appendField(builder,hg.getFirstHeader("Content-Length"));
+                appendField(builder, headerMap.get("content-length"));
 
                 // http header mod-date
-                appendTimeField(builder,hg.getFirstHeader("Last-Modified"));
+                appendTimeField(builder, headerMap.get("last-modified"));
                 // http header expires
-                appendTimeField(builder,hg.getFirstHeader("Expires"));
+                appendTimeField(builder, headerMap.get("expires"));
                 
                 // http header etag
-                appendField(builder,hg.getFirstHeader("ETag"));
+                appendField(builder, headerMap.get("etag"));
                 // http header redirect ('Location' header?)
-                appendField(builder,hg.getFirstHeader("Location"));
+                appendField(builder, headerMap.get("location"));
                 // ip ('e')
                 appendField(builder,h.getIp());
                 // original URI
@@ -186,8 +187,8 @@ public class ARC2WCDX {
             // prepend with delimiter
             builder.append(' ');
         }
-        if(obj instanceof Header) {
-            obj = ((Header)obj).getValue().trim();
+        if(obj instanceof HttpHeader) {
+            obj = ((HttpHeader)obj).getValue().trim();
         }
 
         builder.append((obj==null||obj.toString().length()==0)?"-":obj);
@@ -202,22 +203,39 @@ public class ARC2WCDX {
             builder.append("-");
             return;
         }
-        if(obj instanceof Header) {
-            String s = ((Header)obj).getValue().trim();
+        if(obj instanceof HttpHeader) {
+            String s = ((HttpHeader)obj).getValue().trim();
             try {
-                Date date = DateUtil.parseDate(s);
+                Date date = parseDate(s);
                 String d = ArchiveUtils.get14DigitDate(date);
                 if(d.startsWith("209")) {
                     d = "199"+d.substring(3);
                 }
                 obj = d;
-            } catch (DateParseException e) {
+            } catch (ParseException e) {
                 builder.append('e');
                 return;
             }
 
         }
         builder.append(obj);
+    }
+
+    private static Date parseDate(String s) throws ParseException {
+        SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
+        format.setTimeZone(TimeZone.getTimeZone("GMT"));
+        format.set2DigitYearStart(new Date(946684800)); // year 2000
+        try {
+            return format.parse(s);
+        } catch (ParseException e) {
+            try {
+                format.applyPattern("EEEE, dd-MMM-yy HH:mm:ss zzz");
+                return format.parse(s);
+            } catch (ParseException e1) {
+                format.applyPattern("EEE MMM d HH:mm:ss yyyy");
+                return format.parse(s);
+            }
+        }
     }
 }
 

@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.httpclient.Header;
+import org.archive.format.http.HttpHeader;
 import org.archive.io.arc.ARCRecord;
 import org.archive.io.warc.WARCRecord;
 import org.junit.jupiter.api.Test;
@@ -188,12 +188,12 @@ public class HeaderedArchiveRecordTest {
         assertEquals(har.getHeader().getUrl(), url, "failed to retrieve Url from metadata");
     }
 
-    private void assertHeaderCorrectlyParsed(Header[] headers) {
+    private void assertHeaderCorrectlyParsed(HttpHeader[] headers) {
         final List<String> orgHeaders = Arrays.asList(HTTPHEADER.split("\r\n"));
         assertEquals(orgHeaders.size(), headers.length + 1,
                 "not all HTTP header entries have been retrieved");
 
-        for (Header header : headers) {
+        for (HttpHeader header : headers) {
             assertTrue(orgHeaders.contains(header.getName() + ": "
                     + header.getValue()));
         }

@@ -29,7 +29,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.regex.Matcher;
 
-import org.apache.commons.httpclient.URIException;
+import org.archive.url.URIException;
 import org.archive.url.UsableURIFactory;
 
 /**

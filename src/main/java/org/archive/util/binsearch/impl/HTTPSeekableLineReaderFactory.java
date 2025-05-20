@@ -3,7 +3,6 @@ package org.archive.util.binsearch.impl;
 import java.io.IOException;
 
 import org.archive.util.binsearch.SeekableLineReaderFactory;
-import org.archive.util.binsearch.impl.http.ApacheHttp31SLRFactory;
 import org.archive.util.binsearch.impl.http.ApacheHttp43SLRFactory;
 import org.archive.util.binsearch.impl.http.HTTPURLConnSLRFactory;
 
@@ -20,15 +19,13 @@ public abstract class HTTPSeekableLineReaderFactory implements SeekableLineReade
 	
 	public enum HttpLibs
 	{
-		@Deprecated
-		APACHE_31,
 		APACHE_43,
 		URLCONN,
 	}
 		
 	public static HTTPSeekableLineReaderFactory getHttpFactory()
 	{
-		return getHttpFactory(HttpLibs.APACHE_31);
+		return getHttpFactory(HttpLibs.APACHE_43);
 	}
 	
 	public static HTTPSeekableLineReaderFactory getHttpFactory(HttpLibs type)
@@ -38,7 +35,7 @@ public abstract class HTTPSeekableLineReaderFactory implements SeekableLineReade
 	
 	public static HTTPSeekableLineReaderFactory getHttpFactory(String defaultURL)
 	{
-		return getHttpFactory(HttpLibs.APACHE_31, defaultURL);
+		return getHttpFactory(HttpLibs.APACHE_43, defaultURL);
 	}
 	
 	public static HTTPSeekableLineReaderFactory getHttpFactory(HttpLibs type, String defaultURL)
@@ -46,10 +43,6 @@ public abstract class HTTPSeekableLineReaderFactory implements SeekableLineReade
 		HTTPSeekableLineReaderFactory factory = null;
 		
 		switch (type) {
-		case APACHE_31:
-			factory = new ApacheHttp31SLRFactory();
-			break;
-			
 		case URLCONN:
 			factory = new HTTPURLConnSLRFactory();
 			break;
@@ -60,7 +53,7 @@ public abstract class HTTPSeekableLineReaderFactory implements SeekableLineReade
 		}
 		
 		if (factory == null) {
-			factory = new ApacheHttp31SLRFactory();
+			factory = new ApacheHttp43SLRFactory();
 		}
 		
 		factory.defaultURL = defaultURL;

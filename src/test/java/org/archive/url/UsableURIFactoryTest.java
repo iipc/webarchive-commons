@@ -21,7 +21,6 @@ package org.archive.url;
 
 import java.util.TreeMap;
 
-import org.apache.commons.httpclient.URIException;
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.jupiter.api.Test;
 

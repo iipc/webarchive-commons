@@ -1,6 +1,12 @@
 Unreleased
 ----------
 
+#### Removals
+
+* Removed `org.archive.io.ArchiveFileConstants` (use `org.archive.format.ArchiveFileConstants` instead)
+* `ArchiveReader`, `ArchiveReaderFactory`, `WARCWriter`, `WriterPool` and `WriterPoolMember` no longer implement
+ `ArchiveFileConstants`. Use static imports instead.
+
 #### Dependency upgrades
 
 - **junit**: 4.13.2 → 5.12.2

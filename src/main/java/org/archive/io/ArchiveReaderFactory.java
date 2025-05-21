@@ -33,6 +33,7 @@ import org.archive.net.rsync.RsyncURLConnection;
 import org.archive.url.UsableURI;
 import org.archive.util.FileUtils;
 
+import static org.archive.format.ArchiveFileConstants.*;
 
 /**
  * Factory that returns an Archive file Reader.
@@ -40,7 +41,7 @@ import org.archive.util.FileUtils;
  * @author stack
  * @version $Date$ $Revision$
  */
-public class ArchiveReaderFactory implements ArchiveFileConstants {
+public class ArchiveReaderFactory {
   // Static block to enable S3 URLs
   static {
     if (System.getProperty("java.protocol.handler.pkgs") != null) {

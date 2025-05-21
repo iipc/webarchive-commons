@@ -30,6 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.archive.format.ArchiveFileConstants;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -215,7 +216,7 @@ public abstract class WriterPool {
         // gets attention.
         File file = f.getFile();
         file.renameTo(new File(file.getAbsoluteFile() +
-                WriterPoolMember.INVALID_SUFFIX));
+                ArchiveFileConstants.INVALID_SUFFIX));
     }
 
 	/**

@@ -38,6 +38,7 @@ import org.archive.util.ArchiveUtils;
 import org.archive.util.FileUtils;
 import org.archive.util.PropertyUtils;
 
+import static org.archive.format.ArchiveFileConstants.*;
 
 
 /**
@@ -48,7 +49,7 @@ import org.archive.util.PropertyUtils;
  * @author stack
  * @version $Date$ $Revision$
  */
-public abstract class WriterPoolMember implements ArchiveFileConstants {
+public abstract class WriterPoolMember {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     
     public static final String UTF8 = "UTF-8";

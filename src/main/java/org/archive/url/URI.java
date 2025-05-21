@@ -68,7 +68,7 @@ import java.util.Locale;
  * URI Syntactic Components
  * <p><blockquote><pre>
  * - In general, written as follows:
- *   Absolute URI = &lt;scheme&gt:&lt;scheme-specific-part&gt;
+ *   Absolute URI = &lt;scheme&gt;:&lt;scheme-specific-part&gt;
  *   Generic URI = &lt;scheme&gt;://&lt;authority&gt;&lt;path&gt;?&lt;query&gt;
  *
  * - Syntax
@@ -103,7 +103,7 @@ import java.util.Locale;
  *  - char[] getRawXxx() // method
  *  - String getEscapedXxx() // method
  *  - String toString() // method
- * <p>
+ *
  * For unescaped URI forms
  *  - URI(String) // constructor
  *  - String getXXX() // method
@@ -1873,8 +1873,8 @@ class URI implements Cloneable, Comparable, Serializable {
      *               $3 = //jakarta.apache.org
      *  authority =  $4 = jakarta.apache.org
      *  path      =  $5 = /ietf/uri/
-     *               $6 = <undefined>
-     *  query     =  $7 = <undefined>
+     *               $6 = [undefined]
+     *  query     =  $7 = [undefined]
      *               $8 = #Related
      *  fragment  =  $9 = Related
      * </pre></blockquote><p>
@@ -2502,7 +2502,7 @@ class URI implements Cloneable, Comparable, Serializable {
      * <code>DefaultCharsetChanged</code> exception.
      *
      * So API programmer must follow the following way:
-     * <code><pre>
+     * <pre>
      *  import org.apache.util.URI$DefaultCharsetChanged;
      *      .
      *      .
@@ -2517,7 +2517,7 @@ class URI implements Cloneable, Comparable, Serializable {
      *      // CASE 2: let user know the default document charset changed
      *      }
      *  }
-     *  </pre></code>
+     *  </pre>
      *
      * The API programmer is responsible to set the correct charset.
      * And each application should remember its own charset to support.
@@ -2582,7 +2582,7 @@ class URI implements Cloneable, Comparable, Serializable {
      * <code>DefaultCharsetChanged</code> exception.
      *
      * So API programmer must follow the following way:
-     * <code><pre>
+     * <pre>
      *  import org.apache.util.URI$DefaultCharsetChanged;
      *      .
      *      .
@@ -2597,7 +2597,7 @@ class URI implements Cloneable, Comparable, Serializable {
      *      // CASE 2: let user know the default protocol charset changed
      *      }
      *  }
-     *  </pre></code>
+     *  </pre>
      *
      * The API programmer is responsible to set the correct charset.
      * And each application should remember its own charset to support.

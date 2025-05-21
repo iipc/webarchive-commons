@@ -35,7 +35,7 @@ import java.io.IOException;
 /**
  * The URI parsing and escape encoding exception.
  *
- * @author <a href="mailto:jericho at apache.org">Sung-Gu</a>
+ * @author Sung-Gu
  * @author <a href="mailto:oleg@ural.ru">Oleg Kalnichevski</a>
  * @version $Revision: 480424 $ $Date: 2002/03/14 15:14:01 
  */

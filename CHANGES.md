@@ -1,13 +1,35 @@
 Unreleased
 ----------
 
-#### Removals
+### Removals
 
-* Removed `org.archive.io.ArchiveFileConstants` (use `org.archive.format.ArchiveFileConstants` instead)
-* `ArchiveReader`, `ArchiveReaderFactory`, `WARCWriter`, `WriterPool` and `WriterPoolMember` no longer implement
- `ArchiveFileConstants`. Use static imports instead.
+#### Removed compatibility versions of moved classes
 
-#### Dependency upgrades
+| Removed                                 | Replacement                                   |
+|-----------------------------------------|-----------------------------------------------|
+| `org.archive.io.ArchiveFileConstants`   | `org.archive.format.ArchiveFileConstants`     |
+| `org.archive.io.GzipHeader`             | `org.archive.util.zip.GzipHeader`             |
+| `org.archive.io.GZIPMembersInputStream` | `org.archive.util.zip.GZIPMembersInputStream` |
+| `org.archive.io.NoGzipMagicException`   | `org.archive.util.zip.NoGzipMagicException`   |
+| `org.archive.io.warc.WARCConstants`     | `org.archive.format.warc.WARCConstants`       |
+
+##### Removed usages of constant interfaces
+
+Static imports should be used instead.
+
+* `ArchiveFileConstants` is no longer implemented by:
+  * `ArchiveReader`
+  * `ArchiveReaderFactory`
+  * `WARCWriter`
+  * `WriterPool`
+  * `WriterPoolMember`
+* `WARCConstants` is no longer implemented by:
+  * `WARCReader`
+  * `WARCReaderFactory`
+  * `WARCRecord`
+  * `WARCWriter`
+
+### Dependency upgrades
 
 - **junit**: 4.13.2 → 5.12.2
 

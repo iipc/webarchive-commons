@@ -43,6 +43,8 @@ import org.archive.io.WriterPoolMember;
 import org.archive.util.ArchiveUtils;
 import org.archive.util.anvl.Element;
 
+import static org.archive.format.warc.WARCConstants.*;
+
 
 /**
  * WARC implementation.
@@ -56,8 +58,7 @@ import org.archive.util.anvl.Element;
  * @author stack
  * @version $Revision: 4604 $ $Date: 2006-09-05 22:38:18 -0700 (Tue, 05 Sep 2006) $
  */
-public class WARCWriter extends WriterPoolMember
-implements WARCConstants {
+public class WARCWriter extends WriterPoolMember {
     public static final String TOTALS = "totals";
     public static final String SIZE_ON_DISK = "sizeOnDisk";
     public static final String TOTAL_BYTES = "totalBytes";

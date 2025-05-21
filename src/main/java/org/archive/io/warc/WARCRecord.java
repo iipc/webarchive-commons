@@ -34,13 +34,17 @@ import org.archive.io.ArchiveRecord;
 import org.archive.io.ArchiveRecordHeader;
 import org.archive.util.LaxHttpParser;
 
+import static org.archive.format.ArchiveFileConstants.ABSOLUTE_OFFSET_KEY;
+import static org.archive.format.ArchiveFileConstants.READER_IDENTIFIER_FIELD_KEY;
+import static org.archive.format.warc.WARCConstants.*;
+
 
 /**
  * A WARC file Record.
  *
  * @author stack
  */
-public class WARCRecord extends ArchiveRecord implements WARCConstants {
+public class WARCRecord extends ArchiveRecord {
     private Pattern WHITESPACE = Pattern.compile("\\s");
     
     /**

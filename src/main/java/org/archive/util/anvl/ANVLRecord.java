@@ -72,11 +72,6 @@ public class ANVLRecord extends LinkedList<Element> implements UTF8Bytes {
         super(c);
     }
 
-    /** @deprecated */
-    public ANVLRecord(int initialCapacity) {
-        super();
-    }
-    
     public boolean addLabel(final String l) {
     	return super.add(new Element(new Label(l)));
     }

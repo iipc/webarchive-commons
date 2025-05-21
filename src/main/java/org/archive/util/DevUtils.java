@@ -79,15 +79,6 @@ public class DevUtils {
     }
 
     /**
-     * Nothing to see here, move along.
-     * @deprecated  This method was never used.
-     */
-    @Deprecated
-    public static void betterPrintStack(RuntimeException re) {
-        re.printStackTrace(System.err);
-    }
-    
-    /**
      * Send this JVM process a SIGQUIT; giving a thread dump and possibly
      * a heap histogram (if using -XX:+PrintClassHistogram).
      * 

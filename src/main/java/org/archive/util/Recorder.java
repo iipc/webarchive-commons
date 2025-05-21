@@ -351,16 +351,6 @@ public class Recorder {
     public String getContentEncoding() {
         return this.contentEncoding;
     }
-
-    
-    /**
-     * @return
-     * @throws IOException
-     * @deprecated use getContentReplayCharSequence
-     */
-    public ReplayCharSequence getReplayCharSequence() throws IOException {
-        return getContentReplayCharSequence();
-    }
     
     /**
      * @return A ReplayCharSequence. Caller may call

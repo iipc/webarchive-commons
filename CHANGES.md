@@ -3,7 +3,7 @@ Unreleased
 
 ### Removals
 
-#### Removed compatibility versions of moved classes
+#### Removed deprecated versions of moved classes
 
 | Removed                                 | Replacement                                   |
 |-----------------------------------------|-----------------------------------------------|
@@ -12,6 +12,15 @@ Unreleased
 | `org.archive.io.GZIPMembersInputStream` | `org.archive.util.zip.GZIPMembersInputStream` |
 | `org.archive.io.NoGzipMagicException`   | `org.archive.util.zip.NoGzipMagicException`   |
 | `org.archive.io.warc.WARCConstants`     | `org.archive.format.warc.WARCConstants`       |
+
+#### Removed deprecated methods
+
+| Removed                                       | Replacement                               |
+|-----------------------------------------------|-------------------------------------------|
+| `ANVLRecord(int)`                             | `ANVLRecord()`                            |
+| `DevUtils.betterPrintStack(RuntimeException)` | `Throwable.printStackStrace()`            |
+| `Recorder.getReplayCharSequence()`            | `Recorder.getContentReplayCharSequence()` |
+| `Reporter.shortReportLineTo(PrintWriter)`     | `Reporter.reportTo(PrintWriter)`          |
 
 ##### Removed usages of constant interfaces
 

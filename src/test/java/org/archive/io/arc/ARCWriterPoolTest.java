@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
+import static org.archive.format.arc.ARCConstants.*;
 
 /**
  * Test ARCWriterPool
@@ -119,7 +119,7 @@ public class ARCWriterPoolTest {
         return new WriterPoolSettingsData(
                 "TEST",
                 "${prefix}-${timestamp17}-${serialno}-${heritrix.hostname}",
-                ARCConstants.DEFAULT_MAX_ARC_FILE_SIZE,
+                DEFAULT_MAX_ARC_FILE_SIZE,
                 isCompressed,
                 Arrays.asList(files),
                 null);

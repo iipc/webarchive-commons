@@ -42,12 +42,14 @@ import org.archive.util.InetAddressUtil;
 import org.archive.util.LaxHttpParser;
 import org.archive.util.TextUtils;
 
+import static org.archive.format.arc.ARCConstants.*;
+
 /**
  * An ARC file record.
  * Does not compass the ARCRecord metadata line, just the record content.
  * @author stack
  */
-public class ARCRecord extends ArchiveRecord implements ARCConstants {
+public class ARCRecord extends ArchiveRecord {
     /**
      * Http status code.
      * 
@@ -590,7 +592,7 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
         	}
 
         	statusLine = new String(statusBytes, 0,
-        			statusBytes.length - eolCharCount, ARCConstants.DEFAULT_ENCODING);
+        			statusBytes.length - eolCharCount, DEFAULT_ENCODING);
         	
         	// If a null or DELETED break immediately
         	if ((statusLine == null) || statusLine.startsWith("DELETED")) {
@@ -681,8 +683,7 @@ public class ARCRecord extends ArchiveRecord implements ARCConstants {
         // Read the status line.  Don't let it into the parseHeaders function.
         // It doesn't know what to do with it.
         bais.read(statusBytes, 0, statusBytes.length);
-        this.httpHeaders = LaxHttpParser.parseHeaders(bais,
-            ARCConstants.DEFAULT_ENCODING);
+        this.httpHeaders = LaxHttpParser.parseHeaders(bais, DEFAULT_ENCODING);
         this.getMetaData().setStatusCode(Integer.toString(getStatusCode()));
         bais.reset();
         return bais;

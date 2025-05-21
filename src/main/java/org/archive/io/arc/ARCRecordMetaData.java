@@ -27,13 +27,14 @@ import java.util.Set;
 
 import org.archive.io.ArchiveRecordHeader;
 
+import static org.archive.format.arc.ARCConstants.*;
 
 /**
  * An immutable class to hold an ARC record meta data.
  *
  * @author stack
  */
-public class ARCRecordMetaData implements ArchiveRecordHeader, ARCConstants {
+public class ARCRecordMetaData implements ArchiveRecordHeader {
     /**
      * Map of record header fields.
      *

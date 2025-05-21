@@ -11,6 +11,7 @@ Unreleased
 | `org.archive.io.GzipHeader`             | `org.archive.util.zip.GzipHeader`             |
 | `org.archive.io.GZIPMembersInputStream` | `org.archive.util.zip.GZIPMembersInputStream` |
 | `org.archive.io.NoGzipMagicException`   | `org.archive.util.zip.NoGzipMagicException`   |
+| `org.archive.io.arc.ARCConstants`       | `org.archive.format.arc.ARCConstants`         |
 | `org.archive.io.warc.WARCConstants`     | `org.archive.format.warc.WARCConstants`       |
 
 #### Removed deprecated methods
@@ -32,6 +33,13 @@ Static imports should be used instead.
   * `WARCWriter`
   * `WriterPool`
   * `WriterPoolMember`
+* `ARCConstants` is no longer implemented by:
+  * `ARCReader`
+  * `ARCReaderFactory`
+  * `ARCRecord`
+  * `ARCRecordMetaData`
+  * `ARCUtils`
+  * `ARCWriter`
 * `WARCConstants` is no longer implemented by:
   * `WARCReader`
   * `WARCReaderFactory`

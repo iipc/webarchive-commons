@@ -40,6 +40,7 @@ import org.archive.util.zip.NoGzipMagicException;
 
 import com.google.common.io.CountingInputStream;
 
+import static org.archive.format.arc.ARCConstants.*;
 
 /**
  * Factory that returns an ARCReader.
@@ -48,8 +49,7 @@ import com.google.common.io.CountingInputStream;
  *
  * @author stack
  */
-public class ARCReaderFactory extends ArchiveReaderFactory
-implements ARCConstants {
+public class ARCReaderFactory extends ArchiveReaderFactory {
     /**
      * This factory instance.
      */

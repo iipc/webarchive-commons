@@ -43,6 +43,7 @@ import org.archive.io.RecoverableIOException;
 import org.archive.io.WriterPoolMember;
 import org.archive.util.ArchiveUtils;
 
+import static org.archive.format.arc.ARCConstants.*;
 
 /**
  * Get an iterator on an ARC file or get a record by absolute position.
@@ -66,7 +67,7 @@ import org.archive.util.ArchiveUtils;
  * @version $Date$ $Revision$
  */
 public abstract class ARCReader extends ArchiveReader
-implements ARCConstants, Closeable {
+implements Closeable {
     private final Logger logger = Logger.getLogger(ARCReader.class.getName());
     
     /**

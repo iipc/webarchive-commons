@@ -1,3 +1,11 @@
+2.0.1
+-----
+
+### Changes
+
+* Re-added `Reporter.shortReportLineTo(PrintWriter)` as it turned out to be important to Heritrix.
+
+
 2.0.0
 -----
 

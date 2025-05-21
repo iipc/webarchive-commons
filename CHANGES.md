@@ -17,16 +17,19 @@
 | `org.archive.httpclient.SingleHttpConnectionManager`      |                                      |
 | `org.archive.httpclient.ThreadLocalHttpConnectionManager` |                                      |
 
-#### Removed deprecated versions of moved classes
+#### Removed deprecated versions of renamed classes
 
-| Removed                                      | Replacement                                   |
-|----------------------------------------------|-----------------------------------------------|
-| `org.archive.io.ArchiveFileConstants`        | `org.archive.format.ArchiveFileConstants`     |
-| `org.archive.io.GzipHeader`                  | `org.archive.util.zip.GzipHeader`             |
-| `org.archive.io.GZIPMembersInputStream`      | `org.archive.util.zip.GZIPMembersInputStream` |
-| `org.archive.io.NoGzipMagicException`        | `org.archive.util.zip.NoGzipMagicException`   |
-| `org.archive.io.arc.ARCConstants`            | `org.archive.format.arc.ARCConstants`         |
-| `org.archive.io.warc.WARCConstants`          | `org.archive.format.warc.WARCConstants`       |
+| Removed                                       | Replacement                                      |
+|-----------------------------------------------|--------------------------------------------------|
+| `org.archive.io.ArchiveFileConstants`         | `org.archive.format.ArchiveFileConstants`        |
+| `org.archive.io.GzipHeader`                   | `org.archive.util.zip.GzipHeader`                |
+| `org.archive.io.GZIPMembersInputStream`       | `org.archive.util.zip.GZIPMembersInputStream`    |
+| `org.archive.io.NoGzipMagicException`         | `org.archive.util.zip.NoGzipMagicException`      |
+| `org.archive.io.arc.ARCConstants`             | `org.archive.format.arc.ARCConstants`            |
+| `org.archive.io.warc.WARCConstants`           | `org.archive.format.warc.WARCConstants`          |
+| `org.archive.url.DefaultIACanonicalizerRules` | `org.archive.url.AggressiveIACanonicalizerRules` |
+| `org.archive.url.DefaultIAURLCanonicalizer`   | `org.archive.url.AggressiveIAURLCanonicalizer`   |
+| `org.archive.url.GoogleURLCanonicalizer`      | `org.archive.url.BasicURLCanonicalizer`          |
 
 #### Removed deprecated methods
 

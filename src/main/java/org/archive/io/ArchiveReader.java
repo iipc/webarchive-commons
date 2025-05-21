@@ -42,13 +42,15 @@ import org.archive.util.zip.GZIPMembersInputStream;
 
 import com.google.common.io.CountingInputStream;
 
+import static org.archive.format.ArchiveFileConstants.*;
+
 
 /**
  * Reader for an Archive file of Archive {@link ArchiveRecord}s.
  * @author stack
  * @version $Date$ $Version$
  */
-public abstract class ArchiveReader implements ArchiveFileConstants, Iterable<ArchiveRecord>, Closeable {    
+public abstract class ArchiveReader implements Iterable<ArchiveRecord>, Closeable {
     /**
      * Is this Archive file compressed?
      */
@@ -601,8 +603,7 @@ public abstract class ArchiveReader implements ArchiveFileConstants, Iterable<Ar
      */
     public static String getStrippedFileName(String name,
     		final String dotFileExtension) {
-    	name = stripExtension(name,
-    		ArchiveFileConstants.DOT_COMPRESSED_FILE_EXTENSION);
+    	name = stripExtension(name, DOT_COMPRESSED_FILE_EXTENSION);
     	return stripExtension(name, dotFileExtension);
     }
     
@@ -699,7 +700,7 @@ public abstract class ArchiveReader implements ArchiveFileConstants, Iterable<Ar
     	boolean result = true;
         if (format.equals(CDX)) {
             System.out.println(get().outputCdx(getStrippedFileName()));
-        } else if(format.equals(ArchiveFileConstants.DUMP)) {
+        } else if(format.equals(DUMP)) {
             // No point digesting if dumping content.
             setDigest(false);
             get().dump();

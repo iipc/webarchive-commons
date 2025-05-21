@@ -1,10 +1,10 @@
 package org.archive.url;
 
 public class NonMassagingIAURLCanonicalizer implements URLCanonicalizer {
-	private static final GoogleURLCanonicalizer google = 
-		new GoogleURLCanonicalizer();
+	private static final BasicURLCanonicalizer basic =
+		new BasicURLCanonicalizer();
 	private static CanonicalizeRules nonMassagingRules = 
-		new DefaultIACanonicalizerRules();
+		new AggressiveIACanonicalizerRules();
 	static {
 		nonMassagingRules.setRule(CanonicalizeRules.HOST_SETTINGS,
 				CanonicalizeRules.HOST_LOWERCASE);
@@ -14,7 +14,7 @@ public class NonMassagingIAURLCanonicalizer implements URLCanonicalizer {
 
 	public void canonicalize(HandyURL url) {
 		// just google's stuff, followed by the IA default stuff:
-		google.canonicalize(url);
+		basic.canonicalize(url);
 		ia.canonicalize(url);
 	}
 }

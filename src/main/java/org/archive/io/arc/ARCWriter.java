@@ -42,6 +42,7 @@ import org.archive.util.ArchiveUtils;
 import org.archive.util.DevUtils;
 import org.archive.util.MimetypeUtils;
 
+import static org.archive.format.arc.ARCConstants.*;
 
 /**
  * Write ARC files.
@@ -110,7 +111,7 @@ import org.archive.util.MimetypeUtils;
  *
  * @author stack
  */
-public class ARCWriter extends WriterPoolMember implements ARCConstants, Closeable {
+public class ARCWriter extends WriterPoolMember implements Closeable {
     private static final Logger logger =
         Logger.getLogger(ARCWriter.class.getName());
     

@@ -25,6 +25,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 
+import org.archive.format.ArchiveFileConstants;
 import org.archive.util.Base32;
 
 /**

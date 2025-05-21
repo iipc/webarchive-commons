@@ -35,13 +35,15 @@ import org.apache.commons.lang.NotImplementedException;
 import org.archive.io.ArchiveReader;
 import org.archive.io.ArchiveRecord;
 
+import static org.archive.format.warc.WARCConstants.*;
+
 /**
  * WARCReader.
  * Go via {@link WARCReaderFactory} to get instance.
  * @author stack
  * @version $Date: 2006-11-27 18:03:03 -0800 (Mon, 27 Nov 2006) $ $Version$
  */
-public class WARCReader extends ArchiveReader implements WARCConstants {
+public class WARCReader extends ArchiveReader {
     protected WARCReader() {
         super();
     }

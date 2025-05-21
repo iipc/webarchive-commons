@@ -32,7 +32,9 @@ import org.archive.url.UsableURI;
 import org.archive.util.zip.GzipHeader;
 import org.archive.util.zip.NoGzipMagicException;
 
-public class ARCUtils implements ARCConstants {
+import static org.archive.format.arc.ARCConstants.*;
+
+public class ARCUtils {
     /**
      * @param pathOrUri Path or URI to extract arc filename from.
      * @return Extracted arc file name.

@@ -44,12 +44,14 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import static org.archive.format.warc.WARCConstants.*;
+
 /**
  * Test Writer and Reader.
  * @author stack
  * @version $Date: 2006-08-29 19:35:48 -0700 (Tue, 29 Aug 2006) $ $Version$
  */
-public class WARCWriterTest implements WARCConstants {
+public class WARCWriterTest {
     
     private static final AtomicInteger SERIAL_NO = new AtomicInteger();
     
@@ -153,7 +155,7 @@ public class WARCWriterTest implements WARCConstants {
     	recordInfo.setContentStream(new ByteArrayInputStream(bytes));
     	recordInfo.setContentLength((long) bytes.length);
     	
-        final URI recordid = writer.generateRecordId(WARCWriter.TYPE, WARCRecordType.warcinfo.toString());
+        final URI recordid = writer.generateRecordId(TYPE, WARCRecordType.warcinfo.toString());
         recordInfo.setRecordId(recordid);
         
         writer.writeRecord(recordInfo);

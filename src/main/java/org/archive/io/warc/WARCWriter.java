@@ -37,11 +37,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
-import org.archive.io.ArchiveFileConstants;
+import org.archive.format.ArchiveFileConstants;
 import org.archive.io.UTF8Bytes;
 import org.archive.io.WriterPoolMember;
 import org.archive.util.ArchiveUtils;
 import org.archive.util.anvl.Element;
+
+import static org.archive.format.warc.WARCConstants.*;
 
 
 /**
@@ -56,8 +58,7 @@ import org.archive.util.anvl.Element;
  * @author stack
  * @version $Revision: 4604 $ $Date: 2006-09-05 22:38:18 -0700 (Tue, 05 Sep 2006) $
  */
-public class WARCWriter extends WriterPoolMember
-implements WARCConstants {
+public class WARCWriter extends WriterPoolMember {
     public static final String TOTALS = "totals";
     public static final String SIZE_ON_DISK = "sizeOnDisk";
     public static final String TOTAL_BYTES = "totalBytes";
@@ -343,9 +344,9 @@ implements WARCConstants {
         recordInfo.setMimetype("application/warc-fields");
 
         // Strip .open suffix if present.
-        if (filename.endsWith(WriterPoolMember.OCCUPIED_SUFFIX)) {
+        if (filename.endsWith(ArchiveFileConstants.OCCUPIED_SUFFIX)) {
         	filename = filename.substring(0,
-        		filename.length() - WriterPoolMember.OCCUPIED_SUFFIX.length());
+        		filename.length() - ArchiveFileConstants.OCCUPIED_SUFFIX.length());
         }
         recordInfo.addExtraHeader(HEADER_KEY_FILENAME, filename);
         if (description != null && description.length() > 0) {

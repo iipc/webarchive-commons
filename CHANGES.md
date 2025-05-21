@@ -1,8 +1,73 @@
-Unreleased
-----------
+2.0.0
+-----
 
-#### Dependency upgrades
+### Removals
 
+#### Removed Apache HttpClient 3.1
+
+`HTTPSeekableLineReaderFactory` and `ZipNumBlockLoader` now default to HttpClient 4.3.
+
+| Removed                                                   | Replacement                          |
+|-----------------------------------------------------------|--------------------------------------|
+| `org.apache.commons.httpclient.URIException`              | `org.archive.url.URIException`       |
+| `org.apache.commons.httpclient.Header`                    | `org.archive.format.http.HttpHeader` |
+| `org.archive.httpclient.HttpRecorderGetMethod`            |                                      |
+| `org.archive.httpclient.HttpRecorderMethod`               |                                      |
+| `org.archive.httpclient.HttpRecorderPostMethod`           |                                      |
+| `org.archive.httpclient.SingleHttpConnectionManager`      |                                      |
+| `org.archive.httpclient.ThreadLocalHttpConnectionManager` |                                      |
+
+#### Removed deprecated versions of renamed classes
+
+| Removed                                       | Replacement                                      |
+|-----------------------------------------------|--------------------------------------------------|
+| `org.archive.io.ArchiveFileConstants`         | `org.archive.format.ArchiveFileConstants`        |
+| `org.archive.io.GzipHeader`                   | `org.archive.util.zip.GzipHeader`                |
+| `org.archive.io.GZIPMembersInputStream`       | `org.archive.util.zip.GZIPMembersInputStream`    |
+| `org.archive.io.NoGzipMagicException`         | `org.archive.util.zip.NoGzipMagicException`      |
+| `org.archive.io.arc.ARCConstants`             | `org.archive.format.arc.ARCConstants`            |
+| `org.archive.io.warc.WARCConstants`           | `org.archive.format.warc.WARCConstants`          |
+| `org.archive.url.DefaultIACanonicalizerRules` | `org.archive.url.AggressiveIACanonicalizerRules` |
+| `org.archive.url.DefaultIAURLCanonicalizer`   | `org.archive.url.AggressiveIAURLCanonicalizer`   |
+| `org.archive.url.GoogleURLCanonicalizer`      | `org.archive.url.BasicURLCanonicalizer`          |
+
+#### Removed deprecated methods
+
+| Removed                                       | Replacement                               |
+|-----------------------------------------------|-------------------------------------------|
+| `ANVLRecord(int)`                             | `ANVLRecord()`                            |
+| `DevUtils.betterPrintStack(RuntimeException)` | `Throwable.printStackStrace()`            |
+| `Recorder.getReplayCharSequence()`            | `Recorder.getContentReplayCharSequence()` |
+| `Reporter.shortReportLineTo(PrintWriter)`     | `Reporter.reportTo(PrintWriter)`          |
+
+##### Removed usages of constant interfaces
+
+Static imports should be used instead.
+
+* `ArchiveFileConstants` is no longer implemented by:
+  * `ArchiveReader`
+  * `ArchiveReaderFactory`
+  * `WARCWriter`
+  * `WriterPool`
+  * `WriterPoolMember`
+* `ARCConstants` is no longer implemented by:
+  * `ARCReader`
+  * `ARCReaderFactory`
+  * `ARCRecord`
+  * `ARCRecordMetaData`
+  * `ARCUtils`
+  * `ARCWriter`
+* `WARCConstants` is no longer implemented by:
+  * `WARCReader`
+  * `WARCReaderFactory`
+  * `WARCRecord`
+  * `WARCWriter`
+
+### Dependency upgrades
+
+- **commons-io**: 2.18.0 → 2.19.0
+- **guava**: 33.3.1-jre → 33.4.8-jre
+- **json**: 20240303 → 20250517
 - **junit**: 4.13.2 → 5.12.2
 
 1.3.0

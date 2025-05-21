@@ -49,6 +49,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import static org.archive.format.arc.ARCConstants.*;
 
 /**
  * Test ARCWriter class.
@@ -58,7 +59,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author stack
  */
-public class ARCWriterTest implements ARCConstants {
+public class ARCWriterTest {
     /**
      * Utility class for writing bad ARCs (with trailing junk)
      */

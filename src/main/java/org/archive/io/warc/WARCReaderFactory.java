@@ -30,12 +30,13 @@ import java.util.Iterator;
 import org.archive.io.ArchiveReader;
 import org.archive.io.ArchiveReaderFactory;
 import org.archive.io.ArchiveRecord;
-import org.archive.io.warc.WARCConstants;
 import org.archive.util.ArchiveUtils;
 import org.archive.util.FileUtils;
 import org.archive.util.zip.GZIPMembersInputStream;
 
 import com.google.common.io.CountingInputStream;
+
+import static org.archive.format.warc.WARCConstants.*;
 
 /**
  * Factory for WARC Readers.
@@ -44,8 +45,7 @@ import com.google.common.io.CountingInputStream;
  * @author stack
  * @version $Date: 2006-08-23 17:59:04 -0700 (Wed, 23 Aug 2006) $ $Version$
  */
-public class WARCReaderFactory extends ArchiveReaderFactory
-implements WARCConstants {
+public class WARCReaderFactory extends ArchiveReaderFactory {
     private static final WARCReaderFactory factory = new WARCReaderFactory();
 
     /**

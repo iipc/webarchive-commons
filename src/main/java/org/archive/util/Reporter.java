@@ -33,15 +33,6 @@ public interface Reporter {
     public void reportTo(PrintWriter writer) throws IOException;
     
     /**
-     * Write a short single-line summary report 
-     * 
-     * @param pw writer to receive report
-     */
-    @Deprecated
-    public void shortReportLineTo(PrintWriter pw) throws IOException;
-    
-
-    /**
      * @return Same data that's in the single line report, as key-value pairs
      */
     public Map<String,Object> shortReportMap();

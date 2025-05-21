@@ -27,7 +27,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 import org.archive.format.http.HttpHeader;
-import org.archive.io.arc.ARCConstants;
+import org.archive.format.arc.ARCConstants;
 import org.archive.util.LaxHttpParser;
 
 /**

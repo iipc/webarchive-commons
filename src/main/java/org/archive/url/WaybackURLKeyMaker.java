@@ -5,7 +5,7 @@ import java.util.List;
 
 public class WaybackURLKeyMaker implements URLKeyMaker {
 //	URLCanonicalizer canonicalizer = new NonMassagingIAURLCanonicalizer();
-	URLCanonicalizer canonicalizer = new DefaultIAURLCanonicalizer();
+	URLCanonicalizer canonicalizer = new AggressiveIAURLCanonicalizer();
 	
 	public URLCanonicalizer getCanonicalizer() {
 		return canonicalizer;

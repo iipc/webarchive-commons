@@ -1,6 +1,10 @@
 2.0.0
 -----
 
+### New features
+
+- Added `RecordingInputStream.asOutputStream()` for direct writing of recorded data without an input stream. [#108](https://github.com/iipc/webarchive-commons/pull/108)
+
 ### Removals
 
 #### Removed Apache HttpClient 3.1

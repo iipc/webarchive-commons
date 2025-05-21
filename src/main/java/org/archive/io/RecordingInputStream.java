@@ -383,12 +383,12 @@ public class RecordingInputStream
 
     @Override
     public boolean markSupported() {
-        return this.in.markSupported(); 
+        return in != null && this.in.markSupported();
     }
 
     @Override
     public synchronized void reset() throws IOException {
-        this.in.reset();
+        if (in != null) this.in.reset();
         this.recordingOutputStream.reset();
     }
 
@@ -417,5 +417,14 @@ public class RecordingInputStream
 
     public void clearForReuse() throws IOException {
         recordingOutputStream.clearForReuse();
+    }
+
+    /**
+     * Returns an OutputStream that can be used for recording input data. This is useful if the input comes in some
+     * form other than an InputStream. For example, if the input is provided by a callback periodically called with
+     * a chunk of data.
+     */
+    public RecordingOutputStream asOutputStream() {
+        return this.recordingOutputStream;
     }
 }

@@ -31,7 +31,14 @@ public interface Reporter {
      * @param writer to receive report
      */
     public void reportTo(PrintWriter writer) throws IOException;
-    
+
+    /**
+     * Write a short single-line summary report
+     *
+     * @param pw writer to receive report
+     */
+    public void shortReportLineTo(PrintWriter pw) throws IOException;
+
     /**
      * @return Same data that's in the single line report, as key-value pairs
      */

@@ -62,6 +62,9 @@ Static imports should be used instead.
 
 ### Dependency upgrades
 
+- **commons-io**: 2.18.0 → 2.19.0
+- **guava**: 33.3.1-jre → 33.4.8-jre
+- **json**: 20240303 → 20250517
 - **junit**: 4.13.2 → 5.12.2
 
 1.3.0

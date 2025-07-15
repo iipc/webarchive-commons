@@ -21,7 +21,7 @@ package org.archive.util;
 import java.util.Properties;
 import java.util.regex.Matcher;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utilities for dealing with Java Properties (incl. System Properties)

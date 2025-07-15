@@ -3,7 +3,7 @@ package org.archive.format.cdx;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Base class for text lines that are split by a delimiter Some examples will be

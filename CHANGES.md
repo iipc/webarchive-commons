@@ -1,3 +1,13 @@
+2.0.2
+-----
+
+### Fixes
+
+* Fixes for `org.archive.net.PublicSuffixes` [#110](https://github.com/iipc/webarchive-commons/pull/110)
+  * Updated to the latest version of the public suffix list.
+  * Fixed parsing failures with newer list versions.
+  * Moved `effective_tld_names.dat` to `org/archive/effective_tld_names.dat` to prevent conflict with `crawler-commons`.
+
 2.0.1
 -----
 

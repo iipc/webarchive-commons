@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.archive.io.arc.ARCWriterTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

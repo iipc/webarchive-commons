@@ -32,7 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.archive.format.http.HttpHeader;
 import org.archive.io.ArchiveRecord;
 import org.archive.io.ArchiveRecordHeader;

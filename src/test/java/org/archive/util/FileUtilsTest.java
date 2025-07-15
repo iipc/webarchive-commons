@@ -27,7 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.math.LongRange;
+import org.apache.commons.lang3.LongRange;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -216,7 +216,7 @@ public class FileUtilsTest {
             LongRange range = FileUtils.pagedLines(file,pos,-count,returnedLines,estimate);
             Collections.reverse(returnedLines); 
             testLines.addAll(returnedLines);
-            pos = range.getMinimumLong()-1;
+            pos = range.getMinimum()-1;
         } while (pos>=0);
         Collections.reverse(testLines); 
         return testLines;
@@ -291,7 +291,7 @@ public class FileUtilsTest {
         List<String> testLines = new LinkedList<String>();
         do {
             LongRange range = FileUtils.pagedLines(file,pos,count,testLines,estimate);
-            pos = range.getMaximumLong();
+            pos = range.getMaximum();
         } while (pos<file.length());
         return testLines;
     }

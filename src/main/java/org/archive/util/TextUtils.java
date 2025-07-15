@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -198,7 +198,7 @@ public class TextUtils {
      * @return The same string escaped.
      */
     public static String escapeForHTMLJavascript(String s) {
-        return escapeForHTML(StringEscapeUtils.escapeJavaScript(s));
+        return escapeForHTML(StringEscapeUtils.escapeEcmaScript(s));
     }
     
     /**
@@ -239,7 +239,7 @@ public class TextUtils {
         BufferedReader reader = new BufferedReader(new StringReader(s));
         String line;
         while((line=reader.readLine()) != null){
-            out.println(StringEscapeUtils.escapeHtml(line));
+            out.println(StringEscapeUtils.escapeHtml3(line));
         }
     }
     
@@ -253,7 +253,7 @@ public class TextUtils {
             return cs;
         }
         
-        return StringEscapeUtils.unescapeHtml(cs.toString());
+        return StringEscapeUtils.unescapeHtml4(cs.toString());
     }
     
     /**

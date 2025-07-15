@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.lang.math.LongRange;
+import org.apache.commons.lang3.LongRange;
 
 
 /** Utility methods for manipulating files and directories.
@@ -473,7 +473,7 @@ public class FileUtils {
             if(signedDesiredLineCount>0) {
                 if(startPosition+bufferSize == fileEnd) {
                     // nothing more to read: return nothing
-                    return new LongRange(fileEnd,fileEnd);
+                    return LongRange.of(fileEnd,fileEnd);
                 } else {
                     // retry with larger lineEstimate
                     return pagedLines(file, position, signedDesiredLineCount, lines, Math.max(bufferSize,lineEstimate));
@@ -501,7 +501,7 @@ public class FileUtils {
         }
         int firstLine =  lineStarts.getFirst();
         int partialLine =  lineStarts.getLast(); 
-        LongRange range = new LongRange(startPosition + firstLine, startPosition + partialLine); 
+        LongRange range = LongRange.of(startPosition + firstLine, startPosition + partialLine);
         List<String> foundLines = 
             IOUtils.readLines(new ByteArrayInputStream(buf,firstLine,partialLine-firstLine));
 
@@ -510,7 +510,7 @@ public class FileUtils {
             range = expandRange(
                         range,
                         pagedLines(file, 
-                                   range.getMinimumLong()-1, 
+                                   range.getMinimum()-1,
                                    signedDesiredLineCount+foundFullLines, 
                                    lines, 
                                    bufferSize/foundFullLines));
@@ -519,7 +519,7 @@ public class FileUtils {
         
         lines.addAll(foundLines); 
         
-        if(signedDesiredLineCount < 0 && range.getMaximumLong() < position) {
+        if(signedDesiredLineCount < 0 && range.getMaximum() < position) {
             // did not get line containining start position
             range = expandRange(
                         range,
@@ -530,12 +530,12 @@ public class FileUtils {
                                    bufferSize/foundFullLines));
         }
         
-        if(signedDesiredLineCount > 0 && foundFullLines < desiredLineCount && range.getMaximumLong() < fileEnd) {
+        if(signedDesiredLineCount > 0 && foundFullLines < desiredLineCount && range.getMaximum() < fileEnd) {
             // need more forward lines
             range = expandRange(
                     range,
                     pagedLines(file,
-                               range.getMaximumLong(),
+                               range.getMaximum(),
                                desiredLineCount - foundFullLines,
                                lines,
                                bufferSize/foundFullLines));
@@ -545,8 +545,8 @@ public class FileUtils {
     }
 
     public static LongRange expandRange(LongRange range1, LongRange range2) {
-        return new LongRange(Math.min(range1.getMinimumLong(), range2.getMinimumLong()),
-                             Math.max(range1.getMaximumLong(), range2.getMaximumLong()));
+        return LongRange.of(Math.min(range1.getMinimum(), range2.getMinimum()),
+                             Math.max(range1.getMaximum(), range2.getMaximum()));
         
     }
 

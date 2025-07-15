@@ -34,7 +34,7 @@ import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.archive.io.GenericReplayCharSequence;
 import org.archive.io.RecordingInputStream;
 import org.archive.io.RecordingOutputStream;

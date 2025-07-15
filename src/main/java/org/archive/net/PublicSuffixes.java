@@ -121,6 +121,7 @@ public class PublicSuffixes {
                 i++;
             // zero-length match holds only when both cs and s are empty.
             if (i == 0) return cs.length() == 0 && s.length() == 0;
+            // cs is longer than s, so we need to replace cs with a prefix, and add a branch
             if (i < cs.length()) {
                 CharSequence cs0 = cs.subSequence(0, i);
                 CharSequence cs1 = cs.subSequence(i, cs.length());
@@ -128,10 +129,21 @@ public class PublicSuffixes {
                 cs = cs0;
                 Node alt1 = new Node(cs1, branches);
                 (branches = new ArrayList<Node>()).add(alt1);
-                addBranch(cs2);
+                if(cs2.length() == 0) {
+                    // if cs2 is empty, we have a terminal node.
+                    branches.add(new Node("", null));
+                } else {
+                    // otherwise, we have a new branch.
+                    addBranch(cs2);
+                }
+
             } else {
-                assert i == cs.length();
-                addBranch(s.subSequence(i, s.length()));
+                // s is longer than cs, so we need to add a branch
+                if(i != s.length()) {
+                    // but not if they are equal.
+                    assert i == cs.length();
+                    addBranch(s.subSequence(i, s.length()));
+                }
             }
             return true;
         }
@@ -172,8 +184,8 @@ public class PublicSuffixes {
         InputStream is;
         if (args.length == 0 || "=".equals(args[0])) {
             // use bundled list
-            is = PublicSuffixes.class.getClassLoader().getResourceAsStream(
-            "effective_tld_names.dat");
+            is = PublicSuffixes.class.getResourceAsStream(
+                    "/org/archive/effective_tld_names.dat");
         } else {
             is = new FileInputStream(args[0]);
         }
@@ -265,7 +277,7 @@ public class PublicSuffixes {
                     sb.append("(?=");
                     close = ")";
                 } else if (c == '*') {
-                    sb.append("[-\\w]+");
+                    sb.append("[-\\w\\u00C0-\\u017F]+");
                 } else {
                     sb.append(c);
                 }
@@ -304,7 +316,7 @@ public class PublicSuffixes {
         regex.append("(?ix)^\n");
         trie.addBranch("*,"); // for new/unknown TLDs
         buildRegex(trie, regex);
-        regex.append("\n([-\\w]+,)");
+        regex.append("\n([-\\w\\u00C0-\\u017F]+,)");
         return regex.toString();
     }
 
@@ -321,8 +333,8 @@ public class PublicSuffixes {
             // use bundled list
             try {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        PublicSuffixes.class.getClassLoader().getResourceAsStream(
-                        "effective_tld_names.dat"), "UTF-8"));
+                        PublicSuffixes.class.getResourceAsStream(
+                        "/org/archive/effective_tld_names.dat"), "UTF-8"));
                 topmostAssignedSurtPrefixRegex = getTopmostAssignedSurtPrefixRegex(reader);
                 IOUtils.closeQuietly(reader);
             } catch (UnsupportedEncodingException ex) {

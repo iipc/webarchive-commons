@@ -15,6 +15,7 @@ Users of these methods may need to make the following changes:
 
 ### Dependency upgrades
 
+- **commons-io**: 2.19.0 → 2.20.0
 - **commons-lang**: 2.6 → 3.18.0
 
 2.0.2

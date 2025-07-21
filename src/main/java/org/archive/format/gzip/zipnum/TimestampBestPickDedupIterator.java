@@ -1,6 +1,6 @@
 package org.archive.format.gzip.zipnum;
 
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.archive.util.iterator.CloseableIterator;
 
 public class TimestampBestPickDedupIterator extends TimestampDedupIterator {

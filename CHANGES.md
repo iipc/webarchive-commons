@@ -1,3 +1,22 @@
+Unreleased
+----------
+
+### Changes
+
+`FileUtils.pagedLines()` and `FileUtils.expandRange()` now return the Apache Commons Lang 3 version of `LongRange`.
+Users of these methods may need to make the following changes:
+
+| Old                                             | New                                         |
+|-------------------------------------------------|---------------------------------------------|
+| `import org.apache.commons.lang.math.LongRange` | `import org.apache.commons.lang3.LongRange` |
+| `new LongRange(min, max)`                       | `LongRange.of(min, max)`                    |
+| `longRange.getMaximumLong()`                    | `longRange.getMaximum()`                    |
+| `longRange.getMinimumLong()`                    | `longRange.getMinimum()`                    |
+
+### Dependency upgrades
+
+- **commons-lang**: 2.6 → 3.18.0
+
 2.0.2
 -----
 

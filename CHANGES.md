@@ -1,6 +1,9 @@
 Unreleased
 ----------
 
+3.0.0
+-----
+
 ### Changes
 
 `FileUtils.pagedLines()` and `FileUtils.expandRange()` now return the Apache Commons Lang 3 version of `LongRange`.

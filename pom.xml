@@ -3,7 +3,7 @@
 
   <groupId>org.netpreserve.commons</groupId>
   <artifactId>webarchive-commons</artifactId>
-  <version>3.0.0</version>
+  <version>3.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>webarchive-commons</name>
@@ -41,7 +41,7 @@
       <connection>scm:git:git@github.com:iipc/webarchive-commons.git</connection>
       <developerConnection>scm:git:git@github.com:iipc/webarchive-commons.git</developerConnection>
       <url>https://github.com/iipc/webarchive-commons</url>
-     <tag>webarchive-commons-3.0.0</tag>
+     <tag>webarchive-commons-2.0.0</tag>
   </scm>
 
   <properties>

@@ -1,8 +1,24 @@
 Unreleased
 ----------
 
-3.0.0
------
+3.0.1 (2025-10-27)
+------------------
+
+### Fixes
+
+* Fixed a file handle leak in `FileUtils.pagedLines()` and `FileUtils.appendTo()` that could occur during I/O errors.
+
+### Dependency Upgrades
+
+* **commons-codec**: 1.18.0 → 1.19.0
+* **commons-lang3**: 3.18.0 → 3.19.0
+* **commons-cli**: 1.9.0 → 1.10.0
+* **guava**: 33.4.8-jre → 33.5.0-jre
+* **hadoop**: 3.4.1 → 3.4.2
+* **pig**: 0.17.0 → 0.18.0
+
+3.0.0 (2025-07-21)
+------------------
 
 ### Changes
 
@@ -21,8 +37,8 @@ Users of these methods may need to make the following changes:
 - **commons-io**: 2.19.0 → 2.20.0
 - **commons-lang**: 2.6 → 3.18.0
 
-2.0.2
------
+2.0.2 (2025-07-15)
+------------------
 
 ### Fixes
 
@@ -31,16 +47,16 @@ Users of these methods may need to make the following changes:
   * Fixed parsing failures with newer list versions.
   * Moved `effective_tld_names.dat` to `org/archive/effective_tld_names.dat` to prevent conflict with `crawler-commons`.
 
-2.0.1
------
+2.0.1 (2025-05-21)
+------------------
 
 ### Changes
 
 * Re-added `Reporter.shortReportLineTo(PrintWriter)` as it turned out to be important to Heritrix.
 
 
-2.0.0
------
+2.0.0 (2025-05-21)
+------------------
 
 ### New features
 
@@ -115,8 +131,8 @@ Static imports should be used instead.
 - **json**: 20240303 → 20250517
 - **junit**: 4.13.2 → 5.12.2
 
-1.3.0
------
+1.3.0 (2024-12-20)
+------------------
 
 #### URL Canonicalization Changed
 
@@ -152,8 +168,8 @@ Apache Commons HttpClient 3.1.
 * org.archive.util.binsearch.impl.http.ApacheHttp31SLRFactory
 * org.archive.util.binsearch.impl.http.HTTPSeekableLineReaderFactory.HttpLibs.APACHE_31
 
-1.2.0
------
+1.2.0 (2024-11-29)
+------------------
 
 #### New features
 
@@ -170,15 +186,15 @@ Apache Commons HttpClient 3.1.
 * json 20240303
 * junit 4.13.2
 
-1.1.11
-------
+1.1.11 (2024-11-27)
+-------------------
 
 #### Bug fixes
 
 * Fixed URLParser and WaybackURLKeyMaker failing on URLs with IPv6 address hostnames [#100](https://github.com/iipc/webarchive-commons/pull/100)
 
-1.1.10
-------
+1.1.10 (2024-10-15)
+-------------------
 
 #### Bug fixes
 

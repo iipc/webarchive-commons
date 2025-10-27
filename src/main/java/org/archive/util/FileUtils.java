@@ -424,12 +424,12 @@ public class FileUtils {
         }
 
         // read that reasonable chunk
-        FileInputStream fis = new FileInputStream(file);
-        fis.getChannel().position(startPosition); 
         byte[] buf = new byte[bufferSize];
-        ArchiveUtils.readFully(fis, buf);
-        IOUtils.closeQuietly(fis);
-        
+        try (FileInputStream fis = new FileInputStream(file)) {
+            fis.getChannel().position(startPosition);
+            ArchiveUtils.readFully(fis, buf);
+        }
+
         // find all line starts fully in buffer
         // (positions after a line-end, per line-end definition in 
         // BufferedReader.readLine)
@@ -700,13 +700,12 @@ public class FileUtils {
     public static void appendTo(File fileToAppendTo, File fileToAppendFrom) throws IOException {
         // optimal io block size according to http://lingrok.org/xref/coreutils/src/ioblksize.h
         byte[] buf = new byte[65536];
-        FileOutputStream out = new FileOutputStream(fileToAppendTo, true);
-        FileInputStream in = new FileInputStream(fileToAppendFrom);
-        for (int n = in.read(buf); n > 0; n = in.read(buf)) {
-            out.write(buf, 0, n);
+        try (FileInputStream in = new FileInputStream(fileToAppendFrom);
+             FileOutputStream out = new FileOutputStream(fileToAppendTo, true)) {
+            for (int n = in.read(buf); n > 0; n = in.read(buf)) {
+                out.write(buf, 0, n);
+            }
+            out.flush();
         }
-        in.close();
-        out.flush();
-        out.close();
     }
 }

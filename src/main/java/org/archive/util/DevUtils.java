@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.logging.Logger;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Write a message and stack trace to the 'org.archive.util.DevUtils' logger.
@@ -92,7 +93,7 @@ public class DevUtils {
             Process p = Runtime.getRuntime().exec(
                     new String[] {"perl", "-e", "print getppid(). \"\n\";"});
             BufferedReader br =
-                new BufferedReader(new InputStreamReader(p.getInputStream()));
+                new BufferedReader(new InputStreamReader(p.getInputStream(), UTF_8));
             String ppid = br.readLine();
             Runtime.getRuntime().exec(
                     new String[] {"sh", "-c", "kill -3 "+ppid}).waitFor();

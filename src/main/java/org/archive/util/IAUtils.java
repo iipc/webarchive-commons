@@ -29,6 +29,8 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Properties;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * Miscellaneous useful methods.
  *
@@ -53,7 +55,7 @@ public class IAUtils {
 		BufferedReader br = null;
 		String version;
 		try {
-		    br = new BufferedReader(new InputStreamReader(input));
+		    br = new BufferedReader(new InputStreamReader(input, UTF_8));
 		    version = br.readLine();
 		    br.readLine();
 		} catch (IOException e) {

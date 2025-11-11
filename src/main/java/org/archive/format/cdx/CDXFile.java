@@ -18,6 +18,8 @@ import org.archive.util.binsearch.impl.RandomAccessFileSeekableLineReaderFactory
 import org.archive.util.iterator.CloseableIterator;
 import org.archive.util.zip.OpenJDK7GZIPInputStream;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class CDXFile extends SortedTextFile implements CDXInputSource {
 
 	public CDXFile(String uri) throws IOException {
@@ -94,7 +96,7 @@ public class CDXFile extends SortedTextFile implements CDXInputSource {
 			input = new OpenJDK7GZIPInputStream(swis);	
 		}
 		
-		BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(input, UTF_8));
 		return reader;
 	}
 

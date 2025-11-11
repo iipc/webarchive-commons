@@ -37,7 +37,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @author gojomo &amp; others
  */
 public class IAUtils {
-    public final static Charset UTF8 = Charset.forName("utf-8");
+    public final static Charset UTF8 = UTF_8;
 
     final public static String COMMONS_VERSION = loadCommonsVersion();
     final public static String PUBLISHER = loadCommons("publisher");

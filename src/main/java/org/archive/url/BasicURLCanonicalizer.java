@@ -6,6 +6,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -204,12 +205,9 @@ public class BasicURLCanonicalizer implements URLCanonicalizer {
 		return escapeOnce(unescapeRepeatedly(input));
 	}
 
-	protected static Charset _UTF8 = null;
+	protected static Charset _UTF8 = StandardCharsets.UTF_8;
 
 	protected static Charset UTF8() {
-		if (_UTF8 == null) {
-			_UTF8 = Charset.forName("UTF-8");
-		}
 		return _UTF8;
 	}
 

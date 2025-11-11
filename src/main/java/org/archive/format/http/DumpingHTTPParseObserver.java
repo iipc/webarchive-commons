@@ -1,11 +1,10 @@
 package org.archive.format.http;
 
 import java.io.PrintStream;
-import java.nio.charset.Charset;
 import java.util.Locale;
 
+
 public class DumpingHTTPParseObserver implements HttpHeaderObserver {
-	private static final Charset UTF8 = Charset.forName("UTF-8");
 	private PrintStream ps = null;
 	public DumpingHTTPParseObserver() {
 		ps = System.out;

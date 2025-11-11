@@ -3,10 +3,11 @@ package org.archive.format.gzip.zipnum;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 
 import org.archive.format.gzip.GZIPMemberWriter;
 import org.archive.format.gzip.GZIPMemberWriterCommittedOutputStream;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class ZipNumWriter extends GZIPMemberWriterCommittedOutputStream {
 	int limit;
@@ -14,7 +15,6 @@ public class ZipNumWriter extends GZIPMemberWriterCommittedOutputStream {
 	OutputStream manifestOut;
 	ByteArrayOutputStream manifestBuffer;
 	char delimiter = '\t';
-	private static final Charset UTF8 = Charset.forName("utf-8");
 	public ZipNumWriter(OutputStream main, OutputStream manifest, int limit) {
 		super(new GZIPMemberWriter(main));
 		manifestOut = manifest;
@@ -51,7 +51,7 @@ public class ZipNumWriter extends GZIPMemberWriterCommittedOutputStream {
 		sb.append(delimiter);
 		sb.append(len);
 		sb.append(delimiter);
-		manifestOut.write(sb.toString().getBytes(UTF8));
+		manifestOut.write(sb.toString().getBytes(UTF_8));
 		manifestBuffer.writeTo(manifestOut);
 		manifestOut.flush();
 		count = 0;

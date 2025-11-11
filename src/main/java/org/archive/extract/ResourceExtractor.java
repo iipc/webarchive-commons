@@ -7,7 +7,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +27,6 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 	
 	private final static Logger LOG =
 		Logger.getLogger(ResourceExtractor.class.getName());
-	Charset UTF8 = Charset.forName("utf-8");
 	public final static String TOOL_NAME = "extractor";
 	public static final String TOOL_DESCRIPTION = 
 		"A tool for extracting metadata from WARC, ARC, and WAT files";
@@ -66,7 +65,7 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 	
 	private PrintWriter makePrintWriter(OutputStream os)
 	{
-		return new PrintWriter(new OutputStreamWriter(os, Charset.forName("UTF-8")));
+		return new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
 	}
 
 	public int run(String[] args) 

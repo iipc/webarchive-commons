@@ -1,12 +1,10 @@
 package org.archive.extract;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.net.UnknownHostException;
 import java.util.Date;
@@ -31,13 +29,14 @@ import java.text.SimpleDateFormat;
 
 import java.util.logging.Logger;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class WATExtractorOutput implements ExtractorOutput {
 	WARCRecordWriter recW;
 	private boolean wroteFirst;
 	private GZIPMemberWriter gzW;
 	private static int DEFAULT_BUFFER_RAM = 1024 * 1024;
 	private int bufferRAM = DEFAULT_BUFFER_RAM;
-	private final static Charset UTF8 = Charset.forName("UTF-8");
 	private String outputFile;
 	
 	private static final Logger LOG = Logger.getLogger(WATExtractorOutput.class.getName());
@@ -169,7 +168,7 @@ public class WATExtractorOutput implements ExtractorOutput {
 
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-		OutputStreamWriter osw = new OutputStreamWriter(bos, UTF8);
+		OutputStreamWriter osw = new OutputStreamWriter(bos, UTF_8);
 		try {
 			md.write(osw);
 		} catch (JSONException e1) {

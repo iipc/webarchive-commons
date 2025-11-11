@@ -1,6 +1,7 @@
 package org.archive.format.arc;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.zip.Deflater;
@@ -16,7 +17,7 @@ import org.archive.util.zip.GzipHeader;
  */
 public interface ARCConstants extends ArchiveFileConstants {
 	public final static int MAX_META_LENGTH = 1024 * 32;
-	public final static Charset ARC_META_CHARSET = Charset.forName("utf-8");
+	public final static Charset ARC_META_CHARSET = StandardCharsets.UTF_8;
 	public final static int NEW_LINE_ORD = 10;
 	public static final int CARRIAGE_RETURN_ORD = 13;
 	public final static String DELIMITER = " ";

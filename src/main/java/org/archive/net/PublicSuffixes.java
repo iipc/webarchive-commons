@@ -22,13 +22,14 @@ package org.archive.net;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -37,6 +38,8 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.archive.util.TextUtils;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Utility class for making use of the information about 'public suffixes' at
@@ -198,11 +201,11 @@ public class PublicSuffixes {
         BufferedWriter writer;
         if (args.length >= 2) {
             // write to specified file
-            writer = new BufferedWriter(new FileWriter(args[1]));
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(args[1]), UTF_8));
             needsClose = true;
         } else {
             // write to stdout
-            writer = new BufferedWriter(new OutputStreamWriter(System.out));
+            writer = new BufferedWriter(new OutputStreamWriter(System.out, Charset.defaultCharset()));
         }
         writer.append(regex);
         writer.flush();

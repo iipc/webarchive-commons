@@ -1,10 +1,13 @@
 package org.archive.util;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -119,14 +122,14 @@ public class Grep {
 
 		if (files != null) {
 			if (files.size() == 1) {
-				grep(new BufferedReader(new FileReader(files.get(0))), "");
+				grep(new BufferedReader(new InputStreamReader(new FileInputStream(files.get(0)), UTF_8)), "");
 			} else {
 				for (String path : files) {
-					grep(new BufferedReader(new FileReader(path)), path + ": ");
+					grep(new BufferedReader(new InputStreamReader(new FileInputStream(path), UTF_8)), path + ": ");
 				}
 			}
 		} else {
-			grep(new BufferedReader(new InputStreamReader(System.in)), "");
+			grep(new BufferedReader(new InputStreamReader(System.in, Charset.defaultCharset())), "");
 		}
 	}
 

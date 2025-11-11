@@ -26,9 +26,10 @@ import java.io.Closeable;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -44,6 +45,8 @@ import org.archive.util.zip.GZIPMembersInputStream;
 import com.google.common.io.CountingInputStream;
 
 import static org.archive.format.ArchiveFileConstants.*;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 
 /**
@@ -660,7 +663,7 @@ public abstract class ArchiveReader implements Iterable<ArchiveRecord>, Closeabl
                 DOT_COMPRESSED_FILE_EXTENSION);
             cdxFilename = stripExtension(cdxFilename, getDotFileExtension());
             cdxFilename += ('.' + CDX);
-            cdxWriter = new BufferedWriter(new FileWriter(cdxFilename));
+            cdxWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(cdxFilename), UTF_8));
         }
         
         String header = "CDX b e a m s c " + ((isCompressed()) ? "V" : "v")

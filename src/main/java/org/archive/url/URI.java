@@ -34,6 +34,8 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.net.URLCodec;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -1780,11 +1782,13 @@ class URI implements Cloneable, Comparable, Serializable {
             throw new URIException(e.getMessage());
         }
         try {
-            return new String(rawdata, charset);
-        } catch (UnsupportedEncodingException e) {
-            return new String(rawdata);
+            Charset cs = Charset.forName(charset);
+            return new String(rawdata, cs);
+        } catch (IllegalCharsetNameException e) {
+            return new String(rawdata, StandardCharsets.US_ASCII);
         }
     }
+
     /**
      * Pre-validate the unescaped URI string within a specific component.
      *

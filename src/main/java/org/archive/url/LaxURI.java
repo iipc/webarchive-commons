@@ -19,6 +19,8 @@
 package org.archive.url;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -122,9 +124,10 @@ public class LaxURI extends URI {
         byte[] rawdata = null;
         rawdata = LaxURLCodec.decodeUrlLoose(component.getBytes(StandardCharsets.US_ASCII));
         try {
-            return new String(rawdata, charset);
-        } catch (UnsupportedEncodingException e) {
-            return new String(rawdata);
+            Charset cs = Charset.forName(charset);
+            return new String(rawdata, cs);
+        } catch (IllegalCharsetNameException e) {
+            return new String(rawdata, StandardCharsets.US_ASCII);
         }
     }
     

@@ -589,7 +589,7 @@ public class ARCRecord extends ArchiveRecord {
         	if (eolCharCount <= 0) {
         		throw new RecoverableIOException(
                 "Failed to read http status where one was expected: " 
-                + ((statusBytes == null) ? "" : new String(statusBytes)));
+                + ((statusBytes == null) ? "" : new String(statusBytes, DEFAULT_ENCODING)));
         	}
 
         	statusLine = new String(statusBytes, 0,
@@ -659,7 +659,7 @@ public class ARCRecord extends ArchiveRecord {
             		break;
             	} else {
             		throw new IOException("Failed reading http headers: " +
-            				((lineBytes != null)? new String(lineBytes): null));
+            				((lineBytes != null)? new String(lineBytes, DEFAULT_ENCODING): null));
             	}
             } else {
             	httpHeaderBytesRead += lineBytes.length;

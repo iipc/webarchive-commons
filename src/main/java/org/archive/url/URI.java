@@ -42,6 +42,8 @@ import java.util.BitSet;
 import java.util.Hashtable;
 import java.util.Locale;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * The interface for the URI(Uniform Resource Identifiers) version of RFC 2396.
  * This class has the purpose of supportting of parsing a URI reference to
@@ -1696,7 +1698,7 @@ class URI implements Cloneable, Comparable, Serializable {
         try {
             return original.getBytes(charset);
         } catch (UnsupportedEncodingException e) {
-            return original.getBytes();
+            return original.getBytes(UTF_8);
         }
     }
 

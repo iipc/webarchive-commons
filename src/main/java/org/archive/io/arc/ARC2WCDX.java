@@ -32,6 +32,8 @@ import org.archive.io.ArchiveRecord;
 import org.archive.util.ArchiveUtils;
 import org.archive.util.SURT;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * Create a 'Wide' CDX from an ARC. Takes one argument, the path to the ARC.
  * Writes .wcdx.gz in same directory.
@@ -61,7 +63,7 @@ public class ARC2WCDX {
         PrintStream writer = null;
         long count = 0;
         try {
-            writer = new PrintStream(new GZIPOutputStream(new FileOutputStream(wcdxFile)));
+            writer = new PrintStream(new GZIPOutputStream(new FileOutputStream(wcdxFile)), false, UTF_8.name());
             
             // write header: legend + timestamp
             StringBuilder legend = new StringBuilder();

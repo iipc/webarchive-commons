@@ -9,6 +9,8 @@ import java.util.logging.Logger;
 import org.archive.util.GeneralURIStreamFactory;
 import org.archive.util.iterator.CloseableIterator;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class SortedTextFile {
 	
 	public static class NumericComparator implements Comparator<String>
@@ -371,7 +373,7 @@ public class SortedTextFile {
 	    String prev = null;
 	    while(true) {
 	    	if (line != null) {
-	    		offset += line.getBytes().length + 1;
+	    		offset += line.getBytes(UTF_8).length + 1;
 	    	}
 	    	line = slr.readLine();
 	    	if(line == null) break;
@@ -380,7 +382,7 @@ public class SortedTextFile {
 	    }
 	    
 	    if (lessThan && prev != null) {
-	    	offset -= prev.getBytes().length + 1;
+	    	offset -= prev.getBytes(UTF_8).length + 1;
 	    }
 	    
 	    return offset;

@@ -13,6 +13,7 @@ package org.archive.format.gzip.zipnum;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,6 +35,8 @@ import org.archive.util.binsearch.SeekableLineReaderFactory;
 import org.archive.util.binsearch.SeekableLineReaderIterator;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReader;
 import org.archive.util.iterator.CloseableIterator;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class ZipNumCluster extends ZipNumIndex {
 	

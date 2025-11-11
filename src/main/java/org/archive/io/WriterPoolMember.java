@@ -26,9 +26,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
@@ -104,11 +106,16 @@ public abstract class WriterPoolMember {
     protected static int roundRobinIndex = 0;
 
     /**
+     * Symbol set for serial number formatter.
+     */
+    protected static DecimalFormatSymbols serialNoFormatterSymbols = new DecimalFormatSymbols(Locale.ROOT);
+
+    /**
      * NumberFormat instance for formatting serial number.
      *
      * Pads serial number with zeros.
      */
-    protected static NumberFormat serialNoFormatter = new DecimalFormat("00000");
+    protected static NumberFormat serialNoFormatter = new DecimalFormat("00000", serialNoFormatterSymbols);
     
     
     /**

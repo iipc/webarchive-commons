@@ -157,7 +157,7 @@ public class WATExtractorOutput implements ExtractorOutput {
 			targetURI = extractOrIO(md, "Envelope.WARC-Header-Metadata.WARC-Target-URI");
 		}
 		// handle date of generation in WARC format
-		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.ROOT);
 		String capDateString = dateFormat.format(new Date());
 		String recId = extractOrIO(md, "Envelope.WARC-Header-Metadata.WARC-Record-ID");
 		writeWARCMDRecord(recOut,md,targetURI,capDateString,recId);

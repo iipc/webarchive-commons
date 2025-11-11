@@ -1,6 +1,7 @@
 package org.archive.resource.html;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import org.archive.resource.MetaData;
@@ -98,7 +99,7 @@ public class HTMLMetaData extends MetaData implements ResourceConstants {
 
 		} catch(JSONException e) {
 			try {
-				System.err.format("GotErr(%s) JSON(%s)(%s)", e.getMessage(),
+				System.err.format(Locale.ROOT, "GotErr(%s) JSON(%s)(%s)", e.getMessage(),
 						o.toString(1),a.toString());
 			} catch (JSONException e1) {
 				// TODO Auto-generated catch block

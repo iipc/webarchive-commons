@@ -223,7 +223,8 @@ public class RealCDXExtractorOutput implements ExtractorOutput {
 			canUrl = keyMaker.makeKey(origUrl);
 			// URL DATE OURL MIME HTTP-CODE SHA1 META REDIR OFFSET LENGTH FILE
 			if(dumpJSON) {
-				out.format("%s %s %s %s %s %s %s %s %s %s %s %s\n", 
+				out.format(Locale.ROOT,
+						"%s %s %s %s %s %s %s %s %s %s %s %s\n",
 						canUrl, 
 						date, 
 						origUrl,
@@ -237,7 +238,8 @@ public class RealCDXExtractorOutput implements ExtractorOutput {
 						filename, 
 						m.toString(1));
 			} else {
-				out.format("%s %s %s %s %s %s %s %s %s %s %s\n", 
+				out.format(Locale.ROOT,
+						"%s %s %s %s %s %s %s %s %s %s %s\n",
 						canUrl, 
 						date, 
 						origUrl,

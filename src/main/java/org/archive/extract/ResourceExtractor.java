@@ -141,7 +141,7 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 			} catch(GZIPFormatException e) {
 				LOG.severe(String.format(Locale.ROOT, "%s: %s",exProducer.getContext(),e.getMessage()));
 				//Log is not coming out for some damn reason....needs to be studied
-				System.err.format("%s: %s",exProducer.getContext(),e.getMessage());
+				System.err.format(Locale.ROOT, "%s: %s",exProducer.getContext(),e.getMessage());
 				
 				if(ProducerUtils.STRICT_GZ) {
 					throw e;
@@ -150,7 +150,7 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 			} catch(ResourceParseException e) {
 				LOG.severe(String.format(Locale.ROOT, "%s: %s",exProducer.getContext(),e.getMessage()));
 				//Log is not coming out for some damn reason....needs to be studied
-				System.err.format("%s: %s",exProducer.getContext(),e.getMessage());
+				System.err.format(Locale.ROOT, "%s: %s",exProducer.getContext(),e.getMessage());
 				
 				if(ProducerUtils.STRICT_GZ) {
 					throw e;
@@ -160,7 +160,7 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 				// this should not get here - ResourceFactory et al should wrap as ResourceParseExceptions...
 				LOG.severe(String.format(Locale.ROOT, "RECOVERABLE - %s: %s",exProducer.getContext(),e.getMessage()));
 				//Log is not coming out for some damn reason....needs to be studied
-				System.err.format("%s: %s",exProducer.getContext(),e.getMessage());
+				System.err.format(Locale.ROOT, "%s: %s",exProducer.getContext(),e.getMessage());
 
 				e.printStackTrace();
 				

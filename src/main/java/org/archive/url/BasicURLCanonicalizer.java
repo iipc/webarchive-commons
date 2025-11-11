@@ -34,7 +34,9 @@ public class BasicURLCanonicalizer implements URLCanonicalizer {
 			.compile("^(0[0-7]*)(\\.[0-7]+)?(\\.[0-7]+)?(\\.[0-7]+)?$");
 	Pattern DECIMAL_IP = Pattern
 			.compile("^([1-9][0-9]*)(\\.[0-9]+)?(\\.[0-9]+)?(\\.[0-9]+)?$");
+	Pattern MULTIDOT = Pattern.compile("\\.{2,}");
 
+	@Override
 	public void canonicalize(HandyURL url) {
 		url.setHash(null);
 		url.setAuthUser(minimalEscape(url.getAuthUser()));
@@ -55,8 +57,7 @@ public class BasicURLCanonicalizer implements URLCanonicalizer {
 				host = hostE;
 
 			}
-			host = host.replaceAll("^\\.+", "").replaceAll("\\.\\.+", ".")
-					.replaceAll("\\.$", "");
+			host = normalizeDots(host);
 		}
 
 		String ip = null;
@@ -72,6 +73,36 @@ public class BasicURLCanonicalizer implements URLCanonicalizer {
 		String path = unescapeRepeatedly(url.getPath());
 
 		url.setPath(escapeOnce(normalizePath(path)));
+	}
+
+	/**
+	 * Normalize dots in the host name.
+	 *
+	 * @param host
+	 * @return host name with all sequences of dots replaced with a single dot,
+	 *         and all leading and trailing dots removed
+	 */
+	private String normalizeDots(String host) {
+		if (host.indexOf('.') == -1) {
+			return host;
+		}
+		int start = 0, end = host.length();
+		boolean changed = false;
+		while (host.charAt(start) == '.') {
+			start++;
+			changed = true;
+		}
+		while (host.charAt(end - 1) == '.') {
+			end--;
+			changed = true;
+		}
+		if (changed) {
+			host = host.substring(start, end);
+		}
+		if (host.contains("..")) {
+			host = MULTIDOT.matcher(host).replaceAll(".");
+		}
+		return host;
 	}
 
 	private static final Pattern SINGLE_FORWARDSLASH_PATTERN = Pattern

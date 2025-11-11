@@ -1,6 +1,7 @@
 package org.archive.hadoop;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -111,7 +112,7 @@ public class ResourceRecordReader extends RecordReader<ResourceContext, MetaData
 			if(r != null) {
 
 				StreamCopy.readToEOF(r.getInputStream());
-				LOG.info(String.format("Extracted offset %d\n", 
+				LOG.info(String.format(Locale.ROOT, "Extracted offset %d\n",
 						series.getCurrentMemberStartOffset()));
 				cachedK = new ResourceContext(name, 
 						series.getCurrentMemberStartOffset());
@@ -121,7 +122,7 @@ public class ResourceRecordReader extends RecordReader<ResourceContext, MetaData
 		} catch (ResourceParseException e) {
 			e.printStackTrace();
 			throw new IOException(
-					String.format("ResourceParseException at(%s)(%d)",
+					String.format(Locale.ROOT, "ResourceParseException at(%s)(%d)",
 							name,series.getCurrentMemberStartOffset()),
 					e);
 		}

@@ -2,6 +2,7 @@ package org.archive.url;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,11 +21,11 @@ public class IAURLCanonicalizer implements URLCanonicalizer, CanonicalizerConsta
 		}
 		if (rules.isSet(SCHEME_SETTINGS, SCHEME_LOWERCASE)) {
 			if (url.getScheme() != null) {
-				url.setScheme(url.getScheme().toLowerCase());
+				url.setScheme(url.getScheme().toLowerCase(Locale.ROOT));
 			}
 		}
 		if(rules.isSet(HOST_SETTINGS, HOST_LOWERCASE)) {
-			url.setHost(url.getHost().toLowerCase());
+			url.setHost(url.getHost().toLowerCase(Locale.ROOT));
 		}
 		if(rules.isSet(HOST_SETTINGS, HOST_MASSAGE)) {
 			url.setHost(massageHost(url.getHost()));
@@ -46,7 +47,7 @@ public class IAURLCanonicalizer implements URLCanonicalizer, CanonicalizerConsta
 			url.setPath(null);
 		} else {
 			if(rules.isSet(PATH_SETTINGS, PATH_LOWERCASE)) {
-				path = path.toLowerCase();
+				path = path.toLowerCase(Locale.ROOT);
 			}
 			if(rules.isSet(PATH_SETTINGS, PATH_STRIP_SESSION_ID)) {
 				path = URLRegexTransformer.stripPathSessionID(path);
@@ -71,7 +72,7 @@ public class IAURLCanonicalizer implements URLCanonicalizer, CanonicalizerConsta
 			}
 			// lower-case:
 			if(rules.isSet(QUERY_SETTINGS, QUERY_LOWERCASE)) {
-				query = query.toLowerCase();
+				query = query.toLowerCase(Locale.ROOT);
 			}
 			// re-order?
 			if(rules.isSet(QUERY_SETTINGS, QUERY_ALPHA_REORDER)) {
@@ -155,7 +156,7 @@ public class IAURLCanonicalizer implements URLCanonicalizer, CanonicalizerConsta
 		return host;
 	}
 	public static int getDefaultPort(String scheme) {
-		String lcScheme = scheme.toLowerCase();
+		String lcScheme = scheme.toLowerCase(Locale.ROOT);
 		if(lcScheme.equals("http")) {
 			return 80;
 		} else if(lcScheme.equals("https")) {

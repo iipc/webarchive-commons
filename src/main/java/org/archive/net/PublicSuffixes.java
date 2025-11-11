@@ -31,6 +31,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -231,7 +232,7 @@ public class PublicSuffixes {
             // discard utf8 notation after entry
             line = line.split("\\s+")[0];
             // TODO: maybe we don't need to create lower-cased String
-            line = line.toLowerCase();
+            line = line.toLowerCase(Locale.ROOT);
             // SURT-order domain segments
             String[] segs = line.split("\\.");
             StringBuilder sb = new StringBuilder();

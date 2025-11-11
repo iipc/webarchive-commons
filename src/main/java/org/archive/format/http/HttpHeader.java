@@ -2,6 +2,7 @@ package org.archive.format.http;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Locale;
 
 public class HttpHeader implements HttpConstants {
 	private String name = null;
@@ -27,7 +28,7 @@ public class HttpHeader implements HttpConstants {
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder(name.length() + value.length()+20);
-		sb.append(String.format("HttpHeader(%s)(%s)",name,value));
+		sb.append(String.format(Locale.ROOT, "HttpHeader(%s)(%s)",name,value));
 		return sb.toString();
 	}
 }

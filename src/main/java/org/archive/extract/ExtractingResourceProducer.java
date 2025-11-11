@@ -1,6 +1,7 @@
 package org.archive.extract;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,7 +34,7 @@ public class ExtractingResourceProducer implements ResourceProducer {
 				return current;
 			}
 			if(LOG.isLoggable(Level.INFO)) {
-				LOG.info(String.format("Extracting (%s) with (%s)\n", 
+				LOG.info(String.format(Locale.ROOT, "Extracting (%s) with (%s)\n",
 						current.getClass().toString(),
 						f.getClass().toString()));
 			}

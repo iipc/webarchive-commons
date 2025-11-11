@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -615,7 +616,7 @@ public abstract class ArchiveReader implements Iterable<ArchiveRecord>, Closeabl
     	if (value == null || value.length() <= 0) {
     		return false;
     	}
-        return Boolean.TRUE.toString().equals(value.toLowerCase());
+        return Boolean.TRUE.toString().equals(value.toLowerCase(Locale.ROOT));
     }
     
     /**

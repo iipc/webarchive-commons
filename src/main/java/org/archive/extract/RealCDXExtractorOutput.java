@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -131,7 +132,7 @@ public class RealCDXExtractorOutput implements ExtractorOutput {
 						} else {
 							meta = "-";
 						}
-						if(mime.toLowerCase().contains("html")) {
+						if(mime.toLowerCase(Locale.ROOT).contains("html")) {
 							if(redir.equals("-")) {
 								// maybe an obvious meta-refresh?
 								redir = extractHTMLMetaRefresh(origUrl,m);
@@ -202,7 +203,7 @@ public class RealCDXExtractorOutput implements ExtractorOutput {
 						} else {
 							meta = "-";
 						}
-						if(mime.toLowerCase().contains("html")) {
+						if(mime.toLowerCase(Locale.ROOT).contains("html")) {
 							if(redir.equals("-")) {
 								// maybe an obvious meta-refresh?
 								redir = extractHTMLMetaRefresh(origUrl,m);
@@ -269,7 +270,7 @@ public class RealCDXExtractorOutput implements ExtractorOutput {
 				if(meta != null) {
 					String name = scanHeadersLC(meta, "name", null);
 					if(name != null) {
-						if(name.toLowerCase().equals("robots")) {
+						if(name.toLowerCase(Locale.ROOT).equals("robots")) {
 							// alright - some robot instructions:
 							String content = scanHeadersLC(meta, "content", null);
 							if(content != null) {
@@ -291,7 +292,7 @@ public class RealCDXExtractorOutput implements ExtractorOutput {
 				if(meta != null) {
 					String name = scanHeadersLC(meta, "http-equiv", null);
 					if(name != null) {
-						if(name.toLowerCase().equals("refresh")) {
+						if(name.toLowerCase(Locale.ROOT).equals("refresh")) {
 							// alright - some robot instructions:
 							String content = scanHeadersLC(meta, "content", null);
 							if(content != null) {
@@ -330,7 +331,7 @@ public class RealCDXExtractorOutput implements ExtractorOutput {
 			if(o.length() == 0) {
 				return defaultVal;
 			}
-			String lc = match.toLowerCase().trim();
+			String lc = match.toLowerCase(Locale.ROOT).trim();
 //			try {
 //				System.err.println("REC:" + o.toString(1));
 //			} catch (JSONException e1) {
@@ -338,7 +339,7 @@ public class RealCDXExtractorOutput implements ExtractorOutput {
 //				e1.printStackTrace();
 //			}
 			for(String key : JSONObject.getNames(o)) {
-				if(lc.equals(key.toLowerCase().trim())) {
+				if(lc.equals(key.toLowerCase(Locale.ROOT).trim())) {
 					try {
 						return o.getString(key).trim();
 					} catch (JSONException e) {
@@ -472,7 +473,7 @@ public class RealCDXExtractorOutput implements ExtractorOutput {
 		if(input == null) {
 			return "-";
 		}
-		String up = input.replaceAll("-", "").toUpperCase();
+		String up = input.replaceAll("-", "").toUpperCase(Locale.ROOT);
 		StringBuilder sb = new StringBuilder(3);
 		if(up.contains(NO_FOLLOW_MATCH)) {
 			sb.append("F");

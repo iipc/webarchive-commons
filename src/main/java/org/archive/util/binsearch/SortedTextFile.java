@@ -2,6 +2,7 @@ package org.archive.util.binsearch;
 
 import java.io.IOException;
 import java.util.Comparator;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -142,14 +143,14 @@ public class SortedTextFile {
 	    	if (comparator.compare(key, line) > 0) {
 
 	    		if(LOGGER.isLoggable(Level.FINE)) {
-	    			LOGGER.fine(String.format("Search(%d) (%s)/(%s) : After",
+	    			LOGGER.fine(String.format(Locale.ROOT, "Search(%d) (%s)/(%s) : After",
 	    					mid * blockSize, key,line));
 	    		}
 	    		min = mid;
 	    	} else {
 
 	    		if(LOGGER.isLoggable(Level.FINE)) {
-	    			LOGGER.fine(String.format("Search(%d) (%s)/(%s) : Before",
+	    			LOGGER.fine(String.format(Locale.ROOT, "Search(%d) (%s)/(%s) : Before",
 					mid * blockSize, key,line));
 	    		}
 	    		max = mid;
@@ -391,7 +392,7 @@ public class SortedTextFile {
 		long min = binaryFindOffset(slr, key, comparator);
 
 		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.fine(String.format("Aligning(%d)",min));
+			LOGGER.fine(String.format(Locale.ROOT, "Aligning(%d)",min));
 		}
 
 	    slr.seek(min);

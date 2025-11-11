@@ -31,6 +31,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.util.Iterator;
+import java.util.Locale;
 
 import org.archive.url.UsableURI;
 import org.archive.util.iterator.LineReadingIterator;
@@ -70,7 +71,7 @@ public class SurtPrefixSet extends PrefixSet {
 
         while (iter.hasNext()) {
             s = (String) iter.next();
-            add(s.toLowerCase());
+            add(s.toLowerCase(Locale.ROOT));
         }
     }
 
@@ -145,7 +146,7 @@ public class SurtPrefixSet extends PrefixSet {
         }
         if(u.indexOf("(")>0) {
             // formal SURT prefix; toLowerCase just in case
-            add(u.toLowerCase());
+            add(u.toLowerCase(Locale.ROOT));
         } else {
             // hostname/normal form URI from which 
             // to deduce SURT prefix

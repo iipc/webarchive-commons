@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Locale;
 
 public class HTTP11Stream extends AbstractBufferingStream {
 	private URL url;
@@ -42,7 +43,7 @@ public class HTTP11Stream extends AbstractBufferingStream {
 	public void doSeek(long offset) throws IOException {
 		doClose();
 		conn = url.openConnection();
-		conn.setRequestProperty("Range", String.format("bytes=%d-", offset));
+		conn.setRequestProperty("Range", String.format(Locale.ROOT, "bytes=%d-", offset));
 		conn.connect();
 		is = conn.getInputStream();
 	}

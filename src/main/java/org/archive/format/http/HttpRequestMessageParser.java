@@ -2,6 +2,7 @@ package org.archive.format.http;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 
 public class HttpRequestMessageParser extends HttpMessageParser {
 	public int maxBytes = 1024 * 1024;
@@ -223,7 +224,7 @@ public class HttpRequestMessageParser extends HttpMessageParser {
 
 	protected int parseMethodLax(byte buf[], int start, int len)
 	throws HttpParseException {
-		String v = new String(buf,start,len,UTF8).toUpperCase();
+		String v = new String(buf,start,len,UTF8).toUpperCase(Locale.ROOT);
 		if(v.compareTo(METHOD_GET_STRING) == 0) {
 			return METHOD_GET;
 		} else if(v.compareTo(METHOD_HEAD_STRING) == 0) {

@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.Locale;
 
 import org.archive.io.ArchiveReader;
 import org.archive.io.ArchiveReaderFactory;
@@ -307,9 +308,9 @@ public class WARCReaderFactory extends ArchiveReaderFactory {
     public static boolean isWARCSuffix(final String f) {
     	return (f == null)?
     		false:
-    		(f.toLowerCase().endsWith(DOT_COMPRESSED_WARC_FILE_EXTENSION))?
+    		(f.toLowerCase(Locale.ROOT).endsWith(DOT_COMPRESSED_WARC_FILE_EXTENSION))?
     		    true:
-    			(f.toLowerCase().endsWith(DOT_WARC_FILE_EXTENSION))?
+    			(f.toLowerCase(Locale.ROOT).endsWith(DOT_WARC_FILE_EXTENSION))?
     			true: false;
     }
 }

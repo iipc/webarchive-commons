@@ -261,7 +261,7 @@ class URI implements Cloneable, Comparable, Serializable {
         if (scheme == null) {
            throw new URIException(URIException.PARSING, "scheme required");
         }
-        char[] s = scheme.toLowerCase().toCharArray();
+        char[] s = scheme.toLowerCase(Locale.ROOT).toCharArray();
         if (validate(s, URI.scheme)) {
             _scheme = s; // is_absoluteURI
         } else {
@@ -1954,7 +1954,7 @@ class URI implements Cloneable, Comparable, Serializable {
          * </pre></blockquote><p>
          */
         if (at > 0 && at < length && tmp.charAt(at) == ':') {
-            char[] target = tmp.substring(0, at).toLowerCase().toCharArray();
+            char[] target = tmp.substring(0, at).toLowerCase(Locale.ROOT).toCharArray();
             if (validate(target, scheme)) {
                 _scheme = target;
             } else {

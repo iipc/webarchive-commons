@@ -2,6 +2,7 @@ package org.archive.format.json;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,7 +29,7 @@ public class JSONView {
 	public JSONView(String... pathSpecs) {
 		this.pathSpecs = new ArrayList<JSONPathSpec>(pathSpecs.length);
 		if(LOG.isLoggable(Level.INFO)) {
-			LOG.info(String.format("Creating JSONView with(%s)",
+			LOG.info(String.format(Locale.ROOT, "Creating JSONView with(%s)",
 					StringUtils.join(pathSpecs,",")));
 		}
 		for(String pathSpec : pathSpecs) {

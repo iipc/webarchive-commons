@@ -1,5 +1,6 @@
 package org.archive.format.http;
 
+import java.util.Locale;
 
 public class HttpMessageParser implements HttpConstants {
 	
@@ -22,11 +23,11 @@ public class HttpMessageParser implements HttpConstants {
 	throws HttpParseException {
 	
 		String v = new String(buf,start,len,UTF8);
-		if(v.toLowerCase().compareTo(VERSION_0_STATUS.toLowerCase()) == 0) {
+		if(v.toLowerCase(Locale.ROOT).compareTo(VERSION_0_STATUS.toLowerCase(Locale.ROOT)) == 0) {
 			return VERSION_0;
-		} else if(v.toLowerCase().compareTo(VERSION_1_STATUS.toLowerCase()) == 0) {
+		} else if(v.toLowerCase(Locale.ROOT).compareTo(VERSION_1_STATUS.toLowerCase(Locale.ROOT)) == 0) {
 			return VERSION_1;
-		} else if(v.toLowerCase().compareTo(VERSION_9_STATUS.toLowerCase()) == 0) {
+		} else if(v.toLowerCase(Locale.ROOT).compareTo(VERSION_9_STATUS.toLowerCase(Locale.ROOT)) == 0) {
 			return VERSION_9;
 		}
 		return VERSION_0;

@@ -2,6 +2,7 @@ package org.archive.hadoop;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import org.apache.hadoop.mapreduce.InputFormat;
@@ -54,7 +55,7 @@ public class ArchiveMetadataLoader extends FileInputLoadFunc {
 
 		try {
 			key = reader.getCurrentKey();
-			LOG.info(String.format("Loaded key-offset %d\n", key.offset));
+			LOG.info(String.format(Locale.ROOT, "Loaded key-offset %d\n", key.offset));
 			value = reader.getCurrentValue();
 		} catch (InterruptedException e) {
 			// is this needed and the right way?

@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -338,8 +339,8 @@ public class Recorder {
      * @param contentEncoding declared content-encoding of input recording.
      */
     public void setContentEncoding(String contentEncoding) {
-        String lowerCoding = contentEncoding.toLowerCase(); 
-        if(!SUPPORTED_ENCODINGS.contains(contentEncoding.toLowerCase())) {
+        String lowerCoding = contentEncoding.toLowerCase(Locale.ROOT);
+        if(!SUPPORTED_ENCODINGS.contains(contentEncoding.toLowerCase(Locale.ROOT))) {
             throw new IllegalArgumentException("contentEncoding unsupported: "+contentEncoding); 
         }
         this.contentEncoding = lowerCoding;

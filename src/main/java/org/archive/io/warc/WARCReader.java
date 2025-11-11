@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
@@ -233,7 +234,7 @@ public class WARCReader extends ArchiveReader {
                     break;
                     
                 case 'f':
-                    format = cmdlineOptions[i].getValue().toLowerCase();
+                    format = cmdlineOptions[i].getValue().toLowerCase(Locale.ROOT);
                     boolean match = false;
                     // List of supported formats.
                     final String [] supportedFormats =

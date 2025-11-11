@@ -8,6 +8,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -138,7 +139,7 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 				
 				out.output(r);
 			} catch(GZIPFormatException e) {
-				LOG.severe(String.format("%s: %s",exProducer.getContext(),e.getMessage()));
+				LOG.severe(String.format(Locale.ROOT, "%s: %s",exProducer.getContext(),e.getMessage()));
 				//Log is not coming out for some damn reason....needs to be studied
 				System.err.format("%s: %s",exProducer.getContext(),e.getMessage());
 				
@@ -147,7 +148,7 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 				}
 				e.printStackTrace();
 			} catch(ResourceParseException e) {
-				LOG.severe(String.format("%s: %s",exProducer.getContext(),e.getMessage()));
+				LOG.severe(String.format(Locale.ROOT, "%s: %s",exProducer.getContext(),e.getMessage()));
 				//Log is not coming out for some damn reason....needs to be studied
 				System.err.format("%s: %s",exProducer.getContext(),e.getMessage());
 				
@@ -157,7 +158,7 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 				e.printStackTrace();
 			} catch(RecoverableRecordFormatException e) {
 				// this should not get here - ResourceFactory et al should wrap as ResourceParseExceptions...
-				LOG.severe(String.format("RECOVERABLE - %s: %s",exProducer.getContext(),e.getMessage()));
+				LOG.severe(String.format(Locale.ROOT, "RECOVERABLE - %s: %s",exProducer.getContext(),e.getMessage()));
 				//Log is not coming out for some damn reason....needs to be studied
 				System.err.format("%s: %s",exProducer.getContext(),e.getMessage());
 

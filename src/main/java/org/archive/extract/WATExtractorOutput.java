@@ -10,6 +10,7 @@ import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.Locale;
 
 import org.archive.format.gzip.GZIPMemberWriter;
 import org.archive.format.gzip.GZIPMemberWriterCommittedOutputStream;
@@ -143,7 +144,7 @@ public class WATExtractorOutput implements ExtractorOutput {
 		String capDateString = extractOrIO(md, "Envelope.ARC-Header-Metadata.Date");
 		String filename = extractOrIO(md, "Container.Filename");
 		String offset = extractOrIO(md, "Container.Offset");
-		String recId = String.format("<urn:arc:%s:%s>",filename,offset);
+		String recId = String.format(Locale.ROOT, "<urn:arc:%s:%s>",filename,offset);
 		writeWARCMDRecord(recOut,md,targetURI,capDateString,recId);
 	}
 

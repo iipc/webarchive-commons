@@ -900,7 +900,7 @@ public class ArchiveUtils {
                 if (line.startsWith("#")) {
                     continue;
                 }
-                TLDS.add(line.trim().toLowerCase()); 
+                TLDS.add(line.trim().toLowerCase(Locale.ROOT));
             }
         } catch (Exception e) { 
             LOGGER.log(Level.SEVERE,"TLD list unavailable",e);
@@ -917,7 +917,7 @@ public class ArchiveUtils {
      * @return boolean true if recognized as TLD
      */
     public static boolean isTld(String dom) {
-        return TLDS.contains(dom.toLowerCase());
+        return TLDS.contains(dom.toLowerCase(Locale.ROOT));
     }
     
     public static void closeQuietly(Object input) {
@@ -981,7 +981,7 @@ public class ArchiveUtils {
      */
     public static BufferedReader getBufferedReader(File source) throws IOException {
         InputStream is = new BufferedInputStream(new FileInputStream(source));
-        boolean isGzipped = source.getName().toLowerCase().
+        boolean isGzipped = source.getName().toLowerCase(Locale.ROOT).
             endsWith(GZIP_SUFFIX);
         if(isGzipped) {
             is = new GZIPInputStream(is);

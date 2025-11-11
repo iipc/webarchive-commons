@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Locale;
 
 import org.archive.url.UsableURI;
 import org.archive.util.zip.GzipHeader;
@@ -94,7 +95,7 @@ public class ARCUtils {
     throws IOException {
         boolean compressedARCFile = false;
         isReadable(arcFile);
-        if(!skipSuffixCheck && !arcFile.getName().toLowerCase()
+        if(!skipSuffixCheck && !arcFile.getName().toLowerCase(Locale.ROOT)
                 .endsWith(COMPRESSED_ARC_FILE_EXTENSION)) {
             return compressedARCFile;
         }
@@ -197,7 +198,7 @@ public class ARCUtils {
     throws IOException {
         boolean uncompressedARCFile = false;
         isReadable(arcFile);
-        if(arcFile.getName().toLowerCase().endsWith(ARC_FILE_EXTENSION)) {
+        if(arcFile.getName().toLowerCase(Locale.ROOT).endsWith(ARC_FILE_EXTENSION)) {
             FileInputStream fis = new FileInputStream(arcFile);
             try {
                 byte [] b = new byte[ARC_MAGIC_NUMBER.length()];

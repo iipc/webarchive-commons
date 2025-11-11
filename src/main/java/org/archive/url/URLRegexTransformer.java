@@ -1,5 +1,6 @@
 package org.archive.url;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,7 +28,7 @@ public class URLRegexTransformer {
 
 
     public static String stripOpts(String orig, OptimizedPattern op[]) {
-    	String origLC = orig.toLowerCase();
+    	String origLC = orig.toLowerCase(Locale.ROOT);
         StringBuilder sb = null;
         int i = 0;
         int max = op.length;

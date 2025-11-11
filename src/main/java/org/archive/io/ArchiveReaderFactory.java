@@ -25,6 +25,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Locale;
 
 import org.archive.io.arc.ARCReaderFactory;
 import org.archive.io.warc.WARCReaderFactory;
@@ -296,7 +297,7 @@ public class ArchiveReaderFactory {
      * @throws IOException
      */
     protected boolean isCompressed(final File f) throws IOException {
-        return f.getName().toLowerCase().
+        return f.getName().toLowerCase(Locale.ROOT).
         	endsWith(DOT_COMPRESSED_FILE_EXTENSION);
     }
 }

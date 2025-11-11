@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Locale;
 
 import org.archive.format.http.HttpHeader;
 import org.archive.format.arc.ARCConstants;
@@ -156,8 +157,8 @@ public class HeaderedArchiveRecord extends ArchiveRecord {
         boolean isHttpResponse = statusLine.startsWith("HTTP");
         boolean isHttpRequest = false;
         if (!isHttpResponse) {
-            isHttpRequest = statusLine.toUpperCase().startsWith("GET") ||
-                !statusLine.toUpperCase().startsWith("POST");
+            isHttpRequest = statusLine.toUpperCase(Locale.ROOT).startsWith("GET") ||
+                !statusLine.toUpperCase(Locale.ROOT).startsWith("POST");
         }
         if (!isHttpResponse && !isHttpRequest) {
             throw new UnexpectedStartLineIOException("Failed parse of " +

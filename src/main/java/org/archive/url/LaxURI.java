@@ -22,6 +22,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Locale;
 
 /**
  * URI subclass which allows partial/inconsistent encoding, matching
@@ -321,7 +322,7 @@ public class LaxURI extends URI {
          * </pre></blockquote><p>
          */
         if (at > 0 && at < length && tmp.charAt(at) == ':') {
-            char[] target = tmp.substring(0, at).toLowerCase().toCharArray();
+            char[] target = tmp.substring(0, at).toLowerCase(Locale.ROOT).toCharArray();
             if (validate(target, scheme)) {
                 _scheme = target;
                 from = ++at;

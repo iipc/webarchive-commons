@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Locale;
 import java.util.logging.Level;
 
 import org.archive.format.ArchiveFileConstants;
@@ -393,7 +394,7 @@ public abstract class ArchiveRecord extends InputStream {
             return false;
         }
 
-        if (!url.toLowerCase().startsWith("http")) {
+        if (!url.toLowerCase(Locale.ROOT).startsWith("http")) {
             return false;
         }
 

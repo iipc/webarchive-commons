@@ -23,6 +23,7 @@ import gnu.inet.encoding.IDNAException;
 
 import java.io.UnsupportedEncodingException;
 import java.util.BitSet;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -609,7 +610,7 @@ public class UsableURIFactory extends URI {
                 throw ue;
             }
         }
-        label = label.toLowerCase();
+        label = label.toLowerCase(Locale.ROOT);
         return label;
     }
     
@@ -755,6 +756,6 @@ public class UsableURIFactory extends URI {
      */
     private String checkUriElementAndLowerCase(String element) {
         String tmp = checkUriElement(element);
-        return (tmp != null)? tmp.toLowerCase(): tmp;
+        return (tmp != null)? tmp.toLowerCase(Locale.ROOT): tmp;
     }
 }

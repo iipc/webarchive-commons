@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -376,7 +377,7 @@ public class ARCRecord extends ArchiveRecord {
                     if (keys.size() != values.size()) {
                         // Early ARCs had a space in mimetype.
                         if (values.size() == (keys.size() + 1) &&
-                                        values.get(4).toLowerCase().startsWith("charset=")) {
+                                        values.get(4).toLowerCase(Locale.ROOT).startsWith("charset=")) {
                                 List<String> nuvalues =
                                         new ArrayList<String>(keys.size());
                                 nuvalues.add(0, values.get(0));

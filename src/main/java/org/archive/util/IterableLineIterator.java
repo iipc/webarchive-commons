@@ -19,7 +19,6 @@ public class IterableLineIterator extends LineIterator
         super(reader);
     }
 
-    @SuppressWarnings("unchecked")
     public Iterator<String> iterator() {
         return this;
     }

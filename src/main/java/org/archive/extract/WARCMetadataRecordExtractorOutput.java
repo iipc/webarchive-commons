@@ -3,24 +3,16 @@ package org.archive.extract;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.archive.format.gzip.GZIPFormatException;
-import org.archive.format.json.JSONUtils;
 import org.archive.format.json.SimpleJSONPathSpec;
 import org.archive.resource.MetaData;
 import org.archive.resource.Resource;
-import org.archive.util.IAUtils;
 import org.archive.util.StreamCopy;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.common.io.ByteStreams;

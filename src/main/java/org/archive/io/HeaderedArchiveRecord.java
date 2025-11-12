@@ -150,9 +150,6 @@ public class HeaderedArchiveRecord extends ArchiveRecord {
         }
         String statusLine = new String(statusBytes, 0,
             statusBytes.length - eolCharCount, ARCConstants.DEFAULT_ENCODING);
-        if (statusLine == null) {
-            throw new NullPointerException("Expected status line is null");
-        }
         statusLine = statusLine.trim();
         // TODO: Tighten up this test.
         boolean isHttpResponse = statusLine.startsWith("HTTP");

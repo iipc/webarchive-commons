@@ -393,7 +393,6 @@ public class FileUtils {
      *         after the end of the last line returned
      * @throws IOException
      */
-    @SuppressWarnings("unchecked")
     public static LongRange pagedLines(File file, long position,
             int signedDesiredLineCount, List<String> lines, int lineEstimate)
             throws IOException {

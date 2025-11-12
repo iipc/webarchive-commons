@@ -448,7 +448,6 @@ implements Closeable {
      * @throws IOException
      * @throws java.text.ParseException
      */
-    @SuppressWarnings("unchecked")
     public static void main(String [] args)
     throws ParseException, IOException, java.text.ParseException {
         Options options = getOptions();

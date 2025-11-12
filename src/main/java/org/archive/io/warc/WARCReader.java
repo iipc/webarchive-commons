@@ -199,7 +199,6 @@ public class WARCReader extends ArchiveReader {
         Options options = getOptions();
         PosixParser parser = new PosixParser();
         CommandLine cmdline = parser.parse(options, args, false);
-        @SuppressWarnings("unchecked")
         List<String> cmdlineArgs = cmdline.getArgList();
         Option [] cmdlineOptions = cmdline.getOptions();
         HelpFormatter formatter = new HelpFormatter();

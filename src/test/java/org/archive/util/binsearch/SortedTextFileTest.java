@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Locale;
 
 import org.archive.util.binsearch.impl.RandomAccessFileSeekableLineReaderFactory;
 import org.archive.util.iterator.CloseableIterator;
@@ -13,9 +14,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class SortedTextFileTest {
+
 	private static String formatS(int i) {
-		return String.format("%07d",i);
+		return String.format(Locale.ROOT, "%07d", i);
 	}
+
 	private void createFile(File target, int max) throws FileNotFoundException {
 		PrintWriter pw = new PrintWriter(target);
 		for(int i = 0; i < max; i++) {

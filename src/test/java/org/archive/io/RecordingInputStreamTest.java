@@ -66,8 +66,9 @@ public class RecordingInputStreamTest {
         ReplayInputStream res = ris.getReplayInputStream();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         res.readFullyTo(baos);
-        assertEquals("abcdefg",new String(baos.toByteArray()),"soft max cutoff");
-        // test hard max
+        assertEquals("abcdefg", new String(baos.toByteArray(), UTF_8),
+            "soft max cutoff");
+	    // test hard max
         bais.reset();
         baos.reset();
         ris.open(bais);
@@ -82,8 +83,8 @@ public class RecordingInputStreamTest {
         ris.close();
         res = ris.getReplayInputStream();
         res.readFullyTo(baos);
-        assertEquals("abcdefghijk",new String(baos.toByteArray()),
-                "hard max cutoff");
+        assertEquals("abcdefghijk", new String(baos.toByteArray(), UTF_8),
+            "hard max cutoff");
         // test timeout
         PipedInputStream pin = new PipedInputStream(); 
         PipedOutputStream pout = new PipedOutputStream(pin); 

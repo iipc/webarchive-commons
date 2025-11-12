@@ -27,6 +27,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RepositionableInputStreamTest {
@@ -63,7 +65,7 @@ public class RepositionableInputStreamTest {
         long offset = 0;
         for (int i = 0; i < 10; i++) {
             ris.read(bytes, 0, LINE.length());
-            assertEquals(LINE, new String(bytes));
+            assertEquals(LINE, new String(bytes, UTF_8));
             offset += LINE.length();
             assertEquals(offset, ris.position());
         }

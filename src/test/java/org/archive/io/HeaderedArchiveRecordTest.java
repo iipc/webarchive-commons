@@ -78,7 +78,7 @@ public class HeaderedArchiveRecordTest {
 
         byte[] b = new byte[BODY.length()];
         har.read(b);
-        String bodyRead = new String(b);
+        String bodyRead = new String(b, UTF_8);
         assertEquals(BODY, bodyRead);
         assertHeaderCorrectlyParsed(har.getContentHeaders());
         assertEquals(har.getHeader().getUrl(), url,
@@ -165,7 +165,7 @@ public class HeaderedArchiveRecordTest {
         har.skipHttpHeader();
         byte[] b = new byte[BODY.length()];
         har.read(b);
-        String bodyRead = new String(b);
+        String bodyRead = new String(b, UTF_8);
         assertEquals(BODY, bodyRead);
         assertHeaderCorrectlyParsed(har.getContentHeaders());
     }
@@ -184,7 +184,7 @@ public class HeaderedArchiveRecordTest {
         har.skipHttpHeader();
         byte[] b = new byte[BODY.length()];
         har.read(b);
-        String bodyRead = new String(b);
+        String bodyRead = new String(b, UTF_8);
         assertEquals(BODY, bodyRead);
         assertHeaderCorrectlyParsed(har.getContentHeaders());
         assertEquals(har.getHeader().getUrl(), url, "failed to retrieve Url from metadata");

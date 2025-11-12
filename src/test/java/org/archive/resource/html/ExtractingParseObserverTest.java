@@ -3,6 +3,7 @@ package org.archive.resource.html;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import org.archive.extract.ExtractingResourceFactoryMapper;
@@ -52,7 +53,7 @@ public class ExtractingParseObserverTest {
 				TextNode tn = new TextNode(css);
 				epo.handleStyleNode(tn);
 			} catch(Exception e) {
-				System.err.format("And the winner is....(%s)\n", css);
+				System.err.format(Locale.ROOT, "And the winner is....(%s)\n", css);
 				e.printStackTrace();
 				except = true;
 				throw e;

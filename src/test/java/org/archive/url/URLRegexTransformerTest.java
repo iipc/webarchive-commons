@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Locale;
+
 public class URLRegexTransformerTest {
 
     @Test
@@ -49,7 +51,7 @@ public class URLRegexTransformerTest {
 
 	private static void checkStripPathSessionID(String orig, String want) {
 		String got = URLRegexTransformer.stripPathSessionID(orig);
-        assertEquals(want, got, String.format("FAIL Orig(%s) Got(%s) Want(%s)", orig, got, want));
+        assertEquals(want, got, String.format(Locale.ROOT, "FAIL Orig(%s) Got(%s) Want(%s)", orig, got, want));
 	}
 	
 //    private static final String  BASE = "http://www.archive.org/index.html";

@@ -2,10 +2,12 @@ package org.archive.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 
 public class CrossProductTest {
+
 	private void dumpC(List<Object> a) {
 		StringBuilder sb = new StringBuilder();
 		boolean first = false;
@@ -19,16 +21,19 @@ public class CrossProductTest {
 		}
 		System.out.println("Dump:" + sb.toString());
 	}
+
 	private void dumpLOL(List<List<Object>> coc) {
 		for(List<Object> co : coc) {
 			dumpC(co);
 		}
 	}
+
 	@Test
 	public void testVersion() {
 		String version = IAUtils.loadCommonsVersion();
-		System.out.format("Loaded version(%s)\n", version);
+		System.out.format(Locale.ROOT, "Loaded version(%s)\n", version);
 	}
+
 	@Test
 	public void testCrossProduct() {
 		ArrayList<List<Object>> input = new ArrayList<List<Object>>();
@@ -40,6 +45,7 @@ public class CrossProductTest {
 		List<List<Object>> cross = xp.crossProduct(input);
 		dumpLOL(cross);
 	}
+
 	private List<Object> AtoL(Object... a) {
 		ArrayList<Object> al = new ArrayList<Object>(a.length);
 		for(Object s : a) {

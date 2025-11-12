@@ -626,7 +626,7 @@ class URI implements Cloneable, Comparable, Serializable {
     /**
      * The default charset of the protocol.  RFC 2277, 2396
      */
-    protected static String defaultProtocolCharset = "UTF-8";
+    protected static String defaultProtocolCharset = UTF_8.name();
 
 
     /**

@@ -15,6 +15,8 @@ import org.archive.util.ByteOp;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class GZIPMetaData extends MetaData implements ResourceConstants {
 	private static final Logger LOG = Logger.getLogger(GZIPMetaData.class.getName());
 	
@@ -26,7 +28,7 @@ public class GZIPMetaData extends MetaData implements ResourceConstants {
 			GZIPHeader header = member.getHeader();
 			GZIPStaticHeader staticH = header.getStaticHeader();
 			if(staticH.isFNameSet()) {
-				putString(GZIP_FILENAME,new String(header.getFileName(),"UTF-8"));
+				putString(GZIP_FILENAME, new String(header.getFileName(), UTF_8));
 			}
 			if(staticH.isFCommentSet()) {
 				putLong(GZIP_COMMENT_LENGTH,header.getCommentLength());				
@@ -39,7 +41,7 @@ public class GZIPMetaData extends MetaData implements ResourceConstants {
 			for(int i = 0; i < records; i++) {
 				GZIPFExtraRecord rec = header.getRecord(i);
 				JSONObject recJO = new JSONObject();
-				String name = new String(rec.getName(),"UTF-8");
+				String name = new String(rec.getName(), UTF_8);
 				recJO.put(GZIP_FEXTRA_NAME, name);
 				if(name.equals("SL") || name.equals("LX")) {
 					recJO.put(GZIP_FEXTRA_VALUE, ByteOp.bytesToInt(rec.getValue()));
@@ -55,8 +57,6 @@ public class GZIPMetaData extends MetaData implements ResourceConstants {
 			putLong(GZIP_INFLATED_CRC,footer.getCRC());
 			putLong(GZIP_INFLATED_LENGTH,footer.getLength());
 
-		} catch (UnsupportedEncodingException e) {
-			LOG.warning(e.getMessage());
 		} catch (JSONException e) {
 			LOG.warning(e.getMessage());
 		}

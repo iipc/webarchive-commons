@@ -176,7 +176,7 @@ public class WATExtractorOutput implements ExtractorOutput {
 			throw new IOException(e1);
 		}
 		osw.flush();
-//		ByteArrayInputStream bais = new ByteArrayInputStream(md.toString().getBytes("UTF-8"));
+//		ByteArrayInputStream bais = new ByteArrayInputStream(md.toString().getBytes(UTF_8));
 		Date capDate;
 		try {
 			capDate = DateUtils.getSecondsSinceEpoch(capDateString);

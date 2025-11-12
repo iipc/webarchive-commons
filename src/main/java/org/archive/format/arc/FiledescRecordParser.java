@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 public class FiledescRecordParser {
 	public boolean strict = false;
@@ -12,7 +13,7 @@ public class FiledescRecordParser {
 		FiledescRecord rec = new FiledescRecord();
 		try {
 			// TODO: count input bytes read...
-			BufferedReader br = new BufferedReader(new InputStreamReader(is,"UTF-8"));
+			BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
 			String line = br.readLine();
 			parseLine1(rec,line);
 			line = br.readLine();

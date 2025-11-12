@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -54,7 +55,7 @@ import static org.archive.format.ArchiveFileConstants.*;
 public abstract class WriterPoolMember {
     private final Logger logger = Logger.getLogger(this.getClass().getName());
     
-    public static final String UTF8 = "UTF-8";
+    public static final String UTF8 = StandardCharsets.UTF_8.name();
     
     /**
      * Default archival-aggregate filename template. 

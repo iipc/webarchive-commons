@@ -28,7 +28,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -193,7 +192,7 @@ public class PublicSuffixes {
         } else {
             is = new FileInputStream(args[0]);
         }
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is, UTF_8));
         String regex = getTopmostAssignedSurtPrefixRegex(reader);
         IOUtils.closeQuietly(is);
         
@@ -335,16 +334,11 @@ public class PublicSuffixes {
     public static synchronized String getTopmostAssignedSurtPrefixRegex() {
         if (topmostAssignedSurtPrefixRegex == null) {
             // use bundled list
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        PublicSuffixes.class.getResourceAsStream(
-                        "/org/archive/effective_tld_names.dat"), "UTF-8"));
-                topmostAssignedSurtPrefixRegex = getTopmostAssignedSurtPrefixRegex(reader);
-                IOUtils.closeQuietly(reader);
-            } catch (UnsupportedEncodingException ex) {
-                // should never happen
-                throw new RuntimeException(ex);
-            }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                PublicSuffixes.class.getResourceAsStream(
+                    "/org/archive/effective_tld_names.dat"), UTF_8));
+            topmostAssignedSurtPrefixRegex = getTopmostAssignedSurtPrefixRegex(reader);
+            IOUtils.closeQuietly(reader);
         }
         return topmostAssignedSurtPrefixRegex;
     }

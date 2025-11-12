@@ -148,7 +148,7 @@ public class LaxHttpParser {
 
     public static String readLine(InputStream inputStream) throws IOException {
         LOG.finest("enter LaxHttpParser.readLine(InputStream)");
-        return readLine(inputStream, "US-ASCII");
+        return readLine(inputStream, StandardCharsets.US_ASCII.name());
     }
     
     /**
@@ -238,6 +238,6 @@ public class LaxHttpParser {
      */
     public static HttpHeader[] parseHeaders(InputStream is) throws IOException {
         LOG.finest("enter HeaderParser.parseHeaders(InputStream, String)");
-        return parseHeaders(is, "US-ASCII");
+        return parseHeaders(is, StandardCharsets.US_ASCII.name());
     }
 }

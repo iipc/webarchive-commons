@@ -280,8 +280,7 @@ class ChunkedInputStream extends InputStream {
      * @throws IOException If an IO problem occurs
      */
     private void parseTrailerHeaders() throws IOException {
-        String charset = "US-ASCII";
-        LaxHttpParser.parseHeaders(in, charset);
+        LaxHttpParser.parseHeaders(in, StandardCharsets.US_ASCII.name());
     }
 
     /**

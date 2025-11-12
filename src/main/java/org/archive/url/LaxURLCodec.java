@@ -29,7 +29,7 @@ import org.apache.commons.codec.net.URLCodec;
  * @author gojomo
  */
 public class LaxURLCodec extends URLCodec {
-    public static LaxURLCodec DEFAULT = new LaxURLCodec("UTF-8");
+    public static LaxURLCodec DEFAULT = new LaxURLCodec(StandardCharsets.UTF_8.name());
 
     // passthrough constructor
     public LaxURLCodec(String encoding) {

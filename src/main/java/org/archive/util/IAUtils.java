@@ -73,11 +73,7 @@ public class IAUtils {
         if (input == null) {
             return "UNKNOWN";
         }
-        try {
-            reader = new InputStreamReader(input, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            return "UNKNOWN";
-        }
+        reader = new InputStreamReader(input, UTF_8);
         Properties prop = new Properties();
         try {
             prop.load(reader);

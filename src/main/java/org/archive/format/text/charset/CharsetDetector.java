@@ -22,6 +22,7 @@ package org.archive.format.text.charset;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -92,7 +93,7 @@ public abstract class CharsetDetector {
 	// ...and if the chardet library fails, use the Content-Type header
 	protected final static String HTTP_CONTENT_TYPE_HEADER = "CONTENT-TYPE";
 	/** the default charset name to use when giving up */
-	public final static String DEFAULT_CHARSET = "UTF-8";
+	public final static String DEFAULT_CHARSET = StandardCharsets.UTF_8.name();
 	
 	protected boolean isCharsetSupported(String charsetName) {
 		// can you believe that this throws a runtime? Just asking if it's

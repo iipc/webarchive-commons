@@ -21,6 +21,7 @@ package org.archive.io;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +41,7 @@ public class RepositionableInputStreamTest {
     @BeforeEach
     protected void setUp() throws Exception {
         this.testFile = new File(tempDir, this.getClass().getName());
-        PrintWriter pw = new PrintWriter(new FileOutputStream(testFile));
+        PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(testFile), UTF_8));
         for (int i = 0; i < 100; i++) {
             pw.print(LINE);
         }

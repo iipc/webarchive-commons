@@ -262,7 +262,7 @@ public class ARCWriterTest {
     }
     
     public void testWriteGiantRecord() throws IOException {
-        PrintStream dummyStream = new PrintStream(new NullOutputStream());
+        PrintStream dummyStream = new PrintStream(new NullOutputStream(), false, UTF_8.name());
         ARCWriter arcWriter = 
             new ARCWriter(
                     SERIAL_NO,
@@ -431,7 +431,7 @@ public class ARCWriterTest {
         PrintStream origErr = System.err; 
         ARCReader r = null; 
         try {
-            System.setErr(new PrintStream(os));
+            System.setErr(new PrintStream(os, false, UTF_8.name()));
             
             r = ARCReaderFactory.get(writer.getFile());
             r.setStrict(strict);
@@ -440,7 +440,7 @@ public class ARCWriterTest {
     
             // Make sure we get the warning string which complains about the
             // trailing bytes.
-            String err = os.toString();
+            String err = os.toString(UTF_8.name());
             assertTrue(err.startsWith("WARNING") &&
                 (err.indexOf("Record STARTING at") > 0), "No message " + err);
             r.close();
@@ -496,7 +496,7 @@ public class ARCWriterTest {
         PrintStream origErr = System.err; 
         ARCReader r = null; 
         try {
-            System.setErr(new PrintStream(os));
+            System.setErr(new PrintStream(os, false, UTF_8.name()));
             
             r = ARCReaderFactory.get(writer.getFile());
             r.setStrict(strict);
@@ -505,7 +505,7 @@ public class ARCWriterTest {
             
             // Make sure we get the warning string which complains about the
             // trailing bytes.
-            String err = os.toString();
+            String err = os.toString(UTF_8.name());
             assertTrue(err.startsWith("WARNING Premature EOF before end-of-record"),
                 "No message " + err);
         } finally {

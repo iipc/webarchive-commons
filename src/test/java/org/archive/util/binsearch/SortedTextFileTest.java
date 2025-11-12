@@ -4,11 +4,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
 import org.archive.util.binsearch.impl.RandomAccessFileSeekableLineReaderFactory;
 import org.archive.util.iterator.CloseableIterator;
 import org.junit.jupiter.api.Test;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -19,8 +22,8 @@ public class SortedTextFileTest {
 		return String.format(Locale.ROOT, "%07d", i);
 	}
 
-	private void createFile(File target, int max) throws FileNotFoundException {
-		PrintWriter pw = new PrintWriter(target);
+	private void createFile(File target, int max) throws FileNotFoundException, UnsupportedEncodingException {
+		PrintWriter pw = new PrintWriter(target, UTF_8.name());
 		for(int i = 0; i < max; i++) {
 			pw.println(formatS(i));
 		}

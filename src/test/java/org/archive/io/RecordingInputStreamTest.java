@@ -140,6 +140,6 @@ public class RecordingInputStreamTest {
         ris.close();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ris.getReplayInputStream().readFullyTo(baos);
-        assertEquals("hello", baos.toString());
+        assertEquals("hello", baos.toString(UTF_8.name()));
     }
 }

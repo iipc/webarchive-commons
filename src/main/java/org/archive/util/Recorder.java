@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -41,8 +42,6 @@ import org.archive.io.RecordingInputStream;
 import org.archive.io.RecordingOutputStream;
 import org.archive.io.ReplayCharSequence;
 import org.archive.io.ReplayInputStream;
-
-import com.google.common.base.Charsets;
 
 
 /**
@@ -96,7 +95,7 @@ public class Recorder {
      * (current behavior is for consistency with our prior but perhaps not
      * optimal behavior) 
      */
-    protected Charset charset = Charsets.UTF_8; 
+    protected Charset charset = StandardCharsets.UTF_8; 
     
     /** whether recording-input (ris) message-body is chunked */
     protected boolean inputIsChunked = false; 

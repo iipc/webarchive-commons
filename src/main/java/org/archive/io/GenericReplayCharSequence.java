@@ -33,6 +33,7 @@ import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -41,7 +42,6 @@ import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 import org.archive.util.DevUtils;
 
-import com.google.common.base.Charsets;
 import com.google.common.primitives.Ints;
 
 /**
@@ -68,7 +68,7 @@ public class GenericReplayCharSequence implements ReplayCharSequence {
      *
      * <p>See <a href="http://java.sun.com/j2se/1.4.2/docs/guide/intl/encoding.doc.html">Encoding</a>.
      */
-    public static final Charset WRITE_ENCODING = Charsets.UTF_16BE;
+    public static final Charset WRITE_ENCODING = StandardCharsets.UTF_16BE;
 
     private static final long MAP_MAX_BYTES = 64 * 1024 * 1024; // 64M
     

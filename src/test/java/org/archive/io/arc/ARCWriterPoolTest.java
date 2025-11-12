@@ -30,6 +30,8 @@ import org.archive.io.WriterPoolSettings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.archive.format.arc.ARCConstants.*;
 
@@ -51,7 +53,7 @@ public class ARCWriterPoolTest {
         WriterPoolMember [] writers = new WriterPoolMember[MAX_ACTIVE];
         final String CONTENT = "Any old content";
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        baos.write(CONTENT.getBytes());
+        baos.write(CONTENT.getBytes(UTF_8));
         for (int i = 0; i < MAX_ACTIVE; i++) {
             writers[i] = pool.borrowFile();
             assertEquals(i + 1, pool.getNumActive(), "Number active");
@@ -81,7 +83,7 @@ public class ARCWriterPoolTest {
         WriterPoolMember [] writers = new WriterPoolMember[MAX_ACTIVE];
         final String CONTENT = "Any old content";
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        baos.write(CONTENT.getBytes());
+        baos.write(CONTENT.getBytes(UTF_8));
         for (int i = 0; i < MAX_ACTIVE; i++) {
             writers[i] = pool.borrowFile();
             assertEquals(i + 1, pool.getNumActive(), "Number active");

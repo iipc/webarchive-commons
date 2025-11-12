@@ -31,6 +31,8 @@ import org.archive.io.arc.ARCRecord;
 import org.archive.io.warc.WARCRecord;
 import org.junit.jupiter.api.Test;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -68,7 +70,7 @@ public class HeaderedArchiveRecordTest {
 
         final String hdr = warcHeader + HTTPHEADER + BODY;
 
-        WARCRecord r = new WARCRecord(new ByteArrayInputStream(hdr.getBytes()),
+        WARCRecord r = new WARCRecord(new ByteArrayInputStream(hdr.getBytes(UTF_8)),
                 "READER_IDENTIFIER", 0, false, true);
         HeaderedArchiveRecord har = new HeaderedArchiveRecord(r, true);
 
@@ -156,7 +158,7 @@ public class HeaderedArchiveRecordTest {
             }
 
         };
-        ARCRecord r = new ARCRecord(new ByteArrayInputStream(hdr.getBytes()),
+        ARCRecord r = new ARCRecord(new ByteArrayInputStream(hdr.getBytes(UTF_8)),
                 arh, 0, false, true, false);
 
         HeaderedArchiveRecord har = new HeaderedArchiveRecord(r, true);
@@ -175,7 +177,7 @@ public class HeaderedArchiveRecordTest {
                 + " 192.168.0.1 20070515111004 text/html 167568\n";
         final String hdr = arcHeader + HTTPHEADER + BODY;
 
-        ARCRecord r = new ARCRecord(new ByteArrayInputStream(hdr.getBytes()),
+        ARCRecord r = new ARCRecord(new ByteArrayInputStream(hdr.getBytes(UTF_8)),
                 "READER_IDENTIFIER", 0, false, true, false);
 
         HeaderedArchiveRecord har = new HeaderedArchiveRecord(r, true);
@@ -205,7 +207,7 @@ public class HeaderedArchiveRecordTest {
         String c = "WARC/0.12\r\nContent-Type: text/plain\r\n"
                 + "Content-Length: " + b.length() + "\r\n\r\n" + b;
         org.archive.io.warc.WARCRecord r = new org.archive.io.warc.WARCRecord(
-                new ByteArrayInputStream(c.getBytes()), "READER_IDENTIFIER", 0,
+                new ByteArrayInputStream(c.getBytes(UTF_8)), "READER_IDENTIFIER", 0,
                 false, true);
         HeaderedArchiveRecord har = new HeaderedArchiveRecord(r, true);
         assertTrue(har.isStrict());

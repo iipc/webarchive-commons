@@ -47,6 +47,8 @@ import com.google.common.io.Closeables;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import static org.archive.format.arc.ARCConstants.*;
@@ -122,11 +124,11 @@ public class ARCWriterTest {
         // Start the record with an arbitrary 14-digit date per RFC2540
         String now = ArchiveUtils.get14DigitDate();
         int recordLength = 0;
-        byte[] record = (getContent(indexStr)).getBytes();
+        byte[] record = (getContent(indexStr)).getBytes(UTF_8);
         recordLength += record.length;
         baos.write(record);
         // Add the newline between records back in
-        baos.write("\n".getBytes());
+        baos.write("\n".getBytes(UTF_8));
         recordLength += 1;
         arcWriter.write("http://www.one.net/id=" + indexStr, "text/html",
             "0.1.2.3", Long.parseLong(now), recordLength, baos);
@@ -305,7 +307,7 @@ public class ARCWriterTest {
     
     protected static ByteArrayInputStream getBais(String str)
     throws IOException {
-        return new ByteArrayInputStream(str.getBytes());
+        return new ByteArrayInputStream(str.getBytes(UTF_8));
     }
     
     /**
@@ -417,7 +419,7 @@ public class ARCWriterTest {
             ByteArrayInputStream bais = getBais(content+"SOME TRAILING BYTES");
             writeRecord(writer, SOME_URL, "text/html",
                 content.length(), bais);
-            writer.setEndJunk("SOME TRAILING BYTES".getBytes());
+            writer.setEndJunk("SOME TRAILING BYTES".getBytes(UTF_8));
             writeRecord(writer, SOME_URL, "text/html",
                 content.length(), getBais(content));
         } finally {
@@ -518,7 +520,7 @@ public class ARCWriterTest {
         String content = getContent();
         // Make a 'weird' RIS that returns bad 'remaining' length
         // awhen remaining should be 0
-        ReplayInputStream ris = new ReplayInputStream(content.getBytes(),
+        ReplayInputStream ris = new ReplayInputStream(content.getBytes(UTF_8),
                 content.length(), null) {
             public long remaining() {
                 return (super.remaining()==0) ? -1 : super.remaining();

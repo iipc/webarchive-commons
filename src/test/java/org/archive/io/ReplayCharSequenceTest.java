@@ -36,6 +36,8 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -143,7 +145,7 @@ public class ReplayCharSequenceTest {
     @Test
     public void testReplayCharSequenceByteToString() throws IOException {
         String fileContent = "Some file content";
-        byte [] buffer = fileContent.getBytes();
+        byte [] buffer = fileContent.getBytes(UTF_8);
         RecordingOutputStream ros = writeTestStream(
                 buffer,1,
                 "testReplayCharSequenceByteToString.txt",0);
@@ -207,7 +209,7 @@ public class ReplayCharSequenceTest {
     @Test
     public void testReplayCharSequenceByteToStringOverflow() throws IOException {
         String fileContent = "Some file content. "; // ascii
-        byte [] buffer = fileContent.getBytes();
+        byte [] buffer = fileContent.getBytes(UTF_8);
         RecordingOutputStream ros = writeTestStream(
                 buffer,1,
                 "testReplayCharSequenceByteToStringOverflow.txt",1);

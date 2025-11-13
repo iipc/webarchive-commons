@@ -88,11 +88,11 @@ public class BasicURLCanonicalizer implements URLCanonicalizer {
 		}
 		int start = 0, end = host.length();
 		boolean changed = false;
-		while (host.charAt(start) == '.') {
+		while (start < end && host.charAt(start) == '.') {
 			start++;
 			changed = true;
 		}
-		while (host.charAt(end - 1) == '.') {
+		while (end > start && host.charAt(end - 1) == '.') {
 			end--;
 			changed = true;
 		}

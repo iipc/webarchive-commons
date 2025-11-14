@@ -49,6 +49,8 @@ import org.apache.commons.io.IOUtils;
 import org.archive.format.gzip.GZIPDecoder;
 import org.archive.format.gzip.GZIPFormatException;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * Miscellaneous useful methods.
  *
@@ -851,7 +853,7 @@ public class ArchiveUtils {
         BufferedReader br = null;
         String version;
         try {
-            br = new BufferedReader(new InputStreamReader(input));
+            br = new BufferedReader(new InputStreamReader(input, UTF_8));
             version = br.readLine();
             br.readLine();
         } catch (IOException e) {
@@ -873,7 +875,7 @@ public class ArchiveUtils {
         br = null;
         String timestamp;
         try {
-            br = new BufferedReader(new InputStreamReader(input));
+            br = new BufferedReader(new InputStreamReader(input, UTF_8));
             timestamp = br.readLine();
         } catch (IOException e) {
             return version;
@@ -894,13 +896,13 @@ public class ArchiveUtils {
         TLDS = new HashSet<String>();
         InputStream is = ArchiveUtils.class.getResourceAsStream("tlds-alpha-by-domain.txt");
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is, UTF_8));
             String line; 
             while((line = reader.readLine())!=null) {
                 if (line.startsWith("#")) {
                     continue;
                 }
-                TLDS.add(line.trim().toLowerCase()); 
+                TLDS.add(line.trim().toLowerCase(Locale.ROOT));
             }
         } catch (Exception e) { 
             LOGGER.log(Level.SEVERE,"TLD list unavailable",e);
@@ -917,7 +919,7 @@ public class ArchiveUtils {
      * @return boolean true if recognized as TLD
      */
     public static boolean isTld(String dom) {
-        return TLDS.contains(dom.toLowerCase());
+        return TLDS.contains(dom.toLowerCase(Locale.ROOT));
     }
     
     public static void closeQuietly(Object input) {
@@ -981,12 +983,12 @@ public class ArchiveUtils {
      */
     public static BufferedReader getBufferedReader(File source) throws IOException {
         InputStream is = new BufferedInputStream(new FileInputStream(source));
-        boolean isGzipped = source.getName().toLowerCase().
+        boolean isGzipped = source.getName().toLowerCase(Locale.ROOT).
             endsWith(GZIP_SUFFIX);
         if(isGzipped) {
             is = new GZIPInputStream(is);
         }
-        return new BufferedReader(new InputStreamReader(is));
+        return new BufferedReader(new InputStreamReader(is, UTF_8));
     }
 
     /**
@@ -1002,8 +1004,8 @@ public class ArchiveUtils {
                 || conn.getContentEncoding() != null && conn.getContentEncoding().equalsIgnoreCase("gzip");
         InputStream uis = conn.getInputStream();
         return new BufferedReader(isGzipped?
-            new InputStreamReader(new GZIPInputStream(uis)):
-            new InputStreamReader(uis));    
+            new InputStreamReader(new GZIPInputStream(uis), UTF_8):
+            new InputStreamReader(uis, UTF_8));
     }
     
     /**

@@ -28,6 +28,8 @@ import java.io.PipedOutputStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -55,7 +57,7 @@ public class RecordingInputStreamTest {
         RecordingInputStream ris = new RecordingInputStream(16384, (new File(
                 tempDir, "testReadFullyOrUntil").getAbsolutePath()));
         ByteArrayInputStream bais = new ByteArrayInputStream(
-                "abcdefghijklmnopqrstuvwxyz".getBytes());
+                "abcdefghijklmnopqrstuvwxyz".getBytes(UTF_8));
         // test soft max
         ris.open(bais);
         ris.setLimits(10,0,0);
@@ -64,8 +66,9 @@ public class RecordingInputStreamTest {
         ReplayInputStream res = ris.getReplayInputStream();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         res.readFullyTo(baos);
-        assertEquals("abcdefg",new String(baos.toByteArray()),"soft max cutoff");
-        // test hard max
+        assertEquals("abcdefg", new String(baos.toByteArray(), UTF_8),
+            "soft max cutoff");
+	    // test hard max
         bais.reset();
         baos.reset();
         ris.open(bais);
@@ -80,14 +83,14 @@ public class RecordingInputStreamTest {
         ris.close();
         res = ris.getReplayInputStream();
         res.readFullyTo(baos);
-        assertEquals("abcdefghijk",new String(baos.toByteArray()),
-                "hard max cutoff");
+        assertEquals("abcdefghijk", new String(baos.toByteArray(), UTF_8),
+            "hard max cutoff");
         // test timeout
         PipedInputStream pin = new PipedInputStream(); 
         PipedOutputStream pout = new PipedOutputStream(pin); 
         ris.open(pin);
         exceptionThrown = false; 
-        trickle("abcdefghijklmnopqrstuvwxyz".getBytes(),pout);
+        trickle("abcdefghijklmnopqrstuvwxyz".getBytes(UTF_8),pout);
         int timeout = 200;
         try {
             ris.setLimits(0, timeout,0);
@@ -133,10 +136,10 @@ public class RecordingInputStreamTest {
         RecordingInputStream ris = new RecordingInputStream(16384, (new File(
                 tempDir, "testAsOutputStream").getAbsolutePath()));
         ris.open(null);
-        ris.asOutputStream().write("hello".getBytes());
+        ris.asOutputStream().write("hello".getBytes(UTF_8));
         ris.close();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ris.getReplayInputStream().readFullyTo(baos);
-        assertEquals("hello", baos.toString());
+        assertEquals("hello", baos.toString(UTF_8.name()));
     }
 }

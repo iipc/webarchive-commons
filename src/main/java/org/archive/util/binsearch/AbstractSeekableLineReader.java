@@ -7,13 +7,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.archive.util.zip.GZIPMembersInputStream;
 
 import com.google.common.io.ByteStreams;
 
 public abstract class AbstractSeekableLineReader implements SeekableLineReader {
-	public final static Charset UTF8 = Charset.forName("UTF-8");
+	public final static Charset UTF8 = StandardCharsets.UTF_8;
 	
 	protected int blockSize = 128 * 1024;
 	

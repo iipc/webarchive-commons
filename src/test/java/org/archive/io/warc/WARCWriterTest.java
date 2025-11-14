@@ -42,6 +42,8 @@ import org.archive.util.anvl.ANVLRecord;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import static org.archive.format.warc.WARCConstants.*;
@@ -228,7 +230,7 @@ public class WARCWriterTest {
         String indexStr = Integer.toString(index);
         recordInfo.setUrl("http://www.one.net/id=" + indexStr);
         
-        byte[] record = (getContent(indexStr)).getBytes();
+        byte[] record = (getContent(indexStr)).getBytes(UTF_8);
         recordInfo.setContentLength((long) record.length);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -385,7 +387,7 @@ public class WARCWriterTest {
     protected static ByteArrayOutputStream getBaos(String str)
     throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        baos.write(str.getBytes());
+        baos.write(str.getBytes(UTF_8));
         return baos;
     }
     

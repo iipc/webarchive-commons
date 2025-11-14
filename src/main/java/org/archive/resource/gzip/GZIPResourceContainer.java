@@ -1,6 +1,7 @@
 package org.archive.resource.gzip;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import org.archive.format.gzip.GZIPMemberSeries;
 import org.archive.format.gzip.GZIPSeriesMember;
@@ -54,6 +55,6 @@ public class GZIPResourceContainer implements ResourceContainer, ResourceProduce
 		series.close();
 	}
 	public String getContext() {
-		return String.format("Context(%s)(%d)", series.getStreamContext(), series.getCurrentMemberStartOffset());
+		return String.format(Locale.ROOT, "Context(%s)(%d)", series.getStreamContext(), series.getCurrentMemberStartOffset());
 	}
 }

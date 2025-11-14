@@ -2,6 +2,7 @@ package org.archive.format.http;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 public class HttpHeaderParser implements HttpConstants {
 	private static final int DEFAULT_MAX_NAME_LENGTH = 1024 * 100;
@@ -288,7 +289,8 @@ public class HttpHeaderParser implements HttpConstants {
 				return parser.postColonState;
 			}
 			if(parser.isStrict) {
-				throw new HttpParseException("Illegal char after name("+new String(name,0,nameLength)+")");
+				throw new HttpParseException("Illegal char after name("
+						+ new String(name, 0, nameLength, StandardCharsets.ISO_8859_1) + ")");
 			}
 			parser.headersCorrupted();
 			return parser.laxLineEatParseState;

@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.logging.Level;
 
 import org.archive.io.ArchiveReader;
@@ -230,7 +231,7 @@ public class ARCReaderFactory extends ArchiveReaderFactory {
     throws IOException {
         boolean compressedARCFile = false;
         FileUtils.assertReadable(arcFile);
-        if(!skipSuffixCheck && !arcFile.getName().toLowerCase()
+        if(!skipSuffixCheck && !arcFile.getName().toLowerCase(Locale.ROOT)
                 .endsWith(COMPRESSED_ARC_FILE_EXTENSION)) {
             return compressedARCFile;
         }
@@ -247,9 +248,9 @@ public class ARCReaderFactory extends ArchiveReaderFactory {
     public static boolean isARCSuffix(final String arcName) {
     	return (arcName == null)?
     		false:
-    		(arcName.toLowerCase().endsWith(DOT_COMPRESSED_ARC_FILE_EXTENSION))?
+    		(arcName.toLowerCase(Locale.ROOT).endsWith(DOT_COMPRESSED_ARC_FILE_EXTENSION))?
     		    true:
-    			(arcName.toLowerCase().endsWith(DOT_ARC_FILE_EXTENSION))?
+    			(arcName.toLowerCase(Locale.ROOT).endsWith(DOT_ARC_FILE_EXTENSION))?
     			true: false;
     }
     

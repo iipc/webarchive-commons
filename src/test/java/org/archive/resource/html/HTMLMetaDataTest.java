@@ -1,5 +1,7 @@
 package org.archive.resource.html;
 
+import java.util.Locale;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,7 +61,7 @@ public class HTMLMetaDataTest {
 	}
 	private void appendStrArr2(JSONObject o, String k, String... a) throws JSONException {
 		
-		System.out.format("A length(%d)\n", a.length);
+		System.out.format(Locale.ROOT, "A length(%d)\n", a.length);
 		JSONObject n = new JSONObject();
 		if((a.length & 1) == 1) {
 			throw new IllegalArgumentException();

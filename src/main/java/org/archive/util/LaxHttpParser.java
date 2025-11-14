@@ -36,6 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -127,7 +128,7 @@ public class LaxHttpParser {
         try {
             return new String(rawdata, 0, len - offset, charset);
         } catch (UnsupportedEncodingException e) {
-            return new String(rawdata, 0, len - offset);
+            return new String(rawdata, 0, len - offset, StandardCharsets.ISO_8859_1);
         }
     }
 
@@ -147,7 +148,7 @@ public class LaxHttpParser {
 
     public static String readLine(InputStream inputStream) throws IOException {
         LOG.finest("enter LaxHttpParser.readLine(InputStream)");
-        return readLine(inputStream, "US-ASCII");
+        return readLine(inputStream, StandardCharsets.US_ASCII.name());
     }
     
     /**
@@ -237,6 +238,6 @@ public class LaxHttpParser {
      */
     public static HttpHeader[] parseHeaders(InputStream is) throws IOException {
         LOG.finest("enter HeaderParser.parseHeaders(InputStream, String)");
-        return parseHeaders(is, "US-ASCII");
+        return parseHeaders(is, StandardCharsets.US_ASCII.name());
     }
 }

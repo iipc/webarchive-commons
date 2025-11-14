@@ -22,20 +22,23 @@ package org.archive.net;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.archive.util.TextUtils;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Utility class for making use of the information about 'public suffixes' at
@@ -189,7 +192,7 @@ public class PublicSuffixes {
         } else {
             is = new FileInputStream(args[0]);
         }
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is, UTF_8));
         String regex = getTopmostAssignedSurtPrefixRegex(reader);
         IOUtils.closeQuietly(is);
         
@@ -197,11 +200,11 @@ public class PublicSuffixes {
         BufferedWriter writer;
         if (args.length >= 2) {
             // write to specified file
-            writer = new BufferedWriter(new FileWriter(args[1]));
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(args[1]), UTF_8));
             needsClose = true;
         } else {
             // write to stdout
-            writer = new BufferedWriter(new OutputStreamWriter(System.out));
+            writer = new BufferedWriter(new OutputStreamWriter(System.out, Charset.defaultCharset()));
         }
         writer.append(regex);
         writer.flush();
@@ -231,7 +234,7 @@ public class PublicSuffixes {
             // discard utf8 notation after entry
             line = line.split("\\s+")[0];
             // TODO: maybe we don't need to create lower-cased String
-            line = line.toLowerCase();
+            line = line.toLowerCase(Locale.ROOT);
             // SURT-order domain segments
             String[] segs = line.split("\\.");
             StringBuilder sb = new StringBuilder();
@@ -331,16 +334,11 @@ public class PublicSuffixes {
     public static synchronized String getTopmostAssignedSurtPrefixRegex() {
         if (topmostAssignedSurtPrefixRegex == null) {
             // use bundled list
-            try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(
-                        PublicSuffixes.class.getResourceAsStream(
-                        "/org/archive/effective_tld_names.dat"), "UTF-8"));
-                topmostAssignedSurtPrefixRegex = getTopmostAssignedSurtPrefixRegex(reader);
-                IOUtils.closeQuietly(reader);
-            } catch (UnsupportedEncodingException ex) {
-                // should never happen
-                throw new RuntimeException(ex);
-            }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                PublicSuffixes.class.getResourceAsStream(
+                    "/org/archive/effective_tld_names.dat"), UTF_8));
+            topmostAssignedSurtPrefixRegex = getTopmostAssignedSurtPrefixRegex(reader);
+            IOUtils.closeQuietly(reader);
         }
         return topmostAssignedSurtPrefixRegex;
     }

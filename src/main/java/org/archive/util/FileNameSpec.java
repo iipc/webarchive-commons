@@ -1,5 +1,6 @@
 package org.archive.util;
 
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class FileNameSpec {
@@ -15,7 +16,7 @@ public class FileNameSpec {
 	public String getNextName() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(prefix);
-		sb.append(String.format("%06d",aInt.incrementAndGet()));
+		sb.append(String.format(Locale.ROOT, "%06d",aInt.incrementAndGet()));
 		sb.append(suffix);
 		return sb.toString();
 	}

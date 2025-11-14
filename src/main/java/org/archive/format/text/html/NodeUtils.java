@@ -19,6 +19,8 @@
  */
 package org.archive.format.text.html;
 
+import java.util.Locale;
+
 import org.htmlparser.Node;
 import org.htmlparser.nodes.RemarkNode;
 import org.htmlparser.nodes.TagNode;
@@ -41,7 +43,7 @@ public class NodeUtils {
 		if(isTagNode(node)) {
 			TagNode tagNode = (TagNode) node;
 			String nodeName = tagNode.getTagName();
-			return nodeName.equals(name.toUpperCase());
+			return nodeName.equals(name.toUpperCase(Locale.ROOT));
 		}
 		return false;
 	}
@@ -50,7 +52,7 @@ public class NodeUtils {
 			TagNode tagNode = (TagNode) node;
 			if(!tagNode.isEndTag()) {
 				String nodeName = tagNode.getTagName();
-				return nodeName.equals(name.toUpperCase());
+				return nodeName.equals(name.toUpperCase(Locale.ROOT));
 			}
 		}
 		return false;
@@ -60,7 +62,7 @@ public class NodeUtils {
 			TagNode tagNode = (TagNode) node;
 			if(!tagNode.isEndTag() && !tagNode.isEmptyXmlTag()) {
 				String nodeName = tagNode.getTagName();
-				return nodeName.equals(name.toUpperCase());
+				return nodeName.equals(name.toUpperCase(Locale.ROOT));
 			}
 		}
 		return false;
@@ -70,7 +72,7 @@ public class NodeUtils {
 			TagNode tagNode = (TagNode) node;
 			if(tagNode.isEndTag()) {
 				String nodeName = tagNode.getTagName();
-				return nodeName.equals(name.toUpperCase());
+				return nodeName.equals(name.toUpperCase(Locale.ROOT));
 			}
 		}
 		return false;

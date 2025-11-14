@@ -29,13 +29,15 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Properties;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * Miscellaneous useful methods.
  *
  * @author gojomo &amp; others
  */
 public class IAUtils {
-    public final static Charset UTF8 = Charset.forName("utf-8");
+    public final static Charset UTF8 = UTF_8;
 
     final public static String COMMONS_VERSION = loadCommonsVersion();
     final public static String PUBLISHER = loadCommons("publisher");
@@ -53,7 +55,7 @@ public class IAUtils {
 		BufferedReader br = null;
 		String version;
 		try {
-		    br = new BufferedReader(new InputStreamReader(input));
+		    br = new BufferedReader(new InputStreamReader(input, UTF_8));
 		    version = br.readLine();
 		    br.readLine();
 		} catch (IOException e) {
@@ -71,11 +73,7 @@ public class IAUtils {
         if (input == null) {
             return "UNKNOWN";
         }
-        try {
-            reader = new InputStreamReader(input, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            return "UNKNOWN";
-        }
+        reader = new InputStreamReader(input, UTF_8);
         Properties prop = new Properties();
         try {
             prop.load(reader);

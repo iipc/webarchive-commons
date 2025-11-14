@@ -3,9 +3,13 @@ package org.archive.url;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.util.Locale;
 
 import com.google.common.net.InetAddresses;
+
 import org.junit.jupiter.api.Test;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -15,7 +19,7 @@ public class URLParserTest {
 		Long l = Long.parseLong("3279880203");
 		int i2 = l.intValue();
 		//		int i = Integer.decode("3279880203");
-		System.err.format("FromNum(%s)\n", InetAddresses.fromInteger(i2).getHostAddress());
+		System.err.format(Locale.ROOT, "FromNum(%s)\n", InetAddresses.fromInteger(i2).getHostAddress());
 	}
 
 	@Test
@@ -30,7 +34,7 @@ public class URLParserTest {
 
 	@Test
 	public void testParse() throws UnsupportedEncodingException, URISyntaxException {
-		System.out.format("O(%s) E(%s)\n","%66",URLDecoder.decode("%66","UTF-8"));
+		System.out.format(Locale.ROOT, "O(%s) E(%s)\n","%66", URLDecoder.decode("%66", UTF_8.name()));
 		checkParse("http://www.archive.org/index.html#foo", 
 				null, "http", null, null, "www.archive.org", -1, "/index.html", null, "foo",
 				"http://www.archive.org/index.html#foo", "/index.html");
@@ -96,7 +100,7 @@ public class URLParserTest {
 			String authPass, String host, int port, String path,
 			String query, String fragment, String urlString, String pathQuery) throws URISyntaxException {
 		HandyURL h = URLParser.parse(s);
-		System.out.format("Input:(%s)\nHandyURL\t%s\n",s,h.toDebugString());
+		System.out.format(Locale.ROOT, "Input:(%s)\nHandyURL\t%s\n", s, h.toDebugString());
 		assertEquals(scheme, h.getScheme());
 		assertEquals(authUser, h.getAuthUser());
 		assertEquals(authPass, h.getAuthPass());

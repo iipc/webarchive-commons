@@ -27,10 +27,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 
 import org.archive.url.URIException;
 import org.archive.url.UsableURIFactory;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Sort-friendly URI Reordering Transform.
@@ -238,10 +241,10 @@ public class SURT {
         InputStream in = args.length > 0 ? new BufferedInputStream(
                 new FileInputStream(args[0])) : System.in;
         PrintStream out = args.length > 1 ? new PrintStream(
-                new BufferedOutputStream(new FileOutputStream(args[1])))
+                new BufferedOutputStream(new FileOutputStream(args[1])), false, UTF_8.name())
                 : System.out;
         BufferedReader br =
-            new BufferedReader(new InputStreamReader(in));
+            new BufferedReader(new InputStreamReader(in, Charset.defaultCharset()));
         String line;
         while((line = br.readLine())!=null) {
             if(line.indexOf("#")>0) line=line.substring(0,line.indexOf("#"));

@@ -20,17 +20,16 @@ package org.archive.url;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.BitSet;
 
 import org.apache.commons.codec.net.URLCodec;
-
-import com.google.common.base.Charsets;
 
 /**
  * @author gojomo
  */
 public class LaxURLCodec extends URLCodec {
-    public static LaxURLCodec DEFAULT = new LaxURLCodec("UTF-8");
+    public static LaxURLCodec DEFAULT = new LaxURLCodec(StandardCharsets.UTF_8.name());
 
     // passthrough constructor
     public LaxURLCodec(String encoding) {
@@ -155,6 +154,6 @@ public class LaxURLCodec extends URLCodec {
         if (pString == null) {
             return null;
         }
-        return new String(encodeUrl(safe,pString.getBytes(cs)), Charsets.US_ASCII);
+        return new String(encodeUrl(safe,pString.getBytes(cs)), StandardCharsets.US_ASCII);
     }
 }

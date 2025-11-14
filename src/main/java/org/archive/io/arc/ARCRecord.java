@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -376,7 +377,7 @@ public class ARCRecord extends ArchiveRecord {
                     if (keys.size() != values.size()) {
                         // Early ARCs had a space in mimetype.
                         if (values.size() == (keys.size() + 1) &&
-                                        values.get(4).toLowerCase().startsWith("charset=")) {
+                                        values.get(4).toLowerCase(Locale.ROOT).startsWith("charset=")) {
                                 List<String> nuvalues =
                                         new ArrayList<String>(keys.size());
                                 nuvalues.add(0, values.get(0));
@@ -588,7 +589,7 @@ public class ARCRecord extends ArchiveRecord {
         	if (eolCharCount <= 0) {
         		throw new RecoverableIOException(
                 "Failed to read http status where one was expected: " 
-                + ((statusBytes == null) ? "" : new String(statusBytes)));
+                + ((statusBytes == null) ? "" : new String(statusBytes, DEFAULT_ENCODING)));
         	}
 
         	statusLine = new String(statusBytes, 0,
@@ -658,7 +659,7 @@ public class ARCRecord extends ArchiveRecord {
             		break;
             	} else {
             		throw new IOException("Failed reading http headers: " +
-            				((lineBytes != null)? new String(lineBytes): null));
+            				((lineBytes != null)? new String(lineBytes, DEFAULT_ENCODING): null));
             	}
             } else {
             	httpHeaderBytesRead += lineBytes.length;

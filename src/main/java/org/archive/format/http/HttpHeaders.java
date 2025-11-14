@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import org.archive.util.ByteOp;
@@ -54,9 +55,9 @@ implements HttpHeaderObserver {
 	}
 
 	public String getValueCaseInsensitive(String name) {
-		String lc = name.toLowerCase();
+		String lc = name.toLowerCase(Locale.ROOT);
 		for(HttpHeader h : this) {
-			if(h.getName().toLowerCase().equals(lc)) {
+			if(h.getName().toLowerCase(Locale.ROOT).equals(lc)) {
 				return h.getValue();
 			}
 		}

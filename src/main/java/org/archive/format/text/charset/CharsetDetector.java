@@ -22,6 +22,8 @@ package org.archive.format.text.charset;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -91,7 +93,7 @@ public abstract class CharsetDetector {
 	// ...and if the chardet library fails, use the Content-Type header
 	protected final static String HTTP_CONTENT_TYPE_HEADER = "CONTENT-TYPE";
 	/** the default charset name to use when giving up */
-	public final static String DEFAULT_CHARSET = "UTF-8";
+	public final static String DEFAULT_CHARSET = StandardCharsets.UTF_8.name();
 	
 	protected boolean isCharsetSupported(String charsetName) {
 		// can you believe that this throws a runtime? Just asking if it's
@@ -106,7 +108,7 @@ public abstract class CharsetDetector {
 		}
 	}
 	protected String mapCharset(String orig) {
-		String lc = orig.toLowerCase();
+		String lc = orig.toLowerCase(Locale.ROOT);
 		if(lc.contains("iso8859-1") || lc.contains("iso-8859-1")) {
 			return "cp1252";
 		}
@@ -114,7 +116,7 @@ public abstract class CharsetDetector {
 	}
 	protected String contentTypeToCharset(final String contentType) {
 		int offset = 
-			contentType.toUpperCase().indexOf(CHARSET_TOKEN.toUpperCase());
+			contentType.toUpperCase(Locale.ROOT).indexOf(CHARSET_TOKEN.toUpperCase(Locale.ROOT));
 		
 		if (offset != -1) {
 			String cs = contentType.substring(offset + CHARSET_TOKEN.length());
@@ -148,7 +150,7 @@ public abstract class CharsetDetector {
 			return null;
 		}
 		for(HttpHeader header : headers) {
-			if(header.getName().toUpperCase().trim().equals(
+			if(header.getName().toUpperCase(Locale.ROOT).trim().equals(
 					HTTP_CONTENT_TYPE_HEADER)) {
 				return contentTypeToCharset(header.getValue());
 			}

@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 import org.archive.format.http.HttpHeader;
 import org.archive.format.arc.ARCConstants;
@@ -144,20 +146,17 @@ public class HeaderedArchiveRecord extends ArchiveRecord {
         int eolCharCount = getEolCharsCount(statusBytes);
         if (eolCharCount <= 0) {
             throw new IOException("Failed to read raw lie where one " +
-                " was expected: " + new String(statusBytes));
+                " was expected: " + new String(statusBytes, ARCConstants.DEFAULT_ENCODING));
         }
         String statusLine = new String(statusBytes, 0,
             statusBytes.length - eolCharCount, ARCConstants.DEFAULT_ENCODING);
-        if (statusLine == null) {
-            throw new NullPointerException("Expected status line is null");
-        }
         statusLine = statusLine.trim();
         // TODO: Tighten up this test.
         boolean isHttpResponse = statusLine.startsWith("HTTP");
         boolean isHttpRequest = false;
         if (!isHttpResponse) {
-            isHttpRequest = statusLine.toUpperCase().startsWith("GET") ||
-                !statusLine.toUpperCase().startsWith("POST");
+            isHttpRequest = statusLine.toUpperCase(Locale.ROOT).startsWith("GET") ||
+                !statusLine.toUpperCase(Locale.ROOT).startsWith("POST");
         }
         if (!isHttpResponse && !isHttpRequest) {
             throw new UnexpectedStartLineIOException("Failed parse of " +
@@ -185,7 +184,7 @@ public class HeaderedArchiveRecord extends ArchiveRecord {
             eolCharCount = getEolCharsCount(lineBytes);
             if (eolCharCount <= 0) {
                 throw new IOException("Failed reading headers: " +
-                    ((lineBytes != null)? new String(lineBytes): null));
+                    ((lineBytes != null)? new String(lineBytes, StandardCharsets.ISO_8859_1): null));
             }
             // Save the bytes read.
             baos.write(lineBytes);

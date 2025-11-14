@@ -1,15 +1,14 @@
 package org.archive.extract;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.Locale;
 
 import org.archive.format.gzip.GZIPMemberWriter;
 import org.archive.format.gzip.GZIPMemberWriterCommittedOutputStream;
@@ -30,13 +29,14 @@ import java.text.SimpleDateFormat;
 
 import java.util.logging.Logger;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class WATExtractorOutput implements ExtractorOutput {
 	WARCRecordWriter recW;
 	private boolean wroteFirst;
 	private GZIPMemberWriter gzW;
 	private static int DEFAULT_BUFFER_RAM = 1024 * 1024;
 	private int bufferRAM = DEFAULT_BUFFER_RAM;
-	private final static Charset UTF8 = Charset.forName("UTF-8");
 	private String outputFile;
 	
 	private static final Logger LOG = Logger.getLogger(WATExtractorOutput.class.getName());
@@ -143,7 +143,7 @@ public class WATExtractorOutput implements ExtractorOutput {
 		String capDateString = extractOrIO(md, "Envelope.ARC-Header-Metadata.Date");
 		String filename = extractOrIO(md, "Container.Filename");
 		String offset = extractOrIO(md, "Container.Offset");
-		String recId = String.format("<urn:arc:%s:%s>",filename,offset);
+		String recId = String.format(Locale.ROOT, "<urn:arc:%s:%s>",filename,offset);
 		writeWARCMDRecord(recOut,md,targetURI,capDateString,recId);
 	}
 
@@ -156,7 +156,7 @@ public class WATExtractorOutput implements ExtractorOutput {
 			targetURI = extractOrIO(md, "Envelope.WARC-Header-Metadata.WARC-Target-URI");
 		}
 		// handle date of generation in WARC format
-		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.ROOT);
 		String capDateString = dateFormat.format(new Date());
 		String recId = extractOrIO(md, "Envelope.WARC-Header-Metadata.WARC-Record-ID");
 		writeWARCMDRecord(recOut,md,targetURI,capDateString,recId);
@@ -168,7 +168,7 @@ public class WATExtractorOutput implements ExtractorOutput {
 
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-		OutputStreamWriter osw = new OutputStreamWriter(bos, UTF8);
+		OutputStreamWriter osw = new OutputStreamWriter(bos, UTF_8);
 		try {
 			md.write(osw);
 		} catch (JSONException e1) {
@@ -176,7 +176,7 @@ public class WATExtractorOutput implements ExtractorOutput {
 			throw new IOException(e1);
 		}
 		osw.flush();
-//		ByteArrayInputStream bais = new ByteArrayInputStream(md.toString().getBytes("UTF-8"));
+//		ByteArrayInputStream bais = new ByteArrayInputStream(md.toString().getBytes(UTF_8));
 		Date capDate;
 		try {
 			capDate = DateUtils.getSecondsSinceEpoch(capDateString);

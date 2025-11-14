@@ -19,6 +19,8 @@
 
 package org.archive.format.warc;
 
+import java.nio.charset.StandardCharsets;
+
 import org.archive.format.ArchiveFileConstants;
 
 /**
@@ -93,7 +95,7 @@ public interface WARCConstants extends ArchiveFileConstants {
      * till we figure it, DEFAULT_ENCODING is single-byte charset -- same as
      * ARCs.
      */
-    public static final String DEFAULT_ENCODING = "UTF-8";
+    public static final String DEFAULT_ENCODING = StandardCharsets.UTF_8.name();
     public static final String HEADER_LINE_ENCODING = DEFAULT_ENCODING;
     
     // TODO: Revisit. 8859 isn't correct, especially if we settle on RFC822

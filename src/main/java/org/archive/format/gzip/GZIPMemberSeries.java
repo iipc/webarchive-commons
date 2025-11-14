@@ -2,6 +2,7 @@ package org.archive.format.gzip;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.Inflater;
@@ -227,7 +228,7 @@ public class GZIPMemberSeries extends InputStream implements GZIPConstants {
 					}
 					if(LOG.isLoggable(Level.INFO)) {
 
-						LOG.info(String.format(
+						LOG.info(String.format(Locale.ROOT,
 							"Got EOF after %d bytes before finding magic in %s\n",
 							amtSkipped * -1, streamContext));
 					}
@@ -237,7 +238,7 @@ public class GZIPMemberSeries extends InputStream implements GZIPConstants {
 			if(amtSkipped > 0) {
 				if(strict) {
 					if(state == STATE_START) {
-						LOG.info(String.format(
+						LOG.info(String.format(Locale.ROOT,
 								"Strict mode Skipped %d bytes in (%s) before finding magic at offset(%d)\n",
 								amtSkipped, streamContext, offset-3));
 					} else {
@@ -248,7 +249,7 @@ public class GZIPMemberSeries extends InputStream implements GZIPConstants {
 				}
 				if(LOG.isLoggable(Level.INFO)) {
 
-					LOG.info(String.format(
+					LOG.info(String.format(Locale.ROOT,
 						"Skipped %d bytes in (%s) before finding magic at offset(%d)\n",
 						amtSkipped, streamContext, offset-3));
 				}
@@ -268,7 +269,7 @@ public class GZIPMemberSeries extends InputStream implements GZIPConstants {
 				}
 				offset = currentMemberStartOffset + 3;
 				stream.setOffset(currentMemberStartOffset + 3);
-				LOG.warning(String.format(
+				LOG.warning(String.format(Locale.ROOT,
 						"GZIPFormatException with record around offset(%d) in (%s)\n",
 						offset, streamContext));
 			}

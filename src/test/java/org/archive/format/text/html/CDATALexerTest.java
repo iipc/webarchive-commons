@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Locale;
+
 public class CDATALexerTest {
 	CDATALexer l;
 	Node n;
@@ -102,7 +104,7 @@ public class CDATALexerTest {
 	}
 	
 	private void assertJSContentWorks(String js) throws ParserException {
-		String html = String.format("<script>%s</script>",js);
+		String html = String.format(Locale.ROOT,"<script>%s</script>",js);
 		l = makeLexer(html);
 		assertFalse(l.inCSS());
 		assertFalse(l.inJS());

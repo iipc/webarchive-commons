@@ -2,6 +2,7 @@ package org.archive.format.http;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 public class HttpResponseMessageParser extends HttpMessageParser {
 	public int maxBytes = 1024 * 128;
@@ -97,7 +98,7 @@ public class HttpResponseMessageParser extends HttpMessageParser {
 		version = parseVersionStrict(buf, vs, vl);
 		status = parseStatusStrict(buf,ss,sl);
 		
-		reason = new String(buf,idx+1,(len - idx)-1);
+		reason = new String(buf,idx+1,(len - idx)-1,StandardCharsets.ISO_8859_1);
 
 		obs.messageParsed(version, status, reason, len);
 
@@ -155,7 +156,7 @@ public class HttpResponseMessageParser extends HttpMessageParser {
 			idx++;
 			int reasonLen = bufferEnd - idx;
 			if(reasonLen > 0) {
-				reason = new String(buf,idx,reasonLen);
+				reason = new String(buf,idx,reasonLen,StandardCharsets.ISO_8859_1);
 			}
 		} else {
 			// missed some:

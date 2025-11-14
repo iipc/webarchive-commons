@@ -17,7 +17,6 @@
 package org.archive.hadoop;
 
 import java.io.*;
-import java.util.*;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;

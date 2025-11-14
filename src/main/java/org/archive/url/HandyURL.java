@@ -2,6 +2,7 @@ package org.archive.url;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Locale;
 
 public class HandyURL {
 	public final static int DEFAULT_PORT = -1;
@@ -277,7 +278,7 @@ public class HandyURL {
 	}
 
 	public String toDebugString() {
-		return String.format("Scheme(%s) UserName(%s) UserPass(%s) Host(%s) port(%d) Path(%s) Query(%s) Frag(%s)",
+		return String.format(Locale.ROOT, "Scheme(%s) UserName(%s) UserPass(%s) Host(%s) port(%d) Path(%s) Query(%s) Frag(%s)",
 				scheme, authUser, authPass, host, port, path, query, hash);
 	}
 

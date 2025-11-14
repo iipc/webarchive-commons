@@ -18,10 +18,12 @@
  */
 package org.archive.url;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Locale;
 
 /**
  * URI subclass which allows partial/inconsistent encoding, matching
@@ -121,9 +123,10 @@ public class LaxURI extends URI {
         byte[] rawdata = null;
         rawdata = LaxURLCodec.decodeUrlLoose(component.getBytes(StandardCharsets.US_ASCII));
         try {
-            return new String(rawdata, charset);
-        } catch (UnsupportedEncodingException e) {
-            return new String(rawdata);
+            Charset cs = Charset.forName(charset);
+            return new String(rawdata, cs);
+        } catch (IllegalCharsetNameException e) {
+            return new String(rawdata, StandardCharsets.US_ASCII);
         }
     }
     
@@ -321,7 +324,7 @@ public class LaxURI extends URI {
          * </pre></blockquote><p>
          */
         if (at > 0 && at < length && tmp.charAt(at) == ':') {
-            char[] target = tmp.substring(0, at).toLowerCase().toCharArray();
+            char[] target = tmp.substring(0, at).toLowerCase(Locale.ROOT).toCharArray();
             if (validate(target, scheme)) {
                 _scheme = target;
                 from = ++at;

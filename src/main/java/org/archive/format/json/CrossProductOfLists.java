@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.Locale;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,12 +19,12 @@ public class CrossProductOfLists<T> {
 
 		if(LOG.isLoggable(Level.INFO)) {
 			int count = listOfLists.size();
-			LOG.info(String.format("Total of (%d) lists to cross product",count));
+			LOG.info(String.format(Locale.ROOT, "Total of (%d) lists to cross product",count));
 			for(int i = 0; i < count; i++) {
-				LOG.info(String.format("Field (%d) is (%d) deep",i,listOfLists.get(i).size()));
+				LOG.info(String.format(Locale.ROOT, "Field (%d) is (%d) deep",i,listOfLists.get(i).size()));
 				for(List<T> inner : listOfLists.get(i)) {
 					LOG.info(
-							String.format("----(%d):(%s)"
+							String.format(Locale.ROOT, "----(%d):(%s)"
 									,i,StringUtils.join(inner.toArray(),",") ) );
 				}
 			}

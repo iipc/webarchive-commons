@@ -34,11 +34,15 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.net.URLCodec;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Hashtable;
 import java.util.Locale;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * The interface for the URI(Uniform Resource Identifiers) version of RFC 2396.
@@ -261,7 +265,7 @@ class URI implements Cloneable, Comparable, Serializable {
         if (scheme == null) {
            throw new URIException(URIException.PARSING, "scheme required");
         }
-        char[] s = scheme.toLowerCase().toCharArray();
+        char[] s = scheme.toLowerCase(Locale.ROOT).toCharArray();
         if (validate(s, URI.scheme)) {
             _scheme = s; // is_absoluteURI
         } else {
@@ -622,7 +626,7 @@ class URI implements Cloneable, Comparable, Serializable {
     /**
      * The default charset of the protocol.  RFC 2277, 2396
      */
-    protected static String defaultProtocolCharset = "UTF-8";
+    protected static String defaultProtocolCharset = UTF_8.name();
 
 
     /**
@@ -1694,7 +1698,7 @@ class URI implements Cloneable, Comparable, Serializable {
         try {
             return original.getBytes(charset);
         } catch (UnsupportedEncodingException e) {
-            return original.getBytes();
+            return original.getBytes(UTF_8);
         }
     }
 
@@ -1780,11 +1784,13 @@ class URI implements Cloneable, Comparable, Serializable {
             throw new URIException(e.getMessage());
         }
         try {
-            return new String(rawdata, charset);
-        } catch (UnsupportedEncodingException e) {
-            return new String(rawdata);
+            Charset cs = Charset.forName(charset);
+            return new String(rawdata, cs);
+        } catch (IllegalCharsetNameException e) {
+            return new String(rawdata, StandardCharsets.US_ASCII);
         }
     }
+
     /**
      * Pre-validate the unescaped URI string within a specific component.
      *
@@ -1954,7 +1960,7 @@ class URI implements Cloneable, Comparable, Serializable {
          * </pre></blockquote><p>
          */
         if (at > 0 && at < length && tmp.charAt(at) == ':') {
-            char[] target = tmp.substring(0, at).toLowerCase().toCharArray();
+            char[] target = tmp.substring(0, at).toLowerCase(Locale.ROOT).toCharArray();
             if (validate(target, scheme)) {
                 _scheme = target;
             } else {

@@ -11,8 +11,9 @@ package org.archive.format.gzip.zipnum;
  */
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,6 +35,8 @@ import org.archive.util.binsearch.SeekableLineReaderFactory;
 import org.archive.util.binsearch.SeekableLineReaderIterator;
 import org.archive.util.binsearch.impl.HTTPSeekableLineReader;
 import org.archive.util.iterator.CloseableIterator;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class ZipNumCluster extends ZipNumIndex {
 	
@@ -367,7 +370,7 @@ public class ZipNumCluster extends ZipNumIndex {
 		totalAdjustment = 0;
 		
 		try {
-			reader = new BufferedReader(new FileReader(filename));
+			reader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), UTF_8));
 			
 			while ((line = reader.readLine()) != null) {
 				String[] splits = line.split("\t");

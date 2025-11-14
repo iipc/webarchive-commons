@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
@@ -447,7 +448,6 @@ implements Closeable {
      * @throws IOException
      * @throws java.text.ParseException
      */
-    @SuppressWarnings("unchecked")
     public static void main(String [] args)
     throws ParseException, IOException, java.text.ParseException {
         Options options = getOptions();
@@ -493,7 +493,7 @@ implements Closeable {
                     break;
                     
                 case 'f':
-                    format = cmdlineOptions[i].getValue().toLowerCase();
+                    format = cmdlineOptions[i].getValue().toLowerCase(Locale.ROOT);
                     boolean match = false;
                     // List of supported formats.
                     final String [] supportedFormats =

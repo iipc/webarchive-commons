@@ -38,12 +38,13 @@ import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.archive.format.ArchiveFileConstants;
-import org.archive.io.UTF8Bytes;
 import org.archive.io.WriterPoolMember;
 import org.archive.util.ArchiveUtils;
 import org.archive.util.anvl.Element;
 
 import static org.archive.format.warc.WARCConstants.*;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 
 /**
@@ -357,12 +358,12 @@ public class WARCWriter extends WriterPoolMember {
         byte [] warcinfoBody = null;
         if (settings.getMetadata() == null) {
         	// TODO: What to write into a warcinfo?  What to associate?
-        	warcinfoBody = "TODO: Unimplemented".getBytes();
+        	warcinfoBody = "TODO: Unimplemented".getBytes(UTF_8);
         } else {
         	ByteArrayOutputStream baos = new ByteArrayOutputStream();
         	for (final Iterator<String> i = settings.getMetadata().iterator();
         			i.hasNext();) {
-        		baos.write(i.next().toString().getBytes(UTF8Bytes.UTF8));
+        		baos.write(i.next().toString().getBytes(UTF_8));
         	}
         	warcinfoBody = baos.toByteArray();
         }

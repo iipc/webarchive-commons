@@ -25,16 +25,20 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 import java.util.logging.Logger;
 
 import org.archive.util.FileUtils;
 
-import com.google.common.base.Charsets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+
+import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -133,7 +137,7 @@ public class ReplayCharSequenceTest {
         RecordingOutputStream ros = writeTestStream(
                 regularBuffer,MULTIPLIER,
                 "testGetReplayCharSequenceMultiByteZeroOffset",MULTIPLIER);
-        ReplayCharSequence rcs = getReplayCharSequence(ros,Charsets.UTF_8);
+        ReplayCharSequence rcs = getReplayCharSequence(ros, UTF_8);
 
         for (int i = 0; i < MULTIPLIER; i++) {
             accessingCharacters(rcs);
@@ -143,7 +147,7 @@ public class ReplayCharSequenceTest {
     @Test
     public void testReplayCharSequenceByteToString() throws IOException {
         String fileContent = "Some file content";
-        byte [] buffer = fileContent.getBytes();
+        byte [] buffer = fileContent.getBytes(UTF_8);
         RecordingOutputStream ros = writeTestStream(
                 buffer,1,
                 "testReplayCharSequenceByteToString.txt",0);
@@ -179,7 +183,7 @@ public class ReplayCharSequenceTest {
         String latin1String = new String(bytes, "latin1");
         RecordingOutputStream ros = writeTestStream(
                 bytes, 1, "testSingleByteEncodings-latin1.txt", 0);
-        ReplayCharSequence rcs = getReplayCharSequence(ros,Charsets.ISO_8859_1);
+        ReplayCharSequence rcs = getReplayCharSequence(ros, ISO_8859_1);
         String result = rcs.toString();
         logger.fine("latin1[0] " + toHexString(latin1String));
         logger.fine("latin1[1] " + toHexString(result));
@@ -207,7 +211,7 @@ public class ReplayCharSequenceTest {
     @Test
     public void testReplayCharSequenceByteToStringOverflow() throws IOException {
         String fileContent = "Some file content. "; // ascii
-        byte [] buffer = fileContent.getBytes();
+        byte [] buffer = fileContent.getBytes(UTF_8);
         RecordingOutputStream ros = writeTestStream(
                 buffer,1,
                 "testReplayCharSequenceByteToStringOverflow.txt",1);
@@ -217,8 +221,8 @@ public class ReplayCharSequenceTest {
         // both encodings because they exercise different code paths. UTF-8 is
         // decoded to UTF-16 while windows-1252 is memory mapped directly. See
         // GenericReplayCharSequence
-        ReplayCharSequence rcsUtf8 = getReplayCharSequence(ros,Charsets.UTF_8);
-        ReplayCharSequence rcs1252 = getReplayCharSequence(ros,Charset.forName("windows-1252"));
+        ReplayCharSequence rcsUtf8 = getReplayCharSequence(ros, UTF_8);
+        ReplayCharSequence rcs1252 = getReplayCharSequence(ros, Charset.forName("windows-1252"));
 
         String result = rcsUtf8.toString();
         assertEquals(expectedContent, result, "Strings don't match");
@@ -242,7 +246,7 @@ public class ReplayCharSequenceTest {
                 buffer,1,
                 "testReplayCharSequenceByteToStringMulti.txt",MULTIPLICAND-1);
         for (int i = 0; i < 3; i++) {
-            ReplayCharSequence rcs = getReplayCharSequence(ros,StandardCharsets.UTF_8);
+            ReplayCharSequence rcs = getReplayCharSequence(ros, UTF_8);
             String result = rcs.toString();
             assertEquals(result, expectedResult, "Strings don't match");
             rcs.close();
@@ -255,8 +259,7 @@ public class ReplayCharSequenceTest {
     @Disabled
     public void xestHugeReplayCharSequence() throws IOException {
         String fileContent = "01234567890123456789";
-        String characterEncoding = "ascii";
-        byte[] buffer = fileContent.getBytes(characterEncoding);
+        byte[] buffer = fileContent.getBytes(US_ASCII);
 
         long reps = (long) Integer.MAX_VALUE / (long) buffer.length + 1000000l;
 
@@ -264,7 +267,7 @@ public class ReplayCharSequenceTest {
                 + " bytes to testHugeReplayCharSequence.txt");
         RecordingOutputStream ros = writeTestStream(buffer, 0,
                 "testHugeReplayCharSequence.txt", reps);
-        ReplayCharSequence rcs = getReplayCharSequence(ros,Charset.forName(characterEncoding));
+        ReplayCharSequence rcs = getReplayCharSequence(ros, US_ASCII);
 
         if (reps * fileContent.length() > (long) Integer.MAX_VALUE) {
             assertEquals(Integer.MAX_VALUE, rcs.length(), "ReplayCharSequence has wrong length (length()="
@@ -283,7 +286,7 @@ public class ReplayCharSequenceTest {
             // NumberFormat.getInstance().format(index));
             assertEquals(fileContent.charAt(index % fileContent.length()),
                     rcs.charAt(index), "Characters don't match (index="
-                    + NumberFormat.getInstance().format(index) + ")");
+                    + NumberFormat.getInstance(Locale.ROOT).format(index) + ")");
         }
 
         // check that out of bounds indices throw exception
@@ -307,7 +310,7 @@ public class ReplayCharSequenceTest {
             // NumberFormat.getInstance().format(index));
             assertEquals(fileContent.charAt(index % fileContent.length()),
                     rcs.charAt(index), "Characters don't match (index="
-                    + NumberFormat.getInstance().format(index) + ")");
+                    + NumberFormat.getInstance(Locale.ROOT).format(index) + ")");
         }
     }
     

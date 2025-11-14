@@ -28,6 +28,8 @@ import org.archive.util.Base32;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -266,61 +268,61 @@ public class RecordingOutputStreamTest {
         ros.setSha1Digest();
 
         ros.open(new ByteArrayOutputStream());
-        ros.write("0123456789\n\nabcdefghij".getBytes());
+        ros.write("0123456789\n\nabcdefghij".getBytes(UTF_8));
         assertEquals(12, ros.getMessageBodyBegin());
         assertEquals("22GBTIFDIW36VN4NLYI6TEOAE3WGBW3D", Base32.encode(ros.getDigestValue()));
         ros.close();
 
         ros.open(new ByteArrayOutputStream());
-        ros.write("0123456789\r\n\r\nabcdefghij".getBytes());
+        ros.write("0123456789\r\n\r\nabcdefghij".getBytes(UTF_8));
         assertEquals(14, ros.getMessageBodyBegin());
         assertEquals("22GBTIFDIW36VN4NLYI6TEOAE3WGBW3D", Base32.encode(ros.getDigestValue()));
         ros.close();
 
         ros.open(new ByteArrayOutputStream());
-        ros.write("0123456789\n\r\nabcdefghij".getBytes());
+        ros.write("0123456789\n\r\nabcdefghij".getBytes(UTF_8));
         assertEquals(13, ros.getMessageBodyBegin());
         assertEquals("22GBTIFDIW36VN4NLYI6TEOAE3WGBW3D", Base32.encode(ros.getDigestValue()));
         ros.close();
 
         ros.open(new ByteArrayOutputStream());
-        ros.write("0123456789\n".getBytes());
+        ros.write("0123456789\n".getBytes(UTF_8));
         assertEquals(-1, ros.getMessageBodyBegin());
-        ros.write("\nabcdefghij".getBytes());
+        ros.write("\nabcdefghij".getBytes(UTF_8));
         assertEquals(12, ros.getMessageBodyBegin());
         assertEquals("22GBTIFDIW36VN4NLYI6TEOAE3WGBW3D", Base32.encode(ros.getDigestValue()));
         ros.close();
 
         ros.open(new ByteArrayOutputStream());
-        ros.write("0123456789\n".getBytes());
+        ros.write("0123456789\n".getBytes(UTF_8));
         assertEquals(-1, ros.getMessageBodyBegin());
-        ros.write("\r\nabcdefghij".getBytes());
+        ros.write("\r\nabcdefghij".getBytes(UTF_8));
         assertEquals(13, ros.getMessageBodyBegin());
         assertEquals("22GBTIFDIW36VN4NLYI6TEOAE3WGBW3D", Base32.encode(ros.getDigestValue()));
         ros.close();
 
         ros.open(new ByteArrayOutputStream());
-        ros.write("0123456789\n\r".getBytes());
+        ros.write("0123456789\n\r".getBytes(UTF_8));
         assertEquals(-1, ros.getMessageBodyBegin());
-        ros.write("\nabcdefghij".getBytes());
+        ros.write("\nabcdefghij".getBytes(UTF_8));
         assertEquals(13, ros.getMessageBodyBegin());
         assertEquals("22GBTIFDIW36VN4NLYI6TEOAE3WGBW3D", Base32.encode(ros.getDigestValue()));
         ros.close();
 
         ros.open(new ByteArrayOutputStream());
-        ros.write("0123456789".getBytes());
+        ros.write("0123456789".getBytes(UTF_8));
         ros.write('\n');
         assertEquals(-1, ros.getMessageBodyBegin());
-        ros.write("\nabcdefghij".getBytes());
+        ros.write("\nabcdefghij".getBytes(UTF_8));
         assertEquals(12, ros.getMessageBodyBegin());
         assertEquals("22GBTIFDIW36VN4NLYI6TEOAE3WGBW3D", Base32.encode(ros.getDigestValue()));
         ros.close();
 
         ros.open(new ByteArrayOutputStream());
-        ros.write("0123456789".getBytes());
+        ros.write("0123456789".getBytes(UTF_8));
         ros.write('\n');
         ros.write('\n');
-        for (int b: "abcdefghij".getBytes()) {
+        for (int b: "abcdefghij".getBytes(UTF_8)) {
             ros.write(b);
         }
         assertEquals(12, ros.getMessageBodyBegin());
@@ -328,11 +330,11 @@ public class RecordingOutputStreamTest {
         ros.close();
 
         ros.open(new ByteArrayOutputStream());
-        ros.write("0123456789".getBytes());
+        ros.write("0123456789".getBytes(UTF_8));
         ros.write('\n');
         ros.write('\r');
         ros.write('\n');
-        for (int b: "abcdefghij".getBytes()) {
+        for (int b: "abcdefghij".getBytes(UTF_8)) {
             ros.write(b);
         }
         assertEquals(13, ros.getMessageBodyBegin());
@@ -340,17 +342,17 @@ public class RecordingOutputStreamTest {
         ros.close();
 
         ros.open(new ByteArrayOutputStream());
-        ros.write("0123456789\n".getBytes());
+        ros.write("0123456789\n".getBytes(UTF_8));
         ros.write('\n');
-        ros.write("abcdefghij".getBytes());
+        ros.write("abcdefghij".getBytes(UTF_8));
         assertEquals(12, ros.getMessageBodyBegin());
         assertEquals("22GBTIFDIW36VN4NLYI6TEOAE3WGBW3D", Base32.encode(ros.getDigestValue()));
         ros.close();
 
         ros.open(new ByteArrayOutputStream());
-        ros.write("0123456789\n\r".getBytes());
+        ros.write("0123456789\n\r".getBytes(UTF_8));
         ros.write('\n');
-        ros.write("abcdefghij".getBytes());
+        ros.write("abcdefghij".getBytes(UTF_8));
         assertEquals(13, ros.getMessageBodyBegin());
         assertEquals("22GBTIFDIW36VN4NLYI6TEOAE3WGBW3D", Base32.encode(ros.getDigestValue()));
         ros.close();

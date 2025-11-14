@@ -31,10 +31,13 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.util.Iterator;
+import java.util.Locale;
 
 import org.archive.url.UsableURI;
 import org.archive.util.iterator.LineReadingIterator;
 import org.archive.util.iterator.RegexLineIterator;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Specialized TreeSet for keeping a set of String prefixes. 
@@ -70,7 +73,7 @@ public class SurtPrefixSet extends PrefixSet {
 
         while (iter.hasNext()) {
             s = (String) iter.next();
-            add(s.toLowerCase());
+            add(s.toLowerCase(Locale.ROOT));
         }
     }
 
@@ -145,7 +148,7 @@ public class SurtPrefixSet extends PrefixSet {
         }
         if(u.indexOf("(")>0) {
             // formal SURT prefix; toLowerCase just in case
-            add(u.toLowerCase());
+            add(u.toLowerCase(Locale.ROOT));
         } else {
             // hostname/normal form URI from which 
             // to deduce SURT prefix
@@ -342,10 +345,10 @@ public class SurtPrefixSet extends PrefixSet {
         InputStream in = args.length > 0 ? new BufferedInputStream(
                 new FileInputStream(args[0])) : System.in;
         PrintStream out = args.length > 1 ? new PrintStream(
-                new BufferedOutputStream(new FileOutputStream(args[1])))
+                new BufferedOutputStream(new FileOutputStream(args[1])), false, UTF_8.name())
                 : System.out;
         BufferedReader br =
-            new BufferedReader(new InputStreamReader(in));
+            new BufferedReader(new InputStreamReader(in, UTF_8.name()));
         String line;
         while((line = br.readLine())!=null) {
             if(line.indexOf("#")>0) line=line.substring(0,line.indexOf("#"));

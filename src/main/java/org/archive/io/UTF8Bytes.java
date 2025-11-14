@@ -19,6 +19,7 @@
 package org.archive.io;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Marker Interface for instances that can be serialized as UTF8 bytes.
@@ -27,7 +28,7 @@ import java.io.UnsupportedEncodingException;
  * @version $Date$ $Version$
  */
 public interface UTF8Bytes {
-    public static final String UTF8 = "UTF-8";
+    public static final String UTF8 = StandardCharsets.UTF_8.name();
     
     /**
      * @return Instance as UTF-8 bytes.

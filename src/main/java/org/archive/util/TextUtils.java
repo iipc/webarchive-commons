@@ -30,7 +30,6 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,6 +38,8 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class TextUtils {
     private static final String FIRSTWORD = "^([^\\s]*).*$";
@@ -279,14 +280,11 @@ public class TextUtils {
      * @param s String to escape
      * @return URL-escaped string
      */
-    @SuppressWarnings("deprecation")
     public static String urlEscape(String s) {
         try {
-            return URLEncoder.encode(s,"UTF8");
+            return URLEncoder.encode(s, UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            // should be impossible; all JVMs must support UTF8
-            // but have a fallback just in case
-            return URLEncoder.encode(s); 
+            return s;
         }
     }
 
@@ -296,14 +294,11 @@ public class TextUtils {
      * @param s String do unescape
      * @return URL-unescaped String
      */
-    @SuppressWarnings("deprecation")
     public static String urlUnescape(String s) {
         try {
-            return URLDecoder.decode(s, "UTF8");
+            return URLDecoder.decode(s, UTF_8.name());
         } catch (UnsupportedEncodingException e) {
-            // should be impossible; all JVMs must support UTF8
-            // but have a fallback just in case
-            return URLDecoder.decode(s);
+            return s;
         }
     }
 }

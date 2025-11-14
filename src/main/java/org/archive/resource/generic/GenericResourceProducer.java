@@ -1,6 +1,7 @@
 package org.archive.resource.generic;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import org.archive.resource.MetaData;
 import org.archive.resource.Resource;
@@ -45,6 +46,6 @@ public class GenericResourceProducer implements ResourceContainer, ResourceProdu
 		stream.close();
 	}
 	public String getContext() {
-		return String.format("Context(%s)(%d)", name, stream.getOffset());
+		return String.format(Locale.ROOT, "Context(%s)(%d)", name, stream.getOffset());
 	}
 }

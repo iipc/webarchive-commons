@@ -26,6 +26,8 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * Class to run an external process.
  * @author stack
@@ -55,7 +57,7 @@ public class ProcessUtils {
         public void run() {
             try {
                 BufferedReader br =
-                    new BufferedReader(new InputStreamReader(this.is));
+                    new BufferedReader(new InputStreamReader(this.is, UTF_8));
                 for (String line = null; (line = br.readLine()) != null;) {
                     this.sink.append(line);
                 }

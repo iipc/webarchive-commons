@@ -7,7 +7,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,7 +27,6 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 	
 	private final static Logger LOG =
 		Logger.getLogger(ResourceExtractor.class.getName());
-	Charset UTF8 = Charset.forName("utf-8");
 	public final static String TOOL_NAME = "extractor";
 	public static final String TOOL_DESCRIPTION = 
 		"A tool for extracting metadata from WARC, ARC, and WAT files";
@@ -65,7 +65,7 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 	
 	private PrintWriter makePrintWriter(OutputStream os)
 	{
-		return new PrintWriter(new OutputStreamWriter(os, Charset.forName("UTF-8")));
+		return new PrintWriter(new OutputStreamWriter(os, StandardCharsets.UTF_8));
 	}
 
 	public int run(String[] args) 
@@ -138,18 +138,18 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 				
 				out.output(r);
 			} catch(GZIPFormatException e) {
-				LOG.severe(String.format("%s: %s",exProducer.getContext(),e.getMessage()));
+				LOG.severe(String.format(Locale.ROOT, "%s: %s",exProducer.getContext(),e.getMessage()));
 				//Log is not coming out for some damn reason....needs to be studied
-				System.err.format("%s: %s",exProducer.getContext(),e.getMessage());
+				System.err.format(Locale.ROOT, "%s: %s",exProducer.getContext(),e.getMessage());
 				
 				if(ProducerUtils.STRICT_GZ) {
 					throw e;
 				}
 				e.printStackTrace();
 			} catch(ResourceParseException e) {
-				LOG.severe(String.format("%s: %s",exProducer.getContext(),e.getMessage()));
+				LOG.severe(String.format(Locale.ROOT, "%s: %s",exProducer.getContext(),e.getMessage()));
 				//Log is not coming out for some damn reason....needs to be studied
-				System.err.format("%s: %s",exProducer.getContext(),e.getMessage());
+				System.err.format(Locale.ROOT, "%s: %s",exProducer.getContext(),e.getMessage());
 				
 				if(ProducerUtils.STRICT_GZ) {
 					throw e;
@@ -157,9 +157,9 @@ public class ResourceExtractor implements ResourceConstants, Tool {
 				e.printStackTrace();
 			} catch(RecoverableRecordFormatException e) {
 				// this should not get here - ResourceFactory et al should wrap as ResourceParseExceptions...
-				LOG.severe(String.format("RECOVERABLE - %s: %s",exProducer.getContext(),e.getMessage()));
+				LOG.severe(String.format(Locale.ROOT, "RECOVERABLE - %s: %s",exProducer.getContext(),e.getMessage()));
 				//Log is not coming out for some damn reason....needs to be studied
-				System.err.format("%s: %s",exProducer.getContext(),e.getMessage());
+				System.err.format(Locale.ROOT, "%s: %s",exProducer.getContext(),e.getMessage());
 
 				e.printStackTrace();
 				

@@ -33,14 +33,15 @@ import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 import org.archive.util.DevUtils;
 
-import com.google.common.base.Charsets;
 import com.google.common.primitives.Ints;
 
 /**
@@ -67,7 +68,7 @@ public class GenericReplayCharSequence implements ReplayCharSequence {
      *
      * <p>See <a href="http://java.sun.com/j2se/1.4.2/docs/guide/intl/encoding.doc.html">Encoding</a>.
      */
-    public static final Charset WRITE_ENCODING = Charsets.UTF_16BE;
+    public static final Charset WRITE_ENCODING = StandardCharsets.UTF_16BE;
 
     private static final long MAP_MAX_BYTES = 64 * 1024 * 1024; // 64M
     
@@ -168,8 +169,8 @@ public class GenericReplayCharSequence implements ReplayCharSequence {
         long charLength = (long) this.length() - (long) prefixBuffer.limit(); // in characters
         long mapSize = Math.min((charLength * bytesPerChar) - mapByteOffset, MAP_MAX_BYTES);
         logger.fine("updateMemoryMappedBuffer: mapOffset="
-                + NumberFormat.getInstance().format(mapByteOffset)
-                + " mapSize=" + NumberFormat.getInstance().format(mapSize));
+                + NumberFormat.getInstance(Locale.ROOT).format(mapByteOffset)
+                + " mapSize=" + NumberFormat.getInstance(Locale.ROOT).format(mapSize));
         try {
             // TODO: stress-test without these possibly-costly requests!
 //            System.gc();
@@ -255,9 +256,9 @@ public class GenericReplayCharSequence implements ReplayCharSequence {
         this.length = Ints.saturatedCast(count); 
         if(count>Integer.MAX_VALUE) {
             logger.warning("input stream is longer than Integer.MAX_VALUE="
-                    + NumberFormat.getInstance().format(Integer.MAX_VALUE)
+                    + NumberFormat.getInstance(Locale.ROOT).format(Integer.MAX_VALUE)
                     + " characters -- only first "
-                    + NumberFormat.getInstance().format(Integer.MAX_VALUE)
+                    + NumberFormat.getInstance(Locale.ROOT).format(Integer.MAX_VALUE)
                     + " are accessible through this GenericReplayCharSequence");
         }
 

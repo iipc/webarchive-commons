@@ -1,5 +1,7 @@
 package org.archive.util;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * Generate an HMAC key given a secret sig, key name and optional id and an expiration time
  * 
@@ -63,11 +65,11 @@ public class HMACSigner {
 		String digest = null;
 		try {
 			SecretKeySpec key = new SecretKeySpec(
-			        (keyString).getBytes("UTF-8"), algo);
+			        (keyString).getBytes(StandardCharsets.UTF_8), algo);
 			Mac mac = Mac.getInstance(algo);
 			mac.init(key);
 
-			byte[] bytes = mac.doFinal(msg.getBytes("ASCII"));
+			byte[] bytes = mac.doFinal(msg.getBytes(StandardCharsets.US_ASCII));
 
 			StringBuilder hash = new StringBuilder();
 			

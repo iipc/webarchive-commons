@@ -21,11 +21,14 @@ package org.archive.io;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -38,7 +41,7 @@ public class RepositionableInputStreamTest {
     @BeforeEach
     protected void setUp() throws Exception {
         this.testFile = new File(tempDir, this.getClass().getName());
-        PrintWriter pw = new PrintWriter(new FileOutputStream(testFile));
+        PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(testFile), UTF_8));
         for (int i = 0; i < 100; i++) {
             pw.print(LINE);
         }
@@ -63,7 +66,7 @@ public class RepositionableInputStreamTest {
         long offset = 0;
         for (int i = 0; i < 10; i++) {
             ris.read(bytes, 0, LINE.length());
-            assertEquals(LINE, new String(bytes));
+            assertEquals(LINE, new String(bytes, UTF_8));
             offset += LINE.length();
             assertEquals(offset, ris.position());
         }

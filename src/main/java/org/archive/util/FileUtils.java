@@ -32,6 +32,7 @@ import java.nio.channels.FileChannel;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -219,8 +220,8 @@ public class FileUtils {
         FileFilter prefixFilter = new FileFilter() {
                 public boolean accept(File pathname)
                 {
-                    return pathname.getName().toLowerCase().
-                        startsWith(prefix.toLowerCase());
+                    return pathname.getName().toLowerCase(Locale.ROOT).
+                        startsWith(prefix.toLowerCase(Locale.ROOT));
                 }
             };
         return dir.listFiles(prefixFilter);
@@ -283,7 +284,7 @@ public class FileUtils {
     throws IOException {
         boolean result = false;
         FileUtils.assertReadable(f);
-        if(f.getName().toLowerCase().endsWith(uncompressedExtension)) {
+        if(f.getName().toLowerCase(Locale.ROOT).endsWith(uncompressedExtension)) {
             FileInputStream fis = new FileInputStream(f);
             try {
                 byte [] b = new byte[magic.length()];
@@ -392,7 +393,6 @@ public class FileUtils {
      *         after the end of the last line returned
      * @throws IOException
      */
-    @SuppressWarnings("unchecked")
     public static LongRange pagedLines(File file, long position,
             int signedDesiredLineCount, List<String> lines, int lineEstimate)
             throws IOException {

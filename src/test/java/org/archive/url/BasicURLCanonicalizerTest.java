@@ -1,6 +1,7 @@
 package org.archive.url;
 
 import java.net.URISyntaxException;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 
@@ -204,12 +205,12 @@ public class BasicURLCanonicalizerTest {
 		String path = "/a/b/c/";
 		String[] paths = path.split("/",-1);
 		for(String p : paths) {
-			System.out.format("(%s)",p);
+			System.out.format(Locale.ROOT, "(%s)", p);
 		}
 		System.out.println();
 		paths = path.split("/");
 		for(String p : paths) {
-			System.out.format("(%s)",p);
+			System.out.format(Locale.ROOT, "(%s)", p);
 		}
 		System.out.println();
 	}

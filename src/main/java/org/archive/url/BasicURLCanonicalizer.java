@@ -6,7 +6,9 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,7 +67,7 @@ public class BasicURLCanonicalizer implements URLCanonicalizer {
 		if (ip != null) {
 			host = ip;
 		} else if (host != null) {
-			host = escapeOnce(host.toLowerCase());
+			host = escapeOnce(host.toLowerCase(Locale.ROOT));
 		}
 		url.setHost(host);
 		// now the path:
@@ -190,7 +192,7 @@ public class BasicURLCanonicalizer implements URLCanonicalizer {
 					}
 					ip[i] = octet;
 				}
-				return String.format("%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+				return String.format(Locale.ROOT, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
 			} else {
 				Matcher m2 = DECIMAL_IP.matcher(host);
 				if (m2.matches()) {
@@ -221,7 +223,7 @@ public class BasicURLCanonicalizer implements URLCanonicalizer {
 						}
 						ip[i] = octet;
 					}
-					return String.format("%d.%d.%d.%d", ip[0], ip[1], ip[2],
+					return String.format(Locale.ROOT, "%d.%d.%d.%d", ip[0], ip[1], ip[2],
 							ip[3]);
 
 				}
@@ -234,12 +236,9 @@ public class BasicURLCanonicalizer implements URLCanonicalizer {
 		return escapeOnce(unescapeRepeatedly(input));
 	}
 
-	protected static Charset _UTF8 = null;
+	protected static Charset _UTF8 = StandardCharsets.UTF_8;
 
 	protected static Charset UTF8() {
-		if (_UTF8 == null) {
-			_UTF8 = Charset.forName("UTF-8");
-		}
 		return _UTF8;
 	}
 
@@ -292,7 +291,7 @@ public class BasicURLCanonicalizer implements URLCanonicalizer {
 
 				}
 				sb.append("%");
-				String hex = Integer.toHexString(b).toUpperCase();
+				String hex = Integer.toHexString(b).toUpperCase(Locale.ROOT);
 				if (hex.length() == 1) {
 					sb.append('0');
 				}

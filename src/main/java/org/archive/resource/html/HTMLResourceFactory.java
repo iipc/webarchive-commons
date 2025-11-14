@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
 import org.archive.format.http.HttpHeaders;
@@ -40,7 +41,7 @@ public class HTMLResourceFactory implements ResourceFactory {
 		CDATALexer lex = new CDATALexer();
 
 		// guess charset based on HTTP header and sniffed content chunk
-		String charset = "UTF-8";
+		String charset = StandardCharsets.UTF_8.name();
 		is = new BufferedInputStream(is, CHARSET_GUESS_CHUNK_SIZE);
 		byte[] chunk = new byte[CHARSET_GUESS_CHUNK_SIZE];
 		is.mark(0);

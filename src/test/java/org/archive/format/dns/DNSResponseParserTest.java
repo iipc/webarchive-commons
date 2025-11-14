@@ -5,6 +5,8 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DNSResponseParserTest {
@@ -20,7 +22,7 @@ public class DNSResponseParserTest {
 	}
 	private void verifyResults(String res, String date, String d[][]) throws DNSParseException, IOException {
 		ByteArrayInputStream is = 
-			new ByteArrayInputStream(res.getBytes("UTF-8"));
+			new ByteArrayInputStream(res.getBytes(UTF_8));
 		DNSResponse response = new DNSResponse();
 		parser.parse(is, response);
 		verifyResults(response,date,d);

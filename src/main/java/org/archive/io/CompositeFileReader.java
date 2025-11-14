@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 
 /**
  * @author gojomo
@@ -34,7 +36,7 @@ public class CompositeFileReader extends InputStreamReader {
      * @throws IOException
      */
     public CompositeFileReader(List<File> filenames) throws IOException {
-        super(new CompositeFileInputStream(filenames));
+        super(new CompositeFileInputStream(filenames), UTF_8);
     }
 
 }

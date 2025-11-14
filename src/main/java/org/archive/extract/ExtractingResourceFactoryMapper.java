@@ -1,6 +1,7 @@
 package org.archive.extract;
 
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import org.archive.format.arc.ARCConstants;
@@ -68,14 +69,14 @@ public class ExtractingResourceFactoryMapper implements ResourceFactoryMapper {
 			String key, String search) {
 		String val = getChildField(m,child,key);
 		return val == null ? false : 
-			val.toLowerCase().startsWith(search.toLowerCase());
+			val.toLowerCase(Locale.ROOT).startsWith(search.toLowerCase(Locale.ROOT));
 	}
 
 	private boolean childFieldContains(MetaData m, String child,
 			String key, String search) {
 		String val = getChildField(m,child,key);
 		return val == null ? false : 
-			val.toLowerCase().contains(search.toLowerCase());
+			val.toLowerCase(Locale.ROOT).contains(search.toLowerCase(Locale.ROOT));
 	}
 
 	private boolean childFieldEquals(MetaData m, String child,
@@ -88,7 +89,7 @@ public class ExtractingResourceFactoryMapper implements ResourceFactoryMapper {
 	private String caseInsensitiveKeyScan(MetaData m, String child, String k) {
 		try {
 			if(m.has(child)) {
-				String kLC = k.toLowerCase();
+				String kLC = k.toLowerCase(Locale.ROOT);
 				JSONObject childJSObj = m.getJSONObject(child);
 				@SuppressWarnings("rawtypes")
 				Iterator i = childJSObj.keys();
@@ -96,7 +97,7 @@ public class ExtractingResourceFactoryMapper implements ResourceFactoryMapper {
 					Object kObj = i.next();
 					if(kObj instanceof String) {
 						String kString = (String) kObj;
-						if(kString.toLowerCase().equals(kLC)) {
+						if(kString.toLowerCase(Locale.ROOT).equals(kLC)) {
 							return childJSObj.getString(kString);
 						}
 					}
@@ -128,7 +129,7 @@ public class ExtractingResourceFactoryMapper implements ResourceFactoryMapper {
 	private boolean isHTMLHttpResource(MetaData m) {
 		String type = caseInsensitiveKeyScan(m,HTTP_HEADERS_LIST,
 				"Content-Type");
-		return type == null ? false : type.toLowerCase().contains("html");
+		return type == null ? false : type.toLowerCase(Locale.ROOT).contains("html");
 	}
 
 	private boolean isWARCType(MetaData envelope, WARCRecordType type) {

@@ -185,7 +185,6 @@ public class FileUtilsTest {
         verifyTailLines(nakedLastLineWindows);
     }
     
-    @SuppressWarnings("unchecked")
     private void verifyTailLines(File file) throws IOException {
         List<String> lines = org.apache.commons.io.FileUtils.readLines(file);
         verifyTailLines(file, lines, 1, 80);
@@ -263,7 +262,6 @@ public class FileUtilsTest {
     }
     
     
-    @SuppressWarnings("unchecked")
     private void verifyHeadLines(File file) throws IOException {
         List<String> lines = org.apache.commons.io.FileUtils.readLines(file);
         verifyHeadLines(file, lines, 1, 80);

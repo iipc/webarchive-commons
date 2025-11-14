@@ -1,9 +1,10 @@
 package org.archive.format.http;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public interface HttpConstants {
-	public static final Charset UTF8 = Charset.forName("UTF-8");
+	public static final Charset UTF8 = StandardCharsets.UTF_8;
 	public static final byte CR = 13;
 	public static final byte LF = 10;
 	public static final byte SP = 32;

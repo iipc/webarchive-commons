@@ -47,6 +47,8 @@ import com.google.common.io.Closeables;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import static org.archive.format.arc.ARCConstants.*;
@@ -122,11 +124,11 @@ public class ARCWriterTest {
         // Start the record with an arbitrary 14-digit date per RFC2540
         String now = ArchiveUtils.get14DigitDate();
         int recordLength = 0;
-        byte[] record = (getContent(indexStr)).getBytes();
+        byte[] record = (getContent(indexStr)).getBytes(UTF_8);
         recordLength += record.length;
         baos.write(record);
         // Add the newline between records back in
-        baos.write("\n".getBytes());
+        baos.write("\n".getBytes(UTF_8));
         recordLength += 1;
         arcWriter.write("http://www.one.net/id=" + indexStr, "text/html",
             "0.1.2.3", Long.parseLong(now), recordLength, baos);
@@ -260,7 +262,7 @@ public class ARCWriterTest {
     }
     
     public void testWriteGiantRecord() throws IOException {
-        PrintStream dummyStream = new PrintStream(new NullOutputStream());
+        PrintStream dummyStream = new PrintStream(new NullOutputStream(), false, UTF_8.name());
         ARCWriter arcWriter = 
             new ARCWriter(
                     SERIAL_NO,
@@ -305,7 +307,7 @@ public class ARCWriterTest {
     
     protected static ByteArrayInputStream getBais(String str)
     throws IOException {
-        return new ByteArrayInputStream(str.getBytes());
+        return new ByteArrayInputStream(str.getBytes(UTF_8));
     }
     
     /**
@@ -417,7 +419,7 @@ public class ARCWriterTest {
             ByteArrayInputStream bais = getBais(content+"SOME TRAILING BYTES");
             writeRecord(writer, SOME_URL, "text/html",
                 content.length(), bais);
-            writer.setEndJunk("SOME TRAILING BYTES".getBytes());
+            writer.setEndJunk("SOME TRAILING BYTES".getBytes(UTF_8));
             writeRecord(writer, SOME_URL, "text/html",
                 content.length(), getBais(content));
         } finally {
@@ -429,7 +431,7 @@ public class ARCWriterTest {
         PrintStream origErr = System.err; 
         ARCReader r = null; 
         try {
-            System.setErr(new PrintStream(os));
+            System.setErr(new PrintStream(os, false, UTF_8.name()));
             
             r = ARCReaderFactory.get(writer.getFile());
             r.setStrict(strict);
@@ -438,7 +440,7 @@ public class ARCWriterTest {
     
             // Make sure we get the warning string which complains about the
             // trailing bytes.
-            String err = os.toString();
+            String err = os.toString(UTF_8.name());
             assertTrue(err.startsWith("WARNING") &&
                 (err.indexOf("Record STARTING at") > 0), "No message " + err);
             r.close();
@@ -494,7 +496,7 @@ public class ARCWriterTest {
         PrintStream origErr = System.err; 
         ARCReader r = null; 
         try {
-            System.setErr(new PrintStream(os));
+            System.setErr(new PrintStream(os, false, UTF_8.name()));
             
             r = ARCReaderFactory.get(writer.getFile());
             r.setStrict(strict);
@@ -503,7 +505,7 @@ public class ARCWriterTest {
             
             // Make sure we get the warning string which complains about the
             // trailing bytes.
-            String err = os.toString();
+            String err = os.toString(UTF_8.name());
             assertTrue(err.startsWith("WARNING Premature EOF before end-of-record"),
                 "No message " + err);
         } finally {
@@ -518,7 +520,7 @@ public class ARCWriterTest {
         String content = getContent();
         // Make a 'weird' RIS that returns bad 'remaining' length
         // awhen remaining should be 0
-        ReplayInputStream ris = new ReplayInputStream(content.getBytes(),
+        ReplayInputStream ris = new ReplayInputStream(content.getBytes(UTF_8),
                 content.length(), null) {
             public long remaining() {
                 return (super.remaining()==0) ? -1 : super.remaining();

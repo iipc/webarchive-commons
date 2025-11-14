@@ -3,6 +3,7 @@ package org.archive.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Locale;
 
 import com.google.common.io.ByteStreams;
 
@@ -12,9 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestUtils {
 	public static void dumpMatch(String context, List<List<String>> res) {
 
-		System.out.format("Context(%s) Found (%d) matches\n", context, res.size());
+		System.out.format(Locale.ROOT, "Context(%s) Found (%d) matches\n", context, res.size());
 		for(List<String> r : res) {
-			System.out.format("Match(%s)\n", StringParse.join(r));
+			System.out.format(Locale.ROOT, "Match(%s)\n", StringParse.join(r));
 		}
 		
 	}

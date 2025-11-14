@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.Locale;
 
 import com.google.common.io.LittleEndianDataOutputStream;
 
@@ -18,10 +19,10 @@ public class ByteOpTest {
 		byte a[] = new byte[]{0,1,2,3};
 		ByteArrayInputStream bais = new ByteArrayInputStream(a);
 		int bos = ByteOp.readShort(bais);
-		System.out.format("BO.Read short(%d)\n", bos);
+		System.out.format(Locale.ROOT, "BO.Read short(%d)\n", bos);
 		DataInputStream dis = new DataInputStream(new ByteArrayInputStream(a));
 		int disv = dis.readUnsignedShort();
-		System.out.format("DI.Read short(%d)\n", disv);
+		System.out.format(Locale.ROOT, "DI.Read short(%d)\n", disv);
 		for(int i = 0; i < 256 * 256; i++) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream(2);
 			LittleEndianDataOutputStream dos = new LittleEndianDataOutputStream(baos);

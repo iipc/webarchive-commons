@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Locale;
 
 import org.archive.format.http.HttpHeader;
 import org.archive.format.http.HttpResponse;
@@ -43,7 +44,7 @@ public class WARCResource extends AbstractResource implements EOFObserver, Resou
 			String name = h.getName();
 			String value = h.getValue();
 			fields.putString(name,value);
-			if(name.toLowerCase().equals("content-length")) {
+			if(name.toLowerCase(Locale.ROOT).equals("content-length")) {
 				// TODO: catch formatexception
 				length = Long.parseLong(value);
 			}

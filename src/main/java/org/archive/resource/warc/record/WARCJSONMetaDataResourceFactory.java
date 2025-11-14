@@ -3,7 +3,6 @@ package org.archive.resource.warc.record;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 
 import org.archive.resource.MetaData;
 import org.archive.resource.Resource;
@@ -14,9 +13,9 @@ import org.archive.resource.ResourceParseException;
 import org.json.JSONException;
 import org.json.JSONTokener;
 
-public class WARCJSONMetaDataResourceFactory implements ResourceFactory, ResourceConstants {
-	private static final Charset UTF8 = Charset.forName("UTF-8");
+import static java.nio.charset.StandardCharsets.UTF_8;
 
+public class WARCJSONMetaDataResourceFactory implements ResourceFactory, ResourceConstants {
 	public WARCJSONMetaDataResourceFactory() {
 	}
 
@@ -27,7 +26,7 @@ public class WARCJSONMetaDataResourceFactory implements ResourceFactory, Resourc
 
 		MetaData md;
 		try {
-			md = new MetaData(new JSONTokener(new InputStreamReader(is, UTF8)));
+			md = new MetaData(new JSONTokener(new InputStreamReader(is, UTF_8)));
 		} catch (JSONException e) {
 			throw new ResourceParseException(e);
 		}

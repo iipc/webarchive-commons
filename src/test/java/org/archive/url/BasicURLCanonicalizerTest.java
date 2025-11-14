@@ -286,6 +286,16 @@ public class BasicURLCanonicalizerTest {
 		checkCanonicalization("http://example.org/%F0%9F%82%A1", "http://example.org/%F0%9F%82%A1");
 	}
 	
+	@Test
+	public void testHostDots() throws URISyntaxException {
+		checkCanonicalization("https://foobar.org./", "https://foobar.org/");
+		checkCanonicalization("https://.foobar.org/", "https://foobar.org/");
+		checkCanonicalization("https://foo...bar.org/", "https://foo.bar.org/");
+		checkCanonicalization("https://...foo...bar.org.../", "https://foo.bar.org/");
+		checkCanonicalization("https://localhost/path/file.txt", "https://localhost/path/file.txt");
+		checkCanonicalization("https://....../path/file.txt", "https:///path/file.txt");
+	}
+
 	private void checkCanonicalization(String in, String want) throws URISyntaxException {
 		HandyURL h = URLParser.parse(in);
 		guc.canonicalize(h);

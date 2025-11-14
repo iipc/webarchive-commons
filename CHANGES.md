@@ -1,6 +1,22 @@
 Unreleased
 ----------
 
+3.0.2 (2025-11-14)
+------------------
+
+### Fixes
+
+- Avoid relying on the default locale or charset. [#128](https://github.com/iipc/webarchive-commons/pull/128)
+- BasicURLCanonicalizer: more efficient normalization of dots in host names. [#129](https://github.com/iipc/webarchive-commons/pull/129)
+
+### Dependency upgrades
+
+* **commons-cli**: 1.10.0 → 1.11.0
+* **commons-codec**: 1.19.0 → 1.20.0
+* **commons-io**: 2.20.0 → 2.21.0
+* **junit-jupiter**: 5.13.3 → 5.14.1
+* **maven-release-plugin**: 3.1.1 → 3.2.0
+
 3.0.1 (2025-10-27)
 ------------------
 

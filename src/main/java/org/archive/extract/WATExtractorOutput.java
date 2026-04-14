@@ -152,6 +152,9 @@ public class WATExtractorOutput implements ExtractorOutput {
 		String targetURI;
 		if(warcType.equals("warcinfo")) {
 			targetURI = JSONUtils.extractSingle(md, "Envelope.WARC-Header-Metadata.WARC-Filename");
+		} else if (warcType.equals("metadata")) {
+			// WARC-Target-URI is optional in metadata records
+			targetURI = JSONUtils.extractSingle(md, "Envelope.Metadata-Header-Metadata.WARC-Target-URI");
 		} else {
 			targetURI = extractOrIO(md, "Envelope.WARC-Header-Metadata.WARC-Target-URI");
 		}

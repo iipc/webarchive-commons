@@ -75,7 +75,7 @@ public class GZIPDecoder implements GZIPConstants {
 				// !??
 				// nope. are the next 2 possibilities?
 				if((lookahead[1] == GZIP_MAGIC_ONE) &&
-					(lookahead[2] == GZIP_MAGIC_TWO)) {
+					((lookahead[2] & 0xff) == GZIP_MAGIC_TWO)) {
 					// !12
 					keep = 2;
 				} else if(lookahead[2] == GZIP_MAGIC_ONE) {

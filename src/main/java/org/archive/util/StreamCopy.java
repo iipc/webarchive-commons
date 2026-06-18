@@ -27,7 +27,7 @@ public class StreamCopy {
 	}
 
 	public static long copyLength(InputStream i, OutputStream o, long bytes) throws IOException {
-		return copyLength(i,o,DEFAULT_READ_SIZE);
+		return copyLength(i,o,bytes,DEFAULT_READ_SIZE);
 	}
 
 	public static long copyLength(InputStream i, OutputStream o, long bytes, int readSize) throws IOException {

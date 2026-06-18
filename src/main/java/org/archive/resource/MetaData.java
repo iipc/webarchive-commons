@@ -29,7 +29,7 @@ public class MetaData extends JSONObject {
 		} else {
 			topMetaData = parentMetaData.topMetaData;
 		}
-		parentMetaData.putChild(name, this);
+		if (parentMetaData != null) parentMetaData.putChild(name, this);
 	}
 
 	public MetaData(String jsonString) throws JSONException {

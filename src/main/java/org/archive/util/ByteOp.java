@@ -237,7 +237,7 @@ public class ByteOp {
 		return drawHex(b,0,b.length,bytesPerRow);
 	}
 	public static String drawHex(byte[] b, int offset, int length, int bytesPerRow) {
-		int rows = (int) Math.ceil(length / bytesPerRow);
+		int rows = (int) Math.ceil((double) length / bytesPerRow);
 		if(rows == 0) {
 			rows = 1;
 		}

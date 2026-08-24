@@ -1,6 +1,24 @@
 Unreleased
 ----------
 
+3.0.5 (2026-08-24)
+------------------
+
+### Fixes
+
+* Fix correctness bugs flagged by SpotBugs: [#161](https://github.com/iipc/webarchive-commons/pull/161)
+  * `GZIPDecoder`: Fix magic number check to handle signed bytes correctly.
+  * `MetaData`: Prevent `NullPointerException` when `parentMetaData` is null.
+  * `ByteOp`: Fix integer division truncation in `drawHex` row calculation.
+  * `StreamCopy`: Fix `copyLength` method to correctly pass the `bytes` parameter.
+
+### Dependency upgrades
+
+* **commons-codec**: 1.22.0 → 1.22.1 
+* **guava**: 33.6.0-jre → 33.7.1-jre
+* **json**: 20251224 → 20260814
+* **libidn**: 1.15 → 1.44
+
 3.0.4 (2026-06-02)
 ------------------
 

@@ -1690,8 +1690,7 @@ class URI implements Cloneable, Comparable, Serializable {
         if (allowed == null) {
             throw new IllegalArgumentException("Allowed bitset may not be null");
         }
-        byte[] rawdata = URLCodec.encodeUrl(allowed, getBytes(original, charset));
-        return new String(rawdata, StandardCharsets.US_ASCII).toCharArray();
+        return LaxURLCodec.encodeUrlString(allowed, getBytes(original, charset)).toCharArray();
     }
 
     private static byte[] getBytes(String original, String charset) {

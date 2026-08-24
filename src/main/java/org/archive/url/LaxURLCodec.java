@@ -154,6 +154,28 @@ public class LaxURLCodec extends URLCodec {
         if (pString == null) {
             return null;
         }
-        return new String(encodeUrl(safe,pString.getBytes(cs)), StandardCharsets.US_ASCII);
+        return encodeUrlString(safe,pString.getBytes(cs));
+    }
+
+    private static final char[] HEX = "0123456789ABCDEF".toCharArray();
+
+    /**
+     * Encodes an array of bytes into a URL safe form. Unsafe characters are escaped.
+     * <p>
+     * This differs from URLCodec.encodeUrl() method in that it allows '%' to be considered a safe character.
+     */
+    static String encodeUrlString(BitSet urlsafe, byte[] bytes) {
+        StringBuilder sb = new StringBuilder(bytes.length);
+        for (byte b : bytes) {
+            int c = b & 0xff;
+            if (urlsafe.get(c)) {
+                sb.append((char) c);
+            } else {
+                sb.append('%');
+                sb.append(HEX[c >>> 4]);
+                sb.append(HEX[c & 0xF]);
+            }
+        }
+        return sb.toString();
     }
 }

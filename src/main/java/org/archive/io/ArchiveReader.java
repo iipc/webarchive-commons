@@ -39,6 +39,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.apache.commons.io.IOUtils;
 import org.archive.util.MimetypeUtils;
 import org.archive.util.zip.GZIPMembersInputStream;
 
@@ -150,7 +151,7 @@ public abstract class ArchiveReader implements Iterable<ArchiveRecord>, Closeabl
         cleanupCurrentRecord();
         long posn = positionForRecord(in); 
         if(offset>=posn) {
-            in.skip(offset-posn); 
+            IOUtils.skipFully(in, offset - posn);
         } else {
             throw new UnsupportedOperationException("no reverse seeking: at "+posn+" requested "+offset); 
         }

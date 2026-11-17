@@ -1,5 +1,15 @@
-Unreleased
-----------
+3.0.6 (2026-11-17)
+------------------
+
+### Fixes
+
+* `ArchiveReader.get(offset)`: Fix seeking forward on uncompressed files after a record has been read. [#185](https://github.com/iipc/webarchive-commons/pull/185)
+
+### Dependency upgrades
+
+* **commons-codec**: 1.22.1 → 1.23.0
+* **commons-lang3**: 3.20.0 → 3.22.0
+* **guava**: 33.7.1-jre → 33.8.0-jre
 
 3.0.5 (2026-08-24)
 ------------------

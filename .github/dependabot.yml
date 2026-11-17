@@ -10,6 +10,10 @@ updates:
         update-types:
           - "patch"
           - "minor"
+    ignore:
+      # Hadoop 3.5+ requires Java 11+, but we still target Java 8
+      - dependency-name: "org.apache.hadoop:*"
+        versions: "[3.5,)"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

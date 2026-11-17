@@ -5,6 +5,11 @@ updates:
     open-pull-requests-limit: 10
     schedule:
       interval: "monthly"
+    groups:
+      minor-and-patch:
+        update-types:
+          - "patch"
+          - "minor"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

@@ -20,6 +20,7 @@ package org.archive.io.warc;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Path;
 
 import org.archive.format.warc.WARCConstants.WARCRecordType;
 import org.archive.util.anvl.ANVLRecord;
@@ -36,7 +37,9 @@ public class WARCRecordInfo {
     protected long contentLength;
     protected boolean enforceLength;
     protected String warcFilename;
+    protected Path warcPath;
     protected Long warcFileOffset;
+    protected Long recordLength;
 
     public void setType(WARCRecordType type) {
         this.type = type;
@@ -135,5 +138,27 @@ public class WARCRecordInfo {
     
     public Long getWARCFileOffset() {
         return warcFileOffset;
+    }
+
+    /**
+     * @param warcPath path of the file the record was written to, without the .open suffix
+     */
+    public void setWARCPath(Path warcPath) {
+        this.warcPath = warcPath;
+    }
+
+    public Path getWARCPath() {
+        return warcPath;
+    }
+
+    /**
+     * @param length number of bytes the record occupies in the file, compressed if the file is
+     */
+    public void setRecordLength(Long length) {
+        this.recordLength = length;
+    }
+
+    public Long getRecordLength() {
+        return recordLength;
     }
 }

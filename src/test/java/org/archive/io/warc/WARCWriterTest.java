@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -374,6 +375,14 @@ public class WARCWriterTest {
         try (WARCReader reader = WARCReaderFactory.get(writer.getFile())) {
             assertEquals(SOME_URL, reader.get(offset).getHeader().getUrl());
         }
+
+        long position = 0;
+        for (WARCRecordInfo record : records) {
+            assertEquals(writer.getFile().toPath(), record.getWARCPath());
+            assertEquals(position, (long) record.getWARCFileOffset());
+            position += record.getRecordLength();
+        }
+        assertEquals(Files.size(writer.getFile().toPath()), position);
     }
 
     @Test

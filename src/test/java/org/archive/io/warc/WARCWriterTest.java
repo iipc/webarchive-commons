@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -360,6 +361,19 @@ public class WARCWriterTest {
         }
         reader.close();
         assertEquals(totalRecords - 1, count);
+    }
+
+    @Test
+    public void testRecordLogLocations() throws IOException {
+        WARCWriter writer = createWithOneRecord("recordLogLocations", true);
+        List<WARCRecordInfo> records = new ArrayList<>();
+        writer.getTmpRecordLog().forEach(records::add);
+        writer.close();
+        long offset = records.get(records.size() - 1).getWARCFileOffset();
+        assertTrue(offset > 0, "offset should be after the warcinfo record");
+        try (WARCReader reader = WARCReaderFactory.get(writer.getFile())) {
+            assertEquals(SOME_URL, reader.get(offset).getHeader().getUrl());
+        }
     }
 
     @Test

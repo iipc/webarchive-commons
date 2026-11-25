@@ -228,6 +228,10 @@ public class WARCWriter extends WriterPoolMember {
         long totalBytes = 0;
         long startPosition;
 
+        if (this.out == null) {
+            // ensure the warcinfo record is written before getting startPosition
+            createFile();
+        }
         startPosition = getPosition();
         try {
             preWriteRecordTasks();

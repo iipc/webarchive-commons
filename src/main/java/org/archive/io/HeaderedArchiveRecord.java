@@ -289,7 +289,7 @@ public class HeaderedArchiveRecord extends ArchiveRecord {
             // the underlying ArchiveRecord stream allready did this
             // incrementPosition();
         } else {
-            c = super.read();
+            c = ((ArchiveRecord)this.in).read();
         }
         return c;
     }
@@ -314,7 +314,7 @@ public class HeaderedArchiveRecord extends ArchiveRecord {
             // the underlying ArchiveRecord stream allready did this
             //incrementPosition();
         } else {
-            read = super.read(b, offset, length);
+            read = ((ArchiveRecord)this.in).read(b, offset, length);
         }
         return read;
     }

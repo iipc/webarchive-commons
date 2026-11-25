@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.archive.format.http.HttpHeader;
 import org.archive.io.arc.ARCRecord;
 import org.archive.io.warc.WARCRecord;
@@ -76,10 +77,7 @@ public class HeaderedArchiveRecordTest {
 
         har.skipHttpHeader();
 
-        byte[] b = new byte[BODY.length()];
-        har.read(b);
-        String bodyRead = new String(b, UTF_8);
-        assertEquals(BODY, bodyRead);
+        assertEquals(BODY, new String(IOUtils.toByteArray(har), UTF_8));
         assertHeaderCorrectlyParsed(har.getContentHeaders());
         assertEquals(har.getHeader().getUrl(), url,
                 "failed to retrieve Url from metadata");

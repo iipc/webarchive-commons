@@ -1,3 +1,16 @@
+3.1.0 (2026-11-26)
+------------------
+
+### New features
+
+* `WARCWriter`: Record each written record's file path and length in `WARCRecordInfo`, so it can be located without resolving the filename or using the next record's offset. [#186](https://github.com/iipc/webarchive-commons/pull/186)
+
+### Fixes
+
+* `WARCWriter`: Fix the logged offset of the first record in a new file, which was reported as 0 (the warcinfo record's offset). [#186](https://github.com/iipc/webarchive-commons/pull/186)
+* `HeaderedArchiveRecord`: Fix double counting the position when reading, which caused `IndexOutOfBoundsException` near the end of the record. [#187](https://github.com/iipc/webarchive-commons/pull/187)
+* `WriterPoolMember`: Flush uncompressed records after writing them, so readers of a file still being written don't see truncated records. [#188](https://github.com/iipc/webarchive-commons/pull/188)
+
 3.0.6 (2026-11-17)
 ------------------
 

@@ -228,6 +228,10 @@ public class WARCWriter extends WriterPoolMember {
         long totalBytes = 0;
         long startPosition;
 
+        if (this.out == null) {
+            // ensure the warcinfo record is written before getting startPosition
+            createFile();
+        }
         startPosition = getPosition();
         try {
             preWriteRecordTasks();
@@ -252,14 +256,17 @@ public class WARCWriter extends WriterPoolMember {
             write(CRLF_BYTES);
             write(CRLF_BYTES);
             totalBytes += 2 * CRLF_BYTES.length;
-            
-            recordInfo.setWARCFilename(getFilenameWithoutOccupiedSuffix());
-            recordInfo.setWARCFileOffset(startPosition);
-            tmpRecordLog.add(recordInfo);
         } finally {
             postWriteRecordTasks();
             tally(recordInfo.getType(), contentBytes, totalBytes, getPosition() - startPosition);
         }
+
+        String filename = getFilenameWithoutOccupiedSuffix();
+        recordInfo.setWARCFilename(filename);
+        recordInfo.setWARCPath(getFile().toPath().resolveSibling(filename));
+        recordInfo.setWARCFileOffset(startPosition);
+        recordInfo.setRecordLength(getPosition() - startPosition);
+        tmpRecordLog.add(recordInfo);
     }
 
     public String getFilenameWithoutOccupiedSuffix() {

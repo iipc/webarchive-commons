@@ -341,7 +341,7 @@ public abstract class WriterPoolMember {
 
     /**
      * Post file write tasks.
-     * If compressed, finishes up compression and flushes stream so any
+     * Finishes up compression if compressed, and flushes stream so any
      * subsequent checks get good reading.
      *
      * @exception IOException
@@ -354,6 +354,8 @@ public abstract class WriterPoolMember {
             o.flush();
             o.end();
             this.out = o.getWrappedStream();
+        } else {
+            this.out.flush();
         }
     }
     
